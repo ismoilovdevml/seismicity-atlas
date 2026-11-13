@@ -1,0 +1,23 @@
+{
+ "regions": [
+  {
+   "id": "fixture-ca",
+   "name": "Fixture region (synthetic)",
+   "bbox": [
+    -124.0,
+    33.0,
+    -115.0,
+    40.0
+   ],
+   "catalogue": "Synthetic test catalogue",
+   "licence": "CC0 (test fixture)",
+   "period": [
+    "2000-01-01",
+    "2020-12-31"
+   ],
+   "mc_typical": 2.5,
+   "cells": "regional/fixture-ca/cells.geojson",
+   "cell_detail_dir": "regional/fixture-ca/cells/"
+  }
+ ]
+}
