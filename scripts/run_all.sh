@@ -13,6 +13,7 @@ $PY -I scripts/validate.py
 $PY -I scripts/val_chile.py      # Chile b sensitivity -> results/val_chile.json
 $PY -I scripts/val_literature.py # published b / beta / Mc comparison -> results/val_literature.json
 $PY -I scripts/sequences.py
+$PY -I scripts/val_bt.py         # retrospective b before/after each sequence -> sequences.json `bt`
 $PY -I scripts/site_layers.py
 $PY -I scripts/figures.py
 $PY -I -m pytest -q tests

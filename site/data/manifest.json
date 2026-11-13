@@ -1,7 +1,7 @@
 {
  "name": "Global Seismicity Atlas",
  "version": "0.1.0",
- "generated_utc": "2026-11-13T06:22:17Z",
+ "generated_utc": "2026-11-13T10:47:48Z",
  "data_cutoff_utc": "2026-11-13",
  "coverage": {
   "iscgem": [
@@ -124,12 +124,12 @@
    "sha256": "10bb8bfe413eacbaf76c030ac175ade10fe1f853f296bdb443f868437418d7fc"
   },
   "global.json": {
-   "bytes": 8999,
-   "sha256": "a2c9cc2da033fea519c9a5a2982c08121382fd0f3199fc82b820c1caa36ecb1c"
+   "bytes": 16810,
+   "sha256": "dfb2a3b2ad228414348a9f0bec93c2d1bbf2321d193326efec62724b089c4ff5"
   },
   "sequences.json": {
-   "bytes": 30985,
-   "sha256": "c555b289d262a25762f1c9ba3d1412b22b8889f7b9e3f035756ab065f3f67e1b"
+   "bytes": 56234,
+   "sha256": "0ff831d8462691725026fa0178ac9782b5d4b93f7e38bf7aa7d082dc582ffca0"
   },
   "cells.geojson": {
    "bytes": 1488054,

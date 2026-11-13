@@ -125,3 +125,28 @@ day bins, for the decay chart).
 
 Chart-ready global series: `michael_periods`, `michael_pooled`, `b_cutoff_2004_2021`, `plate_boundary_types`,
 `slab_age_groups`, `validation_table`, `floors`. Field names follow `results/validation.json`.
+
+### `sequences.json`: retrospective b before and after (`bt`, added by `scripts/val_bt.py`)
+
+Each sequence has a `bt` object, and the file has a top-level `bt_method` string. These values are a
+**retrospective description** of the catalogue. They are not a forecast and must not be presented as one.
+
+- `catalogue`: always `"ISC-GEM Mw"`.
+- `mainshock_in_iscgem`: whether the mainshock was found in ISC-GEM (within 60 s and 100 km).
+- `mag_main_iscgem`: the ISC-GEM Mw of the mainshock, used in Mc(t).
+- Windows `pre_5y`, `pre_1y`, `post_0_30d`, `post_30_365d` cover events inside the sequence circle (`radius_km`),
+  at all depths. Each window holds:
+
+| Property | Meaning |
+|---|---|
+| `n`, `n_b` | events in the window; events above their threshold |
+| `b`, `b_lo`, `b_hi` | Aki-Utsu b with per-event threshold and bootstrap 95 % interval; `null` unless `q` is `A` or `B` |
+| `b_raw`, `b_lo_raw`, `b_hi_raw` | the same, also for masked windows |
+| `q` | `A` / `B` / `C` / `insufficient` as for cells; `not covered` when the window is outside ISC-GEM 1976–2021 |
+| `mc_window` | MAXC + 0.2 of the window sample |
+| `bpos`, `bpos_lo`, `bpos_hi`, `n_bpos` | b-positive ± 1.96 σ, present only with ≥ 50 positive differences |
+
+The threshold of each event is the largest of three values:
+- the atlas floor for its period and depth class;
+- `mc_window`;
+- after the mainshock only, Mc(t) = Mm − 4.5 − 0.75 log₁₀(t / day).
