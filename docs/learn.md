@@ -5,14 +5,15 @@ structure: one sentence, a simple explanation with an everyday picture, a **real
 at run time**, an interactive diagram, technical details, further reading and previous/next navigation.
 A concept page is `#v=learn&t=<concept-id>`; the index is `#v=learn`.
 
-Phase 1 (this document's first version) adds the view, the content in four languages and the `infoButton`
-helper. Phase 2 places the (i) buttons in the map, panel, legend and pages, using the table at the end.
+The (i) buttons that open these pages from the rest of the site are listed in the table at the end.
 
 ## Files
 
 | Path | What it holds |
 |---|---|
-| `site/js/info.js` | `infoButton(conceptId, label)`: the (i) link, `#v=learn&t=<id>`, accessible name "What is {label}? Open the explanation" |
+| `site/js/info.js` | `infoButton(id)`, `withInfo(el, id)`, `infoKey(items)`: the (i) buttons, accessible name "About <concept>" |
+| `site/js/info-rail.js` | places the buttons in the static map controls and the disclaimer |
+| `tests/e2e/test_info.py` | browser tests of every button |
 | `site/js/learn/registry.js` | `CONCEPTS` (id, group, diagram) in reading order and `GROUPS` |
 | `site/js/learn/view.js` | `renderLearn(root, {topic, back})`: index and concept pages, language fallback, placeholder filling |
 | `site/js/learn/examples.js` | one loader per concept: `{vars, map, data}` read from `site/data` |
@@ -25,7 +26,7 @@ helper. Phase 2 places the (i) buttons in the map, panel, legend and pages, usin
 | `site/js/i18n/<lang>.js`, block `// learn` | interface strings of the Learn view |
 | `tests/e2e/test_learn.py` | browser tests |
 
-Shared-file hooks are deliberately small: `app.js` registers the `learn` view, the `t` hash parameter, a
+Shared-file hooks of the Learn view itself are small: `app.js` registers the `learn` view, the `t` hash parameter, a
 remembered return hash and a dynamic `import('./learn/view.js')`; `index.html` adds one nav link, one section and
 one stylesheet link. Nothing under `site/js/learn/` is fetched on a first visit to the map (covered by a test).
 
@@ -74,7 +75,7 @@ for Learn. All DOIs except the CORSSA one (DataCite, taken from `docs/prior-work
 ## Adding a concept
 
 1. Add `{ id, group, diagram }` to `CONCEPTS` in `registry.js`, at the place it should appear in the reading order.
-   Ids are stable kebab-case; they appear in URLs and in phase-2 buttons, so never rename one.
+   Ids are stable kebab-case; they appear in URLs and in the (i) buttons, so never rename one.
 2. Add a loader to `EXAMPLES` in `examples.js` returning `{ vars, map, data }`. Choose the example by a rule, format
    every number with `fmt.js`, and build the map link with `mapHash()` (no language: the current one is kept).
 3. Write `diagrams/<name>.js` (or reuse one) with `figure()`, `frame()`, `slider()`, `toggle()` and, for motion,
@@ -87,7 +88,9 @@ for Learn. All DOIs except the CORSSA one (DataCite, taken from `docs/prior-work
 5. Add references to `refs.js` (only works cited in `docs/`; check the DOI).
 6. Translate into `uz`, `ru`, `es` with the same keys and placeholders, and add the id to each `_index.js`. A language
    whose `_index.js` lacks the id shows the English page with a "translation pending" note, never an empty page.
-7. Add the id to `CONCEPTS` in `tests/e2e/test_learn.py` and run the tests.
+7. Add `learn.c.<id>` (the title, used in the buttons' "About …" name) to the `// learn` block of every i18n file.
+8. Add the id to `CONCEPTS` in `tests/e2e/test_learn.py`, place buttons where the concept is shown (update the
+   table below and `VIEWS` in `tests/e2e/test_info.py`) and run the tests.
 
 ## Languages
 
@@ -107,102 +110,165 @@ pending note, diagram and map link present), the diagram controls (including key
 the info button, "Back to where I was", "Show this on the map", language persistence across links and reloads, an
 unknown id, and that the map's first load does not fetch Learn code.
 
-## Phase 2: where the (i) buttons go
+## Info buttons: where each (i) points
 
-Use `infoButton(id, label)` from `site/js/info.js`, placed right after the visible label; `label` is the same
-translated text the element already shows. The button is a link, so it works from any view; the Learn page offers
-"Back to where I was", which returns to the exact previous hash (layer, depth, cell, map position, comparison).
+`infoButton(id)` (`site/js/info.js`) is a `<button>` with the accessible name "About <concept title>" in the current
+language (`learn.about` and `learn.c.<id>` in the `// learn` block of each i18n file), a 24 × 24 px target and a
+16 px icon. Clicking it (or Enter/Space) sets `#v=learn&t=<id>`; `app.js` remembers the previous hash, and the Learn
+page's "Back to where I was" restores it exactly (view, layer, depth, cell, comparison, map position, sequence).
+Buttons in the static map controls are placed by `site/js/info-rail.js` and relabelled on a language change.
 
-### Map controls (`index.html`, `app.js`)
+**Placement rules** (checked against the ui-ux-pro-max guidance: consistent position of help, web target ≥ 24 px,
+≥ 8 px from the next target, no clutter):
 
-| UI element | Where (file, selector or i18n key) | Concept id |
+- the button sits right after the label or heading it explains, never next to each number;
+- at most one button per concept per block (control group, legend, panel section, card, notice). A concept can
+  appear in two blocks of one view, for example b in the panel summary and again on the "b against cutoff" chart;
+- list pages with many cards (Sequences, Ongoing) get one key strip of terms above the cards (`infoKey`), not a
+  button on every card;
+- tooltips get none (hover-only, too small); the cell panel that a click opens carries the same terms.
+
+### Counts per view (desktop, measured)
+
+| View | Buttons |
+|---|---|
+| Disclaimer strip (every view) | 1 |
+| Map controls (rail) | 10 |
+| Legend (b layer with plates and events on; regional block when a region is chosen) | 1 title + 1 per overlay or region block (3 with plates and events) |
+| Cell panel (global cell, with charts) | 12 |
+| Comparison verdict | 2 (3 when the cells come from different catalogues) |
+| Sequences | 3 (key strip) |
+| Ongoing (Sequence Monitor) | 7 (notice + key strip of 6) |
+| Depth 3D | 4 |
+| Validation | 10 |
+| About | 2 |
+
+### Map controls (`index.html`, placed by `info-rail.js`)
+
+| UI element | Selector / i18n key | Concept id |
 |---|---|---|
-| Layer chip "b-value" | `#chips [data-layer=b]`, `chip.b` | `gutenberg-richter-b-value` |
-| Layer chip "Quality" | `#chips [data-layer=q]`, `chip.q` | `quality-codes` |
-| Layer chip "Mc" | `#chips [data-layer=mc]`, `chip.mc` | `magnitude-of-completeness` |
-| Layer chip "Agreement" | `#chips [data-layer=cc]`, `chip.cc` | `catalogue-consistency` |
-| Layer chip "M6+ rate" | `#chips [data-layer=rate]`, `chip.rate` | `rate-m6` |
-| Depth chip / Depth group | `#chip-depth`, `rail.depth` legend of `#depth-seg` | `depth-and-slabs` |
-| Layer list "b-value with 95 % interval" | `#layer-list input[value=b]`, `ll.b` | `gutenberg-richter-b-value` |
-| Layer list hint "Quality-gated" | `ll.bHint` | `quality-codes` |
-| Layer list "Estimate quality" | `ll.q` | `quality-codes` |
-| Layer list "Completeness Mc" | `ll.mc` | `magnitude-of-completeness` |
-| Layer list "Catalogue disagreement" | `ll.cc` | `catalogue-consistency` |
-| Layer list "Mw ≥ 6 rate" | `ll.rate` | `rate-m6` |
-| Regional catalogues group | `#reg-group` legend, `reg.group` | `regional-catalogues` |
-| Overlay "Plate boundaries (PB2002)" | `#chk-plates` label, `rail.plates` | `plate-boundary-classes` |
-| Overlay "Events M ≥ 6 / M ≥ 5" | `#lbl-m6`, `#lbl-m5` | `magnitude-types` |
-| "Statistics window" and its hint | `rail.window`, `rail.windowHint` | `direct-vs-proxy-mw` |
 | Disclaimer strip | `#disclaimer`, `disc.strong` | `not-a-forecast` |
+| Depth group title | `#depth-seg` legend, `rail.depth` | `depth-and-slabs` |
+| Layer "b-value with 95 % interval" | `#layer-list` row `b`, `ll.b` | `gutenberg-richter-b-value` |
+| Layer "Estimate quality" | row `q`, `ll.q` | `quality-codes` |
+| Layer "Completeness Mc" | row `mc`, `ll.mc` | `magnitude-of-completeness` |
+| Layer "Catalogue disagreement" | row `cc`, `ll.cc` | `catalogue-consistency` |
+| Layer "Mw ≥ 6 rate" | row `rate`, `ll.rate` | `rate-m6` |
+| Layer "No cell layer" | row `none` | (none) |
+| Regional catalogues group | `#reg-group` legend, `reg.group` | `regional-catalogues` |
+| Overlay "Plate boundaries (PB2002)" | `#chk-plates` row, `rail.plates` | `plate-boundary-classes` |
+| Overlay "Events M ≥ 6" | `#chk-events` row, `#lbl-m6` | `magnitude-types` |
+| "Statistics window" | `.stat-window .group-title`, `rail.window` | `direct-vs-proxy-mw` |
+| Phone layer chips | `#chips` | (none: chips are buttons; the same rail opens with "More") |
+| Base map group (relief, 3D terrain) | `#bm-group` | (none, see below) |
 
-### Legend (`layers.js` / `map.js`, keys `layer.*`, `lg.*`)
-
-| UI element | i18n key | Concept id |
-|---|---|---|
-| b legend title | `layer.b.title` | `gutenberg-richter-b-value` |
-| b legend unit line ("events within {r} km of the cell centre") | `layer.b.unit` | `h3-cells-and-sample-radius` |
-| Quality A / B / C rows, "Insufficient" row | `layer.b.qA`, `layer.b.qB`, `layer.b.qC`, `layer.insufficient`, `layer.q.*` | `quality-codes` |
-| Quality legend unit ("bootstrap 95 % interval") | `layer.q.unit` | `confidence-interval-bootstrap` |
-| Mc legend titles | `layer.mc.title.ig`, `.cc`, `.cc0` | `magnitude-of-completeness` |
-| Mc ComCat note ("not on the same scale as ISC-GEM") | `layer.mc.noteCc` | `magnitude-types` |
-| Agreement legend, ΔMw, epicentre difference | `layer.cc.title`, `layer.dmw.title`, `layer.dloc.title` | `catalogue-consistency` |
-| Rate legend title and note | `layer.rate.title`, `layer.rate.note` | `rate-m6` (note: `not-a-forecast`) |
-| Plate boundary legend line | `lg.plates` | `plate-boundary-classes` |
-| Earthquakes legend ("Earthquakes by magnitude") | `lg.quakes` | `magnitude-types` |
-| Regional legend block | regional name / licence line | `regional-catalogues` |
-
-### Cell panel (`panel.js`, keys `panel.*`, `fmd.*`, `mct.*`, `bc.*`, `agree.*`, `yr.*`)
+### Legend (`map.js` `renderLegend`)
 
 | UI element | i18n key | Concept id |
 |---|---|---|
-| Panel meta "{pb}, {r} km sample radius, {depth}" | `panel.meta` | `h3-cells-and-sample-radius` (plate class part: `plate-boundary-classes`) |
-| Big "b-value" label | `panel.bvalue` | `gutenberg-richter-b-value` |
-| "95 % CI lo – hi" and the interval scale bar | `panel.ci` | `confidence-interval-bootstrap` |
-| Quality pill (A/B/C/insufficient) | `qPill()` in `panel.js` | `quality-codes` |
-| "Cutoff-unstable" note | `panel.unstable` | `quality-codes` |
-| "Why no b" text (C or too few) | `panel.whyC`, `panel.whyFew`, `panel.noB.*` | `quality-codes` |
-| Tile "Mc, ISC-GEM" / "Mc, ComCat 2010+" | `panel.mcIg`, `panel.mcCc` | `magnitude-of-completeness` |
-| Tile "Events above Mc" | `panel.nAboveMc` | `magnitude-of-completeness` |
-| "b-positive" | `panel.bpos` | `b-positive` |
-| "Declustered (GK)" | `panel.bdecl` | `declustering` |
-| Agreement flag and list | `panel.flag.*`, `agree.h` | `catalogue-consistency` |
-| FMD section and chart | `fmd.h`, `fmd.title` | `frequency-magnitude-distribution` |
-| "The two catalogues use different magnitude scales." | `fmd.scales` | `magnitude-types` |
-| Completeness over time | `mct.h` | `magnitude-of-completeness` |
-| b against magnitude cutoff | `bc.h` | `gutenberg-richter-b-value` |
-| Yearly counts section | `yr.h` | `rate-m6` |
-| Regional cell source block | `regionalSource()` | `regional-catalogues` |
+| Title, b layer | `layer.b.title` | `gutenberg-richter-b-value` |
+| Title, quality layer | `layer.q.title` | `quality-codes` |
+| Title, Mc layer (all variants) | `layer.mc.title.*` | `magnitude-of-completeness` |
+| Title, agreement layer (all variants) | `layer.cc.title`, `layer.dmw.title`, `layer.dloc.title` | `catalogue-consistency` |
+| Title, rate layer | `layer.rate.title` | `rate-m6` |
+| Plate-boundary line | `lg.plates` | `plate-boundary-classes` |
+| "Earthquakes by magnitude" | `lg.quakes` | `magnitude-types` |
+| Regional block heading | `reg.legendHead` | `regional-catalogues` |
 
-### Comparison view (`compare.js`, keys `cmp.*`)
+### Cell panel (`panel.js`)
 
 | UI element | i18n key | Concept id |
 |---|---|---|
-| Chart title "b with 95 % interval" | `cmp.chartTitle` | `confidence-interval-bootstrap` |
-| Verdict heading (overlap / do not overlap / no comparison) | `cmp.overlapHead`, `cmp.separateHead`, `cmp.missingHead` | `confidence-interval-bootstrap` |
-| "These two cells share events" note | `cmp.shared` | `h3-cells-and-sample-radius` |
-| "Different catalogues" note | `cmp.mixedCatalogues` | `regional-catalogues` |
+| Meta line (sample radius), global cell | `panel.meta` | `h3-cells-and-sample-radius` |
+| Meta line, regional cell | `reg.panelMeta` | `regional-catalogues` |
+| "b-value" label | `panel.bvalue` | `gutenberg-richter-b-value` |
+| "95 % CI lo – hi" | `panel.ci` | `confidence-interval-bootstrap` |
+| Quality pill (A/B) | `qPill()` | `quality-codes` |
+| "No b-value shown" heading (C, insufficient) | `panel.noB.*` | `quality-codes` |
+| Tile "Mc, ISC-GEM" (regional: "Mc") | `panel.mcIg` | `magnitude-of-completeness` |
+| Tile "b-positive" | `panel.bpos` | `b-positive` |
+| Tile "Declustered (GK)" | `panel.bdecl` | `declustering` |
+| Section "Frequency-magnitude distribution" | `fmd.h` | `frequency-magnitude-distribution` |
+| Section "Completeness over time" | `mct.h` | `magnitude-of-completeness` |
+| Section "b against magnitude cutoff" | `bc.h` | `gutenberg-richter-b-value` |
+| Section "Yearly counts" (global cells) | `yr.h` | `rate-m6` |
+| Section "Catalogue agreement" | `agree.h` | `catalogue-consistency` |
+| Section "Source" (regional cells) | `reg.sourceH` | `regional-catalogues` |
 
-### Tooltip (`map.js`, keys `tt.*`)
-
-Tooltips are hover-only and short; no buttons there. Their content is covered by the panel buttons above.
-
-### Pages (`pages.js`)
+### Comparison view (`compare.js`)
 
 | UI element | i18n key | Concept id |
 |---|---|---|
-| Sequences page title / lede | `seq.h1`, `seq.lede` | `omori-utsu` |
-| Per-sequence p, c, K values and "c not resolved" | `seq.cUnres`, `seq.notResolved`, `om.title` | `omori-utsu` |
-| Sequence quality badge | sequence card badge | `omori-utsu` |
-| "Second large event in window" | `seq.contaminated` | `aftershock-productivity-bath` |
-| Sequence Monitor (upcoming, `feat/monitor`): productivity, expected aftershock numbers, Båth | – | `aftershock-productivity-bath` |
-| Validation "How a cell value is made" steps | `step.cells`, `step.cat`, `step.mc`, `step.b`, `step.gate`, `step.robust` | `h3-cells-and-sample-radius`, `direct-vs-proxy-mw`, `magnitude-of-completeness`, `confidence-interval-bootstrap`, `quality-codes`, `b-positive` |
-| Validation "b-value by plate-boundary class" | `val.plateH` | `plate-boundary-classes` |
-| Validation "Subduction b, young against old slabs" | `slab.title` | `depth-and-slabs` |
-| Validation "Global completeness floors" | `val.floorsH` | `magnitude-of-completeness` |
-| Validation "Omori-Utsu fitting, synthetic check" | `val.omoriH` | `omori-utsu` |
-| Validation "Limitations" item 7 | `lim.7` | `not-a-forecast` |
-| About page hazard notice | `about.hazard` | `not-a-forecast` |
-| 3D depth view (upcoming, `feat/terrain3d`) | its title | `depth-and-slabs` |
+| Verdict "The 95 % intervals overlap" / "do not overlap" | `cmp.overlapHead`, `cmp.separateHead` | `confidence-interval-bootstrap` |
+| Verdict "No comparison possible" | `cmp.missingHead` | `quality-codes` |
+| "These two cells share events" (when shown) | `cmp.shared` | `h3-cells-and-sample-radius` |
+| "Different catalogues" (when shown) | `cmp.mixedCatalogues` | `regional-catalogues` |
+
+### Sequences (`pages.js`, key strip under the summary)
+
+| Term | Concept id |
+|---|---|
+| p, c, K (and the fit quality badge) | `omori-utsu` |
+| Mcat | `magnitude-of-completeness` |
+| "Second large event in window" | `aftershock-productivity-bath` |
+
+### Ongoing / Sequence Monitor (`monitor.js`)
+
+| UI element | i18n key | Concept id |
+|---|---|---|
+| "Not a forecast" notice | `mon.noticeStrong` | `not-a-forecast` |
+| Key: p, c, K | – | `omori-utsu` |
+| Key: b | – | `gutenberg-richter-b-value` |
+| Key: Quality (Omori and b badges) | `col.quality` | `quality-codes` |
+| Key: b-positive | `mon.bpos` | `b-positive` |
+| Key: Productivity, Largest aftershock (Båth ΔM) | `mon.prod`, `mon.largest` | `aftershock-productivity-bath` |
+| Key: Above completeness (Mcat) | `mon.nMcat` | `magnitude-of-completeness` |
+
+### Depth 3D (`depth3d.js`)
+
+| UI element | i18n key | Concept id |
+|---|---|---|
+| "Slab2 slab surface" control | `d3.slab` | `depth-and-slabs` |
+| "Events by depth" card (depth classes, 70 km split) | `d3.binsH` | `depth-and-slabs` |
+| "b-value, shallow cells" card | `d3.bH.sh` | `gutenberg-richter-b-value` |
+| Cell counts by quality under it | `d3.bSub` | `quality-codes` |
+| "Depth exaggeration" | `d3.ex` | (none: a display setting, explained by its own hint) |
+
+### Validation (`pages.js`)
+
+| UI element | i18n key | Concept id |
+|---|---|---|
+| "b-value by plate-boundary class" | `val.plateH` | `plate-boundary-classes` |
+| Step "Cells and circles" | `step.cells` | `h3-cells-and-sample-radius` |
+| Step "Catalogue for b" | `step.cat` | `direct-vs-proxy-mw` |
+| Step "Completeness, Mc" | `step.mc` | `magnitude-of-completeness` |
+| Step "b and its interval" | `step.b` | `confidence-interval-bootstrap` |
+| Step "The quality gate" | `step.gate` | `quality-codes` |
+| Step "Robustness checks" | `step.robust` | `b-positive` |
+| "Global b in the atlas setting" | `val.globalH` | `gutenberg-richter-b-value` |
+| "Omori-Utsu fitting, synthetic check" | `val.omoriH` | `omori-utsu` |
+| "Limitations" | `val.limH` | `not-a-forecast` |
+
+### About (`pages.js`)
+
+| UI element | i18n key | Concept id |
+|---|---|---|
+| Notice (not a forecast, hazard link) | `about.notice`, `about.hazard` | `not-a-forecast` |
+| "Sources" | `about.sourcesH` | `catalogue-consistency` |
+
+### Not covered, on purpose
+
+- **Base map (relief, lakes, rivers, 3D terrain) and depth exaggeration.** These are display settings, not
+  catalogue quantities; no existing concept explains them and a new concept was not clearly needed. The relief is
+  documented in `docs/basemap.md` and on the About page; the Depth 3D view links `depth-and-slabs` from its slab
+  control and depth card.
+- **Map tooltip.** Hover-only and transient; the panel opened by the same click carries the buttons.
+- **Phone layer chips.** They are buttons and cannot contain another button; "More" opens the rail with the same
+  buttons.
+
+The table is enforced by `tests/e2e/test_info.py`: per view, the set of concepts with a visible button must match,
+no concept repeats inside one block, every button opens its concept and "Back to where I was" returns to the same
+URL state; at 360 px every button is at least 24 px, inside the screen, on top and not overlapping another control.
 
 ## Known limits
 

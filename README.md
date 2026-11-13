@@ -73,6 +73,8 @@ Full tables and the reasons for each verdict: [docs/validation.md](docs/validati
 - [docs/data.md](docs/data.md): sources, magnitude types, depth, duplicates, coverage
 - [docs/data-schema.md](docs/data-schema.md): the data contract for the website (`site/data/`)
 - [docs/monitor.md](docs/monitor.md): the Sequence Monitor (ongoing sequences), its validation and limits
+- [docs/learn.md](docs/learn.md): the Learn pages (18 concepts, four languages), how to add a concept, and where each
+  (i) button points
 - [docs/prior-work.md](docs/prior-work.md): existing tools and literature, and the gap this atlas fills
 - [docs/ai-in-seismology.md](docs/ai-in-seismology.md): ML catalogues and LLM agents, and what they can and
   cannot add here
@@ -138,6 +140,12 @@ cd site && python3 -m http.server 8000   # then open http://localhost:8000/
   Descriptive only, not a forecast. See below.
 - **Validation:** every test against published values, including the mismatch and the untestable rows.
 - **About & data:** sources, licences, data cut-off, how to cite, downloads.
+- **Learn:** one page per concept behind the numbers (magnitude types, Mc, the FMD, b and its interval, quality
+  codes, b-positive, declustering, Omori-Utsu, Båth's law, H3 cells, plate classes, depth and slabs, rates,
+  catalogue consistency, regional catalogues, why this is not a forecast), each with a plain explanation, a real
+  example read from `site/data`, an interactive diagram, technical details and references, in all four languages.
+  Small (i) buttons next to the labels of the map, legend, cell panel, comparison, Sequences, Ongoing, Depth 3D,
+  Validation and About open the matching page; "Back to where I was" returns to the same view. Loaded on demand.
 - Vendored: MapLibre GL JS 5.24.0 (BSD-3-Clause), Inter and IBM Plex Mono (SIL OFL 1.1). No CDN, no third-party
   tiles. Design notes: [docs/ux-notes.md](docs/ux-notes.md); open issues: [docs/known-issues.md](docs/known-issues.md).
 - Browser tests: `tests/e2e/` (Playwright for Python; serves `site/` locally). Run
