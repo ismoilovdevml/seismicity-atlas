@@ -1,6 +1,6 @@
 {
  "note": "Regional layers use each network's own local magnitude and are never merged with the global cells. Not a forecast and not a hazard map.",
- "generated_utc": "2026-11-13T10:59:32Z",
+ "generated_utc": "2026-11-13T11:12:11Z",
  "regions": [
   {
    "id": "italy",
@@ -15,6 +15,7 @@
    "licence": "CC BY 4.0",
    "attribution": "ISIDe Working Group (2007), INGV, doi:10.13127/ISIDE",
    "source_url": "https://terremoti.ingv.it/en/iside",
+   "caveat": "About 10,000 small events (median 1.3, mostly central Italy) carry only a duration magnitude Md and are excluded, so counts below Mc are slightly low.",
    "period": [
     "2010-01-01",
     "2025-12-31"
@@ -46,9 +47,9 @@
    "quality_counts": {
     "sh": {
      "insufficient": 255,
-     "A": 90,
-     "B": 55,
-     "C": 8
+     "A": 88,
+     "B": 56,
+     "C": 9
     },
     "dp": {
      "insufficient": 400,
@@ -64,7 +65,7 @@
    "cells": "regional/italy/cells.geojson",
    "cell_detail_dir": "regional/italy/cells/",
    "summary": "regional/italy/summary.json",
-   "bytes": 654673
+   "bytes": 654443
   },
   {
    "id": "nz",
@@ -79,6 +80,7 @@
    "licence": "CC BY 3.0 NZ",
    "attribution": "GeoNet Aotearoa New Zealand Earthquake Catalogue, doi:10.21420/0S8P-TZ38. We acknowledge the New Zealand GeoNet programme and its sponsors NHC, Earth Sciences NZ, LINZ, NEMA and MBIE for providing data used in this study.",
    "source_url": "https://www.geonet.org.nz/data/access/FDSN",
+   "caveat": "Offshore areas and the central Alpine Fault have too few events for a cell Mc. The region-wide b at fixed thresholds mixes in offshore areas that are not complete.",
    "period": [
     "2013-01-01",
     "2025-12-31"
@@ -101,20 +103,20 @@
    "magtype": "GeoNet preferred magnitude M / MLv (SeisComP era; M equals MLv for small events)",
    "h3_res": 4,
    "radius_km": 30.0,
-   "n_events": 234362,
+   "n_events": 234331,
    "n_cells": 387,
    "quality_counts": {
     "sh": {
      "insufficient": 227,
-     "A": 108,
-     "B": 36,
+     "A": 110,
+     "B": 34,
      "C": 16
     },
     "dp": {
      "insufficient": 316,
      "A": 29,
-     "B": 23,
-     "C": 19
+     "B": 22,
+     "C": 20
     }
    },
    "depth_classes": [
@@ -124,7 +126,69 @@
    "cells": "regional/nz/cells.geojson",
    "cell_detail_dir": "regional/nz/cells/",
    "summary": "regional/nz/summary.json",
-   "bytes": 806882
+   "bytes": 805428
+  },
+  {
+   "id": "socal",
+   "name": "Southern California",
+   "bbox": [
+    -121.0,
+    32.0,
+    -114.5,
+    36.5
+   ],
+   "catalogue": "Southern California Seismic Network (SCSN) via USGS ComCat, catalog=ci",
+   "licence": "Public domain (U.S. Government work)",
+   "attribution": "USGS ComCat; Southern California Seismic Network, Caltech (1926), doi:10.7914/SN/CI; SCEDC (2013), doi:10.7909/C3WD3xH1",
+   "source_url": "https://earthquake.usgs.gov/fdsnws/event/1/",
+   "caveat": "In the 2019 Ridgecrest cells b stays about 0.07 below b-positive even with the 200-event Mc windows (short-term aftershock incompleteness).",
+   "period": [
+    "2006-01-01",
+    "2025-12-31"
+   ],
+   "mc_periods": [
+    [
+     2006,
+     2009
+    ],
+    [
+     2010,
+     2013
+    ],
+    [
+     2014,
+     2017
+    ],
+    [
+     2018,
+     2021
+    ],
+    [
+     2022,
+     2025
+    ]
+   ],
+   "mc_typical": 1.4,
+   "magtype": "ML (Southern California Seismic Network local magnitude, ComCat catalog=ci)",
+   "h3_res": 4,
+   "radius_km": 30.0,
+   "n_events": 197088,
+   "n_cells": 132,
+   "quality_counts": {
+    "sh": {
+     "A": 58,
+     "insufficient": 49,
+     "B": 14,
+     "C": 11
+    }
+   },
+   "depth_classes": [
+    "sh"
+   ],
+   "cells": "regional/socal/cells.geojson",
+   "cell_detail_dir": "regional/socal/cells/",
+   "summary": "regional/socal/summary.json",
+   "bytes": 310976
   },
   {
    "id": "iceland",
@@ -139,6 +203,7 @@
    "licence": "CC BY 4.0",
    "attribution": "Icelandic Met Office (Vedurstofa Islands), Quakes API",
    "source_url": "https://api.vedur.is/quakes/",
+   "caveat": "b depends strongly on the cutoff (region-wide 0.62 at 0.5 and 0.80 at 1.5) and b-positive is higher by about 0.17 in the median cell. Compare b only within this layer, together with b-positive.",
    "period": [
     "2020-01-01",
     "2026-10-31"
@@ -166,9 +231,9 @@
    "quality_counts": {
     "sh": {
      "insufficient": 143,
-     "A": 118,
+     "A": 113,
      "C": 41,
-     "B": 24
+     "B": 29
     }
    },
    "depth_classes": [
@@ -177,12 +242,13 @@
    "cells": "regional/iceland/cells.geojson",
    "cell_detail_dir": "regional/iceland/cells/",
    "summary": "regional/iceland/summary.json",
-   "bytes": 606499
+   "bytes": 606302
   }
  ],
  "sha256": {
-  "italy": "8e01f7479a51935d1114acaa04b8b9b8e6ebacce4d7e90f5f907d2e582c5c092",
-  "nz": "70ba276f76e990e749c2f989555536b71d20d61ac08cac0135385be4e2bf9f19",
-  "iceland": "94057d7b8c9913137d3aa19aaa2595fc8f6922ecb52f5f3b92b8dacf3fa8e6e3"
+  "italy": "99ce79298998b5b2b8e30c3cf068d6f8eb1369d1affffbdf3b887f3dbcedba62",
+  "nz": "b163aafe470a29cc85bfc610a058141f96dab0585ea770d3a25af779fb906ec8",
+  "socal": "03952973da136a5b76ab104711e99111d1d6fc4cc2b2a6efccd144cc56bd5b0c",
+  "iceland": "793ec538de3b6446269642bcad0b589cd9f22ccd3b1a4e28120543a981f1020a"
  }
 }

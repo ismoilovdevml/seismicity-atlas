@@ -115,3 +115,18 @@ def test_parse_magnitudes_and_pick_local_prefers_bulletin():
     assert pick_local(mags, cfg) == 6.1
     assert pick_local(mags, {"altmag_type": "ml"}) == 6.0             # case-insensitive, last listed
     assert pick_local(mags, {"altmag_type": "MLv"}) is None
+
+
+def test_event_windows_remove_sequence_incompleteness():
+    """A burst whose early part is incomplete above a higher Mc biases a per-period b low; 200-event windows fix it."""
+    rng = np.random.default_rng(21)
+    bg = synth_period(3000, 1.0, 1.0, rng)                     # background, complete above 1.0
+    burst = synth_period(1000, 1.0, 2.2, rng)                  # sequence onset, complete only above 2.2
+    m = np.r_[bg, burst]
+    per = np.zeros(m.size, int)                                # one calendar period, time-ordered
+    r0 = rl.cell_b_tv(m, per, [np.nan], nboot=100, rng=0)
+    rw = rl.cell_b_tv(m, per, [np.nan], nboot=100, rng=0, window=200)
+    assert r0["b_raw"] < 0.85, r0["b_raw"]
+    assert abs(rw["b_raw"] - 1.0) < 0.08, rw["b_raw"]
+    blocks, owner = rl._sub_blocks([(0, 1000), (1000, 1150)], 200)
+    assert blocks[-1] == (1000, 1150) and blocks[-2] == (800, 1000) and set(owner) == {0, 1}

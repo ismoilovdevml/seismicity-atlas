@@ -65,3 +65,18 @@ REGIONS = {
         "depth_split": False, "h3_res": 5, "radius_km": 15.0,
     },
 }
+
+# shown with each region in index.json; the reasons and numbers are in docs/regional.md
+CAVEATS = {
+    "italy": ("About 10,000 small events (median 1.3, mostly central Italy) carry only a duration magnitude Md "
+              "and are excluded, so counts below Mc are slightly low."),
+    "nz": ("Offshore areas and the central Alpine Fault have too few events for a cell Mc. The region-wide b at "
+           "fixed thresholds mixes in offshore areas that are not complete."),
+    "socal": ("In the 2019 Ridgecrest cells b stays about 0.07 below b-positive even with the 200-event Mc windows "
+              "(short-term aftershock incompleteness)."),
+    "iceland": ("b depends strongly on the cutoff (region-wide 0.62 at 0.5 and 0.80 at 1.5) and b-positive is "
+                "higher by about 0.17 in the median cell. Compare b only within this layer, together with "
+                "b-positive."),
+}
+for _k, _v in CAVEATS.items():
+    REGIONS[_k]["caveat"] = _v

@@ -36,6 +36,8 @@ NBOOT = 200
 RNG = 20261113
 MIN_CELL_EVENTS = 3        # a cell is drawn when it holds at least this many events (all depths)
 KEEP_ETYPES = {"earthquake", "unknown", "", "nan", "induced or triggered event"}
+MAX_SUBST_DIFF = 1.0       # max |local - preferred| magnitude accepted when substituting the local magnitude
+MC_WINDOW = 200            # events per Mc window inside a period (short windows during intense sequences)
 MIN_DETAIL = 50            # a depth class gets a detail block when its circle holds at least this many events
 
 # named places used in the validation (docs/regional.md); Mc is read from the cell that contains the point
@@ -115,7 +117,10 @@ def load_catalogue(cfg):
     if len(alt):  # larger events whose preferred magnitude is Mw/mB: use their local magnitude instead
         am = fetch_altmag(cfg["id"], alt.id.tolist())
         v = pd.to_numeric(alt.id.map(am), errors="coerce")
-        ok = v.notna().to_numpy()
+        # a local magnitude more than 1 unit from the preferred one points to a wrong or unreviewed value: exclude
+        far = (v - alt.mag).abs() > MAX_SUBST_DIFF
+        cnt["local_magnitude_rejected_far"] = int(far.sum())
+        ok = (v.notna() & ~far).to_numpy()
         rep = alt[ok].copy()
         rep["mag_pref"], rep["magtype_pref"] = rep.mag, rep.magtype
         rep["mag"], rep["magtype"] = v[ok].astype(float), cfg["magtypes"][0]
@@ -196,12 +201,12 @@ def build_region(rid):
             m = dd.mag.to_numpy()[ii]
             per = dd.per.to_numpy()[ii]
             yr = dd.year.to_numpy()[ii]
-            r = rl.cell_b_tv(m, per, fl, nboot=NBOOT, rng=rng) if ii.size else {"n_sample": 0,
+            r = rl.cell_b_tv(m, per, fl, nboot=NBOOT, rng=rng, window=MC_WINDOW) if ii.size else {"n_sample": 0,
                                                                                  "quality": "insufficient"}
             rd, rp = {}, {}
             if r.get("n_b", 0) >= al.NMIN_B:
                 ms = dd.ms.to_numpy()[ii]
-                rd = rl.cell_b_tv(m[ms], per[ms], fl, nboot=100, rng=rng)
+                rd = rl.cell_b_tv(m[ms], per[ms], fl, nboot=100, rng=rng, window=MC_WINDOW)
                 rp = rl.bpos_above_thr(m, rl.thresholds_time_order(r))
             show = r.get("quality") in ("A", "B")
             # Mc is published only when the latest period was measured (>= NMIN_P events), not a fallback value
@@ -291,7 +296,7 @@ def index_entry(rid, s):
     cfg = REGIONS[rid]
     mc = s["mc_cells_latest_period"]
     return {"id": rid, "name": cfg["name"], "bbox": cfg["bbox"], "catalogue": cfg["catalogue"],
-            "licence": cfg["licence"], "attribution": cfg["attribution"], "source_url": cfg["source_url"],
+            "licence": cfg["licence"], "attribution": cfg["attribution"], "source_url": cfg["source_url"], "caveat": cfg.get("caveat"),
             "period": [f"{cfg['periods'][0][0]}-01-01", (pd.Timestamp(cfg["end"]) - pd.Timedelta(days=1)).strftime("%Y-%m-%d")],
             "mc_periods": cfg["periods"], "mc_typical": mc["median"], "magtype": cfg["magtype_label"],
             "h3_res": cfg["h3_res"], "radius_km": cfg["radius_km"], "n_events": s["counts"]["used"],

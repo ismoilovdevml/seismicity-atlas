@@ -18,6 +18,7 @@
    "Md": 10173,
    "Mw": 684
   },
+  "local_magnitude_rejected_far": 0,
   "local_magnitude_substituted": 684,
   "local_magnitude_missing": {},
   "substituted_pref_minus_local_median": -0.1,
@@ -253,15 +254,15 @@
    "excluded_types_above": 1
   }
  },
- "generated_utc": "2026-11-13T10:58:45Z",
+ "generated_utc": "2026-11-13T11:12:00Z",
  "n_cells": 408,
  "n_detail": 221,
  "quality_counts": {
   "sh": {
    "insufficient": 255,
-   "A": 90,
-   "B": 55,
-   "C": 8
+   "A": 88,
+   "B": 56,
+   "C": 9
   },
   "dp": {
    "insufficient": 400,
@@ -283,11 +284,11 @@
    "sh_mc": 1.3,
    "sh_mc_lo": 1.3,
    "sh_mc_hi": 1.5,
-   "sh_b": 1.141,
-   "sh_b_lo": 1.092,
-   "sh_b_hi": 1.155,
+   "sh_b": 1.181,
+   "sh_b_lo": 1.151,
+   "sh_b_hi": 1.207,
    "sh_q": "A",
-   "sh_ciw": 0.063,
+   "sh_ciw": 0.056,
    "mc_periods": [
     [
      2010,
@@ -322,11 +323,11 @@
    "sh_mc": 1.2,
    "sh_mc_lo": 1.2,
    "sh_mc_hi": 1.3,
-   "sh_b": 1.085,
-   "sh_b_lo": 1.079,
-   "sh_b_hi": 1.138,
+   "sh_b": 1.283,
+   "sh_b_lo": 1.251,
+   "sh_b_hi": 1.283,
    "sh_q": "A",
-   "sh_ciw": 0.06,
+   "sh_ciw": 0.031,
    "mc_periods": [
     [
      2010,

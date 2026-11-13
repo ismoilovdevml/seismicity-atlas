@@ -61,7 +61,25 @@ def thresholds_rows(mm, blocks, fallback, dm=0.1, nmin_p=NMIN_P):
     return np.round(thr, 6), np.round(mcp, 6), np.round(mc_all, 6)
 
 
-def cell_b_tv(m, per, fallback, nboot=200, rng=None, dm=0.1, nmin_p=NMIN_P):
+def _sub_blocks(blocks, window):
+    """Split each period block into consecutive windows of `window` events (a short remainder joins the previous
+    window), so that intense sequences get their own, higher, Mc. window=None keeps the period blocks."""
+    if not window:
+        return blocks, list(range(len(blocks)))
+    out, owner = [], []
+    for p, (a, b) in enumerate(blocks):
+        if b - a < 2 * window:
+            out.append((a, b)); owner.append(p)
+            continue
+        edges = list(range(a, b, window))
+        if b - edges[-1] < window:
+            edges = edges[:-1]
+        for k, e in enumerate(edges):
+            out.append((e, edges[k + 1] if k + 1 < len(edges) else b)); owner.append(p)
+    return out, owner
+
+
+def cell_b_tv(m, per, fallback, nboot=200, rng=None, dm=0.1, nmin_p=NMIN_P, window=None):
     """b with a per-cell, per-period Mc. `m` and `per` must be in time order with periods chronological.
 
     `fallback[p]` is the regional floor of period p (used only when the period has fewer than nmin_p events).
@@ -82,12 +100,16 @@ def cell_b_tv(m, per, fallback, nboot=200, rng=None, dm=0.1, nmin_p=NMIN_P):
         return out
     blocks = _blocks(per, nper)
     fb = np.asarray(fallback, float)
-    thr, mcp, mca = thresholds_rows(m[None, :], blocks, fb, dm, nmin_p)
+    sub, owner = _sub_blocks(blocks, window)
+    fbs = fb[owner] if len(owner) else fb
+    _, mcp, mca = thresholds_rows(m[None, :], blocks, fb, dm, nmin_p)     # calendar-period Mc (reported)
+    thr, _, _ = thresholds_rows(m[None, :], sub, fbs, dm, nmin_p)          # thresholds actually used
     thr, mcp = thr[0], mcp[0]
     b, sig, n = sl.b_varmc(m, thr, dm)
-    idx = np.concatenate([a + rng.integers(0, b_ - a, (nboot, b_ - a)) for a, b_ in blocks if b_ > a], axis=1)
+    idx = np.concatenate([a + rng.integers(0, b_ - a, (nboot, b_ - a)) for a, b_ in sub if b_ > a], axis=1)
     mm = m[idx]
-    tb, mcpb, _ = thresholds_rows(mm, blocks, fb, dm, nmin_p)
+    _, mcpb, _ = thresholds_rows(mm, blocks, fb, dm, nmin_p)
+    tb, _, _ = thresholds_rows(mm, sub, fbs, dm, nmin_p)
     bb, nb = al.b_rows(mm, tb, dm)
     ok = np.isfinite(bb) & (nb >= 2)
     lo, hi = (np.percentile(bb[ok], [2.5, 97.5]) if ok.sum() > 0.8 * nboot else (np.nan, np.nan))
