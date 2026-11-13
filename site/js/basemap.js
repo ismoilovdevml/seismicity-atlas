@@ -91,6 +91,7 @@ export function attach(m, st) {
   state = st;
   mountControls();
   mountAttribution();
+  relabel();
 }
 
 function $(id) { return document.getElementById(id); }
