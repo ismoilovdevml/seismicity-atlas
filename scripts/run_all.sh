@@ -10,6 +10,8 @@ $PY -I scripts/atlas.py 200      # radius sensitivity runs (write data/work/cell
 $PY -I scripts/atlas.py 400
 $PY -I scripts/atlas.py          # main run, 300 km
 $PY -I scripts/validate.py
+$PY -I scripts/val_chile.py      # Chile b sensitivity -> results/val_chile.json
+$PY -I scripts/val_literature.py # published b / beta / Mc comparison -> results/val_literature.json
 $PY -I scripts/sequences.py
 $PY -I scripts/site_layers.py
 $PY -I scripts/figures.py

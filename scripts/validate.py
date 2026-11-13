@@ -138,7 +138,7 @@ def main():
         "California": ((32, 42, -125, -114), 1.0, "Hutton, Woessner & Hauksson 2010 (BSSA 100(2)): average b ~1.0, SCSN ML, M>=~1.8-3.25"),
         "Italy": ((36, 47, 6.5, 18.5), 1.0, "Italian hazard models use b close to 1.0 (Gulia & Meletti; MPS04/MPS19 practice)"),
         "Japan": ((30, 46, 128, 148), None, "no verified published number at Mw>=5.2 found; reported for reference only"),
-        "Chile": ((-45, -18, -76, -66), 1.0, "b ~1 (0.97 GR, 1.1 MLE), 2018 national-catalogue study; weak source"),
+        "Chile": ((-45, -18, -76, -66), None, "b ~1 from a 2018 national-catalogue study was a weak source; the GCMT reference (Andean S. America b 0.855 +-0.06, Kagan & Jackson 2013) and the sensitivity tests are in the Chile rows below (scripts/val_chile.py)"),
         "Zagros": ((27, 35, 45, 56), None, "qualitative: Zagros has the highest b of the Iranian units (Iranian Plateau catalogue, J. Seismol. 2020)"),
         "Makran": ((24, 27.5, 57, 66), None, "qualitative: Makran has the lowest b of the Iranian units (same source)"),
     }

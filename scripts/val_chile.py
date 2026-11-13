@@ -59,6 +59,35 @@ def seq_mask(s, mains, before_days=30, after_days=365):
     return out
 
 
+def _f(r):
+    return f"{r['b']:.3f} [{r['ci95'][0]:.3f}, {r['ci95'][1]:.3f}] n={r.get('n_b', r.get('n'))}"
+
+
+def table_rows(out):
+    """Rows for the site validation table (site_layers.validation_table appends them)."""
+    var = [r for grp in ("box", "depth", "period") for r in out[grp].values() if r.get("quality") in ("A", "B")]
+    var += [r for k, r in out["sequences"].items() if k.startswith("without_") and r.get("quality") in ("A", "B")]
+    var += [r for r in out["fixed_threshold"] if r["b"] is not None]
+    lo, hi = min(r["b"] for r in var), max(r["b"] for r in var)
+    kj = out["kj2013_settings"]
+    c = kj["chile_box_m58"]
+    se = (c["ci95"][1] - c["ci95"][0]) / 3.92
+    z = (c["b"] - kj["published"]["b_equiv"]) / np.hypot(se, kj["published"]["b_equiv_sigma"])
+    w = out["sequences"]["without_all_five"]
+    return [
+        {"test": "Chile b: spread over box, depth, period, sequence-removal and fixed-threshold variants",
+         "ours": f"baseline {_f(out['baseline'])}; {len(var)} variants {lo:.3f}-{hi:.3f}",
+         "published": "b ~1 (2018 national-catalogue study, weak source)",
+         "verdict": f"robust: {lo:.2f}-{hi:.2f}; only removing all five large-sequence windows reaches ~1.0"},
+        {"test": "Chile b without the five Mw >= 7.9 sequence windows (1985, 1995, 2010, 2014, 2015)",
+         "ours": _f(w), "published": "b ~1 (weak source)",
+         "verdict": "match" if w["ci95"][0] <= 1.0 <= w["ci95"][1] else "mismatch"},
+        {"test": "Chile box at Kagan & Jackson (2013) settings: 1977-2010, <= 70 km, m >= 5.8",
+         "ours": _f(c), "published": "Andean S. America (FE region 8) beta 0.57 +-0.04 -> b 0.855 +-0.06, GCMT",
+         "verdict": ("match" if abs(z) <= 1.96 else "mismatch") + " (FE region 8 is larger than the Chile box)"},
+    ]
+
+
 def main():
     g = load_work("iscgem")
     fl = json.loads((RES / "atlas_globals.json").read_text())["floors"]
@@ -135,6 +164,7 @@ def main():
         "andean_box_approx_m58": b_fixed(g[kj & box(g, -56, 13, -82, -63)].mag, 5.8),
         "andean_box_approx_m58_sub": b_fixed(g[kj & box(g, -56, 13, -82, -63) & (g.pb_class == "SUB")].mag, 5.8),
     }
+    out["table_rows"] = table_rows(out)
     jdump(out, RES / "val_chile.json", indent=1)
 
     def line(k, r):

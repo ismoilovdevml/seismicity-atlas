@@ -474,5 +474,25 @@
    "n": 289,
    "thr": 5.8
   }
- }
+ },
+ "table_rows": [
+  {
+   "test": "Chile b: spread over box, depth, period, sequence-removal and fixed-threshold variants",
+   "ours": "baseline 0.914 [0.844, 0.984] n=613; 29 variants 0.856-0.980",
+   "published": "b ~1 (2018 national-catalogue study, weak source)",
+   "verdict": "robust: 0.86-0.98; only removing all five large-sequence windows reaches ~1.0"
+  },
+  {
+   "test": "Chile b without the five Mw >= 7.9 sequence windows (1985, 1995, 2010, 2014, 2015)",
+   "ours": "0.980 [0.898, 1.087] n=359",
+   "published": "b ~1 (weak source)",
+   "verdict": "match"
+  },
+  {
+   "test": "Chile box at Kagan & Jackson (2013) settings: 1977-2010, <= 70 km, m >= 5.8",
+   "ours": "0.945 [0.825, 1.084] n=219",
+   "published": "Andean S. America (FE region 8) beta 0.57 +-0.04 -> b 0.855 +-0.06, GCMT",
+   "verdict": "match (FE region 8 is larger than the Chile box)"
+  }
+ ]
 }
