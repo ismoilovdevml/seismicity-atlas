@@ -1,4 +1,5 @@
-"""Chile b-value investigation: why the atlas Chile b (about 0.91) sits below the 'b ~ 1' reference.
+"""Chile b-value investigation: why the atlas Chile b (about 0.85 on direct Mw; 0.91 on every event in v0.1) sits
+below the 'b ~ 1' reference.
 
 Every variant uses ISC-GEM Mw, shallow (<= 70 km), and either the atlas estimator (per-event threshold
 max(MAXC+0.2 of the sample, period floor), bootstrap 95 % interval, `atlaslib.cell_b`) or Aki-Utsu at a fixed
@@ -80,7 +81,9 @@ def table_rows(out):
         {"test": "Chile b: spread over box, depth, period, sequence-removal and fixed-threshold variants",
          "ours": f"baseline {_f(out['baseline'])}; {len(var)} variants {lo:.3f}-{hi:.3f}",
          "published": "b ~1 (2018 national-catalogue study, weak source)",
-         "verdict": f"robust: {lo:.2f}-{hi:.2f}; only removing all five large-sequence windows reaches ~1.0"},
+         "verdict": f"robust: {lo:.2f}-{hi:.2f}" + ("; the highest b is without all five large-sequence windows"
+                                                    if w.get("quality") in ("A", "B") and abs(w["b"] - hi) < 1e-9
+                                                    else "")},
         {"test": "Chile b without the five Mw >= 7.9 sequence windows (1985, 1995, 2010, 2014, 2015)",
          "ours": _f(w), "published": "b ~1 (weak source)",
          "verdict": "match" if w["ci95"][0] <= 1.0 <= w["ci95"][1] else "mismatch"},

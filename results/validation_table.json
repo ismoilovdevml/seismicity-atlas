@@ -67,61 +67,61 @@
  },
  {
   "test": "Regional b, California, shallow, ISC-GEM 1976-2021",
-  "ours": "0.919 [0.757, 1.111] n=84 q=B",
+  "ours": "0.921 [0.741, 1.128] n=74 q=B",
   "published": "1.00",
   "verdict": "match"
  },
  {
   "test": "Regional b, Italy, shallow, ISC-GEM 1976-2021",
-  "ours": "1.183 [0.874, 1.785] n=35 q=insufficient",
+  "ours": "1.130 [0.813, 1.596] n=29 q=insufficient",
   "published": "1.00",
   "verdict": "not testable (n<50)"
  },
  {
   "test": "Regional b, Japan, shallow, ISC-GEM 1976-2021",
-  "ours": "0.970 [0.918, 1.027] n=1007 q=A",
+  "ours": "0.942 [0.879, 1.012] n=747 q=A",
   "published": "no verified published number at Mw>=5.2 found; reported for reference only",
   "verdict": "reference only"
  },
  {
   "test": "Regional b, Chile, shallow, ISC-GEM 1976-2021",
-  "ours": "0.914 [0.844, 0.984] n=613 q=A",
+  "ours": "0.852 [0.780, 0.931] n=472 q=A",
   "published": "b ~1 from a 2018 national-catalogue study was a weak source; the GCMT reference (Andean S. America b 0.855 +-0.06, Kagan & Jackson 2013) and the sensitivity tests are in the Chile rows below (scripts/val_chile.py)",
   "verdict": "reference only"
  },
  {
   "test": "Regional b, Zagros, shallow, ISC-GEM 1976-2021",
-  "ours": "1.316 [1.036, 1.664] n=65 q=C",
+  "ours": "1.199 [0.957, 1.545] n=66 q=C",
   "published": "qualitative: Zagros has the highest b of the Iranian units (Iranian Plateau catalogue, J. Seismol. 2020)",
   "verdict": "reference only"
  },
  {
   "test": "Regional b, Makran, shallow, ISC-GEM 1976-2021",
-  "ours": "0.965 [0.629, 1.551] n=25 q=insufficient",
+  "ours": "0.974 [0.532, 1.737] n=25 q=insufficient",
   "published": "qualitative: Makran has the lowest b of the Iranian units (same source)",
   "verdict": "not testable (n<50)"
  },
  {
   "test": "Plate-boundary b, SUB",
-  "ours": "0.999 [0.977, 1.020]",
+  "ours": "0.971 [0.948, 0.994]",
   "published": "0.98 (beta 0.654 x 1.5, GCMT subduction, Kagan & Jackson)",
   "verdict": "match"
  },
  {
   "test": "Plate-boundary b, OSR (spreading ridges)",
-  "ours": "1.447 [1.386, 1.509]",
+  "ours": "1.480 [1.413, 1.565]",
   "published": "1.2-1.65 (beta 0.8-1.1, Kagan 2002 via Kagan 2010)",
   "verdict": "match"
  },
  {
   "test": "Ranking of b by boundary class",
-  "ours": "OSR > OTF > CTF > SUB > CRB > none > OCB > CCB",
+  "ours": "OSR > OTF > CTF > none > OCB > SUB > CRB > CCB",
   "published": "spreading highest (TRACE 2026, Kagan); thrust/convergent lowest (Schorlemmer 2005)",
   "verdict": "match"
  },
  {
   "test": "Subduction b, young vs old slabs",
-  "ours": "young 0.943 [0.872, 1.021], old 1.089 [1.051, 1.127]",
+  "ours": "young 0.899 [0.832, 0.973], old 1.067 [1.018, 1.112]",
   "published": "b increases with slab age (Nishikawa & Ide 2014)",
   "verdict": "match"
  },
@@ -133,127 +133,127 @@
  },
  {
   "test": "Chile b: spread over box, depth, period, sequence-removal and fixed-threshold variants",
-  "ours": "baseline 0.914 [0.844, 0.984] n=613; 29 variants 0.856-0.980",
+  "ours": "baseline 0.852 [0.780, 0.931] n=472; 29 variants 0.817-0.960",
   "published": "b ~1 (2018 national-catalogue study, weak source)",
-  "verdict": "robust: 0.86-0.98; only removing all five large-sequence windows reaches ~1.0"
+  "verdict": "robust: 0.82-0.96; the highest b is without all five large-sequence windows"
  },
  {
   "test": "Chile b without the five Mw >= 7.9 sequence windows (1985, 1995, 2010, 2014, 2015)",
-  "ours": "0.980 [0.898, 1.087] n=359",
+  "ours": "0.960 [0.866, 1.073] n=312",
   "published": "b ~1 (weak source)",
   "verdict": "match"
  },
  {
   "test": "Chile box at Kagan & Jackson (2013) settings: 1977-2010, <= 70 km, m >= 5.8",
-  "ours": "0.945 [0.825, 1.084] n=219",
+  "ours": "0.871 [0.761, 1.015] n=182",
   "published": "Andean S. America (FE region 8) beta 0.57 +-0.04 -> b 0.855 +-0.06, GCMT",
   "verdict": "match (FE region 8 is larger than the Chile box)"
  },
  {
   "test": "Literature b: kj2013_fe01_alaska_aleutian (box [50, 65, 163, -140], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 0.990 [0.865, 1.133] n=291; Aki 1.001 [0.897, 1.106] n=326; TGR magerr 0.10 only 0.915 [0.808, 1.044] n=259",
+  "ours": "TGR 0.915 [0.808, 1.044] n=259; Aki 0.937 [0.842, 1.048] n=290 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.990 [0.865, 1.133] n=291",
   "published": "beta 0.65 \u00b10.04 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-  "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  "verdict": "match (approximate region); all events: match [needs human check]"
  },
  {
   "test": "Literature b: kj2013_fe05_mexico_guatemala (box [13, 22, -106, -90], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 0.819 [0.660, 1.021] n=125; Aki 0.880 [0.749, 1.066] n=143; TGR magerr 0.10 only 0.795 [0.639, 0.946] n=121",
+  "ours": "TGR 0.795 [0.639, 0.946] n=121; Aki 0.857 [0.737, 1.018] n=138 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.819 [0.660, 1.021] n=125",
   "published": "beta 0.6 \u00b10.06 (b 0.900; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-  "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  "verdict": "match (approximate region); all events: match [needs human check]"
  },
  {
   "test": "Literature b: kj2013_fe06_central_america (box [7, 15, -92, -82], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 1.038 [0.880, 1.283] n=123; Aki 1.073 [0.923, 1.275] n=141; TGR magerr 0.10 only 1.025 [0.868, 1.244] n=121",
+  "ours": "TGR 1.025 [0.868, 1.244] n=121; Aki 1.064 [0.913, 1.246] n=139 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.038 [0.880, 1.283] n=123",
   "published": "beta 0.68 \u00b10.06 (b 1.020; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-  "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  "verdict": "match (approximate region); all events: match [needs human check]"
  },
  {
   "test": "Literature b: kj2013_fe08_andean_south_america (box [-56, 13, -82, -63], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 0.970 [0.866, 1.073] n=357; Aki 0.976 [0.879, 1.081] n=401; TGR magerr 0.10 only 0.903 [0.804, 1.014] n=307",
+  "ours": "TGR 0.903 [0.804, 1.014] n=307; Aki 0.903 [0.816, 1.014] n=339 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.970 [0.866, 1.073] n=357",
   "published": "beta 0.57 \u00b10.04 (b 0.855; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-  "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  "verdict": "match (approximate region); all events: match [needs human check]"
  },
  {
   "test": "Literature b: kj2013_fe12_kermadec_tonga_samoa (box [-38, -13, 175, -170], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 1.259 [1.156, 1.389] n=500; Aki 1.237 [1.137, 1.346] n=569; TGR magerr 0.10 only 1.212 [1.108, 1.314] n=464",
+  "ours": "TGR 1.212 [1.108, 1.314] n=464; Aki 1.184 [1.088, 1.291] n=521 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.259 [1.156, 1.389] n=500",
   "published": "beta 0.8 \u00b10.04 (b 1.200; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-  "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  "verdict": "match (approximate region); all events: match [needs human check]"
  },
  {
   "test": "Literature b: kj2013_fe18_guam_japan (box [12, 34, 138, 148], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 1.285 [0.993, 1.651] n=94; Aki 1.312 [1.082, 1.631] n=111; TGR magerr 0.10 only 1.259 [0.998, 1.631] n=88",
+  "ours": "TGR 1.259 [0.998, 1.631] n=88; Aki 1.290 [1.055, 1.631] n=104 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.285 [0.993, 1.651] n=94",
   "published": "beta 0.86 \u00b10.10 (b 1.290; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-  "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  "verdict": "match (approximate region); all events: match [needs human check]"
  },
  {
   "test": "Literature b: kj2013_fe19_japan_kamchatka (box [35, 60, 140, 165], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 1.072 [0.969, 1.201] n=435; Aki 1.049 [0.962, 1.152] n=479; TGR magerr 0.10 only 0.993 [0.898, 1.116] n=362",
+  "ours": "TGR 0.993 [0.898, 1.116] n=362; Aki 0.983 [0.894, 1.084] n=399 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.072 [0.969, 1.201] n=435",
   "published": "beta 0.62 \u00b10.04 (b 0.930; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-  "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  "verdict": "match (approximate region); all events: match [needs human check]"
  },
  {
   "test": "Literature b: kj2013_tohoku_box (box [35, 40, 140, 146], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 1.082 [0.860, 1.333] n=105; Aki 1.096 [0.930, 1.335] n=117; TGR magerr 0.10 only 1.023 [0.799, 1.260] n=93",
+  "ours": "TGR 1.023 [0.799, 1.260] n=93; Aki 1.055 [0.889, 1.287] n=104 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.082 [0.860, 1.333] n=105",
   "published": "beta 0.64 \u00b10.07 (b 0.960; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-  "verdict": "match; magerr 0.10 only: match [needs human check]"
+  "verdict": "match; all events: match [needs human check]"
  },
  {
   "test": "Literature b: kj2013_fe24_sunda_arc (box [-12, -5, 100, 125], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 1.077 [0.901, 1.253] n=141; Aki 1.126 [0.969, 1.329] n=168; TGR magerr 0.10 only 1.018 [0.862, 1.211] n=124",
+  "ours": "TGR 1.018 [0.862, 1.211] n=124; Aki 1.078 [0.917, 1.285] n=149 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.077 [0.901, 1.253] n=141",
   "published": "beta 0.65 \u00b10.04 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-  "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  "verdict": "match (approximate region); all events: match [needs human check]"
  },
  {
   "test": "Literature b: kj2013_fe46_andaman_sumatra (box [-6, 15, 90, 102], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 1.010 [0.868, 1.151] n=240; Aki 1.002 [0.878, 1.145] n=267; TGR magerr 0.10 only 0.921 [0.798, 1.080] n=195",
+  "ours": "TGR 0.921 [0.798, 1.080] n=195; Aki 0.918 [0.802, 1.073] n=215 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.010 [0.868, 1.151] n=240",
   "published": "beta 0.71 \u00b10.07 (b 1.065; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-  "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  "verdict": "match (approximate region); all events: match [needs human check]"
  },
  {
   "test": "Literature b: kj2013_all_18_subduction_zones (PB2002 SUB, 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 1.034 [0.996, 1.073] n=2783; Aki 1.031 [0.997, 1.069] n=3119; TGR magerr 0.10 only 0.977 [0.938, 1.013] n=2460",
+  "ours": "TGR 0.977 [0.938, 1.013] n=2460; Aki 0.978 [0.941, 1.016] n=2747 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.034 [0.996, 1.073] n=2783",
   "published": "beta 0.65 \u00b10.01 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-  "verdict": "mismatch (approximate region); magerr 0.10 only: match [needs human check]"
+  "verdict": "match (approximate region); all events: mismatch [needs human check]"
  },
  {
   "test": "Literature b: kagan2010_global_mt56 (global, 1982-2008, <= 70 km, m >= 5.6)",
-  "ours": "TGR 1.087 [1.063, 1.110] n=7358; Aki 1.060 [1.037, 1.085] n=8133; TGR magerr 0.10 only 1.035 [1.012, 1.062] n=6522",
+  "ours": "TGR 1.035 [1.012, 1.062] n=6522; Aki 1.006 [0.983, 1.028] n=7138 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.087 [1.063, 1.110] n=7358",
   "published": "beta 0.6773 (b 1.016; Kagan, Y. Y. 2010, Table 2)",
-  "verdict": "mismatch; magerr 0.10 only: match [needs human check]"
+  "verdict": "match; all events: mismatch [needs human check]"
  },
  {
   "test": "Literature b: kagan2010_trenches_mt56 (PB2002 SUB, 1982-2008, <= 70 km, m >= 5.6)",
-  "ours": "TGR 1.053 [1.013, 1.094] n=3513; Aki 1.037 [1.007, 1.069] n=3892; TGR magerr 0.10 only 0.992 [0.955, 1.029] n=3029",
+  "ours": "TGR 0.992 [0.955, 1.029] n=3029; Aki 0.975 [0.943, 1.007] n=3321 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.053 [1.013, 1.094] n=3513",
   "published": "beta 0.6463 (b 0.969; Kagan, Y. Y. 2010, Table 2)",
-  "verdict": "mismatch (approximate region); magerr 0.10 only: match [needs human check]"
+  "verdict": "match (approximate region); all events: mismatch [needs human check]"
  },
  {
   "test": "Literature b: kagan2010_global_declustered_mt56 (global, 1982-2008, <= 70 km, m >= 5.6, declustered)",
-  "ours": "TGR 0.934 [0.902, 0.962] n=3933; Aki 0.914 [0.889, 0.939] n=4282; TGR magerr 0.10 only 0.903 [0.874, 0.926] n=3700",
+  "ours": "TGR 0.903 [0.874, 0.926] n=3700; Aki 0.879 [0.854, 0.906] n=3992 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.934 [0.902, 0.962] n=3933",
   "published": "beta 0.648 (b 0.972; Kagan, Y. Y. 2010, Table 2)",
-  "verdict": "mismatch (approximate region); magerr 0.10 only: mismatch [needs human check]"
+  "verdict": "mismatch (approximate region); all events: mismatch [needs human check]"
  },
  {
   "test": "Literature beta range over PB2002 classes (1977-2002, <= 70 km, m >= 5.8, TGR)",
-  "ours": "beta 0.65-1.02 over 7 classes",
+  "ours": "beta 0.63-0.98 over 7 classes",
   "published": "best-fitting beta 0.53-0.92 (Bird & Kagan 2004, abstract)",
   "verdict": "mismatch (approximate) [needs human check]"
  },
  {
   "test": "Literature Mc: GCMT 1980-2016, 0-50 km (Petruccelli 2018 thesis)",
-  "ours": "global MAXC+0.2 5.4, MBS 5.6, GFT 5.2",
+  "ours": "global MAXC+0.2 5.4, MBS 5.8, GFT 5.2",
   "published": "most local Mc 5.4-5.5; 5.1-5.3 on ridges and Himalaya",
   "verdict": "match (global vs local map) [needs human check]"
  },
  {
   "test": "b(t) retrospective: Sumatra band 92-100 E, 2000-2004 vs 2005-2009, ISC-GEM Mw",
-  "ours": "before 1.330 [0.680, 2.369] n=17 q=insufficient; after 1.043 [0.878, 1.147] n=407 q=A",
+  "ours": "before 1.184 [0.683, 2.062] n=12 q=insufficient; after 1.026 [0.871, 1.175] n=280 q=B",
   "published": "before 1.04, after 1.14 (ISC mb; Srivastava et al. 2021 preprint)",
-  "verdict": "not testable: 2000_2004 window has q=insufficient (n=17) [needs human check]"
+  "verdict": "not testable: 2000_2004 window has q=insufficient (n=12) [needs human check]"
  },
  {
   "test": "b(t) retrospective: 40 sequences, pre 5 yr vs 30-365 d after (ISC-GEM Mw)",
-  "ours": "shown (A/B) per window {'pre_5y': 3, 'pre_1y': 0, 'post_0_30d': 2, 'post_30_365d': 2}; 1 pair(s) with both shown; median post - pre +0.032; 0 with separated intervals",
+  "ours": "shown (A/B) per window {'pre_5y': 2, 'pre_1y': 0, 'post_0_30d': 1, 'post_30_365d': 1}; 1 pair(s) with both shown; median post - pre +0.015; 0 with separated intervals",
   "published": "no published Mw >= 5 before/after comparison found",
   "verdict": "description only"
  }

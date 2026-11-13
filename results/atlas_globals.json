@@ -2,34 +2,34 @@
  "floors": {
   "sh": {
    "1976-2003": {
-    "n": 21052,
+    "n": 16063,
     "maxc02": 5.4,
-    "mbs": 5.7,
+    "mbs": 5.8,
     "gft": 5.3,
-    "floor": 5.7
+    "floor": 5.8
    },
    "2004-2021": {
-    "n": 25518,
+    "n": 23941,
     "maxc02": 5.2,
-    "mbs": 5.0,
+    "mbs": 5.3,
     "gft": 5.0,
-    "floor": 5.2
+    "floor": 5.3
    }
   },
   "dp": {
    "1976-2003": {
-    "n": 5012,
+    "n": 4574,
     "maxc02": 5.4,
-    "mbs": 5.4,
-    "gft": 5.3,
+    "mbs": 5.3,
+    "gft": 5.2,
     "floor": 5.4
    },
    "2004-2021": {
-    "n": 5003,
+    "n": 4958,
     "maxc02": 5.2,
-    "mbs": 5.4,
+    "mbs": 5.1,
     "gft": 5.0,
-    "floor": 5.4
+    "floor": 5.2
    }
   }
  },
@@ -48,7 +48,10 @@
   2021
  ],
  "n_cells": 2598,
- "n_detail": 1292,
+ "n_detail": 1289,
+ "b_magerr_max": 0.1,
+ "b_sample": "Mw uncertainty <= 0.10 (direct Mw)",
+ "b_sample_excluded_1976_2021": 7049,
  "sample_radius_km": 300.0,
  "h3_res": 2,
  "nboot": 200,

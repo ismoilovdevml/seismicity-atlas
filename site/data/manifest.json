@@ -1,7 +1,7 @@
 {
  "name": "Global Seismicity Atlas",
- "version": "0.1.0",
- "generated_utc": "2026-11-13T11:00:19Z",
+ "version": "0.2.0",
+ "generated_utc": "2026-11-13T18:42:15Z",
  "data_cutoff_utc": "2026-11-13",
  "coverage": {
   "iscgem": [
@@ -48,37 +48,39 @@
   "cells": "H3 resolution 2",
   "sample_radius_km": 300.0,
   "b_catalogue": "ISC-GEM Mw 1976-2021",
+  "b_sample": "Mw uncertainty <= 0.10 (direct Mw)",
+  "b_magerr_max": 0.1,
   "floors": {
    "sh": {
     "1976-2003": {
-     "n": 21052,
+     "n": 16063,
      "maxc02": 5.4,
-     "mbs": 5.7,
+     "mbs": 5.8,
      "gft": 5.3,
-     "floor": 5.7
+     "floor": 5.8
     },
     "2004-2021": {
-     "n": 25518,
+     "n": 23941,
      "maxc02": 5.2,
-     "mbs": 5.0,
+     "mbs": 5.3,
      "gft": 5.0,
-     "floor": 5.2
+     "floor": 5.3
     }
    },
    "dp": {
     "1976-2003": {
-     "n": 5012,
+     "n": 4574,
      "maxc02": 5.4,
-     "mbs": 5.4,
-     "gft": 5.3,
+     "mbs": 5.3,
+     "gft": 5.2,
      "floor": 5.4
     },
     "2004-2021": {
-     "n": 5003,
+     "n": 4958,
      "maxc02": 5.2,
-     "mbs": 5.4,
+     "mbs": 5.1,
      "gft": 5.0,
-     "floor": 5.4
+     "floor": 5.2
     }
    }
   },
@@ -92,24 +94,24 @@
  },
  "global": {
   "b_shallow_1976_2021": {
-   "n_sample": 46570,
-   "n_b": 15827,
-   "mc": 5.4,
-   "b": 1.0432295602478125,
+   "n_sample": 40004,
+   "n_b": 15725,
+   "mc": 5.2,
+   "b": 1.0350923766327362,
    "ci95": [
-    1.0254773937508406,
-    1.059415928876279
+    1.018282302869513,
+    1.051983093872792
    ],
    "quality": "A"
   },
   "b_deep_1976_2021": {
-   "n_sample": 10015,
-   "n_b": 5419,
+   "n_sample": 9532,
+   "n_b": 4976,
    "mc": 5.4,
-   "b": 0.9691925450154326,
+   "b": 0.9360865208137327,
    "ci95": [
-    0.9454054225636151,
-    0.995895342009033
+    0.9109181824528273,
+    0.9607696031181667
    ],
    "quality": "A"
   }
@@ -124,16 +126,16 @@
    "sha256": "10bb8bfe413eacbaf76c030ac175ade10fe1f853f296bdb443f868437418d7fc"
   },
   "global.json": {
-   "bytes": 16810,
-   "sha256": "dfb2a3b2ad228414348a9f0bec93c2d1bbf2321d193326efec62724b089c4ff5"
+   "bytes": 17173,
+   "sha256": "4721c686cfcdee4c3af9a75ae122ea3a48e9cd27ae6e13d26609719a6818a883"
   },
   "sequences.json": {
-   "bytes": 56234,
-   "sha256": "0ff831d8462691725026fa0178ac9782b5d4b93f7e38bf7aa7d082dc582ffca0"
+   "bytes": 55272,
+   "sha256": "ac633e3b23b7e6ca87cc6f4c75cbe9fd2cf29b819ffe68232df7ec76fcbd9059"
   },
   "cells.geojson": {
-   "bytes": 1488054,
-   "sha256": "c04437d4aecbe428536a9a89f4edcebd588d9005266cf8ef09e2618d7d565c58"
+   "bytes": 1477697,
+   "sha256": "d5431d3ca72846dd17c873dd7b06b83ab937b5077b90c81f1fbfac9b81412f3f"
   },
   "coastline.geojson": {
    "bytes": 384300,
@@ -149,8 +151,8 @@
   }
  },
  "cell_detail_files": {
-  "count": 1292,
-  "bytes": 2625816
+  "count": 1289,
+  "bytes": 2558469
  },
  "events": {
   "events_m6.json": {

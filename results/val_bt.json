@@ -3,13 +3,13 @@
   "n_sequences": 40,
   "not_covered": 4,
   "shown_per_window": {
-   "pre_5y": 3,
+   "pre_5y": 2,
    "pre_1y": 0,
-   "post_0_30d": 2,
-   "post_30_365d": 2
+   "post_0_30d": 1,
+   "post_30_365d": 1
   },
   "n_pairs_pre5y_post30_365": 1,
-  "median_post_minus_pre": 0.031652067345369295,
+  "median_post_minus_pre": 0.014796994266501384,
   "pairs_non_overlapping_ci": 0
  },
  "validation_sumatra": {
@@ -21,32 +21,32 @@
   },
   "ours": {
    "2000_2004": {
-    "n": 65,
+    "n": 62,
     "b": null,
-    "b_raw": 1.330271386009962,
+    "b_raw": 1.1844394960997784,
     "b_lo": null,
     "b_hi": null,
-    "n_b": 17,
+    "n_b": 12,
     "q": "insufficient",
     "mc_window": 5.5,
-    "b_lo_raw": 0.6804317125676013,
-    "b_hi_raw": 2.3688789921995603
+    "b_lo_raw": 0.683151046481973,
+    "b_hi_raw": 2.061676748290506
    },
    "2005_2009": {
-    "n": 612,
-    "b": 1.0431269054861234,
-    "b_raw": 1.0431269054861234,
-    "b_lo": 0.8779400309450953,
-    "b_hi": 1.1474360390959581,
-    "n_b": 407,
-    "q": "A",
+    "n": 578,
+    "b": 1.0261810542861647,
+    "b_raw": 1.0261810542861647,
+    "b_lo": 0.8713432287156135,
+    "b_hi": 1.1752983638342531,
+    "n_b": 280,
+    "q": "B",
     "mc_window": 5.2,
-    "b_lo_raw": 0.8779400309450953,
-    "b_hi_raw": 1.1474360390959581,
-    "bpos": 1.0022180351613503,
-    "bpos_lo": 0.8249658053277735,
-    "bpos_hi": 1.1794702649949271,
-    "n_bpos": 126
+    "b_lo_raw": 0.8713432287156135,
+    "b_hi_raw": 1.1752983638342531,
+    "bpos": 1.0109984184481207,
+    "bpos_lo": 0.7874950267466079,
+    "bpos_hi": 1.2345018101496334,
+    "n_bpos": 93
    }
   },
   "same_direction": false,
@@ -55,13 +55,13 @@
  "table_rows": [
   {
    "test": "b(t) retrospective: Sumatra band 92-100 E, 2000-2004 vs 2005-2009, ISC-GEM Mw",
-   "ours": "before 1.330 [0.680, 2.369] n=17 q=insufficient; after 1.043 [0.878, 1.147] n=407 q=A",
+   "ours": "before 1.184 [0.683, 2.062] n=12 q=insufficient; after 1.026 [0.871, 1.175] n=280 q=B",
    "published": "before 1.04, after 1.14 (ISC mb; Srivastava et al. 2021 preprint)",
-   "verdict": "not testable: 2000_2004 window has q=insufficient (n=17) [needs human check]"
+   "verdict": "not testable: 2000_2004 window has q=insufficient (n=12) [needs human check]"
   },
   {
    "test": "b(t) retrospective: 40 sequences, pre 5 yr vs 30-365 d after (ISC-GEM Mw)",
-   "ours": "shown (A/B) per window {'pre_5y': 3, 'pre_1y': 0, 'post_0_30d': 2, 'post_30_365d': 2}; 1 pair(s) with both shown; median post - pre +0.032; 0 with separated intervals",
+   "ours": "shown (A/B) per window {'pre_5y': 2, 'pre_1y': 0, 'post_0_30d': 1, 'post_30_365d': 1}; 1 pair(s) with both shown; median post - pre +0.015; 0 with separated intervals",
    "published": "no published Mw >= 5 before/after comparison found",
    "verdict": "description only"
   }
@@ -73,33 +73,33 @@
    "place": "2004 Sumatra - Andaman Islands Earthquake",
    "pre_5y_b": null,
    "pre_1y_b": null,
-   "post_0_30d_b": 1.1135755946237236,
-   "post_30_365d_b": 1.0927772955801671,
+   "post_0_30d_b": null,
+   "post_30_365d_b": null,
    "pre_5y_q": "insufficient",
    "pre_1y_q": "insufficient",
-   "post_0_30d_q": "B",
-   "post_30_365d_q": "B",
-   "pre_5y_n": 17,
+   "post_0_30d_q": "insufficient",
+   "post_30_365d_q": "C",
+   "pre_5y_n": 12,
    "pre_1y_n": 0,
-   "post_0_30d_n": 75,
-   "post_30_365d_n": 97
+   "post_0_30d_n": 49,
+   "post_30_365d_n": 157
   },
   {
    "time": "2011-03-11",
    "mag": 9.1,
    "place": "2011 Great Tohoku Earthquake, Japan",
-   "pre_5y_b": 0.920566529773296,
+   "pre_5y_b": 0.8731846726097129,
    "pre_1y_b": null,
-   "post_0_30d_b": null,
-   "post_30_365d_b": 0.9522185971186653,
-   "pre_5y_q": "A",
+   "post_0_30d_b": 0.9475515968798233,
+   "post_30_365d_b": 0.8879816668762143,
+   "pre_5y_q": "B",
    "pre_1y_q": "insufficient",
-   "post_0_30d_q": "C",
+   "post_0_30d_q": "B",
    "post_30_365d_q": "A",
-   "pre_5y_n": 147,
-   "pre_1y_n": 31,
-   "post_0_30d_n": 191,
-   "post_30_365d_n": 115
+   "pre_5y_n": 114,
+   "pre_1y_n": 25,
+   "post_0_30d_n": 84,
+   "post_30_365d_n": 87
   },
   {
    "time": "2010-02-27",
@@ -107,16 +107,16 @@
    "place": "2010 Maule, Chile Earthquake",
    "pre_5y_b": null,
    "pre_1y_b": null,
-   "post_0_30d_b": 1.08118066823467,
+   "post_0_30d_b": null,
    "post_30_365d_b": null,
    "pre_5y_q": "insufficient",
    "pre_1y_q": "insufficient",
-   "post_0_30d_q": "B",
+   "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 19,
+   "pre_5y_n": 17,
    "pre_1y_n": 0,
-   "post_0_30d_n": 89,
-   "post_30_365d_n": 33
+   "post_0_30d_n": 46,
+   "post_30_365d_n": 37
   },
   {
    "time": "2025-07-29",
@@ -147,9 +147,9 @@
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 48,
+   "pre_5y_n": 35,
    "pre_1y_n": 0,
-   "post_0_30d_n": 20,
+   "post_0_30d_n": 0,
    "post_30_365d_n": 0
   },
   {
@@ -164,7 +164,7 @@
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 14,
+   "pre_5y_n": 10,
    "pre_1y_n": 0,
    "post_0_30d_n": 0,
    "post_30_365d_n": 0
@@ -181,10 +181,10 @@
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 15,
+   "pre_5y_n": 13,
    "pre_1y_n": 0,
-   "post_0_30d_n": 23,
-   "post_30_365d_n": 24
+   "post_0_30d_n": 16,
+   "post_30_365d_n": 22
   },
   {
    "time": "1994-10-04",
@@ -198,10 +198,10 @@
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 16,
+   "pre_5y_n": 14,
    "pre_1y_n": 0,
-   "post_0_30d_n": 20,
-   "post_30_365d_n": 13
+   "post_0_30d_n": 0,
+   "post_30_365d_n": 9
   },
   {
    "time": "2006-11-15",
@@ -215,10 +215,10 @@
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 20,
+   "pre_5y_n": 18,
    "pre_1y_n": 0,
-   "post_0_30d_n": 26,
-   "post_30_365d_n": 15
+   "post_0_30d_n": 12,
+   "post_30_365d_n": 12
   },
   {
    "time": "2013-05-24",
@@ -251,8 +251,8 @@
    "post_30_365d_q": "insufficient",
    "pre_5y_n": 28,
    "pre_1y_n": 0,
-   "post_0_30d_n": 39,
-   "post_30_365d_n": 22
+   "post_0_30d_n": 24,
+   "post_30_365d_n": 21
   },
   {
    "time": "1994-06-09",
@@ -283,9 +283,9 @@
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 35,
-   "pre_1y_n": 22,
-   "post_0_30d_n": 30,
+   "pre_5y_n": 32,
+   "pre_1y_n": 19,
+   "post_0_30d_n": 16,
    "post_30_365d_n": 0
   },
   {
@@ -296,13 +296,13 @@
    "pre_1y_b": null,
    "post_0_30d_b": null,
    "post_30_365d_b": null,
-   "pre_5y_q": "C",
+   "pre_5y_q": "insufficient",
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 50,
+   "pre_5y_n": 49,
    "pre_1y_n": 0,
-   "post_0_30d_n": 19,
+   "post_0_30d_n": 0,
    "post_30_365d_n": 0
   },
   {
@@ -334,7 +334,7 @@
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "not covered",
-   "pre_5y_n": 24,
+   "pre_5y_n": 14,
    "pre_1y_n": 0,
    "post_0_30d_n": 0,
    "post_30_365d_n": null
@@ -351,9 +351,9 @@
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 13,
+   "pre_5y_n": 12,
    "pre_1y_n": 0,
-   "post_0_30d_n": 5,
+   "post_0_30d_n": 0,
    "post_30_365d_n": 0
   },
   {
@@ -404,7 +404,7 @@
    "post_30_365d_q": "insufficient",
    "pre_5y_n": 2,
    "pre_1y_n": 0,
-   "post_0_30d_n": 22,
+   "post_0_30d_n": 0,
    "post_30_365d_n": 0
   },
   {
@@ -419,26 +419,26 @@
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 41,
+   "pre_5y_n": 40,
    "pre_1y_n": 0,
-   "post_0_30d_n": 30,
-   "post_30_365d_n": 17
+   "post_0_30d_n": 16,
+   "post_30_365d_n": 14
   },
   {
    "time": "2021-03-04",
    "mag": 8.1,
    "place": "2021 Kermadec Islands, New Zealand Earthquake",
-   "pre_5y_b": 0.9194279193468601,
+   "pre_5y_b": 0.9039613650474927,
    "pre_1y_b": null,
    "post_0_30d_b": null,
    "post_30_365d_b": null,
    "pre_5y_q": "B",
    "pre_1y_q": "insufficient",
-   "post_0_30d_q": "C",
+   "post_0_30d_q": "insufficient",
    "post_30_365d_q": "not covered",
-   "pre_5y_n": 85,
+   "pre_5y_n": 69,
    "pre_1y_n": 0,
-   "post_0_30d_n": 76,
+   "post_0_30d_n": 48,
    "post_30_365d_n": null
   },
   {
@@ -451,11 +451,11 @@
    "post_30_365d_b": null,
    "pre_5y_q": "insufficient",
    "pre_1y_q": "insufficient",
-   "post_0_30d_q": "C",
+   "post_0_30d_q": "insufficient",
    "post_30_365d_q": "not covered",
-   "pre_5y_n": 38,
+   "pre_5y_n": 35,
    "pre_1y_n": 0,
-   "post_0_30d_n": 71,
+   "post_0_30d_n": 46,
    "post_30_365d_n": null
   },
   {
@@ -521,7 +521,7 @@
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 28,
+   "pre_5y_n": 20,
    "pre_1y_n": 0,
    "post_0_30d_n": 15,
    "post_30_365d_n": 0
@@ -538,7 +538,7 @@
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 20,
+   "pre_5y_n": 19,
    "pre_1y_n": 0,
    "post_0_30d_n": 0,
    "post_30_365d_n": 0
@@ -564,18 +564,18 @@
    "time": "2013-02-06",
    "mag": 8.0,
    "place": "2013 Santa Cruz Islands Earthquake",
-   "pre_5y_b": 1.0159772064293542,
+   "pre_5y_b": null,
    "pre_1y_b": null,
    "post_0_30d_b": null,
    "post_30_365d_b": null,
-   "pre_5y_q": "B",
+   "pre_5y_q": "C",
    "pre_1y_q": "insufficient",
-   "post_0_30d_q": "C",
+   "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 71,
-   "pre_1y_n": 22,
-   "post_0_30d_n": 59,
-   "post_30_365d_n": 11
+   "pre_5y_n": 53,
+   "pre_1y_n": 18,
+   "post_0_30d_n": 45,
+   "post_30_365d_n": 12
   },
   {
    "time": "2019-05-26",
@@ -606,7 +606,7 @@
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 30,
+   "pre_5y_n": 22,
    "pre_1y_n": 0,
    "post_0_30d_n": 0,
    "post_30_365d_n": 0
@@ -640,7 +640,7 @@
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 19,
+   "pre_5y_n": 13,
    "pre_1y_n": 0,
    "post_0_30d_n": 0,
    "post_30_365d_n": 0
@@ -677,7 +677,7 @@
    "pre_5y_n": 0,
    "pre_1y_n": 0,
    "post_0_30d_n": 0,
-   "post_30_365d_n": 14
+   "post_30_365d_n": 0
   },
   {
    "time": "2000-06-18",
@@ -742,7 +742,7 @@
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
    "post_30_365d_q": "insufficient",
-   "pre_5y_n": 15,
+   "pre_5y_n": 0,
    "pre_1y_n": 0,
    "post_0_30d_n": 0,
    "post_30_365d_n": 0
