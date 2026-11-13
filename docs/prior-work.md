@@ -92,3 +92,87 @@ No open source provides a global, per-place Mc and b with stated uncertainty, qu
 compared, and downloadable data. Regional maps exist (e.g. Southern California, Japan, Central Asia). ZMAP-style
 tools let a specialist compute one. The global numbers above are single values per class or per period. The atlas
 publishes the per-place version, shows where it cannot be computed, and gives the reason.
+
+## Ongoing aftershock sequences (Sequence Monitor)
+
+Searched on 2026-11-13 for the "Ongoing" view ([monitor.md](monitor.md)).
+
+### USGS operational aftershock forecasts (`oaf`)
+
+- **What it is.** The USGS issues aftershock forecasts as the ComCat product `oaf`, shown on the event page
+  ("Aftershock Forecast"). The background page describes the Reasenberg & Jones (1989, 1994) rate
+  R = 10^(a + b(Mmain − M)) (T + c)^(−p): a is the productivity, b the magnitude scaling, p the decay and c the early
+  time scale ([USGS OAF background](https://earthquake.usgs.gov/data/oaf/background.php),
+  [overview](https://earthquake.usgs.gov/data/oaf/overview.php)).
+- **Generic and sequence-specific parameters.** The first forecast uses generic regional values; later updates fit
+  a sequence-specific a (b, p and c usually stay generic) and combine the two in a Bayesian way. Outside
+  California the generic values are those of Page et al. (2016); in California, Hardebeck et al. (2018).
+- **What the product holds (read from ComCat on 2026-11-13).** `forecast.json` contains the model name, the
+  parameters (`a`, `p`, `c`, `b`, `magMain`, `Mcat` or `Mc`, the F/G/H of the time-dependent completeness, the
+  region circle, and `aSigma`/`pSigma` for RJ), the observed counts, and the forecast bins with probabilities.
+  - Of the 44 M ≥ 6.5 events between 2025-11-13 and 2026-11-13, 6 had an `oaf` product: 2 Reasenberg-Jones
+    (Hubbard Glacier M 7.0, Alaska M 6.5) and 4 "Epidemic-Type aftershock model (Bayesian Combination)"
+    (Indonesia M 7.8, Panama M 7.7, Venezuela M 7.5, Colombia M 7.4). The ETAS products report `ams` (mainshock
+    productivity) and `a` (secondary productivity) separately.
+  - We reproduce these parameters in [monitor.md](monitor.md) §5.
+- **What we do not do.** The USGS product is a forecast with probabilities. The monitor gives none: it only
+  describes the sequence up to the data cut-off, and links to the USGS event page for the official forecast.
+
+### Page et al. (2016): generic regional parameters
+
+Page, van der Elst, Hardebeck, Felzer & Michael (2016), "Three ingredients for improved global aftershock
+forecasts: tectonic region, time-dependent catalog incompleteness, and intersequence variability", BSSA 106(5),
+2290–2301, doi:10.1785/0120160073 ([USGS record](https://www.usgs.gov/publications/three-ingredients-improved-global-aftershock-forecasts-tectonic-region-time-dependent)).
+
+- Regions are the Garcia et al. (2012) tectonic regimes. Within a region the a-value is treated as normal; the
+  spread between regions in mean productivity reaches almost a factor of 10.
+- The paper's tables were not reachable (publisher page and USGS PDF refused automated access). We use the values
+  that the USGS forecast software ships as `PageEtAlGenericParams_032116.csv` and `GenericRJ_ParametersFetch.json`
+  ([opensha/opensha-oaf](https://github.com/opensha/opensha-oaf)). Every region has b = 1.00 and c = 0.018 day.
+  The a-value spread used by that software is σ(M) = √(σ₀² + σ₁² / 10^max(M, 6)), with σ₀ = 0.49.
+
+  | Region | p | mean a | σ₁ | | Region | p | mean a | σ₁ |
+  |---|---|---|---|---|---|---|---|---|
+  | ANSR-DEEPCON | 0.98 | −2.13 | 250 | | SCR-GENERIC | 0.73 | −2.85 | 870 |
+  | ANSR-HOTSPOT | 1.12 | −3.00 | 680 | | SCR-ABVSLAB | 0.73 | −2.85 | 870 |
+  | ANSR-OCEANBD | 1.08 | −3.19 | 500 | | SOR-GENERIC | 0.97 | −3.04 | 650 |
+  | ANSR-SHALCON | 0.98 | −2.42 | 570 | | SOR-ABVSLAB | 0.97 | −3.04 | 650 |
+  | ANSR-ABSLDEC | 1.01 | −2.29 | 560 | | SZ-GENERIC | 0.88 | −2.47 | 570 |
+  | ANSR-ABSLOCB | 0.64 | −2.82 | 890 | | SZ-INLBACK | 0.86 | −2.43 | 640 |
+  | ANSR-ABSLSHC | 1.06 | −2.85 | 800 | | SZ-ONSHORE | 0.81 | −2.34 | 500 |
+  | | | | | | SZ-OUTERTR | 0.92 | −2.42 | 540 |
+
+- The regime of a point comes from the same software's 0.05° grid (`TectonicRegimeTable.dat`, built from STREC),
+  downloaded at build time from a pinned commit and not redistributed here.
+
+### Other open trackers of ongoing sequences
+
+- **USGS Earthquake Sequence product** ([USGS](https://usgs.gov/programs/earthquake-hazards/science/earthquake-sequence-product)):
+  groups events into sequences with the same models as the forecasts; it shows the sequences for which forecasts
+  are made.
+- **IRIS/EarthScope Aftershocks product** ([IRIS](https://www.iris.edu/ds/products/aftershocks),
+  [newsletter](https://ds.iris.edu/ds/newsletter/vol22/no3/525/aftershocks-data-product-whats-new/)): figures and
+  animations for global M > 7 sequences, updated hourly for 10 days. No fitted parameters with uncertainties.
+- **EarthquakeTracker.org** ([methodology](https://www.earthquaketracker.org/methodology)): a live viewer of USGS
+  data that flags possible mainshocks by a simple count rule (at least three smaller events within 20 km and
+  72 hours). No decay fits.
+- We found **no open global tracker** that publishes, for every recent large sequence, the Omori-Utsu parameters
+  and b with intervals and quality codes, and a productivity comparison with the regional generic values. That is
+  the gap the monitor fills, as a description and not as a forecast.
+
+### Communicating "descriptive, not a forecast"
+
+- Becker et al. (2020, SRL), on the 2016 Kaikōura forecasts: technical agencies used the forecasts well, but less
+  technical users and the public often struggled; the authors recommend audience-specific material and support
+  ([USGS record](https://www.usgs.gov/publications/forecasting-a-fractured-land-a-case-study-communication-and-use-aftershock-forecasts),
+  [Temblor summary](https://temblor.net/?p=11912)).
+- Wein, McBride et al. (2024, IJDRR), on the Canterbury sequence: communicate the uncertainty, and link forecasts to
+  scenarios and preparedness advice ([USGS record](https://www.usgs.gov/publications/long-term-communication-aftershock-forecasts-canterbury-earthquake-sequence-new)).
+- We did not find a study of "descriptive versus forecast" wording as such; Michael et al. (2019, on the 2018
+  Anchorage forecasts) and McBride et al. (2020, Bombay Beach swarm) are likely sources but we did not read their
+  full texts.
+- What the site does, from these points:
+  - one plain sentence first ("Descriptive only, not a forecast"), then what the numbers are and are not;
+  - no probability, no expected count and no curve beyond the data cut-off;
+  - every estimate with its interval and a quality code, and "too few events" said in words;
+  - a link to the official USGS event page, which carries the forecast where one exists.
