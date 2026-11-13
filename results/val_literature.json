@@ -1,0 +1,1049 @@
+{
+ "entries": [
+  {
+   "id": "kj2013_fe01_alaska_aleutian",
+   "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+   "doi": "10.1785/0120120110",
+   "compare": {
+    "kind": "box",
+    "box_SNWE": [
+     50,
+     65,
+     163,
+     -140
+    ],
+    "approximate": true,
+    "years": [
+     1977,
+     2010
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.8,
+    "declustered": false
+   },
+   "needs_human_check": true,
+   "b_aki": {
+    "b": 1.0005653788018405,
+    "ci95": [
+     0.8971974619254102,
+     1.1060937585973434
+    ],
+    "sigma_shibolt": 0.053937996835137475,
+    "n": 326,
+    "thr": 5.8
+   },
+   "b_tgr": {
+    "beta": 0.659683417480004,
+    "b": 0.989525126220006,
+    "ci95": [
+     0.8650679658200956,
+     1.1327360677128593
+    ],
+    "corner_mag": 7.989422586343334,
+    "n": 291,
+    "thr": 5.8
+   },
+   "b_tgr_magerr010": {
+    "beta": 0.6102917328890767,
+    "b": 0.915437599333615,
+    "ci95": [
+     0.8083437771655715,
+     1.0441958451513256
+    ],
+    "corner_mag": 7.945442652941365,
+    "n": 259,
+    "thr": 5.8
+   },
+   "published_b": 0.9750000000000001,
+   "published_b_se": 0.06,
+   "published_n": 280,
+   "verdict": "match (approximate region)",
+   "z": 0.15979513066617373,
+   "verdict_magerr010": "match (approximate region)",
+   "z_magerr010": -0.700977257097291
+  },
+  {
+   "id": "kj2013_fe05_mexico_guatemala",
+   "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+   "doi": "10.1785/0120120110",
+   "compare": {
+    "kind": "box",
+    "box_SNWE": [
+     13,
+     22,
+     -106,
+     -90
+    ],
+    "approximate": true,
+    "years": [
+     1977,
+     2010
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.8,
+    "declustered": false
+   },
+   "needs_human_check": true,
+   "b_aki": {
+    "b": 0.8802850589959611,
+    "ci95": [
+     0.7485811732267433,
+     1.0661649942002573
+    ],
+    "sigma_shibolt": 0.07528415818814663,
+    "n": 143,
+    "thr": 5.8
+   },
+   "b_tgr": {
+    "beta": 0.5457804697737907,
+    "b": 0.818670704660686,
+    "ci95": [
+     0.6601566522731241,
+     1.0211327690903098
+    ],
+    "corner_mag": 7.920860924303919,
+    "n": 125,
+    "thr": 5.8
+   },
+   "b_tgr_magerr010": {
+    "beta": 0.5296823789263924,
+    "b": 0.7945235683895886,
+    "ci95": [
+     0.6391760806529047,
+     0.9456212798459236
+    ],
+    "corner_mag": 7.905628331207475,
+    "n": 121,
+    "thr": 5.8
+   },
+   "published_b": 0.8999999999999999,
+   "published_b_se": 0.09,
+   "published_n": 164,
+   "verdict": "match (approximate region)",
+   "z": -0.6316224702884566,
+   "verdict_magerr010": "match (approximate region)",
+   "z_magerr010": -0.8847866170625663
+  },
+  {
+   "id": "kj2013_fe06_central_america",
+   "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+   "doi": "10.1785/0120120110",
+   "compare": {
+    "kind": "box",
+    "box_SNWE": [
+     7,
+     15,
+     -92,
+     -82
+    ],
+    "approximate": true,
+    "years": [
+     1977,
+     2010
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.8,
+    "declustered": false
+   },
+   "needs_human_check": true,
+   "b_aki": {
+    "b": 1.0733658536083872,
+    "ci95": [
+     0.922881961249015,
+     1.2745456949945264
+    ],
+    "sigma_shibolt": 0.08856236795150595,
+    "n": 141,
+    "thr": 5.8
+   },
+   "b_tgr": {
+    "beta": 0.6921399414893148,
+    "b": 1.038209912233972,
+    "ci95": [
+     0.8802748474112947,
+     1.2833776034216362
+    ],
+    "corner_mag": 7.789272486971846,
+    "n": 123,
+    "thr": 5.8
+   },
+   "b_tgr_magerr010": {
+    "beta": 0.6836665480843693,
+    "b": 1.0254998221265539,
+    "ci95": [
+     0.8677005508342572,
+     1.2441141551782113
+    ],
+    "corner_mag": 7.781423171040811,
+    "n": 121,
+    "thr": 5.8
+   },
+   "published_b": 1.02,
+   "published_b_se": 0.09,
+   "published_n": 161,
+   "verdict": "match (approximate region)",
+   "z": 0.13325499155582735,
+   "verdict_magerr010": "match (approximate region)",
+   "z_magerr010": 0.04178951803761446
+  },
+  {
+   "id": "kj2013_fe08_andean_south_america",
+   "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+   "doi": "10.1785/0120120110",
+   "compare": {
+    "kind": "box",
+    "box_SNWE": [
+     -56,
+     13,
+     -82,
+     -63
+    ],
+    "approximate": true,
+    "years": [
+     1977,
+     2010
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.8,
+    "declustered": false
+   },
+   "needs_human_check": true,
+   "b_aki": {
+    "b": 0.9759153109734056,
+    "ci95": [
+     0.8788790871869215,
+     1.0814552512335323
+    ],
+    "sigma_shibolt": 0.050995848167780855,
+    "n": 401,
+    "thr": 5.8
+   },
+   "b_tgr": {
+    "beta": 0.6463792186755413,
+    "b": 0.9695688280133119,
+    "ci95": [
+     0.8657937169561444,
+     1.072698018338905
+    ],
+    "corner_mag": 8.8621704168717,
+    "n": 357,
+    "thr": 5.8
+   },
+   "b_tgr_magerr010": {
+    "beta": 0.6019691938655469,
+    "b": 0.9029537907983204,
+    "ci95": [
+     0.8035105375518545,
+     1.0138397809099648
+    ],
+    "corner_mag": 8.814995963034205,
+    "n": 307,
+    "thr": 5.8
+   },
+   "published_b": 0.855,
+   "published_b_se": 0.06,
+   "published_n": 286,
+   "verdict": "match (approximate region)",
+   "z": 1.4336895259378564,
+   "verdict_magerr010": "match (approximate region)",
+   "z_magerr010": 0.5957611394202154
+  },
+  {
+   "id": "kj2013_fe12_kermadec_tonga_samoa",
+   "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+   "doi": "10.1785/0120120110",
+   "compare": {
+    "kind": "box",
+    "box_SNWE": [
+     -38,
+     -13,
+     175,
+     -170
+    ],
+    "approximate": true,
+    "years": [
+     1977,
+     2010
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.8,
+    "declustered": false
+   },
+   "needs_human_check": true,
+   "b_aki": {
+    "b": 1.237114193756948,
+    "ci95": [
+     1.1374225132526503,
+     1.3463194104620326
+    ],
+    "sigma_shibolt": 0.05292429333288597,
+    "n": 569,
+    "thr": 5.8
+   },
+   "b_tgr": {
+    "beta": 0.8392644621608241,
+    "b": 1.258896693241236,
+    "ci95": [
+     1.1561077255511811,
+     1.3892855401938065
+    ],
+    "corner_mag": 8.305324314998602,
+    "n": 500,
+    "thr": 5.8
+   },
+   "b_tgr_magerr010": {
+    "beta": 0.8077785402663588,
+    "b": 1.2116678103995382,
+    "ci95": [
+     1.1076214268788265,
+     1.3143692272257232
+    ],
+    "corner_mag": 8.261353566801432,
+    "n": 464,
+    "thr": 5.8
+   },
+   "published_b": 1.2000000000000002,
+   "published_b_se": 0.06,
+   "published_n": 439,
+   "verdict": "match (approximate region)",
+   "z": 0.6970944310849644,
+   "verdict_magerr010": "match (approximate region)",
+   "z_magerr010": 0.14605664088686227
+  },
+  {
+   "id": "kj2013_fe18_guam_japan",
+   "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+   "doi": "10.1785/0120120110",
+   "compare": {
+    "kind": "box",
+    "box_SNWE": [
+     12,
+     34,
+     138,
+     148
+    ],
+    "approximate": true,
+    "years": [
+     1977,
+     2010
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.8,
+    "declustered": false
+   },
+   "needs_human_check": true,
+   "b_aki": {
+    "b": 1.3117465984016636,
+    "ci95": [
+     1.0820199404853925,
+     1.631359982783798
+    ],
+    "sigma_shibolt": 0.14186821670100314,
+    "n": 111,
+    "thr": 5.8
+   },
+   "b_tgr": {
+    "beta": 0.8568367048398619,
+    "b": 1.2852550572597927,
+    "ci95": [
+     0.9929855899115032,
+     1.6508739176587959
+    ],
+    "corner_mag": 8.010931678805061,
+    "n": 94,
+    "thr": 5.8
+   },
+   "b_tgr_magerr010": {
+    "beta": 0.8395908212268463,
+    "b": 1.2593862318402693,
+    "ci95": [
+     0.9984010933987628,
+     1.6312390487397117
+    ],
+    "corner_mag": 7.99183599969026,
+    "n": 88,
+    "thr": 5.8
+   },
+   "published_b": 1.29,
+   "published_b_se": 0.15000000000000002,
+   "published_n": 88,
+   "verdict": "match (approximate region)",
+   "z": -0.02108000482621636,
+   "verdict_magerr010": "match (approximate region)",
+   "z_magerr010": -0.13892075061570774
+  },
+  {
+   "id": "kj2013_fe19_japan_kamchatka",
+   "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+   "doi": "10.1785/0120120110",
+   "compare": {
+    "kind": "box",
+    "box_SNWE": [
+     35,
+     60,
+     140,
+     165
+    ],
+    "approximate": true,
+    "years": [
+     1977,
+     2010
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.8,
+    "declustered": false
+   },
+   "needs_human_check": true,
+   "b_aki": {
+    "b": 1.0493168062126488,
+    "ci95": [
+     0.9615079899280115,
+     1.1521853050770268
+    ],
+    "sigma_shibolt": 0.05075961433356915,
+    "n": 479,
+    "thr": 5.8
+   },
+   "b_tgr": {
+    "beta": 0.7148422613158809,
+    "b": 1.0722633919738214,
+    "ci95": [
+     0.9689850032584628,
+     1.201092543465925
+    ],
+    "corner_mag": 8.44226829007485,
+    "n": 435,
+    "thr": 5.8
+   },
+   "b_tgr_magerr010": {
+    "beta": 0.6617120046387089,
+    "b": 0.9925680069580634,
+    "ci95": [
+     0.898167426264557,
+     1.1155305859159912
+    ],
+    "corner_mag": 8.397025898473856,
+    "n": 362,
+    "thr": 5.8
+   },
+   "published_b": 0.9299999999999999,
+   "published_b_se": 0.06,
+   "published_n": 425,
+   "verdict": "match (approximate region)",
+   "z": 1.6876482224086633,
+   "verdict_magerr010": "match (approximate region)",
+   "z_magerr010": 0.7658383988385671
+  },
+  {
+   "id": "kj2013_tohoku_box",
+   "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+   "doi": "10.1785/0120120110",
+   "compare": {
+    "kind": "box",
+    "box_SNWE": [
+     35,
+     40,
+     140,
+     146
+    ],
+    "approximate": false,
+    "years": [
+     1977,
+     2010
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.8,
+    "declustered": false
+   },
+   "needs_human_check": true,
+   "b_aki": {
+    "b": 1.0962773329596687,
+    "ci95": [
+     0.9296948295711633,
+     1.3354127301624348
+    ],
+    "sigma_shibolt": 0.0987769698629892,
+    "n": 117,
+    "thr": 5.8
+   },
+   "b_tgr": {
+    "beta": 0.7210154112993851,
+    "b": 1.0815231169490775,
+    "ci95": [
+     0.8598195723159474,
+     1.3330896443903129
+    ],
+    "corner_mag": 7.550380020064741,
+    "n": 105,
+    "thr": 5.8
+   },
+   "b_tgr_magerr010": {
+    "beta": 0.6818693894121549,
+    "b": 1.0228040841182324,
+    "ci95": [
+     0.7993394322142161,
+     1.2600593743501927
+    ],
+    "corner_mag": 7.52101294068378,
+    "n": 93,
+    "thr": 5.8
+   },
+   "published_b": 0.96,
+   "published_b_se": 0.10500000000000001,
+   "published_n": 109,
+   "verdict": "match",
+   "z": 0.759500868070296,
+   "verdict_magerr010": "match",
+   "z_magerr010": 0.3984976060971301
+  },
+  {
+   "id": "kj2013_fe24_sunda_arc",
+   "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+   "doi": "10.1785/0120120110",
+   "compare": {
+    "kind": "box",
+    "box_SNWE": [
+     -12,
+     -5,
+     100,
+     125
+    ],
+    "approximate": true,
+    "years": [
+     1977,
+     2010
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.8,
+    "declustered": false
+   },
+   "needs_human_check": true,
+   "b_aki": {
+    "b": 1.1259486567862125,
+    "ci95": [
+     0.9689438640072561,
+     1.328988578501758
+    ],
+    "sigma_shibolt": 0.09172897889677044,
+    "n": 168,
+    "thr": 5.8
+   },
+   "b_tgr": {
+    "beta": 0.7183122547971178,
+    "b": 1.0774683821956768,
+    "ci95": [
+     0.9007186274449497,
+     1.2531757588938996
+    ],
+    "corner_mag": 8.47577382163129,
+    "n": 141,
+    "thr": 5.8
+   },
+   "b_tgr_magerr010": {
+    "beta": 0.678948646934601,
+    "b": 1.0184229704019014,
+    "ci95": [
+     0.8623526166603287,
+     1.2109987074613158
+    ],
+    "corner_mag": 8.434703810593,
+    "n": 124,
+    "thr": 5.8
+   },
+   "published_b": 0.9750000000000001,
+   "published_b_se": 0.06,
+   "published_n": 278,
+   "verdict": "match (approximate region)",
+   "z": 0.9479582373802122,
+   "verdict_magerr010": "match (approximate region)",
+   "z_magerr010": 0.40473862954387535
+  },
+  {
+   "id": "kj2013_fe46_andaman_sumatra",
+   "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+   "doi": "10.1785/0120120110",
+   "compare": {
+    "kind": "box",
+    "box_SNWE": [
+     -6,
+     15,
+     90,
+     102
+    ],
+    "approximate": true,
+    "years": [
+     1977,
+     2010
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.8,
+    "declustered": false
+   },
+   "needs_human_check": true,
+   "b_aki": {
+    "b": 1.0017851116040446,
+    "ci95": [
+     0.8781266692023337,
+     1.145250633759687
+    ],
+    "sigma_shibolt": 0.06875062090543096,
+    "n": 267,
+    "thr": 5.8
+   },
+   "b_tgr": {
+    "beta": 0.6731141938431915,
+    "b": 1.0096712907647873,
+    "ci95": [
+     0.8676018128320311,
+     1.1513633207078697
+    ],
+    "corner_mag": 9.565026420060779,
+    "n": 240,
+    "thr": 5.8
+   },
+   "b_tgr_magerr010": {
+    "beta": 0.6138247096546728,
+    "b": 0.9207370644820092,
+    "ci95": [
+     0.7984125471546226,
+     1.0799567826308012
+    ],
+    "corner_mag": 9.510724714903779,
+    "n": 195,
+    "thr": 5.8
+   },
+   "published_b": 1.065,
+   "published_b_se": 0.10500000000000001,
+   "published_n": 143,
+   "verdict": "match (approximate region)",
+   "z": -0.4338333493301704,
+   "verdict_magerr010": "match (approximate region)",
+   "z_magerr010": -1.1340152736129514
+  },
+  {
+   "id": "kj2013_all_18_subduction_zones",
+   "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+   "doi": "10.1785/0120120110",
+   "compare": {
+    "kind": "class",
+    "pb_class": "SUB",
+    "approximate": true,
+    "years": [
+     1977,
+     2010
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.8,
+    "declustered": false
+   },
+   "needs_human_check": true,
+   "b_aki": {
+    "b": 1.0306749013172865,
+    "ci95": [
+     0.9969874605378385,
+     1.0689914440620178
+    ],
+    "sigma_shibolt": 0.018802652172977618,
+    "n": 3119,
+    "thr": 5.8
+   },
+   "b_tgr": {
+    "beta": 0.6891639560845709,
+    "b": 1.0337459341268564,
+    "ci95": [
+     0.9959570075563586,
+     1.0734121623755024
+    ],
+    "corner_mag": 8.517421046497965,
+    "n": 2783,
+    "thr": 5.8
+   },
+   "b_tgr_magerr010": {
+    "beta": 0.6513572186080717,
+    "b": 0.9770358279121076,
+    "ci95": [
+     0.9377378268301408,
+     1.0127541739984587
+    ],
+    "corner_mag": 8.469757018952905,
+    "n": 2460,
+    "thr": 5.8
+   },
+   "published_b": 0.9750000000000001,
+   "published_b_se": 0.015,
+   "published_n": 4217,
+   "verdict": "mismatch (approximate region)",
+   "z": 2.368062352327434,
+   "verdict_magerr010": "match (approximate region)",
+   "z_magerr010": 0.08372732937198038
+  },
+  {
+   "id": "kagan2010_global_mt56",
+   "citation": "Kagan, Y. Y. (2010). Earthquake size distribution: Power-law with exponent \u03b2 \u2261 1/2? Tectonophysics, 490(1-2), 103-114.",
+   "doi": "10.1016/j.tecto.2010.04.034",
+   "compare": {
+    "kind": "global",
+    "approximate": false,
+    "declustered": false,
+    "years": [
+     1982,
+     2008
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.6
+   },
+   "needs_human_check": true,
+   "b_aki": {
+    "b": 1.0603614539917283,
+    "ci95": [
+     1.0366763536193049,
+     1.084686760672913
+    ],
+    "sigma_shibolt": 0.011522196511526571,
+    "n": 8133,
+    "thr": 5.6
+   },
+   "b_tgr": {
+    "beta": 0.7248041220297468,
+    "b": 1.08720618304462,
+    "ci95": [
+     1.0633144893775088,
+     1.1104191623682764
+    ],
+    "corner_mag": 9.374608643750587,
+    "n": 7358,
+    "thr": 5.6
+   },
+   "b_tgr_magerr010": {
+    "beta": 0.6901347976258984,
+    "b": 1.0352021964388476,
+    "ci95": [
+     1.0123819594411794,
+     1.0615720292349182
+    ],
+    "corner_mag": 9.322696726643779,
+    "n": 6522,
+    "thr": 5.6
+   },
+   "published_b": 1.0159500000000001,
+   "published_b_se": 0.0,
+   "published_n": 7369,
+   "verdict": "mismatch",
+   "z": 5.929862576259831,
+   "verdict_magerr010": "match",
+   "z_magerr010": 1.534224496056479
+  },
+  {
+   "id": "kagan2010_trenches_mt56",
+   "citation": "Kagan, Y. Y. (2010). Earthquake size distribution: Power-law with exponent \u03b2 \u2261 1/2? Tectonophysics, 490(1-2), 103-114.",
+   "doi": "10.1016/j.tecto.2010.04.034",
+   "compare": {
+    "kind": "class",
+    "pb_class": "SUB",
+    "approximate": true,
+    "declustered": false,
+    "years": [
+     1982,
+     2008
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.6
+   },
+   "needs_human_check": true,
+   "b_aki": {
+    "b": 1.0372325255077652,
+    "ci95": [
+     1.0067717495344035,
+     1.068779085404652
+    ],
+    "sigma_shibolt": 0.016579653353130656,
+    "n": 3892,
+    "thr": 5.6
+   },
+   "b_tgr": {
+    "beta": 0.702278510699385,
+    "b": 1.0534177660490776,
+    "ci95": [
+     1.0130041173853719,
+     1.093806760350649
+    ],
+    "corner_mag": 8.346165762506551,
+    "n": 3513,
+    "thr": 5.6
+   },
+   "b_tgr_magerr010": {
+    "beta": 0.6614588723889975,
+    "b": 0.9921883085834962,
+    "ci95": [
+     0.9547506224595154,
+     1.0290184862193255
+    ],
+    "corner_mag": 8.301752164354026,
+    "n": 3029,
+    "thr": 5.6
+   },
+   "published_b": 0.9694499999999999,
+   "published_b_se": 0.0,
+   "published_n": 4805,
+   "verdict": "mismatch (approximate region)",
+   "z": 4.073550453712634,
+   "verdict_magerr010": "match (approximate region)",
+   "z_magerr010": 1.2001714487920954
+  },
+  {
+   "id": "kagan2010_global_declustered_mt56",
+   "citation": "Kagan, Y. Y. (2010). Earthquake size distribution: Power-law with exponent \u03b2 \u2261 1/2? Tectonophysics, 490(1-2), 103-114.",
+   "doi": "10.1016/j.tecto.2010.04.034",
+   "compare": {
+    "kind": "global",
+    "approximate": true,
+    "declustered": true,
+    "years": [
+     1982,
+     2008
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.6
+   },
+   "needs_human_check": true,
+   "b_aki": {
+    "b": 0.9137875148689116,
+    "ci95": [
+     0.8885449123514936,
+     0.9393139047084964
+    ],
+    "sigma_shibolt": 0.013558192261562468,
+    "n": 4282,
+    "thr": 5.6
+   },
+   "b_tgr": {
+    "beta": 0.6223525355877927,
+    "b": 0.9335288033816891,
+    "ci95": [
+     0.901561360491679,
+     0.9619715022648254
+    ],
+    "corner_mag": 9.239980369880056,
+    "n": 3933,
+    "thr": 5.6
+   },
+   "b_tgr_magerr010": {
+    "beta": 0.6020682383678435,
+    "b": 0.9031023575517653,
+    "ci95": [
+     0.8736720405628009,
+     0.9262790545144675
+    ],
+    "corner_mag": 9.208176290186504,
+    "n": 3700,
+    "thr": 5.6
+   },
+   "published_b": 0.972,
+   "published_b_se": 0.0,
+   "published_n": 5841,
+   "verdict": "mismatch (approximate region)",
+   "z": -2.4963869694279652,
+   "verdict_magerr010": "mismatch (approximate region)",
+   "z_magerr010": -5.133892576476946
+  },
+  {
+   "id": "birdkagan2004_pb2002_class_range",
+   "citation": "Bird, P. & Kagan, Y. Y. (2004). Plate-tectonic analysis of shallow seismicity: apparent boundary width, beta, corner magnitude, coupled lithosphere thickness, and coupling in seven tectonic settings. Bulletin of the Seismological Society of America, 94(6), 2380-2399.",
+   "doi": "10.1785/0120030107",
+   "compare": {
+    "kind": "class_range",
+    "years": [
+     1977,
+     2002
+    ],
+    "depth_max_km": 70,
+    "threshold": 5.8,
+    "approximate": true,
+    "declustered": false
+   },
+   "needs_human_check": true,
+   "per_class_beta": {
+    "SUB": {
+     "beta": 0.6981333748568727,
+     "n": 1977
+    },
+    "CCB": {
+     "beta": 0.6573244661944776,
+     "n": 267
+    },
+    "OCB": {
+     "beta": 0.6489356644974034,
+     "n": 160
+    },
+    "CTF": {
+     "beta": 0.716196249538003,
+     "n": 278
+    },
+    "OTF": {
+     "beta": 0.8158348439301216,
+     "n": 617
+    },
+    "CRB": {
+     "beta": 0.7353470502295282,
+     "n": 208
+    },
+    "OSR": {
+     "beta": 1.0223633739430067,
+     "n": 239
+    }
+   },
+   "ours_range": [
+    0.6489356644974034,
+    1.0223633739430067
+   ],
+   "verdict": "mismatch (approximate)"
+  },
+  {
+   "id": "petruccelli2018_gcmt_mc_map",
+   "citation": "Petruccelli, A. (2018). PhD thesis, Alma Mater Studiorum Universit\u00e0 di Bologna (AMS Dottorato eprint 8466) - material later published in Petruccelli et al. (2019) EPSL 527, 115791 and GRL 46.",
+   "doi": null,
+   "compare": {
+    "kind": "mc_global",
+    "years": [
+     1980,
+     2016
+    ],
+    "depth_max_km": 50,
+    "approximate": true
+   },
+   "needs_human_check": true,
+   "maxc02": 5.4,
+   "mbs": 5.6,
+   "gft": 5.2,
+   "n": 34012,
+   "verdict": "match"
+  }
+ ],
+ "table_rows": [
+  {
+   "test": "Literature b: kj2013_fe01_alaska_aleutian (box [50, 65, 163, -140], 1977-2010, <= 70 km, m >= 5.8)",
+   "ours": "TGR 0.990 [0.865, 1.133] n=291; Aki 1.001 [0.897, 1.106] n=326; TGR magerr 0.10 only 0.915 [0.808, 1.044] n=259",
+   "published": "beta 0.65 \u00b10.04 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
+   "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  },
+  {
+   "test": "Literature b: kj2013_fe05_mexico_guatemala (box [13, 22, -106, -90], 1977-2010, <= 70 km, m >= 5.8)",
+   "ours": "TGR 0.819 [0.660, 1.021] n=125; Aki 0.880 [0.749, 1.066] n=143; TGR magerr 0.10 only 0.795 [0.639, 0.946] n=121",
+   "published": "beta 0.6 \u00b10.06 (b 0.900; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
+   "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  },
+  {
+   "test": "Literature b: kj2013_fe06_central_america (box [7, 15, -92, -82], 1977-2010, <= 70 km, m >= 5.8)",
+   "ours": "TGR 1.038 [0.880, 1.283] n=123; Aki 1.073 [0.923, 1.275] n=141; TGR magerr 0.10 only 1.025 [0.868, 1.244] n=121",
+   "published": "beta 0.68 \u00b10.06 (b 1.020; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
+   "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  },
+  {
+   "test": "Literature b: kj2013_fe08_andean_south_america (box [-56, 13, -82, -63], 1977-2010, <= 70 km, m >= 5.8)",
+   "ours": "TGR 0.970 [0.866, 1.073] n=357; Aki 0.976 [0.879, 1.081] n=401; TGR magerr 0.10 only 0.903 [0.804, 1.014] n=307",
+   "published": "beta 0.57 \u00b10.04 (b 0.855; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
+   "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  },
+  {
+   "test": "Literature b: kj2013_fe12_kermadec_tonga_samoa (box [-38, -13, 175, -170], 1977-2010, <= 70 km, m >= 5.8)",
+   "ours": "TGR 1.259 [1.156, 1.389] n=500; Aki 1.237 [1.137, 1.346] n=569; TGR magerr 0.10 only 1.212 [1.108, 1.314] n=464",
+   "published": "beta 0.8 \u00b10.04 (b 1.200; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
+   "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  },
+  {
+   "test": "Literature b: kj2013_fe18_guam_japan (box [12, 34, 138, 148], 1977-2010, <= 70 km, m >= 5.8)",
+   "ours": "TGR 1.285 [0.993, 1.651] n=94; Aki 1.312 [1.082, 1.631] n=111; TGR magerr 0.10 only 1.259 [0.998, 1.631] n=88",
+   "published": "beta 0.86 \u00b10.10 (b 1.290; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
+   "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  },
+  {
+   "test": "Literature b: kj2013_fe19_japan_kamchatka (box [35, 60, 140, 165], 1977-2010, <= 70 km, m >= 5.8)",
+   "ours": "TGR 1.072 [0.969, 1.201] n=435; Aki 1.049 [0.962, 1.152] n=479; TGR magerr 0.10 only 0.993 [0.898, 1.116] n=362",
+   "published": "beta 0.62 \u00b10.04 (b 0.930; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
+   "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  },
+  {
+   "test": "Literature b: kj2013_tohoku_box (box [35, 40, 140, 146], 1977-2010, <= 70 km, m >= 5.8)",
+   "ours": "TGR 1.082 [0.860, 1.333] n=105; Aki 1.096 [0.930, 1.335] n=117; TGR magerr 0.10 only 1.023 [0.799, 1.260] n=93",
+   "published": "beta 0.64 \u00b10.07 (b 0.960; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
+   "verdict": "match; magerr 0.10 only: match [needs human check]"
+  },
+  {
+   "test": "Literature b: kj2013_fe24_sunda_arc (box [-12, -5, 100, 125], 1977-2010, <= 70 km, m >= 5.8)",
+   "ours": "TGR 1.077 [0.901, 1.253] n=141; Aki 1.126 [0.969, 1.329] n=168; TGR magerr 0.10 only 1.018 [0.862, 1.211] n=124",
+   "published": "beta 0.65 \u00b10.04 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
+   "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  },
+  {
+   "test": "Literature b: kj2013_fe46_andaman_sumatra (box [-6, 15, 90, 102], 1977-2010, <= 70 km, m >= 5.8)",
+   "ours": "TGR 1.010 [0.868, 1.151] n=240; Aki 1.002 [0.878, 1.145] n=267; TGR magerr 0.10 only 0.921 [0.798, 1.080] n=195",
+   "published": "beta 0.71 \u00b10.07 (b 1.065; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
+   "verdict": "match (approximate region); magerr 0.10 only: match [needs human check]"
+  },
+  {
+   "test": "Literature b: kj2013_all_18_subduction_zones (PB2002 SUB, 1977-2010, <= 70 km, m >= 5.8)",
+   "ours": "TGR 1.034 [0.996, 1.073] n=2783; Aki 1.031 [0.997, 1.069] n=3119; TGR magerr 0.10 only 0.977 [0.938, 1.013] n=2460",
+   "published": "beta 0.65 \u00b10.01 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
+   "verdict": "mismatch (approximate region); magerr 0.10 only: match [needs human check]"
+  },
+  {
+   "test": "Literature b: kagan2010_global_mt56 (global, 1982-2008, <= 70 km, m >= 5.6)",
+   "ours": "TGR 1.087 [1.063, 1.110] n=7358; Aki 1.060 [1.037, 1.085] n=8133; TGR magerr 0.10 only 1.035 [1.012, 1.062] n=6522",
+   "published": "beta 0.6773 (b 1.016; Kagan, Y. Y. 2010, Table 2)",
+   "verdict": "mismatch; magerr 0.10 only: match [needs human check]"
+  },
+  {
+   "test": "Literature b: kagan2010_trenches_mt56 (PB2002 SUB, 1982-2008, <= 70 km, m >= 5.6)",
+   "ours": "TGR 1.053 [1.013, 1.094] n=3513; Aki 1.037 [1.007, 1.069] n=3892; TGR magerr 0.10 only 0.992 [0.955, 1.029] n=3029",
+   "published": "beta 0.6463 (b 0.969; Kagan, Y. Y. 2010, Table 2)",
+   "verdict": "mismatch (approximate region); magerr 0.10 only: match [needs human check]"
+  },
+  {
+   "test": "Literature b: kagan2010_global_declustered_mt56 (global, 1982-2008, <= 70 km, m >= 5.6, declustered)",
+   "ours": "TGR 0.934 [0.902, 0.962] n=3933; Aki 0.914 [0.889, 0.939] n=4282; TGR magerr 0.10 only 0.903 [0.874, 0.926] n=3700",
+   "published": "beta 0.648 (b 0.972; Kagan, Y. Y. 2010, Table 2)",
+   "verdict": "mismatch (approximate region); magerr 0.10 only: mismatch [needs human check]"
+  },
+  {
+   "test": "Literature beta range over PB2002 classes (1977-2002, <= 70 km, m >= 5.8, TGR)",
+   "ours": "beta 0.65-1.02 over 7 classes",
+   "published": "best-fitting beta 0.53-0.92 (Bird & Kagan 2004, abstract)",
+   "verdict": "mismatch (approximate) [needs human check]"
+  },
+  {
+   "test": "Literature Mc: GCMT 1980-2016, 0-50 km (Petruccelli 2018 thesis)",
+   "ours": "global MAXC+0.2 5.4, MBS 5.6, GFT 5.2",
+   "published": "most local Mc 5.4-5.5; 5.1-5.3 on ridges and Himalaya",
+   "verdict": "match (global vs local map) [needs human check]"
+  }
+ ],
+ "magerr_diagnostic_global_1982_2008": {
+  "share_magerr_gt_0.10_by_mag": {
+   "5.6-6.0": 0.14563106796116504,
+   "6.0-6.5": 0.07150205761316872,
+   "6.5-7.0": 0.03590664272890485,
+   "7.0-7.5": 0.0070921985815602835,
+   "7.5-10.0": 0.012345679012345678
+  },
+  "b_aki_magerr_gt_0.10": {
+   "b": 1.7357823237346328,
+   "ci95": [
+    1.632778581567116,
+    1.8502376771301021
+   ],
+   "sigma_shibolt": 0.054866761937255815,
+   "n": 995,
+   "thr": 5.6
+  },
+  "b_aki_magerr_0.10": {
+   "b": 1.005805785608972,
+   "ci95": [
+    0.9833438710679656,
+    1.027920194301568
+   ],
+   "sigma_shibolt": 0.011396530455464913,
+   "n": 7138,
+   "thr": 5.6
+  }
+ }
+}

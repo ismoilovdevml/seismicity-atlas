@@ -174,6 +174,9 @@ def validation_table(v, seq):
     t.append({"test": "Omori p recovery, synthetic teleseismic sequence (20 runs)",
               "ours": f"p {s['p_mean']:.3f} (sd {s['p_sd_between']:.3f}, mean sigma {s['sp_mean']:.3f})",
               "published": f"true p {s['p_true']}", "verdict": "match" if abs(s["p_mean"] - s["p_true"]) < 2 * s["p_sd_between"] else "biased"})
+    for f in ("val_chile.json", "val_literature.json", "val_bt.json"):  # rows from scripts/val_*.py, if those have been run
+        if (RES / f).exists():
+            t += json.loads((RES / f).read_text()).get("table_rows", [])
     return t
 
 

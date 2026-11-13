@@ -516,8 +516,8 @@
     -76,
     -66
    ],
-   "published_b": 1.0,
-   "source": "b ~1 (0.97 GR, 1.1 MLE), 2018 national-catalogue study; weak source",
+   "published_b": null,
+   "source": "b ~1 from a 2018 national-catalogue study was a weak source; the GCMT reference (Andean S. America b 0.855 +-0.06, Kagan & Jackson 2013) and the sensitivity tests are in the Chile rows below (scripts/val_chile.py)",
    "n_sample": 1572,
    "n_b": 613,
    "mc": 5.4,

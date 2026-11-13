@@ -1,0 +1,681 @@
+[
+ {
+  "id": "kj2013_fe01_alaska_aleutian",
+  "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+  "doi": "10.1785/0120120110",
+  "url_read": "https://arxiv.org/pdf/1112.5217v2 (author preprint v2, 21 Jul 2012; read via pdftotext)",
+  "quote": "1    1 Alaska-Aleutian Arc           280         0.65±0.04    5.10   9.35±0.28 8.0    1.71 0.336",
+  "location_in_source": "Table 1 (Table 1: FE Subduction Seismic Zones, GCMT 1977-2010/12/31, mt = 5.8.) Columns: No | FE No | Flinn-Engdahl seismic region name | N | beta +/- sigma_beta | MT_dot x1e27 | mc +/- sigma | mo | Ms_dot x1e27 | psi; arXiv v2 p.35",
+  "quantity": "beta",
+  "value": 0.65,
+  "uncertainty": "±0.04",
+  "b_equivalent": 0.975,
+  "region_definition": "Flinn-Engdahl seismic region #1 'Alaska-Aleutian Arc'",
+  "suggested_box_SNWE": {
+   "S": 50,
+   "N": 65,
+   "W": 163,
+   "E": -140,
+   "approximate": true,
+   "crosses_dateline": true
+  },
+  "magnitude_type": "Mw (GCMT scalar moment)",
+  "mc_or_threshold": "mt = 5.8",
+  "period": "1977-01-01 to 2010-12-31",
+  "depth_range": "0-70 km (shallow)",
+  "declustering": "none (all events)",
+  "estimator": "maximum likelihood, tapered Gutenberg-Richter (beta and corner magnitude)",
+  "catalogue": "GCMT",
+  "needs_human_check": true,
+  "notes": "N=280. Flinn-Engdahl regions are irregular polygons (USGS feregion files); box is only a rough envelope - derive the real region from FE polygons before comparing. Threshold mt=5.8 is above the atlas Mc (5.2-5.7); beta is from a TGR fit (not a pure GR/Aki b); undeclustered; whole-FE-region (includes non-interface events).",
+  "compare": {
+   "kind": "box",
+   "box_SNWE": [
+    50,
+    65,
+    163,
+    -140
+   ],
+   "approximate": true,
+   "years": [
+    1977,
+    2010
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.8,
+   "declustered": false
+  },
+  "published_n": 280
+ },
+ {
+  "id": "kj2013_fe05_mexico_guatemala",
+  "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+  "doi": "10.1785/0120120110",
+  "url_read": "https://arxiv.org/pdf/1112.5217v2 (author preprint v2, 21 Jul 2012; read via pdftotext)",
+  "quote": "2    5 Mexico-Guatemala              164         0.60±0.06    2.38   9.17±0.29 8.0    1.35 0.567",
+  "location_in_source": "Table 1 (Table 1: FE Subduction Seismic Zones, GCMT 1977-2010/12/31, mt = 5.8.) Columns: No | FE No | Flinn-Engdahl seismic region name | N | beta +/- sigma_beta | MT_dot x1e27 | mc +/- sigma | mo | Ms_dot x1e27 | psi; arXiv v2 p.35",
+  "quantity": "beta",
+  "value": 0.6,
+  "uncertainty": "±0.06",
+  "b_equivalent": 0.9,
+  "region_definition": "Flinn-Engdahl seismic region #5 'Mexico-Guatemala'",
+  "suggested_box_SNWE": {
+   "S": 13,
+   "N": 22,
+   "W": -106,
+   "E": -90,
+   "approximate": true
+  },
+  "magnitude_type": "Mw (GCMT scalar moment)",
+  "mc_or_threshold": "mt = 5.8",
+  "period": "1977-01-01 to 2010-12-31",
+  "depth_range": "0-70 km (shallow)",
+  "declustering": "none (all events)",
+  "estimator": "maximum likelihood, tapered Gutenberg-Richter (beta and corner magnitude)",
+  "catalogue": "GCMT",
+  "needs_human_check": true,
+  "notes": "N=164. Flinn-Engdahl regions are irregular polygons (USGS feregion files); box is only a rough envelope - derive the real region from FE polygons before comparing. Threshold mt=5.8 is above the atlas Mc (5.2-5.7); beta is from a TGR fit (not a pure GR/Aki b); undeclustered; whole-FE-region (includes non-interface events).",
+  "compare": {
+   "kind": "box",
+   "box_SNWE": [
+    13,
+    22,
+    -106,
+    -90
+   ],
+   "approximate": true,
+   "years": [
+    1977,
+    2010
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.8,
+   "declustered": false
+  },
+  "published_n": 164
+ },
+ {
+  "id": "kj2013_fe06_central_america",
+  "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+  "doi": "10.1785/0120120110",
+  "url_read": "https://arxiv.org/pdf/1112.5217v2 (author preprint v2, 21 Jul 2012; read via pdftotext)",
+  "quote": "3    6 Central America               161         0.68±0.06    2.49   9.22±0.29 7.8    0.59 0.236",
+  "location_in_source": "Table 1 (Table 1: FE Subduction Seismic Zones, GCMT 1977-2010/12/31, mt = 5.8.) Columns: No | FE No | Flinn-Engdahl seismic region name | N | beta +/- sigma_beta | MT_dot x1e27 | mc +/- sigma | mo | Ms_dot x1e27 | psi; arXiv v2 p.35",
+  "quantity": "beta",
+  "value": 0.68,
+  "uncertainty": "±0.06",
+  "b_equivalent": 1.02,
+  "region_definition": "Flinn-Engdahl seismic region #6 'Central America'",
+  "suggested_box_SNWE": {
+   "S": 7,
+   "N": 15,
+   "W": -92,
+   "E": -82,
+   "approximate": true
+  },
+  "magnitude_type": "Mw (GCMT scalar moment)",
+  "mc_or_threshold": "mt = 5.8",
+  "period": "1977-01-01 to 2010-12-31",
+  "depth_range": "0-70 km (shallow)",
+  "declustering": "none (all events)",
+  "estimator": "maximum likelihood, tapered Gutenberg-Richter (beta and corner magnitude)",
+  "catalogue": "GCMT",
+  "needs_human_check": true,
+  "notes": "N=161. Flinn-Engdahl regions are irregular polygons (USGS feregion files); box is only a rough envelope - derive the real region from FE polygons before comparing. Threshold mt=5.8 is above the atlas Mc (5.2-5.7); beta is from a TGR fit (not a pure GR/Aki b); undeclustered; whole-FE-region (includes non-interface events).",
+  "compare": {
+   "kind": "box",
+   "box_SNWE": [
+    7,
+    15,
+    -92,
+    -82
+   ],
+   "approximate": true,
+   "years": [
+    1977,
+    2010
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.8,
+   "declustered": false
+  },
+  "published_n": 161
+ },
+ {
+  "id": "kj2013_fe08_andean_south_america",
+  "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+  "doi": "10.1785/0120120110",
+  "url_read": "https://arxiv.org/pdf/1112.5217v2 (author preprint v2, 21 Jul 2012; read via pdftotext)",
+  "quote": "5    8 Andean S. America             286         0.57±0.04    8.49   9.74±0.28 8.8    9.54 1.124",
+  "location_in_source": "Table 1 (Table 1: FE Subduction Seismic Zones, GCMT 1977-2010/12/31, mt = 5.8.) Columns: No | FE No | Flinn-Engdahl seismic region name | N | beta +/- sigma_beta | MT_dot x1e27 | mc +/- sigma | mo | Ms_dot x1e27 | psi; arXiv v2 p.35",
+  "quantity": "beta",
+  "value": 0.57,
+  "uncertainty": "±0.04",
+  "b_equivalent": 0.855,
+  "region_definition": "Flinn-Engdahl seismic region #8 'Andean S. America' (includes Chile and Peru/Ecuador/Colombia margins; no Chile-only split in this table)",
+  "suggested_box_SNWE": {
+   "S": -56,
+   "N": 13,
+   "W": -82,
+   "E": -63,
+   "approximate": true
+  },
+  "magnitude_type": "Mw (GCMT scalar moment)",
+  "mc_or_threshold": "mt = 5.8",
+  "period": "1977-01-01 to 2010-12-31",
+  "depth_range": "0-70 km (shallow)",
+  "declustering": "none (all events)",
+  "estimator": "maximum likelihood, tapered Gutenberg-Richter (beta and corner magnitude)",
+  "catalogue": "GCMT",
+  "needs_human_check": true,
+  "notes": "Closest teleseismic reference for Chile: whole Andean margin, not Chile alone. N=286. Flinn-Engdahl regions are irregular polygons (USGS feregion files); box is only a rough envelope - derive the real region from FE polygons before comparing. Threshold mt=5.8 is above the atlas Mc (5.2-5.7); beta is from a TGR fit (not a pure GR/Aki b); undeclustered; whole-FE-region (includes non-interface events).",
+  "compare": {
+   "kind": "box",
+   "box_SNWE": [
+    -56,
+    13,
+    -82,
+    -63
+   ],
+   "approximate": true,
+   "years": [
+    1977,
+    2010
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.8,
+   "declustered": false
+  },
+  "published_n": 286
+ },
+ {
+  "id": "kj2013_fe12_kermadec_tonga_samoa",
+  "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+  "doi": "10.1785/0120120110",
+  "url_read": "https://arxiv.org/pdf/1112.5217v2 (author preprint v2, 21 Jul 2012; read via pdftotext)",
+  "quote": "6   12 Kermadec-Tonga-Samoa          439         0.80±0.04    5.95   9.12±0.28 8.1    2.16 0.363",
+  "location_in_source": "Table 1 (Table 1: FE Subduction Seismic Zones, GCMT 1977-2010/12/31, mt = 5.8.) Columns: No | FE No | Flinn-Engdahl seismic region name | N | beta +/- sigma_beta | MT_dot x1e27 | mc +/- sigma | mo | Ms_dot x1e27 | psi; arXiv v2 p.35",
+  "quantity": "beta",
+  "value": 0.8,
+  "uncertainty": "±0.04",
+  "b_equivalent": 1.2,
+  "region_definition": "Flinn-Engdahl seismic region #12 'Kermadec-Tonga-Samoa'",
+  "suggested_box_SNWE": {
+   "S": -38,
+   "N": -13,
+   "W": -180,
+   "E": -170,
+   "approximate": true
+  },
+  "magnitude_type": "Mw (GCMT scalar moment)",
+  "mc_or_threshold": "mt = 5.8",
+  "period": "1977-01-01 to 2010-12-31",
+  "depth_range": "0-70 km (shallow)",
+  "declustering": "none (all events)",
+  "estimator": "maximum likelihood, tapered Gutenberg-Richter (beta and corner magnitude)",
+  "catalogue": "GCMT",
+  "needs_human_check": true,
+  "notes": "N=439. Highest beta among large-N zones in the table (b_eq 1.20). Flinn-Engdahl regions are irregular polygons (USGS feregion files); box is only a rough envelope - derive the real region from FE polygons before comparing. Threshold mt=5.8 is above the atlas Mc (5.2-5.7); beta is from a TGR fit (not a pure GR/Aki b); undeclustered; whole-FE-region (includes non-interface events).",
+  "compare": {
+   "kind": "box",
+   "box_SNWE": [
+    -38,
+    -13,
+    175,
+    -170
+   ],
+   "approximate": true,
+   "years": [
+    1977,
+    2010
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.8,
+   "declustered": false
+  },
+  "published_n": 439
+ },
+ {
+  "id": "kj2013_fe18_guam_japan",
+  "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+  "doi": "10.1785/0120120110",
+  "url_read": "https://arxiv.org/pdf/1112.5217v2 (author preprint v2, 21 Jul 2012; read via pdftotext)",
+  "quote": "11   18 Guam-Japan                      88        0.86±0.10    2.89   9.82±0.30 7.8    0.34 0.117",
+  "location_in_source": "Table 1 (Table 1: FE Subduction Seismic Zones, GCMT 1977-2010/12/31, mt = 5.8.) Columns: No | FE No | Flinn-Engdahl seismic region name | N | beta +/- sigma_beta | MT_dot x1e27 | mc +/- sigma | mo | Ms_dot x1e27 | psi; arXiv v2 p.35",
+  "quantity": "beta",
+  "value": 0.86,
+  "uncertainty": "±0.10",
+  "b_equivalent": 1.29,
+  "region_definition": "Flinn-Engdahl seismic region #18 'Guam-Japan' (Izu-Bonin-Mariana arc)",
+  "suggested_box_SNWE": {
+   "S": 12,
+   "N": 35,
+   "W": 138,
+   "E": 148,
+   "approximate": true
+  },
+  "magnitude_type": "Mw (GCMT scalar moment)",
+  "mc_or_threshold": "mt = 5.8",
+  "period": "1977-01-01 to 2010-12-31",
+  "depth_range": "0-70 km (shallow)",
+  "declustering": "none (all events)",
+  "estimator": "maximum likelihood, tapered Gutenberg-Richter (beta and corner magnitude)",
+  "catalogue": "GCMT",
+  "needs_human_check": true,
+  "notes": "N=88 (small); large uncertainty. Izu-Bonin-Mariana proxy. Flinn-Engdahl regions are irregular polygons (USGS feregion files); box is only a rough envelope - derive the real region from FE polygons before comparing. Threshold mt=5.8 is above the atlas Mc (5.2-5.7); beta is from a TGR fit (not a pure GR/Aki b); undeclustered; whole-FE-region (includes non-interface events).",
+  "compare": {
+   "kind": "box",
+   "box_SNWE": [
+    12,
+    34,
+    138,
+    148
+   ],
+   "approximate": true,
+   "years": [
+    1977,
+    2010
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.8,
+   "declustered": false
+  },
+  "published_n": 88
+ },
+ {
+  "id": "kj2013_fe19_japan_kamchatka",
+  "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+  "doi": "10.1785/0120120110",
+  "url_read": "https://arxiv.org/pdf/1112.5217v2 (author preprint v2, 21 Jul 2012; read via pdftotext)",
+  "quote": "12   19 Japan-Kamchatka               425 0.62±0.04            8.49 9.43±0.28   8.4    5.30 0.624",
+  "location_in_source": "Table 1 (Table 1: FE Subduction Seismic Zones, GCMT 1977-2010/12/31, mt = 5.8.) Columns: No | FE No | Flinn-Engdahl seismic region name | N | beta +/- sigma_beta | MT_dot x1e27 | mc +/- sigma | mo | Ms_dot x1e27 | psi; arXiv v2 p.35",
+  "quantity": "beta",
+  "value": 0.62,
+  "uncertainty": "±0.04",
+  "b_equivalent": 0.93,
+  "region_definition": "Flinn-Engdahl seismic region #19 'Japan-Kamchatka' (text: 'Japan-Kurile-Kamchatka #19')",
+  "suggested_box_SNWE": {
+   "S": 35,
+   "N": 60,
+   "W": 140,
+   "E": 165,
+   "approximate": true
+  },
+  "magnitude_type": "Mw (GCMT scalar moment)",
+  "mc_or_threshold": "mt = 5.8",
+  "period": "1977-01-01 to 2010-12-31",
+  "depth_range": "0-70 km (shallow)",
+  "declustering": "none (all events)",
+  "estimator": "maximum likelihood, tapered Gutenberg-Richter (beta and corner magnitude)",
+  "catalogue": "GCMT",
+  "needs_human_check": true,
+  "notes": "N=425. Fig. 1 of the same paper gives beta=0.610 for this zone (TGR fit plot, text: 'The β-value (around 0.61 ± 0.038)'). Flinn-Engdahl regions are irregular polygons (USGS feregion files); box is only a rough envelope - derive the real region from FE polygons before comparing. Threshold mt=5.8 is above the atlas Mc (5.2-5.7); beta is from a TGR fit (not a pure GR/Aki b); undeclustered; whole-FE-region (includes non-interface events).",
+  "compare": {
+   "kind": "box",
+   "box_SNWE": [
+    35,
+    60,
+    140,
+    165
+   ],
+   "approximate": true,
+   "years": [
+    1977,
+    2010
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.8,
+   "declustered": false
+  },
+  "published_n": 425
+ },
+ {
+  "id": "kj2013_tohoku_box",
+  "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+  "doi": "10.1785/0120120110",
+  "url_read": "https://arxiv.org/pdf/1112.5217v2 (author preprint v2, 21 Jul 2012; read via pdftotext)",
+  "quote": "12a – Tohoku area (5 × 6 ) ◦ ◦ 109 0.64±0.07 1.76 9.26±0.29 7.7 0.32 0.180",
+  "location_in_source": "Table 1 (Table 1: FE Subduction Seismic Zones, GCMT 1977-2010/12/31, mt = 5.8.) Columns: No | FE No | Flinn-Engdahl seismic region name | N | beta +/- sigma_beta | MT_dot x1e27 | mc +/- sigma | mo | Ms_dot x1e27 | psi; arXiv v2 p.35",
+  "quantity": "beta",
+  "value": 0.64,
+  "uncertainty": "±0.07",
+  "b_equivalent": 0.96,
+  "region_definition": "Spherical rectangle; text p.~13: 'Tohoku area (latitudes 35 − 40◦ N, longitudes 140 − 146◦E)'",
+  "suggested_box_SNWE": {
+   "S": 35,
+   "N": 40,
+   "W": 140,
+   "E": 146,
+   "approximate": false
+  },
+  "magnitude_type": "Mw (GCMT scalar moment)",
+  "mc_or_threshold": "mt = 5.8",
+  "period": "1977-01-01 to 2010-12-31",
+  "depth_range": "0-70 km (shallow)",
+  "declustering": "none (all events)",
+  "estimator": "maximum likelihood, tapered Gutenberg-Richter (beta and corner magnitude)",
+  "catalogue": "GCMT",
+  "needs_human_check": true,
+  "notes": "N=109; simple lat/lon box, directly reproducible in the atlas. Row text as extracted by pdftotext (whitespace-normalised; the two ◦ are the degree superscripts of '5° × 6°'). Pre-Tohoku period (ends 2010-12-31). mt=5.8, TGR beta, undeclustered.",
+  "compare": {
+   "kind": "box",
+   "box_SNWE": [
+    35,
+    40,
+    140,
+    146
+   ],
+   "approximate": false,
+   "years": [
+    1977,
+    2010
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.8,
+   "declustered": false
+  },
+  "published_n": 109
+ },
+ {
+  "id": "kj2013_fe24_sunda_arc",
+  "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+  "doi": "10.1785/0120120110",
+  "url_read": "https://arxiv.org/pdf/1112.5217v2 (author preprint v2, 21 Jul 2012; read via pdftotext)",
+  "quote": "17   24 Sunda Arc                     278         0.65±0.04    6.51   9.55±0.28 8.6    4.66 0.716",
+  "location_in_source": "Table 1 (Table 1: FE Subduction Seismic Zones, GCMT 1977-2010/12/31, mt = 5.8.) Columns: No | FE No | Flinn-Engdahl seismic region name | N | beta +/- sigma_beta | MT_dot x1e27 | mc +/- sigma | mo | Ms_dot x1e27 | psi; arXiv v2 p.35",
+  "quantity": "beta",
+  "value": 0.65,
+  "uncertainty": "±0.04",
+  "b_equivalent": 0.975,
+  "region_definition": "Flinn-Engdahl seismic region #24 'Sunda Arc' (Java-Sumba; Sumatra is in FE #46)",
+  "suggested_box_SNWE": {
+   "S": -12,
+   "N": -5,
+   "W": 100,
+   "E": 125,
+   "approximate": true
+  },
+  "magnitude_type": "Mw (GCMT scalar moment)",
+  "mc_or_threshold": "mt = 5.8",
+  "period": "1977-01-01 to 2010-12-31",
+  "depth_range": "0-70 km (shallow)",
+  "declustering": "none (all events)",
+  "estimator": "maximum likelihood, tapered Gutenberg-Richter (beta and corner magnitude)",
+  "catalogue": "GCMT",
+  "needs_human_check": true,
+  "notes": "N=278. Flinn-Engdahl regions are irregular polygons (USGS feregion files); box is only a rough envelope - derive the real region from FE polygons before comparing. Threshold mt=5.8 is above the atlas Mc (5.2-5.7); beta is from a TGR fit (not a pure GR/Aki b); undeclustered; whole-FE-region (includes non-interface events).",
+  "compare": {
+   "kind": "box",
+   "box_SNWE": [
+    -12,
+    -5,
+    100,
+    125
+   ],
+   "approximate": true,
+   "years": [
+    1977,
+    2010
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.8,
+   "declustered": false
+  },
+  "published_n": 278
+ },
+ {
+  "id": "kj2013_fe46_andaman_sumatra",
+  "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+  "doi": "10.1785/0120120110",
+  "url_read": "https://arxiv.org/pdf/1112.5217v2 (author preprint v2, 21 Jul 2012; read via pdftotext)",
+  "quote": "18   46 Andaman Is-Sumatra            143         0.71±0.07    2.66   9.37±0.29 9.1   15.26 5.734",
+  "location_in_source": "Table 1 (Table 1: FE Subduction Seismic Zones, GCMT 1977-2010/12/31, mt = 5.8.) Columns: No | FE No | Flinn-Engdahl seismic region name | N | beta +/- sigma_beta | MT_dot x1e27 | mc +/- sigma | mo | Ms_dot x1e27 | psi; arXiv v2 p.35",
+  "quantity": "beta",
+  "value": 0.71,
+  "uncertainty": "±0.07",
+  "b_equivalent": 1.065,
+  "region_definition": "Flinn-Engdahl seismic region #46 'Andaman Is-Sumatra'",
+  "suggested_box_SNWE": {
+   "S": -6,
+   "N": 15,
+   "W": 90,
+   "E": 102,
+   "approximate": true
+  },
+  "magnitude_type": "Mw (GCMT scalar moment)",
+  "mc_or_threshold": "mt = 5.8",
+  "period": "1977-01-01 to 2010-12-31",
+  "depth_range": "0-70 km (shallow)",
+  "declustering": "none (all events)",
+  "estimator": "maximum likelihood, tapered Gutenberg-Richter (beta and corner magnitude)",
+  "catalogue": "GCMT",
+  "needs_human_check": true,
+  "notes": "N=143; period includes 2004 Sumatra-Andaman and 2005 Nias sequences (undeclustered, aftershocks included). Flinn-Engdahl regions are irregular polygons (USGS feregion files); box is only a rough envelope - derive the real region from FE polygons before comparing. Threshold mt=5.8 is above the atlas Mc (5.2-5.7); beta is from a TGR fit (not a pure GR/Aki b); undeclustered; whole-FE-region (includes non-interface events).",
+  "compare": {
+   "kind": "box",
+   "box_SNWE": [
+    -6,
+    15,
+    90,
+    102
+   ],
+   "approximate": true,
+   "years": [
+    1977,
+    2010
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.8,
+   "declustered": false
+  },
+  "published_n": 143
+ },
+ {
+  "id": "kj2013_all_18_subduction_zones",
+  "citation": "Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? Bulletin of the Seismological Society of America, 103(2B), 1181-1194.",
+  "doi": "10.1785/0120120110",
+  "url_read": "https://arxiv.org/pdf/1112.5217v2 (author preprint v2, 21 Jul 2012; read via pdftotext)",
+  "quote": "1977-2010/12/31 ZONES      4217         0.65±0.01   77.57   9.36±0.27 9.1   49.07 0.633",
+  "location_in_source": "Table 1 (Table 1: FE Subduction Seismic Zones, GCMT 1977-2010/12/31, mt = 5.8.) Columns: No | FE No | Flinn-Engdahl seismic region name | N | beta +/- sigma_beta | MT_dot x1e27 | mc +/- sigma | mo | Ms_dot x1e27 | psi; arXiv v2 p.35",
+  "quantity": "beta",
+  "value": 0.65,
+  "uncertainty": "±0.01",
+  "b_equivalent": 0.975,
+  "region_definition": "Union of the 18 Flinn-Engdahl subduction zones listed in Table 1",
+  "suggested_box_SNWE": null,
+  "magnitude_type": "Mw (GCMT scalar moment)",
+  "mc_or_threshold": "mt = 5.8",
+  "period": "1977-01-01 to 2010-12-31",
+  "depth_range": "0-70 km (shallow)",
+  "declustering": "none (all events)",
+  "estimator": "maximum likelihood, tapered Gutenberg-Richter (beta and corner magnitude)",
+  "catalogue": "GCMT",
+  "needs_human_check": true,
+  "notes": "N=4217. Text: 'the β-values are approximately the same for all the zones, and the hypothesis of the values equality cannot be statistically rejected (Kagan, 1997)'. Figure 4 caption gives average <β> = 0.654 for 1977-2010. Flinn-Engdahl regions are irregular polygons (USGS feregion files); box is only a rough envelope - derive the real region from FE polygons before comparing. Threshold mt=5.8 is above the atlas Mc (5.2-5.7); beta is from a TGR fit (not a pure GR/Aki b); undeclustered; whole-FE-region (includes non-interface events).",
+  "compare": {
+   "kind": "class",
+   "pb_class": "SUB",
+   "approximate": true,
+   "years": [
+    1977,
+    2010
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.8,
+   "declustered": false
+  },
+  "published_n": 4217
+ },
+ {
+  "id": "kagan2010_global_mt56",
+  "citation": "Kagan, Y. Y. (2010). Earthquake size distribution: Power-law with exponent β ≡ 1/2? Tectonophysics, 490(1-2), 103-114.",
+  "doi": "10.1016/j.tecto.2010.04.034",
+  "url_read": "https://arxiv.org/pdf/0908.1207v2 (author preprint v2, 18 Mar 2010)",
+  "quote": "1.             Global              0.6773    7369    0.6820   5450",
+  "location_in_source": "Table 2: 'The β-values for various subdivisions of CMT catalog.' Columns: # | Earthquakes | mt = 5.6: β, Eq. # | mt = 5.8: β, Eq. #. Caption note: 'Shallow earthquakes in 1977-2008 (mt = 5.8) and 1982-2008 (mt = 5.6) CMT catalog.' (arXiv v2 p.41)",
+  "quantity": "beta",
+  "value": 0.6773,
+  "uncertainty": null,
+  "b_equivalent": 1.016,
+  "region_definition": "Global, all shallow GCMT earthquakes",
+  "suggested_box_SNWE": null,
+  "magnitude_type": "Mw (CMT moment)",
+  "mc_or_threshold": "mt = 5.6 (value recorded); same row gives mt = 5.8 value in column 5",
+  "period": "1982-2008 for mt=5.6 (1977-2008 for mt=5.8)",
+  "depth_range": "shallow (paper elsewhere: 0-70 km; not restated at the table)",
+  "declustering": "none (rows 2-3 of same table give declustered global: 0.6480 / aftershock-moment-included 0.6229 at mt=5.6)",
+  "estimator": "maximum likelihood beta (Kagan)",
+  "catalogue": "GCMT (CMT)",
+  "needs_human_check": true,
+  "notes": "N=7369 (mt=5.6, 1982-2008). Text: 'This effect could explain why the β-values for trenches are significantly lower (by about 5%) than the global ones.' No uncertainty printed in the table. mt=5.6 is inside the atlas Mc range - closest comparator here.",
+  "compare": {
+   "kind": "global",
+   "approximate": false,
+   "declustered": false,
+   "years": [
+    1982,
+    2008
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.6
+  },
+  "published_n": 7369
+ },
+ {
+  "id": "kagan2010_trenches_mt56",
+  "citation": "Kagan, Y. Y. (2010). Earthquake size distribution: Power-law with exponent β ≡ 1/2? Tectonophysics, 490(1-2), 103-114.",
+  "doi": "10.1016/j.tecto.2010.04.034",
+  "url_read": "https://arxiv.org/pdf/0908.1207v2 (author preprint v2, 18 Mar 2010)",
+  "quote": "4.   Trenches (Subduction zones)   0.6463    4805    0.6507   3223",
+  "location_in_source": "Table 2: 'The β-values for various subdivisions of CMT catalog.' Columns: # | Earthquakes | mt = 5.6: β, Eq. # | mt = 5.8: β, Eq. #. Caption note: 'Shallow earthquakes in 1977-2008 (mt = 5.8) and 1982-2008 (mt = 5.6) CMT catalog.' (arXiv v2 p.41)",
+  "quantity": "beta",
+  "value": 0.6463,
+  "uncertainty": null,
+  "b_equivalent": 0.9694,
+  "region_definition": "Trenches (subduction zones) as defined in Kagan et al. (2010) PAGEOPH tectonic-zone regionalisation (Kagan, Bird & Jackson 2010)",
+  "suggested_box_SNWE": null,
+  "magnitude_type": "Mw (CMT moment)",
+  "mc_or_threshold": "mt = 5.6 (value recorded); same row gives mt = 5.8 value in column 5",
+  "period": "1982-2008 for mt=5.6 (1977-2008 for mt=5.8)",
+  "depth_range": "shallow (paper elsewhere: 0-70 km; not restated at the table)",
+  "declustering": "none (rows 2-3 of same table give declustered global: 0.6480 / aftershock-moment-included 0.6229 at mt=5.6)",
+  "estimator": "maximum likelihood beta (Kagan)",
+  "catalogue": "GCMT (CMT)",
+  "needs_human_check": true,
+  "notes": "N=4805 (mt=5.6, 1982-2008). Text: 'This effect could explain why the β-values for trenches are significantly lower (by about 5%) than the global ones.' No uncertainty printed in the table. mt=5.6 is inside the atlas Mc range - closest comparator here.",
+  "compare": {
+   "kind": "class",
+   "pb_class": "SUB",
+   "approximate": true,
+   "declustered": false,
+   "years": [
+    1982,
+    2008
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.6
+  },
+  "published_n": 4805
+ },
+ {
+  "id": "kagan2010_global_declustered_mt56",
+  "citation": "Kagan, Y. Y. (2010). Earthquake size distribution: Power-law with exponent β ≡ 1/2? Tectonophysics, 490(1-2), 103-114.",
+  "doi": "10.1016/j.tecto.2010.04.034",
+  "url_read": "https://arxiv.org/pdf/0908.1207v2 (author preprint v2, 18 Mar 2010)",
+  "quote": "2.       Global declustered        0.6480    5841    0.6568   4498",
+  "location_in_source": "Table 2: 'The β-values for various subdivisions of CMT catalog.' Columns: # | Earthquakes | mt = 5.6: β, Eq. # | mt = 5.8: β, Eq. #. Caption note: 'Shallow earthquakes in 1977-2008 (mt = 5.8) and 1982-2008 (mt = 5.6) CMT catalog.' (arXiv v2 p.41)",
+  "quantity": "beta",
+  "value": 0.648,
+  "uncertainty": null,
+  "b_equivalent": 0.972,
+  "region_definition": "Global, all shallow GCMT earthquakes",
+  "suggested_box_SNWE": null,
+  "magnitude_type": "Mw (CMT moment)",
+  "mc_or_threshold": "mt = 5.6 (value recorded); same row gives mt = 5.8 value in column 5",
+  "period": "1982-2008 for mt=5.6 (1977-2008 for mt=5.8)",
+  "depth_range": "shallow (paper elsewhere: 0-70 km; not restated at the table)",
+  "declustering": "Kagan's own declustering (not Gardner-Knopoff; method not restated at the table)",
+  "estimator": "maximum likelihood beta (Kagan)",
+  "catalogue": "GCMT (CMT)",
+  "needs_human_check": true,
+  "notes": "N=5841 (mt=5.6, 1982-2008). Our comparison uses Gardner-Knopoff mainshocks, a different declustering; compare with care.",
+  "compare": {
+   "kind": "global",
+   "approximate": true,
+   "declustered": true,
+   "years": [
+    1982,
+    2008
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.6
+  },
+  "published_n": 5841
+ },
+ {
+  "id": "birdkagan2004_pb2002_class_range",
+  "citation": "Bird, P. & Kagan, Y. Y. (2004). Plate-tectonic analysis of shallow seismicity: apparent boundary width, beta, corner magnitude, coupled lithosphere thickness, and coupling in seven tectonic settings. Bulletin of the Seismological Society of America, 94(6), 2380-2399.",
+  "doi": "10.1785/0120030107",
+  "url_read": "https://central.scec.org/node/3563 (SCEC record, abstract; raw HTML via curl)",
+  "quote": "Best-fitting ß values range from 0.53 to 0.92, but all 95% confidence ranges are consistent with a common value of 0.61–0.66.",
+  "location_in_source": "Abstract",
+  "quantity": "beta",
+  "value": "0.53 to 0.92 (common 0.61–0.66)",
+  "uncertainty": "95% confidence ranges (per class, not read)",
+  "b_equivalent": "0.795 to 1.38 (common 0.915–0.99)",
+  "region_definition": "Seven PB2002 plate-boundary classes (CRB, CTF, CCB, OSR, OTF, OCB, SUB), platelike (non-orogen) regions, apparent boundary half-widths",
+  "suggested_box_SNWE": null,
+  "magnitude_type": "Mw (CMT moment)",
+  "mc_or_threshold": "not read (Bird et al. 2010 SRL, which uses these parameters, uses mT = 5.66)",
+  "period": "CMT 1977 onward (exact end not read)",
+  "depth_range": "shallow (<= 70 km per Bird et al. 2010 description)",
+  "declustering": "none",
+  "estimator": "maximum likelihood tapered Gutenberg-Richter",
+  "catalogue": "CMT (Harvard/GCMT)",
+  "needs_human_check": true,
+  "notes": "Per-class beta table (Table 5) NOT read: BSSA full text paywalled, peterbird.name returned HTTP 403, moho.ess.ucla.edu timed out. Which class has 0.53 and which 0.92 is unknown from what was read.",
+  "compare": {
+   "kind": "class_range",
+   "years": [
+    1977,
+    2002
+   ],
+   "depth_max_km": 70,
+   "threshold": 5.8,
+   "approximate": true,
+   "declustered": false
+  }
+ },
+ {
+  "id": "petruccelli2018_gcmt_mc_map",
+  "citation": "Petruccelli, A. (2018). PhD thesis, Alma Mater Studiorum Università di Bologna (AMS Dottorato eprint 8466) - material later published in Petruccelli et al. (2019) EPSL 527, 115791 and GRL 46.",
+  "doi": null,
+  "url_read": "https://amsdottorato.unibo.it/id/eprint/8466/1/Petruccelli_Antonio_tesi.pdf (read via pdftotext)",
+  "quote": "However, the Mc-map (Fig. 2.2) of the GCMT catalog for the full period since 1980 shows that most Mc-values are in the range 5.4–5.5, with only little deviations in some particular zones: along most oceanic ridges and in the Himalayan area the Mc-values are slightly lower with 5.1–5.3.",
+  "location_in_source": "Part 2, Methods (around Fig. 2.2, thesis p.~46)",
+  "quantity": "Mc",
+  "value": "5.4–5.5 (most); 5.1–5.3 (oceanic ridges, Himalaya)",
+  "uncertainty": null,
+  "b_equivalent": null,
+  "region_definition": "Global map of local Mc (spatially variable cylinder radius R, Fig. 2.1)",
+  "suggested_box_SNWE": null,
+  "magnitude_type": "Mw (GCMT)",
+  "mc_or_threshold": "local Mc map",
+  "period": "1980-2016",
+  "depth_range": "0-50 km",
+  "declustering": "none",
+  "estimator": "not read in detail (local Mc per node)",
+  "catalogue": "GCMT",
+  "needs_human_check": true,
+  "notes": "Direct comparator for the atlas Mc range (5.2-5.7). Preceding sentence: 'the completeness level of the GCMT catalog has improved from 5.4 – 5.5 for older data down to 5.0 after 2010 [Ekström et al., 2012].'",
+  "compare": {
+   "kind": "mc_global",
+   "years": [
+    1980,
+    2016
+   ],
+   "depth_max_km": 50,
+   "approximate": true
+  }
+ }
+]
