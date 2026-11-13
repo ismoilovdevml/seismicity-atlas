@@ -1,6 +1,8 @@
 // Small hand-written SVG chart kit. Colours are CSS custom properties, so charts follow the theme without
 // re-rendering. Every chart has a hover/keyboard readout and a data table.
 
+import { t as tr } from './i18n/index.js';
+
 const NS = 'http://www.w3.org/2000/svg';
 
 export function svgEl(tag, attrs = {}, parent) {
@@ -78,7 +80,7 @@ function tableEl(table) {
 function legendRow(series) {
   const shown = series.filter((s) => s.name && !s.noLegend);
   if (shown.length < 2) return null;
-  return h('ul', { class: 'chart-legend', 'aria-label': 'Legend' },
+  return h('ul', { class: 'chart-legend', 'aria-label': tr('chart.legend') },
     shown.map((s) => h('li', {},
       h('span', { class: `key key-${s.key || (s.type === 'dots' ? 'dot' : 'line')}`, style: `--c:${s.color}` }),
       s.name)));
@@ -93,13 +95,13 @@ function figure({ title, sub, alt, series = [], table, note, draw }) {
   if (title) fig.append(h('figcaption', {}, h('span', { class: 'chart-title', text: title }), sub ? h('span', { class: 'chart-sub', text: sub }) : null));
   const lg = legendRow(series);
   if (lg) fig.append(lg);
-  const wrap = h('div', { class: 'chart-wrap', tabindex: '0', role: 'group', 'aria-label': `${alt}. Use the left and right arrow keys to read values.` });
+  const wrap = h('div', { class: 'chart-wrap', tabindex: '0', role: 'group', 'aria-label': tr('chart.aria', { alt }) });
   const tip = h('div', { class: 'chart-tip', 'aria-live': 'polite' });
   tip.hidden = true;
   fig.append(wrap);
   if (note) fig.append(h('p', { class: 'chart-note', text: note }));
   if (table && table.rows.length) {
-    const det = h('details', { class: 'chart-table' }, h('summary', { text: 'Data table' }));
+    const det = h('details', { class: 'chart-table' }, h('summary', { text: tr('chart.table') }));
     det.addEventListener('toggle', () => { if (det.open && det.children.length === 1) det.append(tableEl(table)); }, { once: false });
     fig.append(det);
   }
@@ -314,7 +316,7 @@ export function forestChart(spec) {
         const lab = svgEl('text', { x: 0, y: cy + 4, class: r.emph ? 'row-label emph' : 'row-label' }, svg);
         lab.textContent = r.label;
         if (r.v === null || r.v === undefined) {
-          svgEl('text', { x: m.l + 4, y: cy + 4, class: 'tick', 'text-anchor': 'start' }, svg).textContent = r.text || 'not available';
+          svgEl('text', { x: m.l + 4, y: cy + 4, class: 'tick', 'text-anchor': 'start' }, svg).textContent = r.text || tr('chart.na');
           return;
         }
         const st = `--c:${r.color || 'var(--s1)'}`;
