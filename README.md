@@ -1,6 +1,9 @@
 # Global Seismicity Atlas
 
-An open, reproducible world map of earthquake-catalogue statistics. For each place it gives:
+**Live site: https://ismoilovdevml.github.io/seismicity-atlas/**
+
+An open, reproducible world map of earthquake-catalogue statistics, built only from free global catalogues
+(ISC-GEM and USGS ComCat). For each place it gives:
 
 - how much seismicity there is;
 - the magnitude of completeness (Mc), and how it has changed over time;
@@ -98,6 +101,16 @@ cd site && python3 -m http.server 8000   # then open http://localhost:8000/
   tiles. Design notes: [docs/ux-notes.md](docs/ux-notes.md); open issues: [docs/known-issues.md](docs/known-issues.md).
 
 ![Map with a selected cell](docs/img/site-map-panel-light.png)
+
+## How to cite
+
+Use the metadata in [CITATION.cff](CITATION.cff) (GitHub shows a "Cite this repository" button), and cite the
+underlying catalogues listed below. Please quote the data cut-off date shown on the site.
+
+## Contributing
+
+Issues and pull requests are welcome, especially published regional b-value or Mc estimates that can be added to
+the validation table (with the paper, the magnitude type and the completeness used).
 
 ## Licences
 

@@ -199,7 +199,9 @@ function drawMethods(root, g, sq, man) {
     'Plate-boundary classes are approximate: each event takes the class of the nearest PB2002 step within 200 km.',
     'This is not an earthquake forecast and not a seismic hazard model.',
   ].map((t) => h('li', { text: t }))));
-  out.push(h('p', { class: 'hint', text: 'Full method notes, sensitivity tests and code are in the project repository (docs/method.md, docs/validation.md).' }));
+  out.push(h('p', { class: 'hint' }, 'Full method notes, sensitivity tests and code are in the project repository: ',
+    h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/blob/main/docs/method.md', target: '_blank', rel: 'noopener', text: 'docs/method.md' }), ', ',
+    h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/blob/main/docs/validation.md', target: '_blank', rel: 'noopener', text: 'docs/validation.md' }), '.'));
   root.replaceChildren(...out);
 }
 
@@ -308,6 +310,8 @@ export function renderAbout(root, ctx) {
     h('li', {}, h('a', { href: 'data/manifest.json', text: 'manifest.json' }), ': version, sources, file list and checksums'),
     files.map(([name, v]) => h('li', {}, h('a', { href: `data/${name}`, text: name }), ` (${mb(v.bytes)})`)),
     h('li', {}, `cells/<H3 id>.json: ${f.int(man.cell_detail_files.count)} per-cell detail files, ${mb(man.cell_detail_files.bytes)} in total, loaded when you click a cell`)));
-  out.push(h('p', { class: 'prose', text: 'Field definitions are in docs/data-schema.md in the project repository.' }));
+  out.push(h('p', { class: 'prose' }, 'Field definitions: ',
+    h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/blob/main/docs/data-schema.md', target: '_blank', rel: 'noopener', text: 'docs/data-schema.md' }),
+    ' in the project repository.'));
   root.replaceChildren(...out);
 }

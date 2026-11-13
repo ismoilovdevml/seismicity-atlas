@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this atlas, please cite it as below, together with the ISC-GEM catalogue and USGS ComCat."
+title: "Global Seismicity Atlas"
+abstract: "An open, reproducible world map of earthquake-catalogue statistics: completeness (Mc), Gutenberg-Richter b-value with 95 % intervals and quality codes, ISC-GEM vs ComCat consistency, and Omori-Utsu parameters for major sequences. Not a forecast and not a hazard map."
+type: software
+version: "0.1.0"
+date-released: "2026-11-13"
+license: MIT
+repository-code: "https://github.com/ismoilovdevml/seismicity-atlas"
+url: "https://ismoilovdevml.github.io/seismicity-atlas/"
+authors:
+  - alias: "ismoilovdevml"
+keywords:
+  - seismology
+  - earthquake catalogue
+  - b-value
+  - magnitude of completeness
+  - Gutenberg-Richter
+  - Omori-Utsu
+  - ISC-GEM
+references:
+  - type: data
+    title: "ISC-GEM Earthquake Catalogue"
+    authors:
+      - name: "International Seismological Centre"
+    doi: "10.31905/D808B825"
+  - type: data
+    title: "ANSS Comprehensive Earthquake Catalog (ComCat)"
+    authors:
+      - name: "U.S. Geological Survey"
+    url: "https://earthquake.usgs.gov/data/comcat/"
