@@ -32,7 +32,7 @@ export default function mount(el, { dg }) {
     return e.m >= M0 + 1.5 * (1 - u);
   };
   const fig = figure(el, { title: dg.title, caption: dg.caption, alt: dg.alt });
-  fig.fig.insertBefore(legend([{ label: dg.lgSeen, color: 'var(--s1)' }, { label: dg.lgMissed, color: 'var(--nodata)' }]), fig.plotEl);
+  fig.fig.insertBefore(legend([{ label: dg.lgSeen, color: 'var(--s1)', dot: true }, { label: dg.lgMissed, color: 'var(--nodata)', dot: true }]), fig.plotEl);
   const draw = (W) => {
     const H = 250;
     const F = frame({ W, H, x: { domain: [0, 1], label: dg.xLabel, fmt: () => '' }, y: { domain: [M0 - 0.2, MMAIN + 0.3], label: dg.yLabel }, alt: dg.alt });

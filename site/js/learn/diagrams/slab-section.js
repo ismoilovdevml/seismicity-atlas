@@ -9,7 +9,7 @@ export default function mount(el, { dg, ex }) {
   const y0 = Math.floor(pts[0].y), y1 = Math.floor(pts[pts.length - 1].y);
   const st = { upto: y1 };
   const fig = figure(el, { title: dg.title, caption: dg.caption, alt: dg.alt });
-  fig.fig.insertBefore(legend([{ label: dg.lgShallow, color: 'var(--s1)' }, { label: dg.lgDeep, color: 'var(--s2)' }]), fig.plotEl);
+  fig.fig.insertBefore(legend([{ label: dg.lgShallow, color: 'var(--s1)', dot: true }, { label: dg.lgDeep, color: 'var(--s2)', dot: true }]), fig.plotEl);
   const draw = (W) => {
     const H = Math.max(260, Math.min(380, W * 0.5));
     const xs0 = Math.min(...pts.map((p) => p.x)) - 30, xs1 = Math.max(...pts.map((p) => p.x)) + 30;

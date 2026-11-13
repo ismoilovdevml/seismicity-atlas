@@ -10,7 +10,7 @@ export default function mount(el, { dg, ex }) {
   const nMc = (cum.find(([m]) => Math.abs(m - ex.mc) < 1e-6) || cum[0])[1];
   const st = { b: 1.0 };
   const fig = figure(el, { title: dg.title, caption: dg.caption, alt: dg.alt });
-  fig.fig.insertBefore(legend([{ label: dg.lgData, color: 'var(--s1)' }, { label: dg.lgLine, color: 'var(--s2)', line: true }]), fig.plotEl);
+  fig.fig.insertBefore(legend([{ label: dg.lgData, color: 'var(--s1)', dot: true }, { label: dg.lgLine, color: 'var(--s2)', line: true }]), fig.plotEl);
   const draw = (W) => {
     const H = 270;
     const ymax = cum[0][1];
@@ -24,7 +24,7 @@ export default function mount(el, { dg, ex }) {
     label(F.top, F.xs(ex.mc) + 8, F.ys(nMc) - 8, dg.pivot, 'lbl');
     const xc = F.xs(ex.mc - 0.05);
     svgEl('line', { x1: xc, x2: xc, y1: F.m.t, y2: H - F.m.b, class: 'rule dashed' }, F.top);
-    label(F.top, xc - 5, H - F.m.b - 8, `Mc ${f.mag(ex.mc)}`, 'lbl strong', 'end');
+    label(F.top, xc + 5, H - F.m.b - 8, `Mc ${f.mag(ex.mc)}`, 'lbl strong');
     return F.svg;
   };
   const update = () => {

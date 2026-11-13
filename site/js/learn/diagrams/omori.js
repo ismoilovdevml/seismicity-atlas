@@ -27,7 +27,7 @@ export default function mount(el, { dg, ex }) {
   sample();
   let shown = ticks.length;
   const fig = figure(el, { title: dg.title, caption: dg.caption, alt: dg.alt });
-  fig.fig.insertBefore(legend([{ label: dg.lgData, color: 'var(--s1)' }, { label: dg.lgModel, color: 'var(--s2)', line: true }]), fig.plotEl);
+  fig.fig.insertBefore(legend([{ label: dg.lgData, color: 'var(--s1)', dot: true }, { label: dg.lgModel, color: 'var(--s2)', line: true }]), fig.plotEl);
   const draw = (W) => {
     const H = 260, strip = 56;
     const rmax = Math.max(...obs.map((o) => o.r)), rmin = Math.min(...obs.map((o) => o.r));

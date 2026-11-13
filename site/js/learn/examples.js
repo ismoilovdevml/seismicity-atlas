@@ -133,7 +133,7 @@ export const EXAMPLES = {
     return {
       vars: { ...cellVars(p), maxc: f.mag(maxc(fmd)), mcCc: f.mag(p.sh_mc_cc), mcCc0: f.mag(p.sh_mc_cc0),
         per0: keys[0].replace('-', '–'), floor0: f.mag(fl[keys[0]].floor), per1: keys[keys.length - 1].replace('-', '–'), floor1: f.mag(fl[keys[keys.length - 1]].floor),
-        region: it ? it.name : '–', regionMc: it ? f.mag(it.mc_typical) : '–', regionMag: it ? it.magtype : '–' },
+        region: it ? it.name : '–', regionMc: it ? f.mag(it.mc_typical) : '–', regionMag: it ? ((it.magtype.match(/\b(ML\w*|Md|Mw|M)\b/) || [it.magtype])[0]) : '–' },
       map: cellMap(p, 'mc'),
       data: { fmd, mc: p.sh_mc, b: p.sh_b },
     };

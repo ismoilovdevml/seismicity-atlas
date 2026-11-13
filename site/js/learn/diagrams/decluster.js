@@ -47,7 +47,7 @@ export default function mount(el, { dg }) {
   };
   run();
   const fig = figure(el, { title: dg.title, caption: dg.caption, alt: dg.alt });
-  fig.fig.insertBefore(legend([{ label: dg.lgKept, color: 'var(--s1)' }, { label: dg.lgRemoved, color: 'var(--nodata)' }, { label: dg.lgWindow, color: 'var(--s2)' }]), fig.plotEl);
+  fig.fig.insertBefore(legend([{ label: dg.lgKept, color: 'var(--s1)', dot: true }, { label: dg.lgRemoved, color: 'var(--nodata)', dot: true }, { label: dg.lgWindow, color: 'var(--s2)' }]), fig.plotEl);
   const removedNow = (j) => res.dep[j] !== -1 && res.dep[j] < st.opened;
   const draw = (W) => {
     const H = 280;

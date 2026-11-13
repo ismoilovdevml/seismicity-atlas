@@ -51,7 +51,7 @@
 .page .lr-pending { color: var(--note-fg); }
 .lr-analogy { background: var(--surface-2); border: 1px solid var(--rule-soft); border-radius: 10px; padding: 14px 18px; display: flex; flex-direction: column; gap: 6px; }
 .lr-analogy h3 { font-size: 14px !important; color: var(--ink-2); }
-.lr-num { font-weight: 500; color: var(--ink); white-space: nowrap; }
+.lr-num { font-size: 0.93em; font-weight: 500; color: var(--ink); white-space: nowrap; }
 .lr-example-body { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 22px; display: flex; flex-direction: column; gap: 10px; }
 .lr-example-body h3 { font-size: 15px; }
 .lr-source { font-size: 12.5px; color: var(--ink-3) !important; }
@@ -123,6 +123,7 @@
 .lr-legend li { display: inline-flex; align-items: center; gap: 6px; }
 .lr-legend .sw { width: 14px; height: 10px; border-radius: 2px; background: var(--c); display: inline-block; }
 .lr-legend .sw.line { height: 2px; }
+.lr-legend .sw.dot { width: 10px; height: 10px; border-radius: 50%; }
 
 @media (max-width: 720px) {
   .lr-lead { font-size: 17px; }

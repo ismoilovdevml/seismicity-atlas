@@ -264,9 +264,9 @@ export function maxc(pairs) {
 /** Plain-text template: tpl('b = {b}', {b: '1.00'}). Used with textContent only. */
 export const tpl = (s, v = {}) => String(s ?? '').replace(/\{(\w+)\}/g, (m, k) => (v[k] !== undefined && v[k] !== null ? v[k] : m));
 
-/** A legend list; items: [{label, color, line}] */
+/** A legend list; items: [{label, color, line, dot}] */
 export function legend(items) {
-  return h('ul', { class: 'lr-legend' }, items.map((it) => h('li', {}, h('span', { class: it.line ? 'sw line' : 'sw', style: `--c:${it.color}` }), it.label)));
+  return h('ul', { class: 'lr-legend' }, items.map((it) => h('li', {}, h('span', { class: it.line ? 'sw line' : it.dot ? 'sw dot' : 'sw', style: `--c:${it.color}` }), it.label)));
 }
 
 /** Text label in an SVG. */
