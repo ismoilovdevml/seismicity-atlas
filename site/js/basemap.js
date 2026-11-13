@@ -147,8 +147,12 @@ function ensureWater() {
 function ensureTerrainSource() {
   if (terrainAdded) return;
   terrainAdded = true;
-  map.addSource('dem', { type: 'raster-dem', tiles: [TERRAIN_TILES], encoding: 'terrarium', tileSize: 256, minzoom: 0, maxzoom: 10 });
-  map.addLayer({ id: 'terrain-shade', type: 'hillshade', source: 'dem', layout: { visibility: 'none' }, paint: hillshadePaint() }, 'lakes');
+  // Two sources with the same tiles, as MapLibre advises for terrain plus hillshade; the browser cache serves the
+  // second request of each tile.
+  const dem = { type: 'raster-dem', tiles: [TERRAIN_TILES], encoding: 'terrarium', tileSize: 256, minzoom: 0, maxzoom: 10 };
+  map.addSource('dem', dem);
+  map.addSource('dem-shade', { ...dem });
+  map.addLayer({ id: 'terrain-shade', type: 'hillshade', source: 'dem-shade', layout: { visibility: 'none' }, paint: hillshadePaint() }, 'lakes');
 }
 
 function hillshadePaint() {
