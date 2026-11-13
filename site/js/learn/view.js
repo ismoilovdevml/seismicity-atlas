@@ -17,10 +17,10 @@ const MAP_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 /** Fill {name} placeholders with escaped values; the template itself is trusted, hand-written content. */
-export function fill(tpl, vars = {}) {
+export function fill(tpl, vars = {}, missing = null) {
   return String(tpl).replace(/\{(\w+)\}/g, (m, k) => {
     const v = vars[k];
-    if (v === undefined || v === null) return m;
+    if (v === undefined || v === null) return missing === null ? m : missing;
     const s = String(v);
     // numbers (and short coded values) in the mono face; names and sentences in the text face
     return /\d/.test(s) && s.length <= 24 ? `<span class="mono lr-num">${esc(s)}</span>` : `<span class="lr-val">${esc(s)}</span>`;
@@ -32,6 +32,14 @@ function html(tag, cls, s) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
   e.innerHTML = s;
+  return e;
+}
+
+/** Content text that may name example values ({radius}, {nboot} …): shown with "…" until the data arrive. */
+let templated = [];
+function tmpl(tag, cls, s) {
+  const e = html(tag, cls, fill(s, {}, '…'));
+  if (/\{\w+\}/.test(s)) templated.push([e, s]);
   return e;
 }
 
@@ -76,6 +84,7 @@ export async function renderLearn(root, { topic, back }) {
   shownKey = key;
   const my = ++token;
   teardown();
+  templated = [];
   const { tl, en } = await titles(code);
   if (my !== token) return;
   const name = (id) => (tl[id] || en[id] || [id])[0];
@@ -110,18 +119,18 @@ export async function renderLearn(root, { topic, back }) {
     pending ? h('p', { class: 'lr-pending', role: 'note', text: t('learn.pending') }) : null,
     h('section', { class: 'lr-sec lr-sentence', 'aria-labelledby': 'lr-h-one' },
       h('h2', { id: 'lr-h-one', class: 'lr-kicker', text: t('learn.sentence') }),
-      html('p', 'lr-lead', c.sentence)),
+      tmpl('p', 'lr-lead', c.sentence)),
     h('section', { class: 'lr-sec', 'aria-labelledby': 'lr-h-simple' },
       h('h2', { id: 'lr-h-simple', text: t('learn.simple') }),
-      ...c.simple.map((s) => html('p', '', s)),
-      c.analogy ? h('aside', { class: 'lr-analogy' }, h('h3', { text: t('learn.analogy') }), html('p', '', c.analogy)) : null),
+      ...c.simple.map((s) => tmpl('p', '', s)),
+      c.analogy ? h('aside', { class: 'lr-analogy' }, h('h3', { text: t('learn.analogy') }), tmpl('p', '', c.analogy)) : null),
     h('section', { class: 'lr-sec lr-example', 'aria-labelledby': 'lr-h-ex' },
       h('h2', { id: 'lr-h-ex', text: t('learn.example') }), exBox),
     h('section', { class: 'lr-sec lr-wide', 'aria-labelledby': 'lr-h-dg' },
       h('h2', { id: 'lr-h-dg', text: t('learn.diagram') }), dgBox),
     h('section', { class: 'lr-sec lr-tech', 'aria-labelledby': 'lr-h-tech' },
       h('h2', { id: 'lr-h-tech', text: t('learn.tech') }),
-      ...c.tech.map((s) => html(/^\s*<(ul|ol|div|pre|table)/.test(s) ? 'div' : 'p', /^\s*<(ul|ol|div|pre|table)/.test(s) ? 'lr-block' : '', s))),
+      ...c.tech.map((s) => tmpl(/^\s*<(ul|ol|div|pre|table)/.test(s) ? 'div' : 'p', /^\s*<(ul|ol|div|pre|table)/.test(s) ? 'lr-block' : '', s))),
     refs.length ? h('section', { class: 'lr-sec lr-refs', 'aria-labelledby': 'lr-h-refs' },
       h('h2', { id: 'lr-h-refs', text: t('learn.refs') }),
       h('ol', {}, refs.map((r) => h('li', {}, `${r.text} `, r.doi ? h('a', { href: `https://doi.org/${r.doi}`, target: '_blank', rel: 'noopener', text: `doi:${r.doi}` })
@@ -145,6 +154,7 @@ export async function renderLearn(root, { topic, back }) {
       ...c.example.body.map((s) => html('p', '', fill(s, ex.vars))),
       h('p', { class: 'lr-source', text: t('learn.liveData', { v: man.version, cutoff: man.data_cutoff_utc }) }),
       ex.map ? h('a', { class: 'lr-map-btn', href: ex.map, 'data-learn': 'map', text: t('learn.showMap') }) : null);
+    for (const [e, tplStr] of templated) e.innerHTML = fill(tplStr, ex.vars, '–');
     const btn = exBox.querySelector('.lr-map-btn');
     if (btn) btn.insertAdjacentHTML('afterbegin', MAP_ICON);
   } catch (e) {
