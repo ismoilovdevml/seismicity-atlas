@@ -1,5 +1,9 @@
 """Validation: synthetic recovery, global Mc/b vs Michael (2014), regional and plate-boundary-type b, sensitivities.
 
+The atlas-method rows (global, regions, plate-boundary types, slab age) use the atlas b sample (common.b_sample_mask:
+direct Mw only by default) and also report the same estimate on every event (`*_all_events`) for comparison.
+The Michael (2014) rows use the whole catalogue, as Michael did.
+
 Writes results/validation.json. Every number in docs/validation.md comes from that file.
 """
 from __future__ import annotations
@@ -14,7 +18,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import atlaslib as al  # noqa: E402
 import seislib as sl  # noqa: E402
 from atlas import PERIODS, floor_of  # noqa: E402
-from common import MICHAEL_DEEP, MICHAEL_SHALLOW, RES, jdump, load_work  # noqa: E402
+from common import (B_MAGERR_MAX, MICHAEL_DEEP, MICHAEL_SHALLOW, RES, b_sample_label, b_sample_mask,  # noqa: E402
+                    jdump, load_work)
 
 RNG = 7
 
@@ -127,9 +132,15 @@ def main():
     print("global ...", flush=True)
     out["michael_periods"], out["michael_pooled"] = global_vs_michael(g)
 
-    g76 = g[(g.year >= 1976) & (g.year <= 2021)]
+    g76_all = g[(g.year >= 1976) & (g.year <= 2021)]
+    bsel = b_sample_mask(g76_all.magerr)
+    out["b_sample"] = {"rule": b_sample_label(), "b_magerr_max": B_MAGERR_MAX, "n_1976_2021": len(g76_all),
+                       "n_in_sample": int(bsel.sum()), "n_excluded": int((~bsel).sum())}
+    g76 = g76_all[bsel]
     sh = ~g76.deep
     out["global_atlas_method"] = {"shallow": b_region(g76, sh, "sh", fl, 5), "deep": b_region(g76, g76.deep, "dp", fl, 6)}
+    out["global_atlas_method_all_events"] = {"shallow": b_region(g76_all, ~g76_all.deep, "sh", fl, 5),
+                                             "deep": b_region(g76_all, g76_all.deep, "dp", fl, 6)}
     out["declustering_effect_global_shallow"] = {
         "full": out["global_atlas_method"]["shallow"],
         "gk_mainshocks": b_region(g76, sh & g76.mainshock, "sh", fl, 7)}
@@ -145,11 +156,15 @@ def main():
     out["regions"] = {}
     for name, (bx, pub, src) in regions.items():
         r = b_region(g76, sh & box(g76, *bx), "sh", fl, 11)
-        out["regions"][name] = {"box_SNWE": bx, "published_b": pub, "source": src, **r}
+        out["regions"][name] = {"box_SNWE": bx, "published_b": pub, "source": src, **r,
+                                "all_events": b_region(g76_all, ~g76_all.deep & box(g76_all, *bx), "sh", fl, 11)}
 
     out["plate_boundary_types"] = {}
     for cls in ("SUB", "CCB", "OCB", "CTF", "OTF", "CRB", "OSR", "none"):
         out["plate_boundary_types"][cls] = b_region(g76, sh & (g76.pb_class == cls), "sh", fl, 13)
+        out["plate_boundary_types_all_events"] = out.get("plate_boundary_types_all_events", {})
+        out["plate_boundary_types_all_events"][cls] = b_region(g76_all, ~g76_all.deep & (g76_all.pb_class == cls),
+                                                               "sh", fl, 13)
 
     slab = {"young": [("Mexico-Central America", (8, 20, -106, -83)), ("Nankai-Ryukyu", (24, 35, 123, 138)),
                       ("South-central Chile", (-46, -33, -76, -70)), ("Cascadia", (40, 50, -130, -121))],
@@ -197,7 +212,8 @@ def main():
                             "bpos_within_ci_fraction": float(((p.sh_bpos >= p.sh_b_lo) & (p.sh_bpos <= p.sh_b_hi)).mean()),
                             "unstable_fraction": float(s.sh_b_unstable.mean())}
     jdump(out, RES / "validation.json", indent=1)
-    print(json.dumps({k: out[k] for k in ("michael_pooled", "global_atlas_method", "regions", "plate_boundary_types",
+    print(json.dumps({k: out[k] for k in ("b_sample", "michael_pooled", "global_atlas_method",
+                                          "global_atlas_method_all_events", "regions", "plate_boundary_types",
                                           "slab_age_groups", "cells_summary", "radius_sensitivity")}, indent=1,
                      default=float))
     print(pd.DataFrame(out["synthetic"]).round(3).to_string())

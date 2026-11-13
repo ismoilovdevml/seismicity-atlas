@@ -87,3 +87,7 @@ def test_bump_release(tmp_path):
     assert br.main(["--cutoff", "2026-12-01"], f) == "0.1.1"
     assert json.loads(f.read_text()) == {"version": "0.1.1", "data_cutoff_utc": "2026-12-01"}
     assert br.main(["--cutoff", "2027-01-01", "--part", "minor"], f) == "0.2.0"
+    assert br.main(["--part", "minor"], f) == "0.3.0"                 # method change: cut-off kept
+    assert json.loads(f.read_text()) == {"version": "0.3.0", "data_cutoff_utc": "2027-01-01"}
+    with pytest.raises(SystemExit):
+        br.main([], f)                                                 # no cut-off and patch: refused

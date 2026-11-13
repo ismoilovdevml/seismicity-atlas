@@ -8,8 +8,9 @@ threshold and declustering. For every entry two numbers are computed on the same
   b_tgr : 1.5 x beta of a tapered Gutenberg-Richter fit (maximum likelihood, beta and corner moment free,
           Kagan 2002), bootstrap 95 % interval. This is the like-for-like estimator for the Kagan / Bird values.
 
-A diagnostic third number, b_tgr on events with ISC-GEM magnitude uncertainty 0.10 only, tests the effect of the
-non-GCMT magnitudes in ISC-GEM (larger uncertainties; an inference, the ComCat mirror does not flag proxies).
+Both are computed on the atlas b sample (common.b_sample_mask: direct Mw only by default, the GCMT-type magnitudes
+the published values were made from). For comparison the same two numbers are also given on every event
+(`*_all_events`, the v0.1 behaviour) and on the magnitude-uncertainty-0.10 events (`*_magerr010`).
 
 Verdict: z = (ours - published) / sqrt(se_ours^2 + se_pub^2), se_ours = CI width / 3.92, se_pub from the printed
 uncertainty (0 if none). |z| <= 1.96 -> match, else mismatch. Entries whose region is only approximated (an
@@ -29,7 +30,7 @@ from scipy.optimize import minimize
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import seislib as sl  # noqa: E402
-from common import RES, jdump, load_work  # noqa: E402
+from common import RES, b_sample_label, b_sample_mask, jdump, load_work  # noqa: E402
 from val_chile import b_fixed  # noqa: E402
 from validate import box  # noqa: E402
 
@@ -109,7 +110,8 @@ def fmt(r):
 
 
 def main():
-    g = load_work("iscgem")
+    g_all = load_work("iscgem")
+    g = g_all[b_sample_mask(g_all.magerr)]
     lit = json.loads(LIT.read_text())
     res, rows = [], []
     for e in lit:
@@ -120,27 +122,33 @@ def main():
         short = e["citation"].split("(")[0].strip().rstrip(",") + " " + e["citation"].split("(")[1][:4]
         if c["kind"] in ("box", "class", "global"):
             m = g[s].mag.to_numpy()
+            out["b_sample"] = b_sample_label()
             out["b_aki"] = b_fixed(m, c["threshold"])
             out["b_tgr"] = b_tgr(m, c["threshold"])
-            # diagnostic: only events with ISC-GEM magnitude uncertainty 0.10 (taken as direct GCMT-type Mw)
-            out["b_tgr_magerr010"] = b_tgr(g[s & (g.magerr <= 0.1001)].mag.to_numpy(), c["threshold"])
+            s_all = select(g_all, c)
+            out["b_aki_all_events"] = b_fixed(g_all[s_all].mag.to_numpy(), c["threshold"])
+            out["b_tgr_all_events"] = b_tgr(g_all[s_all].mag.to_numpy(), c["threshold"])
+            s10 = s_all & (g_all.magerr <= 0.1001)
+            out["b_aki_magerr010"] = b_fixed(g_all[s10].mag.to_numpy(), c["threshold"])
+            out["b_tgr_magerr010"] = b_tgr(g_all[s10].mag.to_numpy(), c["threshold"])
             pb, pse = pub_b(e)
             out["published_b"], out["published_b_se"] = pb, pse
             out["published_n"] = e.get("published_n")
-            primary = out["b_tgr"] if e["quantity"] == "beta" else out["b_aki"]
-            out["verdict"], out["z"] = verdict(primary, pb, pse, c.get("approximate", False))
-            out["verdict_magerr010"], out["z_magerr010"] = verdict(
-                out["b_tgr_magerr010"] if e["quantity"] == "beta" else primary, pb, pse, c.get("approximate", False))
+            key = "b_tgr" if e["quantity"] == "beta" else "b_aki"
+            approx = c.get("approximate", False)
+            out["verdict"], out["z"] = verdict(out[key], pb, pse, approx)
+            out["verdict_all_events"], out["z_all_events"] = verdict(out[key + "_all_events"], pb, pse, approx)
+            out["verdict_magerr010"], out["z_magerr010"] = verdict(out[key + "_magerr010"], pb, pse, approx)
             where = (f"box {c['box_SNWE']}" if c["kind"] == "box" else
                      f"PB2002 {c['pb_class']}" if c["kind"] == "class" else "global")
             rows.append({"test": f"Literature b: {e['id']} ({where}, {c['years'][0]}-{c['years'][1]}, "
                                  f"<= {c['depth_max_km']} km, m >= {c['threshold']}"
                                  f"{', declustered' if c.get('declustered') else ''})",
-                         "ours": f"TGR {fmt(out['b_tgr'])}; Aki {fmt(out['b_aki'])}; "
-                                 f"TGR magerr 0.10 only {fmt(out['b_tgr_magerr010'])}",
+                         "ours": f"TGR {fmt(out['b_tgr'])}; Aki {fmt(out['b_aki'])} ({out['b_sample']}); "
+                                 f"all events: TGR {fmt(out['b_tgr_all_events'])}",
                          "published": f"{e['quantity']} {e['value']}{' ' + e['uncertainty'] if e.get('uncertainty') else ''}"
                                       f" (b {pb:.3f}; {short}, {e['location_in_source'].split(':')[0]})",
-                         "verdict": out["verdict"] + f"; magerr 0.10 only: {out['verdict_magerr010'].split(' (')[0]}"
+                         "verdict": out["verdict"] + f"; all events: {out['verdict_all_events'].split(' (')[0]}"
                                     " [needs human check]"})
         elif c["kind"] == "class_range":
             per = {}
@@ -172,6 +180,7 @@ def main():
                          "verdict": out["verdict"] + " (global vs local map) [needs human check]"})
         res.append(out)
     # diagnostic: share and b of the non-0.10-uncertainty magnitudes, global shallow 1982-2008, m >= 5.6
+    g = g_all
     s = (g.year >= 1982) & (g.year <= 2008) & (g.depth <= 70)
     big = g.magerr > 0.1001
     edges = (5.6, 6.0, 6.5, 7.0, 7.5, 10.0)

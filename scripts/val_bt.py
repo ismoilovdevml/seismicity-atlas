@@ -8,8 +8,8 @@ windows around the mainshock, inside the sequence circle (radius_km, all depths)
   post_0_30d  : 0-30 days after
   post_30_365d: 30-365 days after
 
-Catalogue  : ISC-GEM Mw (the atlas b catalogue; covers 1976-2021). A window that is not fully inside 1976-2021 is
-             left empty with a reason, so sequences from 2022 on have no values.
+Catalogue  : ISC-GEM Mw, the atlas b sample (1976-2021, direct Mw only: common.b_sample_mask). A window that is
+             not fully inside 1976-2021 is left empty with a reason, so sequences from 2022 on have no values.
 Threshold  : per event, thr_i = max(period/depth floor of the atlas, MAXC+0.2 of the window sample) and, after the
              mainshock, also Mc(t) = Mm - 4.5 - 0.75 log10(t days) (Helmstetter et al. 2006 form; its coefficients
              were derived for California and are an assumption at teleseismic scale).
@@ -35,7 +35,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import atlaslib as al  # noqa: E402
 import seislib as sl  # noqa: E402
 from atlas import floor_of  # noqa: E402
-from common import RES, SITE, jdump, load_work  # noqa: E402
+from common import RES, SITE, b_sample_mask, jdump, load_work  # noqa: E402
 from validate import box  # noqa: E402
 
 WINDOWS = {"pre_5y": (-5 * 365.25, 0.0), "pre_1y": (-365.25, 0.0), "post_0_30d": (0.0, 30.0),
@@ -114,7 +114,7 @@ def overlap(a, b):
 def main():
     g = load_work("iscgem")
     fl = json.loads((RES / "atlas_globals.json").read_text())["floors"]
-    g = g[(g.year >= 1976) & (g.year <= 2021)].reset_index(drop=True)
+    g = g[(g.year >= 1976) & (g.year <= 2021) & b_sample_mask(g.magerr)].reset_index(drop=True)
     fl_all = floors(g, fl)
     path = SITE / "sequences.json"
     doc = json.loads(path.read_text())

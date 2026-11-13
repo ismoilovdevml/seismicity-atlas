@@ -4,8 +4,10 @@ Every variant uses ISC-GEM Mw, shallow (<= 70 km), and either the atlas estimato
 max(MAXC+0.2 of the sample, period floor), bootstrap 95 % interval, `atlaslib.cell_b`) or Aki-Utsu at a fixed
 threshold with a bootstrap percentile interval. Variants:
 
-  magnitude    : ISC-GEM magnitude uncertainty 0.10 (taken here as a marker of direct, GCMT-type Mw; an inference,
-                 ISC-GEM does not flag proxies in the ComCat mirror) vs larger uncertainties
+  b sample     : every variant below uses the atlas b sample (common.b_sample_mask: direct Mw only by default);
+                 the baseline is also given on every event (`baseline_all_events`)
+  magnitude    : ISC-GEM magnitude uncertainty 0.10 (direct, GCMT-type Mw; see docs/method.md) vs larger
+                 uncertainties (proxy Mw), always on every event
   completeness : fixed thresholds 5.2-6.4, and MAXC / MBS / GFT Mc of the box sample
   sequences    : the five Mw >= 7.9 mainshocks in the box (1985 Valparaiso, 1995 Antofagasta, 2010 Maule,
                  2014 Iquique, 2015 Illapel) with their space-time windows removed (radius max(100 km, Wells &
@@ -28,7 +30,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import seislib as sl  # noqa: E402
-from common import RES, jdump, load_work  # noqa: E402
+from common import RES, b_sample_label, b_sample_mask, jdump, load_work  # noqa: E402
 from validate import b_region, box  # noqa: E402
 
 CHILE = (-45, -18, -76, -66)        # atlas validation box, S N W E
@@ -89,28 +91,35 @@ def table_rows(out):
 
 
 def main():
-    g = load_work("iscgem")
+    g_all = load_work("iscgem")
     fl = json.loads((RES / "atlas_globals.json").read_text())["floors"]
+    a76 = g_all[(g_all.year >= 1976) & (g_all.year <= 2021)].reset_index(drop=True)
+    a_base = ~a76.deep & box(a76, *CHILE)
+
+    # ---------------------------------------------------------------- magnitude type mix (every event)
+    direct = (a76.magerr <= 0.1001).to_numpy()
+    out = {"box_SNWE": CHILE, "b_sample": b_sample_label()}
+    out["baseline_all_events"] = b_region(a76, a_base, "sh", fl, 11)
+    out["magnitude"] = {
+        "share_magerr_0.10_chile": float(direct[a_base.to_numpy()].mean()),
+        "share_magerr_0.10_global_shallow": float(direct[(~a76.deep).to_numpy()].mean()),
+        "magerr_0.10_only": b_region(a76, a_base & direct, "sh", fl, 11),
+        "magerr_gt_0.10_only": b_region(a76, a_base & ~direct, "sh", fl, 11),
+    }
+
+    # every other variant: the atlas b sample
+    g = g_all[b_sample_mask(g_all.magerr)]
     g76 = g[(g.year >= 1976) & (g.year <= 2021)].reset_index(drop=True)
     sh = ~g76.deep
     inbox = box(g76, *CHILE)
     base = sh & inbox
     s = g76[base]
-    out = {"box_SNWE": CHILE, "n_events_box": int(base.sum())}
+    out["n_events_box"] = int(base.sum())
 
     def atl(sel, seed=11):
         return b_region(g76, sel, "sh", fl, seed)
 
     out["baseline"] = atl(base)
-
-    # ---------------------------------------------------------------- magnitude type mix
-    direct = (g76.magerr <= 0.1001).to_numpy()
-    out["magnitude"] = {
-        "share_magerr_0.10_chile": float(direct[base.to_numpy()].mean()),
-        "share_magerr_0.10_global_shallow": float(direct[sh.to_numpy()].mean()),
-        "magerr_0.10_only": atl(base & direct),
-        "magerr_gt_0.10_only": atl(base & ~direct),
-    }
 
     # ---------------------------------------------------------------- completeness
     m = sl.bin_mag(s.mag.to_numpy())
