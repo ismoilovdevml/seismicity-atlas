@@ -3,6 +3,9 @@
 All values are read from `results/validation.json`, `results/validation_table.json` and `results/sequences.json`
 (run of 2026-11-13, fixed random seeds). Intervals are 95 %. A mismatch is reported as a mismatch.
 
+Since v0.2 every atlas-method b uses the direct-Mw b sample (ISC-GEM Mw uncertainty 0.10; `method.md` §2.1). The
+Michael (2014) rows in §2 keep every event, as he did. What changed against v0.1 is listed in §10.
+
 ## 1. Synthetic recovery (estimator)
 
 60 synthetic cells per row. True b is drawn from 0.7–1.4 and true Mc from 5.0–6.0. Detection is a logistic
@@ -57,8 +60,8 @@ copy used here is a later release that adds about 12,000 pre-1960 events and ext
   (1976–2003). Pooled over 1918–2009 we get 1.078, slightly above his 1.05; he reports 1.05 as fitting "within
   1 standard deviation". The difference is small but outside our interval. A likely cause is the catalogue
   version; we did not test it.
-- **Atlas setting** (1976–2021, our floors): global b = 1.043 [1.025, 1.059] shallow (≤ 70 km) and
-  0.969 [0.945, 0.996] deeper.
+- **Atlas setting** (1976–2021, our floors, direct Mw): global b = 1.035 [1.018, 1.052] shallow (≤ 70 km) and
+  0.936 [0.911, 0.961] deeper (v0.1, every event: 1.043 [1.025, 1.059] and 0.969 [0.945, 0.996]).
 
 ![Mc by period](img/val_mc_michael.png)
 ![Mc over time](img/val_mc_time.png)
@@ -71,57 +74,53 @@ b-value agrees with the long-run local one; it does not prove the method.
 
 | Region | Ours | Published | Verdict |
 |---|---|---|---|
-| California | 0.919 [0.757, 1.111], n = 84, B | ≈ 1.0 (Hutton, Woessner & Hauksson 2010, SCSN) | match (wide interval) |
-| Chile | 0.914 [0.844, 0.984], n = 613, A | earlier: ≈ 1 (a 2018 national-catalogue study, weak source); now: Andean S. America b 0.855 ± 0.06 (GCMT, Kagan & Jackson 2013) | **weak reference replaced**: with the GCMT reference, ours matches (§3.1) |
-| Japan | 0.970 [0.918, 1.027], n = 1,007, A | no verified number at Mw ≥ 5 found | reference only |
-| Italy | n = 35 above Mc | ≈ 1.0 in Italian hazard models | **not testable**: too few Mw ≥ 5.4 events |
-| Zagros vs Makran | Zagros 1.316 [1.036, 1.664] (C, n = 65); Makran n = 25 | Zagros highest, Makran lowest of the Iranian units (Iranian Plateau catalogue, J. Seismol. 2020) | same direction, but neither passes the quality gate |
+| California | 0.921 [0.741, 1.128], n = 74, B | ≈ 1.0 (Hutton, Woessner & Hauksson 2010, SCSN) | match (wide interval) |
+| Chile | 0.852 [0.780, 0.931], n = 472, A | earlier: ≈ 1 (a 2018 national-catalogue study, weak source); now: Andean S. America b 0.855 ± 0.06 (GCMT, Kagan & Jackson 2013) | **weak reference replaced**: with the GCMT reference, ours matches (§3.1) |
+| Japan | 0.942 [0.879, 1.012], n = 747, A | no verified number at Mw ≥ 5 found | reference only |
+| Italy | n = 29 above Mc | ≈ 1.0 in Italian hazard models | **not testable**: too few Mw ≥ 5.4 events |
+| Zagros vs Makran | Zagros 1.199 [0.957, 1.545] (C, n = 66); Makran n = 25 | Zagros highest, Makran lowest of the Iranian units (Iranian Plateau catalogue, J. Seismol. 2020) | same direction, but neither passes the quality gate |
 
-### 3.1 Chile: why b is about 0.91 and not 1.0
+### 3.1 Chile: why b is about 0.85 and not 1.0
 
 All numbers in this section come from `scripts/val_chile.py` and `results/val_chile.json`. Every variant uses
-ISC-GEM Mw at ≤ 70 km depth.
+ISC-GEM Mw at ≤ 70 km depth and, since v0.2, the direct-Mw b sample, except the two magnitude rows.
 
 | Test | b [95 %] | n |
 |---|---|---|
-| Atlas setting (box 45–18° S, 76–66° W, 1976–2021) | 0.914 [0.844, 0.984] | 613 |
-| Only events with ISC-GEM magnitude uncertainty 0.10 (76 % of the box; 86 % globally) | 0.846 [0.776, 0.918] | 495 |
-| Only events with larger uncertainty | 1.378 [1.187, 1.638] | 118 |
-| Fixed thresholds 5.2 … 6.4 (Aki, no floor) | 0.894–0.963 | 1,269 … 95 |
-| Box Mc: MAXC+0.2 / MBS / GFT, 1976–2003 | 5.5 / 5.3 / 5.3 | 543 |
-| Box Mc: MAXC+0.2 / MBS / GFT, 2004–2021 | 5.4 / 5.1 / 5.1 | 1,029 |
-| Without the 2010 Maule window (30 d before to 365 d after, 565 km) | 0.905 [0.832, 0.979] | 489 |
-| Without the 2014 Iquique window | 0.929 [0.859, 1.022] | 574 |
-| Without all five Mw ≥ 7.9 windows (1985, 1995, 2010, 2014, 2015) | 0.980 [0.898, 1.087] | 359 |
-| Gardner-Knopoff mainshocks only | 0.671 [0.591, 0.770] | 194 |
-| b-positive (time-ordered, above the period floor) | 0.886 [0.784, 0.988] | 302 differences |
-| Interface only (PB2002 SUB within 200 km) / coastal strip 76–69° W | 0.906 / 0.904 | 570 / 588 |
-| North 18–27° S / central 27–33° S / south-central 33–45° S | 0.856 / 0.901 / 0.964 | 148 / 216 / 249 |
-| Depth ≤ 40 km / 40–70 km | 0.922 / 0.875 | 514 / 99 |
-| 1976–2009 / 2010–2021 | 0.909 / 0.908 | 228 / 368 |
-| Kagan & Jackson settings (1977–2010, m ≥ 5.8), Chile box | 0.945 [0.825, 1.084] | 219 |
+| Atlas setting (box 45–18° S, 76–66° W, 1976–2021, direct Mw) | 0.852 [0.780, 0.931] | 472 |
+| Same, every event (v0.1 sample, v0.2 floors) | 0.920 [0.849, 0.992] | 584 |
+| Only events with larger uncertainty (24 % of the box; 14 % globally) | 1.394 [1.185, 1.694] | 112 |
+| Fixed thresholds 5.2 … 6.4 (Aki, no floor) | 0.824–0.892 | 910 … 89 |
+| Box Mc: MAXC+0.2 / MBS / GFT, 1976–2003 | 5.7 / 5.4 / 5.3 | 371 |
+| Box Mc: MAXC+0.2 / MBS / GFT, 2004–2021 | 5.4 / 5.0 / 5.0 | 828 |
+| Without the 2010 Maule window (30 d before to 365 d after, 565 km) | 0.871 [0.783, 0.961] | 405 |
+| Without the 2014 Iquique window | 0.872 [0.801, 0.962] | 443 |
+| Without all five Mw ≥ 7.9 windows (1985, 1995, 2010, 2014, 2015) | 0.960 [0.866, 1.073] | 312 |
+| Gardner-Knopoff mainshocks only | 0.675 [0.591, 0.783] | 180 |
+| b-positive (time-ordered, above the period floor) | 0.882 [0.755, 1.008] | 190 differences |
+| Interface only (PB2002 SUB within 200 km) / coastal strip 76–69° W | 0.848 / 0.851 | 444 / 461 |
+| North 18–27° S / central 27–33° S / south-central 33–45° S | 0.817 / 0.848 / 0.880 | 124 / 168 / 180 |
+| Depth ≤ 40 km / 40–70 km | 0.853 / 0.848 | 387 / 85 |
+| 1976–2009 / 2010–2021 | 0.890 / 0.819 | 192 / 335 |
+| Kagan & Jackson settings (1977–2010, m ≥ 5.8), Chile box | 0.871 [0.761, 1.015] | 182 |
 
-- **Mc choice is not the cause.** Fixed thresholds from 5.2 to 6.4 give 0.89–0.96, and the box's own Mc agrees
-  with the atlas floors to within 0.2.
+- **Mc choice is not the cause.** Fixed thresholds from 5.2 to 6.4 give 0.82–0.89.
 - **The large sequences pull b down only a little.** Removing any one of them changes b by less than 0.03.
-  Removing all five raises it to 0.98, which includes 1.0. That is 40 % fewer events, and the interval widens.
-  b-positive, which is less sensitive to short-term aftershock incompleteness, gives 0.886. Gardner-Knopoff
-  declustering lowers b, as it does globally (§6).
+  Removing all five raises it to 0.96, which includes 1.0. That is 34 % fewer events, and the interval widens.
+  b-positive, which is less sensitive to short-term aftershock incompleteness, gives 0.882 and includes 1.0.
+  Gardner-Knopoff declustering lowers b, as it does globally (§6).
 - **Box, depth and period are not the cause.** All 29 box, depth, period, sequence-removal and fixed-threshold
-  variants fall in 0.86–0.98.
-- **Magnitude type matters, in the opposite direction.** The events with larger ISC-GEM magnitude uncertainty,
-  which are probably not direct GCMT Mw, have a much higher b. The direct-type events alone give 0.846.
+  variants fall in 0.82–0.96.
+- **Magnitude origin matters, in the opposite direction.** The proxy-Mw events (larger ISC-GEM uncertainty) have a
+  much higher b. v0.1 included them (0.914); v0.2 leaves them out (0.852).
 - **Stronger reference.** Kagan & Jackson (2013, Table 1) give β = 0.57 ± 0.04 (b = 0.855 ± 0.06) for the
   GCMT Flinn-Engdahl region "Andean S. America", 1977–2010, m ≥ 5.8. At the same settings, our Chile box gives
-  0.945 [0.825, 1.084]. An approximate Andean envelope gives a TGR value of 0.970 [0.866, 1.073]. Both match
-  within the uncertainties (z = 1.0 and 1.4).
+  0.871 [0.761, 1.015], and an approximate Andean envelope gives a TGR value of 0.903 [0.804, 1.014]. Both match.
 
-**Conclusion: weak reference.** At Mw ≥ 5.4, Chile's teleseismic b is about 0.85–0.95, and the published GCMT
-value agrees. The earlier "≈ 1" came from a national catalogue at much smaller magnitudes. The atlas value is
-not a method artefact: no single choice moves it to 1.0. It sits about 0.07 above the GCMT-type subset because
-ISC-GEM's non-GCMT magnitudes steepen the distribution (§8). This fits the young-slab result in §4 (Nishikawa &
-Ide 2014). Segment values from Crisosto & Tassara (2024), who use ISC b on 157 trench transects, could not be
-retrieved.
+**Conclusion: weak reference.** At Mw ≥ 5.4, Chile's teleseismic b on direct Mw is about 0.85–0.90, and the
+published GCMT value (0.855) agrees. The earlier "≈ 1" came from a national catalogue at much smaller magnitudes.
+No single choice moves the atlas value to 1.0. This fits the young-slab result in §4 (Nishikawa & Ide 2014).
+Segment values from Crisosto & Tassara (2024), who use ISC b on 157 trench transects, could not be retrieved.
 
 ## 4. Plate-boundary type
 
@@ -129,22 +128,25 @@ Shallow ISC-GEM 1976–2021 events, nearest PB2002 step within 200 km:
 
 | Class | b [95 %] | n |
 |---|---|---|
-| OSR oceanic spreading ridge | 1.447 [1.386, 1.509] | 1,907 |
-| OTF oceanic transform | 1.169 [1.132, 1.203] | 3,624 |
-| CTF continental transform | 1.056 [0.993, 1.123] | 922 |
-| SUB subduction | 0.999 [0.977, 1.020] | 7,768 |
-| CRB continental rift | 0.991 [0.928, 1.057] | 804 |
-| none (> 200 km from a step) | 0.991 [0.940, 1.041] | 1,317 |
-| OCB oceanic convergent | 0.967 [0.892, 1.031] | 710 |
-| CCB continental convergent | 0.960 [0.900, 1.025] | 844 |
+| OSR oceanic spreading ridge | 1.480 [1.413, 1.565] | 1,358 |
+| OTF oceanic transform | 1.174 [1.137, 1.217] | 2,698 |
+| CTF continental transform | 1.035 [0.960, 1.117] | 761 |
+| none (> 200 km from a step) | 0.977 [0.917, 1.023] | 1,287 |
+| OCB oceanic convergent | 0.976 [0.896, 1.061] | 535 |
+| SUB subduction | 0.971 [0.948, 0.994] | 6,287 |
+| CRB continental rift | 0.965 [0.905, 1.039] | 687 |
+| CCB continental convergent | 0.930 [0.872, 0.993] | 703 |
+
+Direct-Mw sample (v0.2). On every event (same floors) the values are 0.996–1.491; the largest shifts are SUB
+1.001 → 0.971, CRB 1.011 → 0.965 and CCB 0.971 → 0.930 (`plate_boundary_types_all_events`).
 
 | Comparison | Published | Verdict |
 |---|---|---|
 | SUB | b = 1.5 × 0.654 = 0.98 (GCMT subduction zones 1977–2010, as quoted from Kagan & Jackson) | match |
 | OSR | β 0.8–1.1 → b 1.2–1.65 for mid-ocean events (Kagan 2002, quoted in Kagan 2010) | match |
-| non-ridge classes | universal β 0.63–0.67 → b 0.95–1.0 (Kagan 1999; Bird & Kagan 2004) | CRB, OCB, CCB, SUB match; CTF slightly higher |
+| non-ridge classes | universal β 0.63–0.67 → b 0.95–1.0 (Kagan 1999; Bird & Kagan 2004) | SUB, CRB, OCB, CTF, CCB match within their intervals; the CCB point value (0.930) is below the range |
 | Ranking | spreading highest; thrust and convergent lowest (Schorlemmer et al. 2005; TRACE 2026, see below) | match |
-| Subduction, young slabs (Mexico–Central America, Nankai–Ryukyu, south-central Chile, Cascadia) vs old (Japan Trench, Kuril–Kamchatka, Izu–Bonin–Mariana, Tonga–Kermadec) | b increases with slab age (Nishikawa & Ide 2014) | **match**: young 0.943 [0.872, 1.021], old 1.089 [1.051, 1.127]; the intervals do not overlap |
+| Subduction, young slabs (Mexico–Central America, Nankai–Ryukyu, south-central Chile, Cascadia) vs old (Japan Trench, Kuril–Kamchatka, Izu–Bonin–Mariana, Tonga–Kermadec) | b increases with slab age (Nishikawa & Ide 2014) | **match**: young 0.899 [0.832, 0.973], old 1.067 [1.018, 1.112]; the intervals do not overlap |
 
 The slab-age groups use approximate literature ages assigned by region. The PB2002 `SEAFLOORAG` field holds codes
 (220, 260), not ages, for subduction steps, so it could not be used.
@@ -158,7 +160,7 @@ plate-boundary type (GCMT Mw ≥ 5). We read the full HTML text of v4 (30 Sep 20
 (Ridgecrest, Sanriku). A search-engine summary of the PDF mentions a GCMT 1980–2023 Mw ≥ 5 analysis with median
 b of about 1.12 for spreading centres and 0.93 for extension, with subduction, collision and transforms lower. We
 could not confirm this in the text. It is treated as an unverified comparison: it agrees with our ranking, and its
-spreading-centre value is lower than our OSR 1.45.
+spreading-centre value is lower than our OSR 1.48.
 
 ![b by boundary class](img/val_plate_b.png)
 
@@ -184,10 +186,10 @@ Global shallow events, 2004–2021, same years in both catalogues:
 
 | Check | Result |
 |---|---|
-| Radius 200 / 400 km vs 300 km | median \|Δb\| 0.035 / 0.039 on common cells |
-| b-positive vs b (shown cells) | median +0.029; b⁺ inside the b interval in 87.8 % of cells |
-| Gardner-Knopoff declustering | global shallow b 1.043 → 0.895; per-cell median −0.192 (not used for the map, see method §6) |
-| Cutoff-stability flag | 4.9 % of shown shallow cells |
+| Radius 200 / 400 km vs 300 km | median \|Δb\| 0.042 / 0.039 on common cells (v0.1: 0.035 / 0.039) |
+| b-positive vs b (shown cells) | median +0.046; b⁺ inside the b interval in 64.9 % of cells (v0.1: +0.029, 87.8 %; see method §2.1, open point) |
+| Gardner-Knopoff declustering | global shallow b 1.035 → 0.887; per-cell median −0.202 (not used for the map, see method §6) |
+| Cutoff-stability flag | 4.7 % of shown shallow cells |
 
 ## 7. Omori-Utsu
 
@@ -209,21 +211,22 @@ The full table with exact quotes and table numbers is in [`literature-values.md`
 is in `scripts/val_literature.json`, and the code is `scripts/val_literature.py`. All 16 entries are flagged
 `needs_human_check`, because they were extracted with LLM assistance.
 
-- **Ten regional values match**, nine of them on approximate boxes. They come from Kagan & Jackson 2013,
+- **Ten regional values match** (in v0.1 and v0.2), nine of them on approximate boxes. They come from Kagan & Jackson 2013,
   Table 1: GCMT 1977–2010, m ≥ 5.8, tapered G-R β. Only the Tohoku box (35–40° N, 140–146° E) is defined
-  exactly. Ours there is 1.082 [0.860, 1.333] (n = 105), against 0.96 ± 0.11 (published n = 109).
-- **Global and subduction aggregates mismatch.** On full ISC-GEM, ours is higher by 0.06–0.07, for example global
-  1982–2008, m ≥ 5.6: TGR 1.087 [1.063, 1.110] against Kagan (2010) 1.016. They **match when only events with
-  ISC-GEM magnitude uncertainty 0.10 are used**: global 1.035, trenches 0.992 against 0.969, all subduction zones
-  0.977 against 0.975.
-  - The remaining events are 14.6 % of Mw 5.6–6.0 and about 1 % from Mw 7.0 up.
-  - Alone, they give b = 1.736 [1.633, 1.850].
-  - This is a catalogue effect on every b in the atlas, of about +0.05 at the global scale. It is reported here
-    and not corrected in the map. Using magnitude uncertainty to identify proxy magnitudes is an inference; we
-    did not check it against ISC-GEM's own magnitude-source flags.
-- **Declustered global b mismatches** (0.934 against 0.972). Gardner-Knopoff is not Kagan's declustering.
+  exactly. Ours there is 1.023 [0.799, 1.260] (n = 93; v0.1 1.082, n = 105), against 0.96 ± 0.11 (published
+  n = 109).
+- **Global and subduction aggregates now match (v0.2).** On the direct-Mw sample: global 1982–2008, m ≥ 5.6,
+  TGR 1.035 [1.012, 1.062] against Kagan (2010) 1.016 (z = 1.53); trenches 0.992 [0.955, 1.029] against 0.969;
+  all 18 subduction zones 0.977 [0.938, 1.013] against 0.975. In v0.1 (every event) all three mismatched, higher
+  by 0.06–0.08 (global 1.087 [1.063, 1.110], z = 5.93).
+  - The proxy-Mw events are 14.6 % of Mw 5.6–6.0 and about 1 % from Mw 7.0 up. Alone, they give
+    b = 1.736 [1.633, 1.850].
+  - The marker (uncertainty 0.10 = direct Mw) is checked against GCMT magnitudes in ComCat (99.97 % agreement,
+    `method.md` §2.1), not against ISC-GEM's own source column, which the ComCat copy does not carry.
+- **Declustered global b mismatches**, and more so in v0.2 (0.903 against 0.972, z = −5.13; v0.1 0.934,
+  z = −2.50). Gardner-Knopoff is not Kagan's declustering.
 - **Mc matches.** The global MAXC+0.2 for 1980–2016 at 0–50 km is 5.4, against GCMT Mc 5.4–5.5 (Petruccelli 2018).
-- **The β range over classes mismatches at the top end.** Our OSR β is 1.02, against a published maximum of 0.92
+- **The β range over classes mismatches at the top end.** Our OSR β is 0.98 (v0.1: 1.02), against a published maximum of 0.92
   (Bird & Kagan 2004, abstract). The per-class table was not read.
 
 ## 9. Retrospective b before and after the 40 sequences
@@ -241,10 +244,10 @@ not a forecast.**
 
 - **Most windows are too small.** Of 40 sequences, 4 are outside ISC-GEM's coverage (1976–2021). The number of
   sequences with b shown (quality A/B) is:
-  - 3 for 5 years before;
+  - 2 for 5 years before (v0.1: 3);
   - 0 for 1 year before;
-  - 2 for 0–30 days after;
-  - 2 for 30–365 days after.
+  - 1 for 0–30 days after (v0.1: 2);
+  - 1 for 30–365 days after (v0.1: 2).
 
   At Mw ≥ 5.2–5.7, only the largest sequences have enough events. Teleseismic Mw catalogues cannot resolve b(t)
   for most M 8 sequences.
@@ -252,24 +255,83 @@ not a forecast.**
 
 | Sequence | 5 yr before | 0–30 d after | 30–365 d after |
 |---|---|---|---|
-| 2004 Sumatra–Andaman | insufficient | 1.114 [0.915, 1.350] B | 1.093 [0.929, 1.356] B |
-| 2010 Maule | insufficient | 1.081 [0.884, 1.316] B | insufficient |
-| 2011 Tohoku | 0.921 [0.791, 1.072] A | C (1.009, interval too wide) | 0.952 [0.832, 1.109] A |
-| 2021 Kermadec | 0.919 [0.774, 1.116] B | C | not covered |
-| 2013 Santa Cruz Is. | 1.016 [0.815, 1.282] B | C | insufficient |
+| 2004 Sumatra–Andaman | insufficient | insufficient (n = 49) | C |
+| 2011 Tohoku | 0.873 [0.721, 1.068] B | 0.948 [0.795, 1.135] B | 0.888 [0.768, 1.047] A |
+| 2021 Kermadec | 0.904 [0.751, 1.140] B | insufficient | not covered |
+| 2013 Santa Cruz Is. | C | insufficient | insufficient |
 
-- **Tohoku is the only sequence with b shown both before and after.** The change is +0.03, and the intervals
+  Direct-Mw sample (v0.2). In v0.1 Sumatra (0–30 d, 30–365 d), Maule (0–30 d) and Santa Cruz (5 yr before) were
+  also shown; with the proxies removed they fall below 50 events or get wider intervals.
+
+- **Tohoku is the only sequence with b shown both before and after.** The change is +0.015, and the intervals
   overlap: no detectable change at this magnitude range.
 - **Published comparison.** No published before/after b at Mw ≥ 5 for a single great earthquake was found.
   - The closest is Srivastava et al. (2021, arXiv:2108.06557, preprint; ISC mb, 92–100° E). For Sumatra they
     report b 1.04 in the five years before 2004 and 1.14 after.
-  - Our replication in the same band (13° S–11° N) has only 17 events above threshold in 2000–2004, against 407
-    in 2005–2009 (b 1.043 [0.878, 1.147]). It is **not testable**, so we cannot confirm or contradict the
+  - Our replication in the same band (13° S–11° N) has only 12 events above threshold in 2000–2004, against 280
+    in 2005–2009 (b 1.026 [0.871, 1.175]). It is **not testable**, so we cannot confirm or contradict the
     direction.
   - Nanjo et al. (2012) and Nuannin et al. (2005) describe a pre-2004 decrease, but their catalogues and
     magnitudes could not be verified from the text we read.
   - A 2026 preprint (arXiv:2603.22745) reports no rolling-b change before M ≥ 6 in Chile and Japan in ComCat.
 - **Assumption.** The Mc(t) coefficients (4.5, 0.75) were derived for California. They are applied here unchanged.
+
+## 10. v0.2: direct-Mw b sample, before and after
+
+v0.1 used every ISC-GEM event of 1976–2021; v0.2 uses only direct Mw (uncertainty 0.10; `method.md` §2.1). Both runs
+use the same data cut-off and seeds. The v0.1 numbers were recomputed with `ATLAS_B_MAGERR_MAX=all` and reproduce
+the committed v0.1 outputs exactly (every number in `results/*.json` and every cell file unchanged).
+
+| | v0.1, every event | v0.2, direct Mw |
+|---|---|---|
+| Events in the b sample, 1976–2021 | 56,585 | 49,536 (7,049 proxy Mw left out) |
+| Global b, shallow ≤ 70 km | 1.043 [1.025, 1.059], n = 15,827 | 1.035 [1.018, 1.052], n = 15,725 |
+| Global b, deeper | 0.969 [0.945, 0.996], n = 5,419 | 0.936 [0.911, 0.961], n = 4,976 |
+| Floors, shallow, 1976–2003 / 2004–2021 | 5.7 / 5.2 | 5.8 / 5.3 |
+| Floors, deeper, 1976–2003 / 2004–2021 | 5.4 / 5.4 | 5.4 / 5.2 |
+| Shallow cells A / B (shown) | 80 / 124 (204) | 58 / 112 (170) |
+| Deeper cells A / B (shown) | 22 / 48 (70) | 24 / 49 (73) |
+| Per-cell change, shallow (167 cells shown in both) | – | median −0.019 (IQR −0.047 to +0.015); 63 % lower |
+| Per-cell change, deeper (66 cells shown in both) | – | median −0.036 (IQR −0.054 to −0.015); 86 % lower |
+| b-positive inside the b interval (shown shallow cells) | 87.8 % | 64.9 % |
+
+- Shallow cells shown only in v0.1: 37; only in v0.2: 3. Deeper: 4 and 7.
+- With every event but the v0.2 floors, global shallow b is 1.053; so the floor change alone moves it by +0.010
+  and leaving the proxies out by −0.018.
+- **b-positive did not follow.** In the 77 shallow cells with b and b-positive in both runs, b fell by a median
+  0.022 and b-positive rose by 0.002. Part of the per-cell drop may be incompleteness of the direct sample just
+  above the floor; this is open (`method.md` §2.1).
+
+**Verdicts that changed** (site validation table, `results/validation_table.json`):
+
+- Literature: Kagan & Jackson (2013) all 18 subduction zones, Kagan (2010) global and Kagan (2010) trenches go
+  from **mismatch to match**.
+- Chile spread: the variant range moves from 0.86–0.98 to 0.82–0.96 (verdict text only; still "robust").
+- No verdict went from match to mismatch. The declustered Kagan (2010) value stays a mismatch and moves further
+  (z −2.50 → −5.13). The boundary-class ranking changes order below OTF/CTF (SUB now below "none" and OCB) but
+  keeps its verdict. The Sumatra b(t) row stays "not testable". Michael (2014) rows are unchanged by design.
+
+**The 16 literature comparisons** (primary estimator: TGR for every β entry):
+
+| # | Entry | Published b | v0.1 (all events) | v0.2 (direct Mw) | Verdict v0.1 → v0.2 |
+|---|---|---|---|---|---|
+| 1 | `kj2013_fe01_alaska_aleutian` | 0.975 | TGR 0.990 [0.865, 1.133] (z +0.16) | TGR 0.915 [0.808, 1.044] (z -0.70) | match (approximate region) |
+| 2 | `kj2013_fe05_mexico_guatemala` | 0.900 | TGR 0.819 [0.660, 1.021] (z -0.63) | TGR 0.795 [0.639, 0.946] (z -0.88) | match (approximate region) |
+| 3 | `kj2013_fe06_central_america` | 1.020 | TGR 1.038 [0.880, 1.283] (z +0.13) | TGR 1.025 [0.868, 1.244] (z +0.04) | match (approximate region) |
+| 4 | `kj2013_fe08_andean_south_america` | 0.855 | TGR 0.970 [0.866, 1.073] (z +1.43) | TGR 0.903 [0.804, 1.014] (z +0.60) | match (approximate region) |
+| 5 | `kj2013_fe12_kermadec_tonga_samoa` | 1.200 | TGR 1.259 [1.156, 1.389] (z +0.70) | TGR 1.212 [1.108, 1.314] (z +0.15) | match (approximate region) |
+| 6 | `kj2013_fe18_guam_japan` | 1.290 | TGR 1.285 [0.993, 1.651] (z -0.02) | TGR 1.259 [0.998, 1.631] (z -0.14) | match (approximate region) |
+| 7 | `kj2013_fe19_japan_kamchatka` | 0.930 | TGR 1.072 [0.969, 1.201] (z +1.69) | TGR 0.993 [0.898, 1.116] (z +0.77) | match (approximate region) |
+| 8 | `kj2013_tohoku_box` | 0.960 | TGR 1.082 [0.860, 1.333] (z +0.76) | TGR 1.023 [0.799, 1.260] (z +0.40) | match |
+| 9 | `kj2013_fe24_sunda_arc` | 0.975 | TGR 1.077 [0.901, 1.253] (z +0.95) | TGR 1.018 [0.862, 1.211] (z +0.40) | match (approximate region) |
+| 10 | `kj2013_fe46_andaman_sumatra` | 1.065 | TGR 1.010 [0.868, 1.151] (z -0.43) | TGR 0.921 [0.798, 1.080] (z -1.13) | match (approximate region) |
+| 11 | `kj2013_all_18_subduction_zones` | 0.975 | TGR 1.034 [0.996, 1.073] (z +2.37) | TGR 0.977 [0.938, 1.013] (z +0.08) | **mismatch → match** (approximate region) |
+| 12 | `kagan2010_global_mt56` | 1.016 | TGR 1.087 [1.063, 1.110] (z +5.93) | TGR 1.035 [1.012, 1.062] (z +1.53) | **mismatch → match** |
+| 13 | `kagan2010_trenches_mt56` | 0.969 | TGR 1.053 [1.013, 1.094] (z +4.07) | TGR 0.992 [0.955, 1.029] (z +1.20) | **mismatch → match** (approximate region) |
+| 14 | `kagan2010_global_declustered_mt56` | 0.972 | TGR 0.934 [0.902, 0.962] (z -2.50) | TGR 0.903 [0.874, 0.926] (z -5.13) | mismatch (approximate region) |
+| 15 | `birdkagan2004_pb2002_class_range` | β 0.53–0.92 | β 0.65–1.02 | β 0.63–0.98 | mismatch (approximate) |
+| 16 | `petruccelli2018_gcmt_mc_map` | Mc 5.4–5.5 | MAXC+0.2 5.4, MBS 5.6 | MAXC+0.2 5.4, MBS 5.8 | match |
+
 
 ## Not verified
 
@@ -281,5 +343,10 @@ not a forecast.**
   universal β and the ridge range instead.
 - TRACE's global plate-boundary b numbers (see §4).
 - Every literature entry in §8 (`needs_human_check: true`); Flinn-Engdahl regions approximated by boxes.
-- That ISC-GEM magnitude uncertainty 0.10 marks direct GCMT-type Mw (§3.1, §8).
+- That ISC-GEM magnitude uncertainty 0.10 marks direct Mw. It is checked against GCMT magnitudes in ComCat
+  (99.97 % of GCMT-sourced matches carry 0.10), not against ISC-GEM's own direct/proxy column, which the ComCat
+  copy lacks (`method.md` §2.1).
+- Whether the lower per-cell b of v0.2 is partly residual incompleteness of the direct-Mw sample: b-positive did
+  not move (median +0.002 against −0.022 for b in 77 cells; §10).
+- The ISC-GEM overview and Di Giacomo et al. (2018) quotes in `method.md` §2.1 (read through a summariser).
 - Mc(t) coefficients at teleseismic scale (§9).

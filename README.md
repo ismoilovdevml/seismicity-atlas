@@ -25,9 +25,9 @@ The main message is **where the catalogue numbers can be trusted, and where they
 |---|---|
 | Events analysed | ISC-GEM 74,153 (1904–2021); ComCat M ≥ 4.5: 294,223 (1973–2026-11-12) |
 | Duplicates | 58,666 of 58,982 ISC-GEM events in 1973–2021 matched in ComCat (99.5 %); median offset 1.1 s, 9.6 km |
-| Global b, ISC-GEM Mw 1976–2021 | shallow ≤ 70 km: **1.043 [1.025, 1.059]**; deeper: **0.969 [0.945, 0.996]** |
-| Cells with a trusted b (95 % interval ≤ 0.5) | 204 shallow and 70 deeper, out of 2,598 cells that hold events |
-| Global completeness (ISC-GEM, shallow) | Mw 5.7 for 1976–2003, 5.2 for 2004–2021 |
+| Global b, ISC-GEM direct Mw 1976–2021 | shallow ≤ 70 km: **1.035 [1.018, 1.052]**; deeper: **0.936 [0.911, 0.961]** |
+| Cells with a trusted b (95 % interval ≤ 0.5) | 170 shallow and 73 deeper, out of 2,598 cells that hold events |
+| Global completeness (ISC-GEM direct Mw, shallow) | Mw 5.8 for 1976–2003, 5.3 for 2004–2021 |
 | USGS M4.5+ feed, as served | complete above about 4.7 (mostly mb) worldwide since 1993 |
 | Omori fits | 40 sequences since 1990: 17 quality A, 10 B, 8 C, 5 insufficient |
 
@@ -39,16 +39,32 @@ The main message is **where the catalogue numbers can be trusted, and where they
 | Global b, shallow, 1918–2009 | 1.078 [1.056, 1.102] | 1.05 (Michael 2014) | close; just outside our interval |
 | Mc, deep, 1964–2009 | 5.7 | 5.7 (Michael 2014) | match |
 | Mc, shallow, modern periods | 5.2–5.7 | 5.7–6.0 (Michael 2014, catalogue v1) | ours 0.1–0.5 lower (newer catalogue release) |
-| b, subduction boundaries | 0.999 [0.977, 1.020] | 0.98 (β 0.654, Kagan & Jackson) | match |
-| b, oceanic spreading ridges | 1.447 [1.386, 1.509] | 1.2–1.65 (β 0.8–1.1, Kagan 2002) | match |
-| b, young vs old subducting slabs | 0.943 vs 1.089 (intervals do not overlap) | b increases with slab age (Nishikawa & Ide 2014) | match |
-| b, California | 0.919 [0.757, 1.111] | ≈ 1.0 (Hutton et al. 2010) | match (wide) |
-| b, Chile | 0.914 [0.844, 0.984] | ≈ 1 (weak source) | **mismatch** |
-| b, Italy | 35 events above Mc | ≈ 1.0 | not testable |
+| b, subduction boundaries | 0.971 [0.948, 0.994] | 0.98 (β 0.654, Kagan & Jackson) | match |
+| b, global 1982–2008, m ≥ 5.6 (TGR) | 1.035 [1.012, 1.062] | 1.016 (Kagan 2010, GCMT) | match (mismatch in v0.1) |
+| b, oceanic spreading ridges | 1.480 [1.413, 1.565] | 1.2–1.65 (β 0.8–1.1, Kagan 2002) | match |
+| b, young vs old subducting slabs | 0.899 vs 1.067 (intervals do not overlap) | b increases with slab age (Nishikawa & Ide 2014) | match |
+| b, California | 0.921 [0.741, 1.128] | ≈ 1.0 (Hutton et al. 2010) | match (wide) |
+| b, Chile | 0.852 [0.780, 0.931] | 0.855 ± 0.06 (Andean S. America, GCMT; Kagan & Jackson 2013) | match at their settings (0.871 [0.761, 1.015]); the earlier "≈ 1" reference was weak |
+| b, Italy | 29 events above Mc | ≈ 1.0 | not testable |
 | Synthetic cells, 100–1000 events | median bias ≤ 0.021, CI coverage 0.88–0.98 | true b | match |
 | Omori p, synthetic | 1.063 ± 0.025 | 1.05 | match |
 
 Full tables and the reasons for each verdict: [docs/validation.md](docs/validation.md).
+
+### What changed in v0.2
+
+- **b now uses direct Mw only.** ISC-GEM mixes direct moment magnitudes (GCMT) with proxy Mw converted from Ms and
+  mb. In 1976–2021 the proxies are 16 % of events at Mw 5.6–6.0 and under 1 % from Mw 7, and alone they give
+  b ≈ 1.74, so they raised every b. The ComCat copy has no direct/proxy flag; the magnitude uncertainty 0.10 marks
+  direct Mw (99.97 % of events with a GCMT magnitude in ComCat carry it). v0.2 leaves the other 7,049 events
+  (12.5 %) out of every b. Details: [method §2.1](docs/method.md), before/after: [validation §10](docs/validation.md).
+- Global b: shallow 1.043 → 1.035, deeper 0.969 → 0.936. Trusted cells: 204 → 170 shallow, 70 → 73 deeper.
+  Median per-cell change −0.019 (shallow) and −0.036 (deeper).
+- Kagan (2010) global and trench b and the Kagan & Jackson (2013) all-subduction b now match (they mismatched).
+- Open point: b-positive did not move with b, so part of the per-cell drop may be incompleteness of the direct
+  sample just above the floor.
+- `ATLAS_B_MAGERR_MAX=all ./scripts/run_all.sh` rebuilds the v0.1 behaviour for comparison.
+  `manifest.json` → `method` gains `b_sample` and `b_magerr_max`.
 
 ## Documentation
 

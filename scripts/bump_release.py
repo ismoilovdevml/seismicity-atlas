@@ -6,7 +6,9 @@ Patch = data refresh with the same schema; minor = schema change (docs/data-sche
 Usage
   python -I scripts/bump_release.py --cutoff 2026-12-01            # data refresh: patch bump
   python -I scripts/bump_release.py --cutoff 2026-12-01 --part minor
-Prints the new version. Exits 0 without changes if the cut-off is not later than the current one.
+  python -I scripts/bump_release.py --part minor                   # method change, same data cut-off
+Prints the new version. With --cutoff, exits 0 without changes if the cut-off is not later than the current one.
+Without --cutoff, --part minor or major is required and only the version changes.
 """
 from __future__ import annotations
 
@@ -29,10 +31,17 @@ def bump(version: str, part: str) -> str:
 
 def main(argv=None, path: Path = RELEASE) -> str:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--cutoff", required=True, type=date.fromisoformat, help="YYYY-MM-DD (UTC)")
+    ap.add_argument("--cutoff", type=date.fromisoformat, help="YYYY-MM-DD (UTC); omit for a method-only bump")
     ap.add_argument("--part", choices=["patch", "minor", "major"], default="patch")
     a = ap.parse_args(argv)
     rel = json.loads(path.read_text())
+    if a.cutoff is None:
+        if a.part == "patch":
+            ap.error("a method-only bump (no --cutoff) needs --part minor or --part major")
+        rel = {"version": bump(rel["version"], a.part), "data_cutoff_utc": rel["data_cutoff_utc"]}
+        path.write_text(json.dumps(rel, indent=1) + "\n")
+        print(rel["version"])
+        return rel["version"]
     if a.cutoff <= date.fromisoformat(rel["data_cutoff_utc"]):
         print(rel["version"])
         return rel["version"]

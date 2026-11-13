@@ -2,7 +2,10 @@
 
 Spatial unit : H3 resolution-2 cells (display and counting) with a fixed 300 km sampling circle around each cell
                centre for the statistics (Mc, b), so every estimate has the same spatial support.
-b catalogue  : ISC-GEM Mw, 1976-2021 (the GCMT era: mostly direct Mw), shallow (<= 70 km) and deeper separately.
+b catalogue  : ISC-GEM Mw, 1976-2021 (the GCMT era), shallow (<= 70 km) and deeper separately, direct Mw only:
+               events with Mw uncertainty <= common.B_MAGERR_MAX (0.10; ATLAS_B_MAGERR_MAX=all keeps every event).
+               The floors, b, declustered b, b-positive, the FMD / b-cutoff curves and the yearly counts above the
+               threshold use this sample; Mc(t) and the cell counts use every event.
 Thresholds   : per event, max(cell MAXC+0.2, global floor of its period). Floors are estimated from the global
                ISC-GEM data per depth class as max(MAXC+0.2, MBS) for 1976-2003 and 2004-2021.
 Outputs      : data/work/cells.pkl, results/atlas_globals.json, site/data/cells/<h3>.json (per-cell detail)
@@ -21,7 +24,8 @@ from scipy.spatial import cKDTree
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import atlaslib as al  # noqa: E402
 import seislib as sl  # noqa: E402
-from common import CUTOFF_YEAR, H3_RES, RES, SAMPLE_R_KM, SITE, WORK, jdump, load_work  # noqa: E402
+from common import (B_MAGERR_MAX, CUTOFF_YEAR, H3_RES, RES, SAMPLE_R_KM, SITE, WORK, b_sample_label,  # noqa: E402
+                    b_sample_mask, jdump, load_work)
 
 PERIODS = [(1976, 2003), (2004, 2021)]
 Y0, Y1 = 1976, 2021
@@ -96,7 +100,8 @@ def main(radius=SAMPLE_R_KM):
     g = load_work("iscgem")
     c = load_work("comcat")
     mt = load_work("matches")
-    fl = global_floors(g)
+    bsel = b_sample_mask(g.magerr)
+    fl = global_floors(g[bsel])
     print(json.dumps(fl, indent=1))
 
     cells = sorted(set(g.h3) | set(c.h3))
@@ -130,7 +135,7 @@ def main(radius=SAMPLE_R_KM):
 
     sets = {}
     for dname, dsel_g, dsel_c in (("sh", ~g.deep, ~c.deep), ("dp", g.deep, c.deep)):
-        gg = g[dsel_g & (g.year >= Y0) & (g.year <= Y1)].reset_index(drop=True)
+        gg = g[dsel_g & (g.year >= Y0) & (g.year <= Y1) & bsel].reset_index(drop=True)
         cc = c[dsel_c].reset_index(drop=True)
         sets[dname] = (gg, cc, cKDTree(xyz(gg.lat.to_numpy(), gg.lon.to_numpy())),
                        cKDTree(xyz(cc.lat.to_numpy(), cc.lon.to_numpy())), floor_of(gg.year.to_numpy(), fl[dname]))
@@ -221,6 +226,8 @@ def main(radius=SAMPLE_R_KM):
     for h, det in details.items():
         jdump(det, ddir / f"{h}.json")
     jdump({"floors": fl, "periods": PERIODS, "years": [Y0, Y1], "n_cells": len(df), "n_detail": len(details),
+           "b_magerr_max": B_MAGERR_MAX, "b_sample": b_sample_label(),
+           "b_sample_excluded_1976_2021": int(((g.year >= Y0) & (g.year <= Y1) & ~bsel).sum()),
            "sample_radius_km": SAMPLE_R_KM, "h3_res": H3_RES, "nboot": NBOOT, "rng_seed": RNG},
           RES / "atlas_globals.json", indent=1)
     for d in ("sh", "dp"):

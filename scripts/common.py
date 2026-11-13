@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -27,6 +28,14 @@ SAMPLE_R_KM = 300.0             # sampling radius around each cell centre for Mc
 DEPTH_SPLIT = 70.0              # km: shallow <= 70 < intermediate/deep
 DM = 0.1
 MW_TYPES = {"mww", "mwc", "mwb", "mwr", "mw", "mwp", "mi", "mwd"}
+
+# b sample (docs/method.md, "Direct-Mw b sample"): every b-value is computed only from ISC-GEM events whose Mw
+# uncertainty is at most B_MAGERR_MAX. In 1976-2021 the 0.10 class is, in effect, the direct (GCMT) Mw and the
+# larger values the proxy Mw converted from Ms / mb; the ComCat mirror has no field that flags them directly. Rates, counts,
+# Mc(t) and the event layers keep every event. Set the environment variable ATLAS_B_MAGERR_MAX=all to use every
+# event (the v0.1 behaviour) or to a number for another limit.
+_ENV_MAGERR = os.environ.get("ATLAS_B_MAGERR_MAX", "0.10").strip().lower()
+B_MAGERR_MAX = None if _ENV_MAGERR in ("all", "none", "") else float(_ENV_MAGERR)
 
 # Michael (2014, BSSA 104(4)) ISC-GEM completeness, shallow (< 60 km) and deep events
 MICHAEL_SHALLOW = [(1900, 1917, 7.7), (1918, 1939, 7.0), (1940, 1954, 6.8), (1955, 1963, 6.5),
@@ -85,6 +94,23 @@ def jdump(obj, path: Path, indent=None):
             return [clean(v) for v in o]
         return o
     path.write_text(json.dumps(clean(obj), indent=indent, default=conv, separators=None if indent else (",", ":")))
+
+
+def b_sample_mask(magerr, max_err=B_MAGERR_MAX) -> np.ndarray:
+    """True for events that enter b estimates: Mw uncertainty <= max_err (all True when max_err is None).
+
+    Events without an uncertainty are left out. If most events lack one (a catalogue file without the column), the
+    filter cannot work and this raises instead of returning an almost empty sample."""
+    e = np.asarray(magerr, dtype=float)
+    if max_err is None:
+        return np.ones(e.shape, bool)
+    if e.size and np.isnan(e).mean() > 0.5:
+        raise ValueError("most events have no Mw uncertainty: set ATLAS_B_MAGERR_MAX=all to use every event")
+    return np.nan_to_num(e, nan=np.inf) <= max_err + 1e-6
+
+
+def b_sample_label(max_err=B_MAGERR_MAX) -> str:
+    return "all events" if max_err is None else f"Mw uncertainty <= {max_err:.2f} (direct Mw)"
 
 
 def load_work(name: str) -> pd.DataFrame:
