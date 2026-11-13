@@ -14,7 +14,7 @@ from shapely.geometry import MultiLineString, mapping, shape
 from shapely.ops import linemerge
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import AUX, CUTOFF, RES, SITE, VERSION, jdump, load_work  # noqa: E402
+from common import AUX, CUTOFF, PROC, RES, SITE, VERSION, jdump, load_work  # noqa: E402
 
 R = lambda x, n: None if x is None or not np.isfinite(x) else round(float(x), n)  # noqa: E731
 
@@ -77,15 +77,14 @@ def events_layers(g, c):
              "mt": {"0": "ISC-GEM Mw", "1": "ComCat Mw-type", "2": "ComCat mb to Mw proxy",
                     "3": "ComCat Ms to Mw proxy", "4": "ComCat other magnitude, unchanged"}}
     out = {}
-    for name, thr, with_id in (("events_m6.json", 6.0, True), ("events_m5.json", 5.0, False)):
+    for name, thr in (("events_m6.json", 6.0), ("events_m5.json", 5.0)):
         e = ev[ev.mag >= thr - 1e-9]
-        fields = ["lon", "lat", "depth", "mag", "year", "src", "mt"] + (["id"] if with_id else [])
+        fields = ["lon", "lat", "depth", "mag", "year", "src", "mt", "id"]
         obj = {"n": len(e), "fields": fields, "codes": codes,
                "lon": np.round(e.lon, 2).tolist(), "lat": np.round(e.lat, 2).tolist(),
                "depth": np.round(e.depth).astype(int).tolist(), "mag": e.mag.tolist(),
-               "year": np.round(e.year, 3).tolist(), "src": e.src.astype(int).tolist(), "mt": e.mt.astype(int).tolist()}
-        if with_id:
-            obj["id"] = e.id.astype(str).tolist()
+               "year": np.round(e.year, 3).tolist(), "src": e.src.astype(int).tolist(), "mt": e.mt.astype(int).tolist(),
+               "id": e.id.astype(str).tolist()}
         jdump(obj, SITE / name)
         out[name] = {"n": len(e), "src_counts": e.src.value_counts().sort_index().to_dict()}
     return out
@@ -186,6 +185,10 @@ def main():
     prep = json.loads((RES / "prepare.json").read_text())
     seq = json.loads((SITE / "sequences.json").read_text())
     detail_ids = {p.stem for p in (SITE / "cells").glob("*.json")}
+    srcf = PROC / "iscgem_source.json"
+    isrc = json.loads(srcf.read_text()) if srcf.exists() else {"source": "comcat-mirror"}
+    iscgem_access = ("official ISC-GEM CSV, sha256 " + isrc["sha256"] if isrc["source"] == "official"
+                     else "USGS ComCat mirror, catalog=iscgem")
     jdump(cells_layer(cells, detail_ids), SITE / "cells.geojson")
     ev = events_layers(g, c)
     jdump(plates_layer(), SITE / "plates.geojson")
@@ -214,7 +217,7 @@ def main():
                        "official seismic hazard map."),
         "licence": {"data": "CC BY-SA 4.0 (derived from ISC-GEM, CC BY-SA 3.0)", "code": "MIT"},
         "sources": [
-            {"name": "ISC-GEM Global Instrumental Earthquake Catalogue", "access": "USGS ComCat mirror, catalog=iscgem",
+            {"name": "ISC-GEM Global Instrumental Earthquake Catalogue", "access": iscgem_access,
              "url": "https://www.isc.ac.uk/iscgem/", "licence": "CC BY-SA 3.0",
              "citation": "Storchak et al. 2013 SRL 84(5); Di Giacomo et al. 2018 ESSD 10, 1877; doi:10.31905/D808B825"},
             {"name": "USGS ANSS ComprehensiveCatalog (ComCat)", "url": "https://earthquake.usgs.gov/fdsnws/event/1/",

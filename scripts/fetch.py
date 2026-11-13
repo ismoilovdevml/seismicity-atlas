@@ -7,12 +7,15 @@ Sources
   comcat   USGS ComCat FDSN event service, global, M >= 4.5, 1973 .. cut-off, chunked by year
            (ComCat refuses queries above 20,000 events with HTTP 400; such chunks are split in two)
   iscgem   ISC-GEM Global Instrumental Earthquake Catalogue as served by ComCat (catalog=iscgem).
-           The ISC download page requires a personal request form, so the ComCat mirror is used.
+           The ISC download page requires a personal request form, so the ComCat mirror is used by default.
+           If the official file is present at data/raw/iscgem_official/isc-gem-cat.csv it is used instead
+           (see scripts/iscgem_official.py and docs/release.md); --iscgem-source forces either one.
   aux      Natural Earth 110m land + 50m coastline (public domain) and Bird (2003) PB2002 plate boundaries
            and boundary steps via github.com/fraxen/tectonicplates (ODC-BY 1.0)
 
 Usage
   python -I scripts/fetch.py all --end 2026-11-13
+  python -I scripts/fetch.py comcat --refresh --end 2026-12-01   # re-download ComCat (monthly update)
 """
 from __future__ import annotations
 
@@ -20,12 +23,16 @@ import argparse
 import hashlib
 import io
 import json
+import sys
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pandas as pd
 import requests
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import iscgem_official  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"
@@ -40,6 +47,10 @@ AUX = {
 }
 KEEP = ["time", "latitude", "longitude", "depth", "mag", "magType", "net", "id", "place", "status",
         "horizontalError", "depthError", "magError", "magSource", "locationSource", "updated"]
+
+
+MIN_CHUNK_DAYS = 1.0   # a chunk this short that still exceeds ComCat's 20,000-event limit is an error, not split
+PAUSE_S = 1.0          # pause between ComCat requests
 
 
 class TooMany(Exception):
@@ -97,14 +108,17 @@ def comcat_chunk(t0, t1, minmag, catalog, refresh, frames):
         p["eventtype"] = "earthquake"
     try:
         body = cache_get(COMCAT, p, catalog or "comcat", "csv", refresh)
-    except TooMany:
-        mid = datetime.fromisoformat(t0) + (datetime.fromisoformat(t1) - datetime.fromisoformat(t0)) / 2
+    except TooMany as e:
+        span = datetime.fromisoformat(t1) - datetime.fromisoformat(t0)
+        if span <= timedelta(days=MIN_CHUNK_DAYS):
+            raise RuntimeError(f"ComCat refused {t0}..{t1} (HTTP 400) even at {span}: {e}") from e
+        mid = datetime.fromisoformat(t0) + span / 2
         comcat_chunk(t0, mid.isoformat(), minmag, catalog, refresh, frames)
         comcat_chunk(mid.isoformat(), t1, minmag, catalog, refresh, frames)
         return
     if body.strip():
         frames.append(pd.read_csv(io.BytesIO(body), dtype={"id": str, "net": str, "magType": str}))
-    time.sleep(0.5)
+    time.sleep(PAUSE_S)
 
 
 def fetch_catalog(name, start, end, minmag, chunk_days, catalog, refresh):
@@ -123,6 +137,22 @@ def fetch_catalog(name, start, end, minmag, chunk_days, catalog, refresh):
           f"{out.relative_to(ROOT)}")
 
 
+def fetch_iscgem(end, refresh, source="auto"):
+    """ISC-GEM: the official file if present (or forced), else the ComCat mirror. Records the choice."""
+    path = iscgem_official.DEFAULT_PATH
+    use_official = source == "official" or (source == "auto" and path.exists())
+    PROC.mkdir(parents=True, exist_ok=True)
+    if use_official:
+        df, info = iscgem_official.load(path)
+        df.to_csv(PROC / "iscgem.csv", index=False)
+        info["file"] = str(path.relative_to(ROOT))
+        print(f"iscgem: official file {info['file']}: {info['n']} events, {info['span'][0]} .. {info['span'][1]}")
+    else:
+        fetch_catalog("iscgem", "1900-01-01", end, None, 3652.5, "iscgem", refresh)
+        info = {"source": "comcat-mirror", "query": "catalog=iscgem", "end": end}
+    (PROC / "iscgem_source.json").write_text(json.dumps(info, indent=1))
+
+
 def fetch_aux(refresh):
     d = PROC / "aux"
     d.mkdir(parents=True, exist_ok=True)
@@ -137,10 +167,12 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("what", choices=["comcat", "iscgem", "aux", "all"])
     ap.add_argument("--end", default=datetime.now(timezone.utc).strftime("%Y-%m-%d"))
-    ap.add_argument("--refresh", action="store_true")
+    ap.add_argument("--refresh", action="store_true", help="re-download even if a cached response exists")
+    ap.add_argument("--iscgem-source", choices=["auto", "comcat", "official"], default="auto",
+                    help="auto: official file if present, else the ComCat mirror")
     a = ap.parse_args()
     if a.what in ("iscgem", "all"):
-        fetch_catalog("iscgem", "1900-01-01", a.end, None, 3652.5, "iscgem", a.refresh)
+        fetch_iscgem(a.end, a.refresh, a.iscgem_source)
     if a.what in ("comcat", "all"):
         fetch_catalog("comcat_m45", "1973-01-01", a.end, 4.5, 365.25, None, a.refresh)
     if a.what in ("aux", "all"):

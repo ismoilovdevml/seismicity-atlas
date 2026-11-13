@@ -4,12 +4,9 @@ Status of the website (phase 2) on 2026-11-13. Data issues are documented here, 
 
 ## Data (`site/data/`)
 
-- **ISC-GEM yearly counts outside 1976–2021 are 0, not null.** `cells/<id>.json` → `rate_iscgem_above_thr` covers
-  1973–2026, but ISC-GEM b-period events exist only for 1976–2021, so 1973–1975 and 2022–2026 are written as 0.
-  The site masks those years as "no data" using the b period from `manifest.json` (`method.b_catalogue`).
-  Suggested fix in the pipeline: write `null` outside the period.
-- **`events_m5.json` has no event ids.** Events of M 5.0–5.9 therefore cannot link to a USGS event page. The site
-  merges `events_m6.json` (with ids) for M ≥ 6 and says so in the popup. Suggested fix: add the `id` column.
+- **Fixed in the pipeline:** `rate_iscgem_above_thr` is now `null` outside 1976–2021 (it was 0), and
+  `events_m5.json` now carries the `id` column. The site's own masking and M ≥ 6 id merge still work and can be
+  simplified.
 - **ISC-GEM-only events use `iscgem…` ids.** One was checked and resolves on the USGS event page
   (`iscgem610326271`, HTTP 200). The other 7,126 were not checked one by one.
 

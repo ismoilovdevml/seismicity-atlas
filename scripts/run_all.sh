@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # Reproduce every number, figure and site/data file from the cached downloads (data/raw/, gitignored).
-# First run downloads ~75 MB; later runs reuse the cache. Use `fetch.py all --refresh` to pull newer data.
+# First run downloads ~75 MB; later runs reuse the cache. To pull newer data, see docs/release.md.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PY=${PY:-.venv/bin/python}
-$PY -I scripts/fetch.py all --end 2026-11-13
+# data cut-off and version come from scripts/release.json (bumped by scripts/bump_release.py)
+CUTOFF=$($PY -I -c 'import json,sys; print(json.load(open(sys.argv[1]))["data_cutoff_utc"])' scripts/release.json)
+$PY -I scripts/fetch.py all --end "$CUTOFF"
 $PY -I scripts/prepare.py
 $PY -I scripts/atlas.py 200      # radius sensitivity runs (write data/work/cells_r*.pkl only)
 $PY -I scripts/atlas.py 400

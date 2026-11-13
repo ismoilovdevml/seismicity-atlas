@@ -21,7 +21,7 @@ from scipy.spatial import cKDTree
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import atlaslib as al  # noqa: E402
 import seislib as sl  # noqa: E402
-from common import H3_RES, RES, SAMPLE_R_KM, SITE, WORK, jdump, load_work  # noqa: E402
+from common import CUTOFF_YEAR, H3_RES, RES, SAMPLE_R_KM, SITE, WORK, jdump, load_work  # noqa: E402
 
 PERIODS = [(1976, 2003), (2004, 2021)]
 Y0, Y1 = 1976, 2021
@@ -79,6 +79,16 @@ def b_cutoff_curve(m, floor, mc_list):
         if n >= 30 and np.isfinite(b):
             rows.append([round(mc, 1), round(b, 3), round(b - 1.96 * sig, 3), round(b + 1.96 * sig, 3), int(n)])
     return rows
+
+
+def yearly_counts(years, y0, y1, cover=None):
+    """Counts per calendar year y0..y1 (inclusive). Years outside cover = (a, b) are None: no data, not zero."""
+    yy = np.arange(y0, y1 + 1)
+    years = np.asarray(years, dtype=int)
+    n = np.bincount(years[(years >= y0) & (years <= y1)] - y0, minlength=yy.size).tolist()
+    if cover is not None:
+        n = [v if cover[0] <= y <= cover[1] else None for y, v in zip(yy, n)]
+    return n
 
 
 def main(radius=SAMPLE_R_KM):
@@ -172,22 +182,21 @@ def main(radius=SAMPLE_R_KM):
             if not sens and (ig.size >= 20 or ic.size >= 50):
                 ga, tga = full[dname]  # full-period ISC-GEM (1904-2021) for Mc(t), restricted to the circle
                 ia = np.array(sorted(tga.query_ball_point(p, chord)), dtype=int)
-                yy = np.arange(1973, 2027)
+                ry0, ry1 = 1973, CUTOFF_YEAR
                 thr = np.maximum(r.get("mc", np.nan), fg) if ig.size else np.array([])
                 det[dname] = {
                     "fmd_iscgem": fmd_pairs(sl.bin_mag(mg)) if ig.size else [],
                     "fmd_comcat": fmd_pairs(sl.bin_mag(mc_)) if ic.size else [],
                     "mc_t_iscgem": mc_windows(ga.mag.to_numpy()[ia], ga.year.to_numpy()[ia], 1904, 2021, 10)
                     if ia.size else [],
-                    "mc_t_comcat": mc_windows(mc_, yc, 1973, 2026, 5) if ic.size else [],
+                    "mc_t_comcat": mc_windows(mc_, yc, 1973, CUTOFF_YEAR, 5) if ic.size else [],
                     "b_cutoff": b_cutoff_curve(sl.bin_mag(mg), sl.bin_mag(fg), np.round(np.arange(5.0, 7.01, 0.1), 1))
                     if ig.size else [],
-                    "rate_years": [int(yy[0]), int(yy[-1])],
-                    "rate_iscgem_above_thr": np.bincount((yg[mg >= thr - 1e-9] - 1973).astype(int),
-                                                         minlength=yy.size)[: yy.size].tolist()
+                    "rate_years": [ry0, ry1],
+                    # ISC-GEM b-period events exist only for Y0..Y1: other years are null, not 0
+                    "rate_iscgem_above_thr": yearly_counts(yg[mg >= thr - 1e-9], ry0, ry1, (Y0, Y1))
                     if ig.size and np.isfinite(r.get("mc", np.nan)) else [],
-                    "rate_comcat_m45": np.bincount((yc - 1973).astype(int), minlength=yy.size)[: yy.size].tolist()
-                    if ic.size else [],
+                    "rate_comcat_m45": yearly_counts(yc, ry0, ry1) if ic.size else [],
                     "stats": {kk: v for kk, v in r.items()},
                 }
         if any(d in det for d in ("sh", "dp")):

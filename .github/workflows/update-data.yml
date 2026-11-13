@@ -1,0 +1,92 @@
+name: Update data
+
+# Monthly refresh of the ComCat part of the atlas. Re-downloads ComCat up to the new cut-off, rebuilds every output,
+# runs the tests and the drift guard, and commits site/data, docs/img, results and scripts/release.json to main.
+# Nothing is committed if any step fails. See docs/release.md.
+
+on:
+  schedule:
+    - cron: "17 4 2 * *" # 04:17 UTC on the 2nd of every month
+  workflow_dispatch:
+    inputs:
+      cutoff:
+        description: "Data cut-off YYYY-MM-DD (UTC). Empty = today."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    if: github.repository == 'ismoilovdevml/seismicity-atlas'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install requirements
+        run: python -m pip install -r requirements.txt
+
+      - name: Restore download cache
+        uses: actions/cache/restore@v4
+        with:
+          path: data/raw
+          key: atlas-raw-${{ github.run_id }}
+          restore-keys: atlas-raw-
+
+      - name: Set cut-off and bump version
+        env:
+          INPUT_CUTOFF: ${{ inputs.cutoff }}
+        run: |
+          CUTOFF="${INPUT_CUTOFF:-$(date -u +%F)}"
+          if ! [[ "$CUTOFF" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+            echo "bad cut-off: $CUTOFF" >&2
+            exit 1
+          fi
+          mkdir -p "$RUNNER_TEMP/baseline"
+          cp site/data/manifest.json site/data/cells.geojson "$RUNNER_TEMP/baseline/"
+          VERSION=$(python -I scripts/bump_release.py --cutoff "$CUTOFF")
+          echo "CUTOFF=$CUTOFF" >> "$GITHUB_ENV"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "cut-off $CUTOFF, version $VERSION"
+
+      - name: Fetch ComCat (fresh, yearly chunks, 1 s apart)
+        run: python -I scripts/fetch.py comcat --refresh --end "$CUTOFF"
+
+      - name: Save download cache
+        uses: actions/cache/save@v4
+        with:
+          path: data/raw
+          key: atlas-raw-${{ github.run_id }}
+
+      - name: Run pipeline and tests
+        run: PY=python ./scripts/run_all.sh
+
+      - name: Drift guard
+        run: python -I scripts/check_drift.py --baseline "$RUNNER_TEMP/baseline" --new site/data
+
+      - name: Commit and push
+        run: |
+          git config user.name "ismoilovdevml"
+          git config user.email "107093598+ismoilovdevml@users.noreply.github.com"
+          git add site/data docs/img results scripts/release.json
+          if git diff --cached --quiet -- site/data ':(exclude)site/data/manifest.json'; then
+            echo "No data change beyond manifest.json; nothing committed."
+            exit 0
+          fi
+          git commit -m "Update data to cut-off $CUTOFF (v$VERSION)"
+          git pull --rebase origin main
+          git push origin HEAD:main

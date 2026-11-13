@@ -17,8 +17,11 @@ SITE = ROOT / "site" / "data"
 for d in (WORK, RES, IMG, SITE):
     d.mkdir(parents=True, exist_ok=True)
 
-CUTOFF = "2026-11-13"          # data cut-off date (UTC) used for the ComCat download
-VERSION = "0.1.0"
+# Release identity: scripts/release.json is the single source of truth (updated by scripts/bump_release.py).
+_RELEASE = json.loads((Path(__file__).resolve().parent / "release.json").read_text())
+CUTOFF = _RELEASE["data_cutoff_utc"]    # data cut-off date (UTC) used for the ComCat download
+CUTOFF_YEAR = int(CUTOFF[:4])
+VERSION = _RELEASE["version"]
 H3_RES = 2                      # display cells: H3 resolution 2 (mean area 86,802 km2)
 SAMPLE_R_KM = 300.0             # sampling radius around each cell centre for Mc / b
 DEPTH_SPLIT = 70.0              # km: shallow <= 70 < intermediate/deep
