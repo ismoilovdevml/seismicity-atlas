@@ -1,0 +1,21 @@
+// Concept titles and one-line summaries for the Learn index (Uzbek). Keys are the registry ids.
+export default {
+  'magnitude-types': [`Magnituda turlari`, `Mw, mb, Ms, ML va Md turli toʻlqinlarni oʻlchaydi, ularning baʼzilari yirik zilzilalarda oʻsishdan toʻxtaydi.`],
+  'direct-vs-proxy-mw': [`Bevosita va proksi Mw`, `Nega atlas v0.2 dan beri b ni konversiya qilingan emas, faqat oʻlchangan moment magnitudalaridan hisoblaydi.`],
+  'magnitude-of-completeness': [`Toʻliqlik magnitudasi (Mc)`, `Katalog deyarli hech narsani oʻtkazib yubormaydigan oʻlcham va u vaqt oʻtishi bilan qanday oʻzgaradi.`],
+  'frequency-magnitude-distribution': [`Chastota-magnituda taqsimoti`, `Har bir oʻlchamdagi zilzilalar soni: Mc va b ortidagi asosiy grafik.`],
+  'gutenberg-richter-b-value': [`Gutenberg-Richter b qiymati`, `Yirik zilzilalar kichiklariga nisbatan qanchalik tez kamayib borishini koʻrsatadigan qiyalik.`],
+  'confidence-interval-bootstrap': [`95 % oraliq va bootstrap`, `b qiymati qanchalik ishonchli ekanini katalogni koʻp marta qayta tanlab baholash.`],
+  'quality-codes': [`A, B, C va “yetarli emas” sifat kodlari`, `Nega baʼzi kataklarda b qiymati koʻrsatiladi, aksariyatida esa yoʻq.`],
+  'b-positive': [`b-positive`, `Magnituda farqlaridan olinadigan va oʻtkazib yuborilgan kichik aftershoklar chalgʻitmaydigan b qiymati.`],
+  'declustering': [`Klasterlardan tozalash`, `Aftershoklarni fazo-vaqt oynalari bilan olib tashlash va nega bu yerda u b ni pasaytiradi.`],
+  'omori-utsu': [`Omori-Utsu soʻnishi`, `Aftershoklar chastotasi vaqt oʻtishi bilan qanday pasayadi: K, c va p.`],
+  'aftershock-productivity-bath': [`Aftershoklar mahsuldorligi va Båth qonuni`, `Eng yirik aftershok odatda qanchalik katta boʻladi va qancha aftershok kutish mumkin.`],
+  'h3-cells-and-sample-radius': [`H3 kataklari va tanlanma doirasi`, `Koʻrsatish uchun oltiburchaklar, statistika uchun belgilangan doira.`],
+  'plate-boundary-classes': [`Plita chegarasi sinflari`, `PB2002 dagi subduksiya, tizmalar, transformlar va riftlar hamda ularning b qiymatlari.`],
+  'depth-and-slabs': [`Chuqurlik va slablar`, `Nega sayoz va chuqurroq zilzilalar xaritada alohida koʻrsatiladi.`],
+  'rate-m6': [`Mw ≥ 6 chastotasi`, `Katakda yirik zilzilalar maydon va yil birligiga qanchalik tez-tez sodir boʻlgan.`],
+  'catalogue-consistency': [`Kataloglar mosligi`, `ComCat va ISC-GEM magnituda va joylashuv boʻyicha qayerda mos keladi yoki farq qiladi.`],
+  'regional-catalogues': [`Mintaqaviy kataloglar`, `Zich milliy tarmoqlar oʻz magnituda shkalasida ancha kichik zilzilalarni ham qayd etadi.`],
+  'not-a-forecast': [`Prognoz emas`, `Nega katalog statistikasi keyingi zilzila qachon yoki qayerda boʻlishini aytmaydi.`],
+};

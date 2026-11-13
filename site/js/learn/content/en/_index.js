@@ -1,0 +1,21 @@
+// Concept titles and one-line summaries for the Learn index (English). Keys are the registry ids.
+export default {
+  'magnitude-types': [`Magnitude types`, `Mw, mb, Ms, ML and Md measure different waves, and some of them stop growing for large earthquakes.`],
+  'direct-vs-proxy-mw': [`Direct vs proxy Mw`, `Why the atlas, since v0.2, computes b only from moment magnitudes that were measured, not converted.`],
+  'magnitude-of-completeness': [`Magnitude of completeness (Mc)`, `The size above which a catalogue misses almost nothing, and how it changes over time.`],
+  'frequency-magnitude-distribution': [`Frequency-magnitude distribution`, `How many earthquakes of each size: the basic chart behind Mc and b.`],
+  'gutenberg-richter-b-value': [`Gutenberg-Richter b-value`, `The slope that says how quickly large earthquakes become rarer than small ones.`],
+  'confidence-interval-bootstrap': [`95 % interval and the bootstrap`, `How sure a b-value is, estimated by re-drawing the catalogue many times.`],
+  'quality-codes': [`Quality codes A, B, C and insufficient`, `Why some cells show a b-value and most do not.`],
+  'b-positive': [`b-positive`, `A b-value from magnitude differences that is not fooled by missing small aftershocks.`],
+  'declustering': [`Declustering`, `Removing aftershocks with space-time windows, and why it lowers b here.`],
+  'omori-utsu': [`Omori-Utsu decay`, `How aftershock rates fall with time: K, c and p.`],
+  'aftershock-productivity-bath': [`Aftershock productivity and Båth's law`, `How large the largest aftershock tends to be, and how many aftershocks to expect.`],
+  'h3-cells-and-sample-radius': [`H3 cells and the sampling circle`, `Hexagons for display, a fixed circle for the statistics.`],
+  'plate-boundary-classes': [`Plate-boundary classes`, `Subduction, ridges, transforms and rifts in PB2002, and their b-values.`],
+  'depth-and-slabs': [`Depth and slabs`, `Why shallow and deeper earthquakes are mapped separately.`],
+  'rate-m6': [`Mw ≥ 6 rate`, `How often large earthquakes happened in a cell, per area and per year.`],
+  'catalogue-consistency': [`Catalogue consistency`, `Where ComCat and ISC-GEM agree or disagree on magnitude and location.`],
+  'regional-catalogues': [`Regional catalogues`, `Dense national networks see much smaller earthquakes, on their own magnitude scale.`],
+  'not-a-forecast': [`Not a forecast`, `Why catalogue statistics do not say when or where the next earthquake will be.`],
+};

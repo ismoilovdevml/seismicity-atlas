@@ -14,9 +14,9 @@ import { t, setLang, LANGS } from './i18n/index.js';
 import { readExtras, writeExtras, setCommit } from './hashx.js';
 import * as D from './depth3d.js';
 
-const VIEWS = ['map', 'sequences', 'monitor', 'methods', 'about', 'depth'];
+const VIEWS = ['map', 'sequences', 'monitor', 'methods', 'about', 'depth', 'learn'];
 const LAYERS = ['b', 'q', 'mc', 'cc', 'rate', 'none'];
-const DEFAULTS = { v: 'map', l: 'b', m: '', d: 'sh', c: null, k: null, r: null, ev: 0, y0: null, y1: null, mm: 6, pl: 1, g: 0, at: null, s: null, lang: 'en' };
+const DEFAULTS = { v: 'map', l: 'b', m: '', d: 'sh', c: null, k: null, r: null, ev: 0, y0: null, y1: null, mm: 6, pl: 1, g: 0, at: null, s: null, lang: 'en', t: null };
 const CELL_ID = /^[0-9a-f]{15}$/;
 
 const state = { ...DEFAULTS };
@@ -74,6 +74,7 @@ function parseHash(fallbackLang = preferredLang()) {
   if (/^[a-z0-9]{4,24}$/.test(p.get('s') || '')) s.s = p.get('s');
   if (LANGS[p.get('lang')]) s.lang = p.get('lang');
   readExtras(p, s);
+  if (s.v === 'learn' && /^[a-z0-9-]{1,48}$/.test(p.get('t') || '')) s.t = p.get('t');
   return s;
 }
 
@@ -94,6 +95,7 @@ function hashOf(s) {
   if (s.at) p.set('at', `${s.at.z}/${s.at.lat}/${s.at.lon}`);
   if (s.s) p.set('s', s.s);
   writeExtras(s, p);
+  if (s.v === 'learn' && s.t) p.set('t', s.t);
   // Always name the language, so a shared link opens in the language it was copied in.
   p.set('lang', s.lang);
   return `#${p.toString().replace(/%2F/g, '/')}`;
@@ -120,6 +122,8 @@ async function applyHash() {
   const langChanged = s.lang !== state.lang;
   const regionChanged = s.r !== state.r;
   const seqChanged = s.s !== state.s;
+  // Learn: remember the place the visitor came from, for its "back to where I was" link.
+  if (s.v === 'learn' && state.v !== 'learn') learnBack = hashOf(state);
   Object.assign(state, s);
   if (langChanged) await applyLang();
   syncControls();
@@ -147,6 +151,7 @@ function showView(v) {
   document.getElementById('menu-btn').setAttribute('aria-expanded', 'false');
   const site = t('title.site');
   document.title = v === 'map' ? site : `${t(`title.${v}`)} | ${site}`;
+  if (v === 'learn') { showLearn(); return; }
   if (!ctx.manifest) return;
   if (v === 'map') { M.resize(); return; }
   if (v === 'depth') { D.show(document.getElementById('depth-root'), { state, manifest: ctx.manifest, cells: ctx.cells }); return; }
@@ -157,6 +162,14 @@ function showView(v) {
   if (v === 'monitor') renderMonitor(document.getElementById('monitor-root'), pageCtx);
   if (v === 'methods') renderMethods(document.getElementById('methods-root'), pageCtx);
   if (v === 'about') renderAbout(document.getElementById('about-root'), pageCtx);
+}
+
+let learnBack = null;
+/** The Learn pages load on demand, so the map's first load stays the same. */
+function showLearn() {
+  import('./learn/view.js')
+    .then((m) => m.renderLearn($('learn-root'), { topic: state.t, back: learnBack }))
+    .catch((e) => { console.error(e); });
 }
 
 function showOnMap(s) {
