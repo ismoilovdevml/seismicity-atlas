@@ -11,8 +11,10 @@ import { SUBS, layerName, subLabel } from './layers.js';
 import * as f from './fmt.js';
 import { h } from './charts.js';
 import { t, setLang, LANGS } from './i18n/index.js';
+import { readExtras, writeExtras, setCommit } from './hashx.js';
+import * as D from './depth3d.js';
 
-const VIEWS = ['map', 'sequences', 'monitor', 'methods', 'about'];
+const VIEWS = ['map', 'sequences', 'monitor', 'methods', 'about', 'depth'];
 const LAYERS = ['b', 'q', 'mc', 'cc', 'rate', 'none'];
 const DEFAULTS = { v: 'map', l: 'b', m: '', d: 'sh', c: null, k: null, r: null, ev: 0, y0: null, y1: null, mm: 6, pl: 1, g: 0, at: null, s: null, lang: 'en' };
 const CELL_ID = /^[0-9a-f]{15}$/;
@@ -71,6 +73,7 @@ function parseHash(fallbackLang = preferredLang()) {
   if (at.length === 3 && at.every(Number.isFinite) && Math.abs(at[1]) <= 85) s.at = { z: at[0], lat: at[1], lon: at[2] };
   if (/^[a-z0-9]{4,24}$/.test(p.get('s') || '')) s.s = p.get('s');
   if (LANGS[p.get('lang')]) s.lang = p.get('lang');
+  readExtras(p, s);
   return s;
 }
 
@@ -90,6 +93,7 @@ function hashOf(s) {
   if (s.g) p.set('g', '1');
   if (s.at) p.set('at', `${s.at.z}/${s.at.lat}/${s.at.lon}`);
   if (s.s) p.set('s', s.s);
+  writeExtras(s, p);
   // Always name the language, so a shared link opens in the language it was copied in.
   p.set('lang', s.lang);
   return `#${p.toString().replace(/%2F/g, '/')}`;
@@ -145,6 +149,7 @@ function showView(v) {
   document.title = v === 'map' ? site : `${t(`title.${v}`)} | ${site}`;
   if (!ctx.manifest) return;
   if (v === 'map') { M.resize(); return; }
+  if (v === 'depth') { D.show(document.getElementById('depth-root'), { state, manifest: ctx.manifest, cells: ctx.cells }); return; }
   if (rendered.has(v)) return;
   rendered.add(v);
   const pageCtx = { manifest: ctx.manifest, showOnMap, state };
@@ -448,6 +453,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if
 
 async function start() {
   Object.assign(state, parseHash());
+  setCommit(commit);
   await setLang(state.lang);
   wireControls();
   syncControls();

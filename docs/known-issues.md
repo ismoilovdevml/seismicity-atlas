@@ -65,3 +65,31 @@ Status on 2026-11-13 (branch with the browser suite, comparison, CSV, regional l
 - CI (GitHub Actions, Ubuntu, headless Firefox without a GPU): the cell-comparison tests log a bare
   `console.error: Error` at teardown. The same tests pass in Firefox on macOS (5/5 locally, 2026-11-13), so this looks
   specific to the runner's WebGL setup. Firefox and WebKit jobs are `continue-on-error`; Chromium is the required job.
+
+## Relief, 3D terrain and the Depth 3D view
+
+Status on 2026-11-14 (branch `feat/terrain3d`); details in [basemap.md](basemap.md).
+
+- **Relief resolution.** The Natural Earth relief tiles stop at zoom 4 (to keep the site small) and are upsampled at
+  zoom 5–8, where they look soft. Turning on 3D terrain replaces them with a hillshade of the elevation tiles.
+- **Relief under cells.** Relief, lakes and rivers are drawn under the cell layer on purpose, so cell colours are
+  exact. Under quality A cells (opacity 0.92) the relief is only a faint texture; choose "No cell layer" to see it.
+- **3D terrain is external.** It loads AWS Terrain Tiles and works only online; the browser tests use a synthetic
+  tile, so the real service is not covered by CI. The MapLibre changelog lists a fix after 5.24.0 for a camera jump
+  on drag with globe + terrain at low pitch (#7736); not reproduced here, not tested.
+- **Terrain and the URL.** The map position in the URL keeps zoom and centre but not pitch or bearing; a link with
+  `tr=1` opens at the default 55° tilt, north up.
+- **Slab2 source.** The Slab2 contours were taken from a public mirror (hashes cross-checked against two other
+  mirrors) because the ScienceBase download blocks scripted access. They were not compared byte for byte with the
+  official files.
+- **Depth 3D events.** The events are all catalogued events in the box (M ≥ 6, or M ≥ 5 on request), also below
+  completeness and with catalogue depths as published; ISC-GEM fixed depths (for example 10, 15 or 35 km) appear
+  as flat layers. The per-depth counts are counts, not rates.
+- **Depth 3D colours.** The one-hue depth ramp has adjacent steps that are hard to tell apart by colour alone (by
+  design, as for any 6-step one-hue ramp); depth is also the vertical position, and the classes are listed in the
+  legend and the depth table.
+- **Depth 3D accessibility.** The canvas has a label and keyboard orbit, and the statistics are HTML tables and
+  lists. Screen readers were not tested. Very large boxes with M ≥ 5 (tens of thousands of points) were checked only
+  in Chromium on an Apple M-series laptop.
+- **WebGL 2.** three.js 0.170 needs WebGL 2; without it the view shows the cross-section (tested by disabling WebGL in
+  the browser test, not on a real old device).
