@@ -68,7 +68,9 @@ export function initMap(ctx, base) {
     attributionControl: false,
   });
   map.touchZoomRotate.disableRotation();
-  if (new URLSearchParams(location.search).has('debug')) window.__map = map; // used by the browser tests
+  // Test hook: the browser tests define this function in an init script before the page loads. Normal visits
+  // never define it, so the map object is not exposed on window.
+  if (typeof window.__gsaTestHook === 'function') window.__gsaTestHook(map);
   map.on('styleimagemissing', (e) => { if (e.id === 'hatch' && !map.hasImage('hatch')) map.addImage('hatch', hatchImage(), { pixelRatio: 2 }); });
 
   const canvas = map.getCanvas();
