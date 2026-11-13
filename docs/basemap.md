@@ -212,7 +212,7 @@ water file, and the small modules above. three.js, Slab2 and the M5 events load 
 ## Not tested
 
 - The real AWS terrain in the browser tests: the tests use a synthetic tile. Real tiles were checked by hand once
-  (Chromium, 2026-11-13).
+  (Chromium, 2026-11-14, Himalaya at zoom 5: terrain, tilt, hillshade and the credits box shown, no console errors).
 - Terrain on the globe at very low pitch while dragging (the MapLibre fix #7736 is not in 5.24.0).
 - Very old GPUs and screen readers on the 3D canvas (it has a label and keyboard control, and the depth table and
   b-value rows carry the same information as text).
