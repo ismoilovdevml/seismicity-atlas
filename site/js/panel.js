@@ -3,97 +3,97 @@
 import * as f from './fmt.js';
 import { h, xyChart, forestChart, sparkColumns, padDomain } from './charts.js';
 import { getJSON, ruleNumber } from './data.js';
-import { bSentence } from './map.js';
 import { CC_RULES } from './layers.js';
 
-const QCOLOR = { A: 'var(--s1)', B: 'var(--s1)' };
-
-export function qBadge(q) {
-  const lab = q === 'insufficient' ? 'Insufficient' : `Quality ${q}`;
-  return h('span', { class: `qbadge${q === 'C' ? ' hatch' : ''}`, style: q === 'A' || q === 'B' ? `--c:${QCOLOR[q]}` : '' }, h('i', { 'aria-hidden': 'true' }), lab);
+export function qPill(q) {
+  const cls = q === 'A' ? 'ok' : q === 'B' ? 'close' : q === 'C' ? 'na' : '';
+  return h('span', { class: `pill ${cls}`, text: q === 'insufficient' ? 'Insufficient' : `Quality ${q}` });
 }
 
 let token = 0;
 
-/** Render the panel for cell properties p. ctx: {state, manifest, onDepth(d), onClose()} */
+function scaleBar(v, lo, hi) {
+  const D0 = 0.6, D1 = 1.6;
+  const pct = (x) => `${Math.max(0, Math.min(100, ((x - D0) / (D1 - D0)) * 100))}%`;
+  const w = (x0, x1) => `${Math.max(0.5, ((Math.min(D1, x1) - Math.max(D0, x0)) / (D1 - D0)) * 100)}%`;
+  return h('div', { class: 'scale', role: 'img', 'aria-label': `b ${f.b2(v)} with 95 % interval ${f.b2(lo)} to ${f.b2(hi)}, on a scale from ${D0} to ${D1}` },
+    h('div', { class: 'track' }), h('div', { class: 'ci', style: `left:${pct(lo)};width:${w(lo, hi)}` }),
+    h('div', { class: 'one', style: `left:${pct(1)}` }), h('div', { class: 'est', style: `left:${pct(v)}` }),
+    h('span', { style: 'left:0', text: '0.6' }), h('span', { style: `left:${pct(1)};margin-left:4px`, text: '1.0' }), h('span', { style: 'right:0', text: '1.6' }));
+}
+
+const tile = (k, v, small) => h('div', { class: 'tile' }, h('span', { class: 'k', text: k }), h('span', { class: 'v' }, v, small ? h('small', { text: ` ${small}` }) : null));
+
+/** Render the panel for cell properties p. ctx: {state, manifest, onClose()} */
 export function renderPanel(p, ctx) {
   const my = ++token;
-  const st = ctx.state;
-  const d = st.d;
+  const d = ctx.state.d;
   const panel = document.getElementById('panel');
-  document.getElementById('panel-title').textContent = `Cell at ${f.latlon(p.lat, p.lon)}`;
-  document.getElementById('panel-meta').textContent = `${f.PB_NAMES[p.pb] || p.pb}. H3 cell ${p.id}, ${f.int(p.area_km2)} km².`;
+  panel.classList.remove('full');
+  document.getElementById('panel-eyebrow').textContent = 'Selected cell';
+  document.getElementById('panel-title').textContent = f.latlon(p.lat, p.lon, 2);
+  document.getElementById('panel-meta').textContent = `${f.PB_NAMES[p.pb] || p.pb}, ${ctx.manifest.method.sample_radius_km} km sample radius, ${f.DEPTH_SHORT[d]}. H3 ${p.id.slice(0, 7)}…`;
   const body = document.getElementById('panel-body');
   body.replaceChildren();
   panel.hidden = false;
 
-  // depth switch inside the panel mirrors the map control
-  const seg = h('fieldset', { class: 'seg panel-depth', 'aria-label': 'Depth class for this panel' },
-    ['sh', 'dp'].map((k) => h('label', {}, h('input', { type: 'radio', name: 'pdepth', value: k, checked: k === d, onchange: () => ctx.onDepth(k) }), k === 'sh' ? 'Shallow ≤ 70 km' : 'Deeper > 70 km')));
-  body.append(seg);
-
-  // b-value summary
   const q = p[`${d}_q`];
-  const bs = bSentence(p, d, ctx.manifest);
-  const sec1 = h('section', { 'aria-labelledby': 'h-b' }, h('h3', { id: 'h-b', text: 'b-value' }));
+  const nMin = ruleNumber(ctx.manifest.method.quality.insufficient);
   const qB = ruleNumber(ctx.manifest.method.quality.B);
+  const top = h('section', { 'aria-label': 'b-value' });
   if (q === 'A' || q === 'B') {
-    sec1.append(h('p', { class: 'lead-b' }, h('strong', { text: f.b2(p[`${d}_b`]) }), ` [${f.b2(p[`${d}_b_lo`])}, ${f.b2(p[`${d}_b_hi`])}] 95 % interval `, qBadge(q)));
-    const g = ctx.manifest.global[d === 'sh' ? 'b_shallow_1976_2021' : 'b_deep_1976_2021'];
-    const rows = [
-      { label: 'b (map value)', v: p[`${d}_b`], lo: p[`${d}_b_lo`], hi: p[`${d}_b_hi`], emph: true, color: 'var(--s1)', text: f.interval(p[`${d}_b`], p[`${d}_b_lo`], p[`${d}_b_hi`]) },
-      p[`${d}_bpos`] !== undefined
-        ? { label: 'b-positive', v: p[`${d}_bpos`], lo: p[`${d}_bpos_lo`], hi: p[`${d}_bpos_hi`], color: 'var(--ink-3)', text: f.interval(p[`${d}_bpos`], p[`${d}_bpos_lo`], p[`${d}_bpos_hi`]) }
-        : { label: 'b-positive', v: null, text: 'not available' },
-      p[`${d}_bdecl`] !== undefined
-        ? { label: 'b, declustered', v: p[`${d}_bdecl`], lo: p[`${d}_bdecl_lo`], hi: p[`${d}_bdecl_hi`], color: 'var(--ink-3)', text: f.interval(p[`${d}_bdecl`], p[`${d}_bdecl_lo`], p[`${d}_bdecl_hi`]) }
-        : { label: 'b, declustered', v: null, text: 'not available' },
-    ];
-    const vals = rows.filter((r) => r.v !== null).flatMap((r) => [r.lo, r.hi]).concat([g.ci95[0], g.ci95[1]]);
-    const dom = [Math.floor((Math.min(...vals) - 0.05) * 10) / 10, Math.ceil((Math.max(...vals) + 0.05) * 10) / 10];
-    sec1.append(forestChart({
-      title: 'Three estimates with 95 % intervals',
-      sub: `Grey band and line: global ${f.DEPTH_SHORT[d]} b, ${f.interval(g.b, g.ci95[0], g.ci95[1], f.b3)}`,
-      alt: `b-value ${rows[0].text} compared with b-positive and declustered b`,
-      rows, domain: dom, ref: { value: g.b, lo: g.ci95[0], hi: g.ci95[1], label: 'global' }, labelWidth: 120,
-      table: { columns: ['Estimate', 'b', '95 % low', '95 % high'], rows: rows.map((r) => [r.label, f.b2(r.v), f.b2(r.lo), f.b2(r.hi)]) },
-      note: 'Declustering (Gardner-Knopoff) removes many events in a global M ≥ 5 catalogue, so its b mostly reflects the window choice. The map shows the full catalogue.',
-    }));
-    if (p[`${d}_unstable`]) sec1.append(h('p', { class: 'hint', text: 'Cutoff-unstable: b at threshold +0.2 and +0.4 both fall outside the interval on the same side. Treat this value with extra care.' }));
+    top.append(h('div', { class: 'bhead' },
+      h('div', {}, h('span', { class: 'lbl', text: 'b-value' }), h('span', { class: 'bbig', text: f.b2(p[`${d}_b`]) })),
+      h('div', { class: 'bside' }, h('span', { class: 'mono', text: `95 % CI ${f.b2(p[`${d}_b_lo`])} – ${f.b2(p[`${d}_b_hi`])}` }),
+        h('span', { class: 'pill-line' }, qPill(q), `${f.int(p[`${d}_nb`])} events above Mc`))));
+    top.append(scaleBar(p[`${d}_b`], p[`${d}_b_lo`], p[`${d}_b_hi`]));
+    if (p[`${d}_unstable`]) top.append(h('p', { class: 'hint', text: 'Cutoff-unstable: b at threshold +0.2 and +0.4 both fall outside the interval on the same side. Treat with extra care.' }));
   } else {
-    sec1.append(h('p', { class: 'lead-b' }, h('strong', { text: bs.strong }), ' ', qBadge(q)));
-    sec1.append(h('p', { class: 'hint', text: q === 'C'
-      ? `The 95 % interval is ${f.b2(p[`${d}_ciw`])} wide. A b-value is shown only when the interval is at most ${qB.toFixed(2)} wide.`
-      : `Only ${f.int(p[`${d}_nb`] || 0)} events lie above the completeness threshold. At least ${ruleNumber(ctx.manifest.method.quality.insufficient)} are needed.` }));
+    const nb = p[`${d}_nb`] || 0;
+    const why = q === 'C'
+      ? `${f.int(nb)} events lie above Mc${p[`${d}_mc`] !== undefined ? ` ${f.mag(p[`${d}_mc`])}` : ''} here, but the 95 % interval would be ${f.b2(p[`${d}_ciw`])} wide; the atlas shows b only when it is at most ${qB.toFixed(2)} wide. The estimate is withheld rather than guessed.`
+      : `Only ${f.int(nb)} events lie above Mc${p[`${d}_mc`] !== undefined ? ` ${f.mag(p[`${d}_mc`])}` : ''} at ${d === 'sh' ? 'depths of 70 km or less' : 'depths over 70 km'} here; the atlas needs at least ${nMin}.${p[`${d}_ciw`] !== undefined ? ` The 95 % interval would be ${f.b2(p[`${d}_ciw`])} wide.` : ''} The estimate is withheld rather than guessed.`;
+    top.append(h('div', { class: 'withheld' }, h('strong', { text: `${d === 'sh' ? 'Shallow' : 'Deeper'} events: no b-value shown` }), h('p', { text: why }), qPill(q)));
   }
-  const facts = h('dl', { class: 'facts' });
-  const fact = (k, v) => facts.append(h('dt', { text: k }), h('dd', { text: v }));
-  if (p[`${d}_mc`] !== undefined) fact('Mc, ISC-GEM', `${f.mag(p[`${d}_mc`])} Mw [${f.mag(p[`${d}_mc_lo`])}, ${f.mag(p[`${d}_mc_hi`])}]`);
-  fact('Events in circle', `${f.int(p[`${d}_n`])} (ISC-GEM 1976–2021, within ${ctx.manifest.method.sample_radius_km} km)`);
-  fact('Above threshold', f.int(p[`${d}_nb`]));
-  if (p[`${d}_mc_cc`] !== undefined) fact('Mc, ComCat 2010+', `${f.mag(p[`${d}_mc_cc`])} as served`);
-  if (p[`${d}_mc_cc0`] !== undefined) fact('Mc, ComCat 1973–1989', `${f.mag(p[`${d}_mc_cc0`])} as served`);
-  sec1.append(facts);
-  body.append(sec1);
+  const tiles = h('div', { class: 'tiles' });
+  tiles.append(tile('Mc, ISC-GEM', p[`${d}_mc`] !== undefined ? f.mag(p[`${d}_mc`]) : '–', p[`${d}_mc`] !== undefined ? `(${f.mag(p[`${d}_mc_lo`])}–${f.mag(p[`${d}_mc_hi`])})` : ''));
+  tiles.append(tile('Mc, ComCat 2010+', p[`${d}_mc_cc`] !== undefined ? f.mag(p[`${d}_mc_cc`]) : '–'));
+  if (q === 'A' || q === 'B') {
+    tiles.append(tile('b-positive', p[`${d}_bpos`] !== undefined ? f.b2(p[`${d}_bpos`]) : 'n/a', p[`${d}_bpos`] !== undefined ? `[${f.b2(p[`${d}_bpos_lo`])}, ${f.b2(p[`${d}_bpos_hi`])}]` : ''));
+    tiles.append(tile('Declustered (GK)', p[`${d}_bdecl`] !== undefined ? f.b2(p[`${d}_bdecl`]) : 'n/a', p[`${d}_bdecl`] !== undefined ? `[${f.b2(p[`${d}_bdecl_lo`])}, ${f.b2(p[`${d}_bdecl_hi`])}]` : ''));
+  }
+  top.append(tiles);
+  body.append(top);
 
-  // lazy charts
-  const charts = h('div');
-  body.append(charts);
-  body.append(consistencySection(p));
-  body.append(countsSection(p, ctx));
+  // peek row (phones): one-line agreement summary and the full-details button
+  const flagTxt = { ok: 'Catalogues agree', check: 'Catalogues disagree: check', few: 'Too few shared events' }[p.c_flag];
+  const peek = h('div', { class: 'peek-only', style: 'flex-direction:column;gap:12px' },
+    h('div', { class: 'tile', style: 'flex-direction:row;justify-content:space-between;align-items:center;background:var(--surface-2);border:0' },
+      h('span', { text: flagTxt }), h('span', { class: 'mono', style: 'font-size:12px', text: p.c_dmw !== undefined ? `ΔMw ${f.signed(p.c_dmw)}${p.c_dloc !== undefined ? `, ${f.km(p.c_dloc)}` : ''}` : '' })),
+    h('button', { class: 'btn solid', type: 'button', text: 'Full details and charts', onclick: () => { panel.classList.add('full'); } }));
+  body.append(peek);
+
+  const full = h('div', { class: 'full-only' });
+  body.append(full);
+  const charts = h('div', { style: 'display:contents' });
+  full.append(charts);
+  full.append(agreementSection(p, ctx));
+  full.append(h('div', { class: 'panel-actions' },
+    p.detail ? h('a', { class: 'btn primary', href: `data/cells/${p.id}.json`, target: '_blank', rel: 'noopener', text: 'Cell data (JSON)' }) : null,
+    h('a', { class: 'btn', href: '#v=methods', text: 'How this is computed' })));
 
   if (!p.detail) {
-    charts.append(h('section', {}, h('h3', { text: 'Charts' }), h('p', { class: 'hint', text: 'No detail file for this cell: the circle holds fewer than 20 ISC-GEM and fewer than 50 ComCat events.' })));
+    charts.append(h('section', {}, h('p', { class: 'hint', text: 'No detail file for this cell: the circle holds fewer than 20 ISC-GEM and fewer than 50 ComCat events.' })));
     return;
   }
   const load = () => {
-    charts.replaceChildren(h('div', { class: 'loading', role: 'status', text: 'Loading charts for this cell…' }));
+    charts.replaceChildren(h('section', {}, h('div', { class: 'loading', role: 'status', text: 'Loading charts for this cell…' })));
     getJSON(`cells/${p.id}.json`).then((det) => {
       if (my !== token) return;
       charts.replaceChildren(...detailCharts(p, det, d, ctx));
     }).catch((e) => {
       if (my !== token) return;
-      charts.replaceChildren(h('p', { class: 'error', role: 'alert' }, `${e.message} The summary above comes from the map data. `, h('button', { class: 'small-btn', type: 'button', onclick: load, text: 'Try again' })));
+      charts.replaceChildren(h('section', {}, h('p', { class: 'error', role: 'alert' }, `${e.message} The numbers above come from the map data. `, h('button', { class: 'small-btn', type: 'button', onclick: load, text: 'Try again' }))));
     });
   };
   load();
@@ -127,7 +127,7 @@ function detailCharts(p, det, d, ctx) {
         { key: 'line', name: 'ComCat, as served', color: 'var(--s2)', type: 'line', points: fc, fmt: (v) => `N = ${f.int(v)}` },
       ],
       xSpans: mc !== undefined ? [{ from: p[`${d}_mc_lo`] - 0.05, to: p[`${d}_mc_hi`] + 0.05 }] : [],
-      xRules: mc !== undefined ? [{ value: mc - 0.05, label: `Mc ${f.mag(mc)}` }] : [],
+      xRules: mc !== undefined ? [{ value: mc - 0.05, label: `Mc ${f.mag(mc)}`, dashed: true }] : [],
       hoverTitle: (x) => `M ≥ ${f.mag(x)}`,
       table: { columns: ['M', 'ISC-GEM N ≥ M', 'ComCat N ≥ M'], rows: [...new Set(ms)].sort((a, b) => a - b).map((m) => [f.mag(m), f.int((fi.find((x) => x[0] === m) || [])[1]), f.int((fc.find((x) => x[0] === m) || [])[1])]) },
       note: mc !== undefined ? `Shaded: the bootstrap 95 % range of Mc, ${f.mag(p[`${d}_mc_lo`])}–${f.mag(p[`${d}_mc_hi`])}. The two catalogues use different magnitude scales.` : 'The two catalogues use different magnitude scales.',
@@ -207,35 +207,26 @@ function detailCharts(p, det, d, ctx) {
   return out;
 }
 
-function consistencySection(p) {
-  const sec = h('section', { 'aria-labelledby': 'h-cc' }, h('h3', { id: 'h-cc', text: 'Do the two catalogues agree here?' }));
+function agreementSection(p, ctx) {
   const flag = p.c_flag;
-  const label = { ok: 'They agree', check: 'Check: they disagree on at least one test', few: 'Too few shared events to compare' }[flag];
-  sec.append(h('p', { class: `status ${flag}` }, h('span', { 'aria-hidden': 'true', text: flag === 'ok' ? '✓' : flag === 'check' ? '!' : '–' }), label));
-  const li = [];
-  const add = (txt, flagged) => li.push(h('li', { class: flagged ? 'flagged' : '', text: txt }));
-  add(`${f.int(p.c_n)} events in this cell are in both ISC-GEM and ComCat (1973–2021, matched within 30 s and 100 km).`);
-  if (p.c_dmw !== undefined) {
-    const v = p.c_dmw;
-    add(v === 0 ? 'ComCat moment magnitudes equal ISC-GEM Mw (median).' : `ComCat moment magnitudes are ${f.fixed(Math.abs(v), 2)} ${v > 0 ? 'higher' : 'lower'} than ISC-GEM Mw (median).`, Math.abs(v) > CC_RULES.dmw && p.c_n >= CC_RULES.minPairs);
-  }
-  if (p.c_dmb !== undefined) add(`ComCat mb is ${f.fixed(Math.abs(p.c_dmb), 2)} ${p.c_dmb >= 0 ? 'higher' : 'lower'} than ISC-GEM Mw (median). mb is a different scale, so this offset is expected, not an error.`);
-  if (p.c_dloc !== undefined) add(`Epicentres of the same event differ by ${f.km(p.c_dloc)} (median).`, p.c_dloc > CC_RULES.dlocKm && p.c_n >= CC_RULES.minPairs);
-  if (p.c_ddep !== undefined) add(p.c_ddep === 0 ? 'Depths agree (median difference 0 km).' : `ComCat depths are ${f.km(Math.abs(p.c_ddep))} ${p.c_ddep > 0 ? 'deeper' : 'shallower'} than ISC-GEM (median).`);
-  const un = p.c_gonly + p.c_conly;
-  add(`${f.int(p.c_gonly)} ISC-GEM events have no ComCat match, and ${f.int(p.c_conly)} ComCat events of Mw-proxy 6.0 or more have no ISC-GEM match.`, p.c_n >= CC_RULES.minPairs && p.c_n > 0 && un / p.c_n > CC_RULES.unmatchedShare);
-  sec.append(h('ul', { class: 'plain' }, li));
-  if (li.some((x) => x.classList.contains('flagged'))) sec.append(h('p', { class: 'hint', text: 'Lines marked "!" are the tests that set the "check" flag.' }));
+  const pill = h('span', { class: `pill ${flag === 'ok' ? 'ok' : flag === 'check' ? 'bad' : ''}`, text: flag === 'ok' ? 'Consistent' : flag === 'check' ? 'Check' : 'Too few events' });
+  const sec = h('section', { 'aria-labelledby': 'h-cc' }, h('div', { class: 'agree-head' }, h('h3', { id: 'h-cc', text: 'Catalogue agreement' }), pill));
+  const dl = h('dl', { class: 'agree' });
+  const enough = p.c_n >= CC_RULES.minPairs;
+  const row = (k, v, flagged) => dl.append(h('dt', { text: k }), h('dd', { class: flagged ? 'flagged' : '', text: v }));
+  row('Magnitude, ComCat Mw − ISC-GEM Mw', p.c_dmw !== undefined ? f.signed(p.c_dmw) : '–', enough && Math.abs(p.c_dmw) > CC_RULES.dmw);
+  row('ComCat mb − ISC-GEM Mw (scale offset)', p.c_dmb !== undefined ? f.signed(p.c_dmb) : '–');
+  row('Epicentre difference (median)', p.c_dloc !== undefined ? f.km(p.c_dloc) : '–', enough && p.c_dloc > CC_RULES.dlocKm);
+  row('Depth, ComCat − ISC-GEM', p.c_ddep !== undefined ? `${f.signed(p.c_ddep, 1)} km` : '–');
+  row('Events in only one catalogue', `${f.int(p.c_gonly)} + ${f.int(p.c_conly)} of ${f.int(p.c_n)}`, enough && p.c_n > 0 && (p.c_gonly + p.c_conly) / p.c_n > CC_RULES.unmatchedShare);
+  row('Mw ≥ 6 rate per 100,000 km²', `${f.sig2(p.rate_m6)} / yr`);
+  sec.append(dl);
+  const plain = flag === 'few'
+    ? `Only ${f.int(p.c_n)} events here are in both catalogues (matched within 30 s and 100 km, 1973–2021), too few to compare.`
+    : `${f.int(p.c_n)} events here are in both catalogues (matched within 30 s and 100 km, 1973–2021). ${flag === 'ok' ? 'Their magnitudes and locations agree within the atlas tolerances.' : 'At least one value in red is outside the atlas tolerances.'} The mb offset is expected: mb is a different magnitude scale.`;
+  sec.append(h('p', { class: 'plain', text: plain }));
+  sec.append(h('p', { class: 'hint', text: `Cell counts: ${f.int(p.n_iscgem)} ISC-GEM events (all years and depths) and ${f.int(p.n_comcat)} ComCat M ≥ 4.5 events to ${ctx.manifest.data_cutoff_utc}. The rate uses ISC-GEM Mw ≥ 6, 1964–2021.` }));
   return sec;
-}
-
-function countsSection(p, ctx) {
-  const facts = h('dl', { class: 'facts' });
-  const fact = (k, v) => facts.append(h('dt', { text: k }), h('dd', { text: v }));
-  fact('ISC-GEM events in the cell', `${f.int(p.n_iscgem)} (all years, all depths)`);
-  fact('ComCat M ≥ 4.5 in the cell', `${f.int(p.n_comcat)} (1973 to ${ctx.manifest.data_cutoff_utc})`);
-  fact('M6+ rate', `${f.sig2(p.rate_m6)} per year per 100,000 km² (1964–2021)`);
-  return h('section', {}, h('h3', { text: 'Counts in the cell itself' }), facts);
 }
 
 /** Table view of every cell with a b-value: the keyboard and screen-reader route into the map data. */
@@ -249,7 +240,7 @@ export function renderCellList(cells, ctx) {
   const body = document.getElementById('panel-body');
   let sort = 'b';
   const sorters = { b: (a, b) => a[`${d}_b`] - b[`${d}_b`], bd: (a, b) => b[`${d}_b`] - a[`${d}_b`], w: (a, b) => a[`${d}_ciw`] - b[`${d}_ciw`], n: (a, b) => b[`${d}_nb`] - a[`${d}_nb`] };
-  const sel = h('select', { class: 'sub-select', 'aria-label': 'Sort cells by', onchange: (e) => { sort = e.target.value; draw(); } },
+  const sel = h('select', { class: 'select', 'aria-label': 'Sort cells by', onchange: (e) => { sort = e.target.value; draw(); } },
     h('option', { value: 'b', text: 'Sort by b, lowest first' }), h('option', { value: 'bd', text: 'Sort by b, highest first' }),
     h('option', { value: 'w', text: 'Sort by interval width, narrowest first' }), h('option', { value: 'n', text: 'Sort by events above Mc, most first' }));
   const tb = h('tbody');
@@ -257,7 +248,7 @@ export function renderCellList(cells, ctx) {
     h('thead', {}, h('tr', {}, ['Cell centre', 'b [95 %]', 'Quality', 'Events'].map((c) => h('th', { scope: 'col', text: c })))), tb);
   const draw = () => {
     tb.replaceChildren(...rows.slice().sort(sorters[sort]).map((p) => h('tr', {},
-      h('td', {}, h('button', { class: 'linkish', type: 'button', onclick: () => ctx.onOpen(p.id), text: f.latlon(p.lat, p.lon) })),
+      h('td', {}, h('button', { class: 'link-btn', type: 'button', onclick: () => ctx.onOpen(p.id), text: f.latlon(p.lat, p.lon) })),
       h('td', { text: f.interval(p[`${d}_b`], p[`${d}_b_lo`], p[`${d}_b_hi`]) }),
       h('td', { text: p[`${d}_q`] }),
       h('td', { text: f.int(p[`${d}_nb`]) }))));

@@ -4,6 +4,10 @@
 import { sequential, diverging, oklch, HUE } from './color.js';
 import { ruleNumber } from './data.js';
 
+// b palette from the design reference: blue for low b, orange-brown for high b, centred on b = 1.
+export const B_LIGHT = ['#1f4e8c', '#4f7fb8', '#9db8d6', '#ebc08f', '#d98a3d', '#a4501b'];
+export const B_DARK = ['#4a7cc0', '#7ea3d3', '#b4c9e2', '#ebc08f', '#de9550', '#c06a30'];
+
 // Consistency thresholds of c_flag, as defined in docs/data-schema.md.
 export const CC_RULES = { minPairs: 10, dmw: 0.10, dlocKm: 30, unmatchedShare: 0.10 };
 
@@ -72,21 +76,24 @@ export function layerDef(st, manifest) {
 
   if (st.l === 'b') {
     const breaks = [0.8, 0.9, 1.0, 1.1, 1.2];
-    const colors = diverging(HUE.low, HUE.high, 3, dark);
+    const colors = dark ? B_DARK : B_LIGHT;
     const valid = ['in', ['get', `${d}_q`], ['literal', ['A', 'B']]];
     return {
+      bar: { colors, breaks, d: 1 }, opacityB: true,
+      passKeys: ['qA', 'qB'],
       ...base, hatch: true,
       title: 'b-value, Gutenberg-Richter',
       unit: `${manifest.method.b_catalogue}, events within ${radius} km of the cell centre. Classes are centred on b = 1.`,
       note: `Coloured only where quality is A or B (95 % interval up to ${qB.toFixed(2)} wide). Hover a cell for b with its interval.`,
       items: [
-        ...stepLabels(breaks, 2).map((label, i) => ({ color: colors[i], label, key: i })),
-        hatchItem(`Quality C: interval wider than ${qB.toFixed(2)}, b withheld`),
+        { color: colors[1], label: `Quality A: 95 % interval ≤ ${qA.toFixed(2)}`, key: 'qA' },
+        { color: colors[1], op: 0.55, label: `Quality B: interval ≤ ${qB.toFixed(2)} (fainter)`, key: 'qB' },
+        hatchItem(`Quality C: b withheld, interval wider than ${qB.toFixed(2)}`),
         washItem(`Insufficient: fewer than ${nMin} events above Mc`, 'Insufficient'),
       ],
       fill: ['case', valid, stepExpr(`${d}_b`, breaks, colors), cssVar('--nodata')],
       valid,
-      classify: (p) => (p[`${d}_q`] === 'A' || p[`${d}_q`] === 'B' ? stepIndex(p[`${d}_b`], breaks) : p[`${d}_q`] === 'C' ? 'hatch' : 'wash'),
+      classify: (p) => (p[`${d}_q`] === 'A' ? 'qA' : p[`${d}_q`] === 'B' ? 'qB' : p[`${d}_q`] === 'C' ? 'hatch' : 'wash'),
     };
   }
 
@@ -130,10 +137,8 @@ export function layerDef(st, manifest) {
       note: ig
         ? `For b, each event's threshold is never below the global floor of its period (${floorTxt}).`
         : 'The ComCat query starts at M 4.5, so this Mc cannot fall below 4.7. Not on the same scale as ISC-GEM Mw.',
-      items: [
-        ...labels.map((label, i) => ({ color: colors[i], label, key: i })),
-        washItem('No Mc: too few events in the circle'),
-      ],
+      bar: { colors, breaks, d: 1, labels },
+      items: [washItem('No Mc: too few events in the circle')],
       fill: ['case', valid, stepExpr(prop, breaks, colors), cssVar('--nodata')],
       valid,
       classify: (p) => (p[prop] === undefined || p[prop] === null ? 'wash' : stepIndex(p[prop], breaks)),
@@ -166,13 +171,13 @@ export function layerDef(st, manifest) {
       const breaks = [-0.1, -0.05, 0, 0.05, 0.1];
       const colors = diverging(HUE.low, HUE.high, 3, dark);
       const valid = ['all', ['has', 'c_dmw'], enough];
-      const lab = ['ComCat lower by more than 0.10', '0.05–0.10 lower', '0–0.05 lower', '0–0.05 higher', '0.05–0.10 higher', 'ComCat higher by more than 0.10'];
       return {
         ...base2,
         title: 'Mw difference, ComCat − ISC-GEM',
         unit: 'Median over matched events with a ComCat Mw-type magnitude, magnitude units. All depths.',
         note: `Differences beyond ±${CC_RULES.dmw.toFixed(2)} trigger "check".`,
-        items: [...lab.map((label, i) => ({ color: colors[i], label, key: i })), washItem(`No Mw pairs, or fewer than ${CC_RULES.minPairs} matched events`)],
+        bar: { colors, breaks, d: 2 },
+        items: [washItem(`No Mw pairs, or fewer than ${CC_RULES.minPairs} matched events`)],
         fill: ['case', valid, stepExpr('c_dmw', breaks, colors), cssVar('--nodata')],
         valid,
         classify: (p) => (p.c_dmw !== undefined && p.c_n >= CC_RULES.minPairs ? stepIndex(p.c_dmw, breaks) : 'wash'),
@@ -186,7 +191,8 @@ export function layerDef(st, manifest) {
       title: 'Epicentre difference, ComCat vs ISC-GEM',
       unit: 'Median distance between the two locations of the same event, km. All depths.',
       note: `Medians above ${CC_RULES.dlocKm} km trigger "check".`,
-      items: [...stepLabels(breaks, 0, 'km').map((label, i) => ({ color: colors[i], label, key: i })), washItem(`Fewer than ${CC_RULES.minPairs} matched events`, 'Too few')],
+      bar: { colors, breaks, d: 0 },
+      items: [washItem(`Fewer than ${CC_RULES.minPairs} matched events`, 'Too few')],
       fill: ['case', valid, stepExpr('c_dloc', breaks, colors), cssVar('--nodata')],
       valid,
       classify: (p) => (p.c_dloc !== undefined && p.c_n >= CC_RULES.minPairs ? stepIndex(p.c_dloc, breaks) : 'wash'),
@@ -202,7 +208,8 @@ export function layerDef(st, manifest) {
       title: 'Rate of M6+ earthquakes',
       unit: 'ISC-GEM Mw ≥ 6.0 events per year per 100,000 km² of the cell itself, 1964–2021, all depths.',
       note: 'A long-term average of past events. It is not a probability of future earthquakes.',
-      items: [...stepLabels(breaks, 2).map((label, i) => ({ color: colors[i], label, key: i })), washItem('No M6+ event in 1964–2021', 'None')],
+      bar: { colors, breaks, d: 2 },
+      items: [washItem('No M6+ event in 1964–2021', 'None')],
       fill: ['case', valid, stepExpr('rate_m6', breaks, colors), cssVar('--nodata')],
       valid,
       classify: (p) => (p.rate_m6 > 0 ? stepIndex(p.rate_m6, breaks) : 'wash'),

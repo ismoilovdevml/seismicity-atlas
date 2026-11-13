@@ -442,7 +442,7 @@ details.method pre { white-space: pre-wrap; font-family: var(--mono); font-size:
 
   #view-map { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
   .chips { display: flex; grid-row: 1; gap: 8px; padding: 10px 14px; overflow-x: auto; background: var(--surface); border-bottom: 1px solid var(--rule); scrollbar-width: none; }
-  .chip { flex: none; min-height: 40px; padding: 0 13px; border-radius: 999px; border: 1px solid var(--rule); background: var(--surface); font-size: 13px; cursor: pointer; }
+  .chip { flex: none; min-height: 44px; padding: 0 13px; border-radius: 999px; border: 1px solid var(--rule); background: var(--surface); font-size: 13px; cursor: pointer; }
   .chip[aria-pressed='true'] { border-color: var(--accent-border); background: var(--accent-bg); color: var(--accent-hover); font-weight: 600; }
   :root[data-theme='dark'] .chip[aria-pressed='true'] { color: var(--accent); }
   .chip-depth, #chip-more { background: var(--seg-bg); border-color: var(--rule-strong); }
@@ -456,7 +456,8 @@ details.method pre { white-space: pre-wrap; font-family: var(--mono); font-size:
   .map-buttons { top: 12px; right: 12px; }
   .map-btn { width: 44px; height: 44px; }
   .legend { top: 12px; bottom: auto; left: 12px; width: 168px; padding: 8px 10px; gap: 6px; max-height: calc(100% - 24px); }
-  .legend .lg-unit, .legend .lg-rows, .legend .lg-count, .legend .lg-extra, .legend .lg-depth { display: none; }
+  .legend .lg-unit, .legend.has-bar .lg-rows, .legend .lg-count, .legend .lg-extra, .legend .lg-depth, .legend .cnt { display: none; }
+  .legend .lg-rows { gap: 3px; font-size: 11px; }
   .legend .lg-title { font-size: 12px; }
   .legend .lg-bar div { height: 10px; }
   .legend .lg-ticks { font-size: 9.5px; }

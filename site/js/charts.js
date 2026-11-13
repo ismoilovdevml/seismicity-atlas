@@ -122,7 +122,7 @@ function figure({ title, sub, alt, series = [], table, note, draw }) {
       e.preventDefault();
       idx = idx < 0 ? 0 : Math.max(0, Math.min(ctl.xs.length - 1, idx + (e.key === 'ArrowRight' ? 1 : -1)));
       ctl.show(idx);
-    } else if (e.key === 'Escape') { ctl.hide(); idx = -1; }
+    } else if (e.key === 'Escape' && idx >= 0) { e.stopPropagation(); ctl.hide(); idx = -1; }
   });
   wrap.addEventListener('blur', () => ctl && ctl.hide());
   return fig;
@@ -196,7 +196,7 @@ export function xyChart(spec) {
       }
       for (const r of spec.xRules || []) {
         const x = xs(r.value);
-        svgEl('line', { x1: x, x2: x, y1: m.t, y2: H - m.b, class: 'rule' }, plot);
+        svgEl('line', { x1: x, x2: x, y1: m.t, y2: H - m.b, class: r.dashed ? 'rule dashed' : 'rule' }, plot);
         if (r.label) {
           const right = x < (m.l + W - m.r) / 2;
           svgEl('text', { x: x + (right ? 4 : -4), y: m.t + 10, class: 'rule-label', 'text-anchor': right ? 'start' : 'end' }, svg).textContent = r.label;
@@ -295,10 +295,12 @@ export function forestChart(spec) {
       const H = m.t + m.b + spec.rows.length * rowH;
       const xs = scale('lin', spec.domain, [m.l, W - m.r]);
       const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: 'img', 'aria-label': spec.alt, class: 'chart-svg' });
-      for (const v of niceTicks(...spec.domain, Math.max(2, Math.floor((W - m.l - m.r) / 60)))) {
+      const ft = niceTicks(...spec.domain, Math.max(2, Math.floor((W - m.l - m.r) / 80)));
+      const dec = ft.length > 1 && ft[1] - ft[0] < 0.1 - 1e-9 ? 2 : 1;
+      for (const v of ft) {
         const x = xs(v);
         svgEl('line', { x1: x, x2: x, y1: m.t, y2: H - m.b, class: 'grid' }, svg);
-        svgEl('text', { x, y: H - m.b + 16, class: 'tick', 'text-anchor': 'middle' }, svg).textContent = (spec.tickFmt || String)(v);
+        svgEl('text', { x, y: H - m.b + 16, class: 'tick', 'text-anchor': 'middle' }, svg).textContent = v.toFixed(dec);
       }
       if (spec.x && spec.x.label) svgEl('text', { x: (m.l + W - m.r) / 2, y: H - 2, class: 'axis-label', 'text-anchor': 'middle' }, svg).textContent = spec.x.label;
       if (spec.ref) {

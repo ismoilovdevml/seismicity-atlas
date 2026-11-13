@@ -34,14 +34,14 @@ function drawSequences(root, data, ctx) {
     h('p', { class: 'lede', text: `How quickly aftershock rates decayed after the ${seqs.length} largest independent mainshocks since ${Math.min(...years)} (M ${f.mag(Math.min(...mags))} to ${f.mag(Math.max(...mags))}), fitted with the Omori-Utsu law: rate = K / (t + c)^p.` }),
     h('p', { class: 'summary-line' }, `${counts.A} quality A, ${counts.B} B, ${counts.C} C, ${counts.insufficient} insufficient. In ${nUnres} of the ${nFit} fits the parameter c is not resolved: the teleseismic catalogue misses the first hours, so c is unconstrained there, while K and p remain usable.`),
   ];
-  const seg = (name, opts, cur, on) => h('fieldset', { class: 'seg', 'aria-label': name },
+  const seg = (name, opts, cur, on) => h('div', { class: 'seg', role: 'radiogroup', 'aria-label': name === 'seqf' ? 'Filter by quality' : 'Sort order', style: `grid-template-columns:repeat(${opts.length},auto)` },
     opts.map(([v, lab]) => h('label', {}, h('input', { type: 'radio', name, value: v, checked: v === cur, onchange: () => on(v) }), lab)));
   const listEl = h('ul', { class: 'seq-list', 'aria-label': 'Sequences' });
   const countEl = h('p', { class: 'hint', 'aria-live': 'polite' });
   const toolbar = h('div', { class: 'toolbar' },
     h('div', {}, h('span', { class: 'lbl', text: 'Show' }), seg('seqf', [['all', 'All'], ['A', 'A'], ['B', 'B'], ['C', 'C'], ['insufficient', 'Insufficient']], filter, (v) => { filter = v; draw(); })),
     h('div', {}, h('span', { class: 'lbl', text: 'Sort by' }), seg('seqs', [['mag', 'Magnitude'], ['time', 'Date']], sort, (v) => { sort = v; draw(); })));
-  const method = h('details', { class: 'notice' }, h('summary', { text: 'How the sequences were selected and fitted' }), h('pre', { style: 'white-space:pre-wrap;font:inherit;font-size:13.5px;margin:8px 0 0', text: data.method }));
+  const method = h('details', { class: 'method card' }, h('summary', { text: 'How the sequences were selected and fitted' }), h('pre', { text: data.method }));
   root.replaceChildren(...intro, method, toolbar, countEl, listEl);
 
   function draw() {
@@ -54,9 +54,10 @@ function drawSequences(root, data, ctx) {
 }
 
 function seqItem(s, ctx) {
-  const badges = [h('span', { class: 'badge q', text: Q_TEXT[s.quality] })];
-  if (s.c_resolved === false) badges.push(h('span', { class: 'badge warn' }, h('span', { class: 'ic', 'aria-hidden': 'true', text: '!' }), 'c not resolved'));
-  if (s.contaminated) badges.push(h('span', { class: 'badge warn' }, h('span', { class: 'ic', 'aria-hidden': 'true', text: '!' }), 'Second large event in window'));
+  const qcls = { A: 'ok', B: 'close', C: 'na', insufficient: '' }[s.quality];
+  const badges = [h('span', { class: `pill ${qcls}`, text: Q_TEXT[s.quality] })];
+  if (s.c_resolved === false) badges.push(h('span', { class: 'pill bad', text: 'c not resolved' }));
+  if (s.contaminated) badges.push(h('span', { class: 'pill na', text: 'Second large event in window' }));
   const params = h('dl', { class: 'params' });
   const par = (k, v) => params.append(h('div', {}, h('dt', { text: k }), h('dd', { text: v })));
   if (s.p !== undefined) {
@@ -72,7 +73,7 @@ function seqItem(s, ctx) {
   const li = h('li', { class: 'seq' }, head, meta, h('div', { class: 'badges' }, badges), params);
   if (s.rate_counts && s.rate_bins_days) li.append(omoriChart(s));
   else li.append(h('p', { class: 'hint', text: `Only ${f.int(s.n_fit)} events above Mcat ${f.mag(s.mcat)} in the window: too few to fit a decay.` }));
-  li.append(h('button', { class: 'linkish', type: 'button', onclick: () => ctx.showOnMap(s), text: 'Show on the map with the earthquakes of that year' }));
+  li.append(h('button', { class: 'link-btn', type: 'button', onclick: () => ctx.showOnMap(s), text: 'Show on the map with the earthquakes of that year' }));
   return li;
 }
 
@@ -108,17 +109,17 @@ function omoriChart(s) {
 // ---------------------------------------------------------------- methods
 
 const VERDICTS = [
-  [/^match/i, 'ok', '✓', 'Match'],
-  [/^close/i, 'warn', '~', 'Close'],
-  [/^mismatch/i, 'bad', '✕', 'Mismatch'],
-  [/^not testable/i, 'na', '–', 'Not testable'],
-  [/^reference only/i, 'na', 'i', 'Reference only'],
-  [/^lower by/i, 'warn', '~', 'Differs'],
+  [/^match/i, 'ok', 'Match'],
+  [/^close/i, 'close', 'Close'],
+  [/^mismatch/i, 'bad', 'Mismatch'],
+  [/^not testable/i, 'na', 'Not testable'],
+  [/^lower by/i, '', 'Lower (newer catalogue)'],
+  [/^reference only/i, '', 'Reference only'],
 ];
 
 function verdictEl(text) {
-  const v = VERDICTS.find(([re]) => re.test(text)) || [null, 'na', '?', 'Other'];
-  return { cls: v[1], el: h('span', { class: `verdict ${v[1]}` }, h('span', { 'aria-hidden': 'true', text: v[2] }), v[3]), label: v[3] };
+  const v = VERDICTS.find(([re]) => re.test(text)) || [null, '', 'Other'];
+  return { cls: v[1], el: h('span', { class: `pill ${v[1]}`, text: v[2] }), label: v[2] };
 }
 
 export function renderMethods(root, ctx) {
@@ -134,22 +135,23 @@ function drawMethods(root, g, sq, man) {
   const q = m.quality;
   const gs = man.global.b_shallow_1976_2021, gd = man.global.b_deep_1976_2021;
   const out = [];
-  out.push(h('h1', { text: 'Methods and validation' }));
-  out.push(h('p', { class: 'lede', text: 'How each number on the map is made, and how the method compares with published results. Mismatches and tests that could not be run are listed, not hidden.' }));
-
-  // validation summary first: it is the page's main claim
+  out.push(h('section', {}, h('h1', { text: 'Does the method reproduce published numbers?' }),
+    h('p', { class: 'lede', text: 'Before any cell is shown, the same code is run on cases with known answers: synthetic catalogues, global values from Michael (2014), plate-boundary classes and well-studied regions. Every test is listed, including the ones that fail or cannot be tested.' })));
   const vt = g.validation_table;
-  const tally = {};
-  for (const r of vt) { const v = verdictEl(r.verdict).label; tally[v] = (tally[v] || 0) + 1; }
-  out.push(h('h2', { text: 'Our results against published values' }));
-  out.push(h('p', { class: 'summary-line', text: `${vt.length} comparisons: ${Object.entries(tally).map(([k, v]) => `${v} ${k.toLowerCase()}`).join(', ')}.` }));
-  out.push(h('p', { class: 'prose', text: '"Differs" rows are completeness values lower than Michael (2014); the catalogue has been revised since his analysis, so these are expected differences, not errors. "Reference only" rows have no verified published number to compare with. Regional published values come from local catalogues at much smaller magnitudes: a match means agreement, not proof.' }));
+  const tally = new Map();
+  for (const r of vt) { const v = verdictEl(r.verdict); const k = v.label; if (!tally.has(k)) tally.set(k, { n: 0, cls: v.cls }); tally.get(k).n++; }
+  out.push(h('section', { 'aria-label': 'Summary' }, h('div', { class: 'summary-cards' },
+    h('div', {}, h('span', { class: 'n', text: String(vt.length) }), h('span', { class: 'pill', text: 'Tests in total' })),
+    [...tally.entries()].map(([k, v]) => h('div', {}, h('span', { class: 'n', text: String(v.n) }), h('span', { class: `pill ${v.cls}`, text: k }))))));
+  out.push(h('section', {}, h('div', { class: 'sec-head' }, h('h2', { text: 'b-value by plate-boundary class' }), h('span', { class: 'sub', text: 'Shallow, ISC-GEM Mw 1976–2021. Dot = b, bar = 95 % interval.' })), h('div', { class: 'card' }, plateChart(g, gs))));
   const tb = h('tbody');
   for (const r of vt) {
     const v = verdictEl(r.verdict);
-    tb.append(h('tr', {}, h('td', { 'data-h': 'Test', text: r.test }), h('td', { class: 'num', 'data-h': 'Ours', text: r.ours }), h('td', { 'data-h': 'Published', text: r.published }), h('td', { 'data-h': 'Verdict' }, v.el, h('div', { class: 'muted', style: 'font-size:12.5px', text: r.verdict }))));
+    tb.append(h('tr', {}, h('td', { 'data-h': 'Test', text: r.test }), h('td', { class: 'num', 'data-h': 'This atlas', text: r.ours }), h('td', { 'data-h': 'Published', text: r.published }), h('td', { 'data-h': 'Verdict' }, v.el, h('div', { class: 'detail', text: r.verdict }))));
   }
-  out.push(h('div', { class: 'table-scroll' }, h('table', { class: 'vtable' }, h('caption', { class: 'sr-only', text: 'Validation table' }), h('thead', {}, h('tr', {}, ['Test', 'Ours', 'Published', 'Verdict'].map((c) => h('th', { scope: 'col', text: c })))), tb)));
+  out.push(h('section', {}, h('h2', { text: 'All tests' }),
+    h('div', { class: 'table-card' }, h('table', { class: 'vtable' }, h('caption', { class: 'sr-only', text: 'Validation tests' }), h('thead', {}, h('tr', {}, ['Test', 'This atlas', 'Published', 'Verdict'].map((c) => h('th', { scope: 'col', text: c })))), tb)),
+    h('p', { class: 'hint', text: '"Lower" Mc rows compare our MAXC + 0.2 / MBS estimates on the current ISC-GEM release with Michael (2014), who used the first release. Mismatches are kept visible. Regional published values come from local catalogues at much smaller magnitudes: a match means agreement, not proof.' })));
 
   // method summary
   out.push(h('h2', { text: 'How a cell value is made' }));
@@ -161,7 +163,7 @@ function drawMethods(root, g, sq, man) {
     ['The quality gate', `A: ${q.A}. B: ${q.B}. C: ${q.C}. Insufficient: ${q.insufficient}. Only A and B cells get a b-value; the map never shows b without its interval and quality code.`],
     ['Robustness checks', 'b-positive (van der Elst 2021) and a Gardner-Knopoff declustered b are published per cell for comparison. Declustering is not used for the map because its windows remove far more than aftershocks in a global M ≥ 5 catalogue.'],
   ];
-  out.push(h('dl', { class: 'prose' }, steps.flatMap(([k, v]) => [h('dt', {}, h('strong', { text: k })), h('dd', { style: 'margin:2px 0 12px', text: v })])));
+  out.push(h('dl', { class: 'steps' }, steps.map(([k, v]) => h('div', {}, h('dt', { text: k }), h('dd', { text: v })))));
 
   // global b
   out.push(h('h3', { text: 'Global b in the atlas setting' }));
@@ -169,17 +171,16 @@ function drawMethods(root, g, sq, man) {
 
   // floors table
   const ft = h('tbody');
-  for (const [d, per] of Object.entries(g.floors)) for (const [p, v] of Object.entries(per)) ft.append(h('tr', {}, h('td', { text: f.DEPTH_NAMES[d] }), h('td', { text: p }), h('td', { class: 'num', text: f.int(v.n) }), h('td', { class: 'num', text: f.mag(v.maxc02) }), h('td', { class: 'num', text: f.mag(v.mbs) }), h('td', { class: 'num', text: f.mag(v.gft) }), h('td', { class: 'num' }, h('strong', { text: f.mag(v.floor) }))));
+  for (const [d, per] of Object.entries(g.floors)) for (const [p, v] of Object.entries(per)) ft.append(h('tr', {}, h('td', { 'data-h': 'Depth', text: f.DEPTH_NAMES[d] }), h('td', { 'data-h': 'Period', text: p }), h('td', { class: 'num', 'data-h': 'Events', text: f.int(v.n) }), h('td', { class: 'num', 'data-h': 'MAXC + 0.2', text: f.mag(v.maxc02) }), h('td', { class: 'num', 'data-h': 'MBS', text: f.mag(v.mbs) }), h('td', { class: 'num', 'data-h': 'GFT', text: f.mag(v.gft) }), h('td', { class: 'num', 'data-h': 'Floor' }, h('strong', { text: f.mag(v.floor) }))));
   out.push(h('h3', { text: 'Global completeness floors' }));
-  out.push(h('div', { class: 'table-scroll' }, h('table', { class: 'vtable' }, h('thead', {}, h('tr', {}, ['Depth', 'Period', 'Events', 'MAXC + 0.2', 'MBS', 'GFT', 'Floor'].map((c) => h('th', { scope: 'col', text: c })))), ft)));
+  out.push(h('div', { class: 'table-card' }, h('table', { class: 'vtable' }, h('thead', {}, h('tr', {}, ['Depth', 'Period', 'Events', 'MAXC + 0.2', 'MBS', 'GFT', 'Floor'].map((c) => h('th', { scope: 'col', text: c })))), ft)));
 
   // charts
-  out.push(h('h2', { text: 'Validation charts' }));
+  out.push(h('h2', { text: 'More validation charts' }));
   const grid = h('div', { class: 'grid-2' });
-  grid.append(plateChart(g, gs));
-  grid.append(slabChart(g));
-  grid.append(cutoffChart(g));
-  grid.append(michaelChart(g));
+  grid.append(h('div', { class: 'card' }, slabChart(g)));
+  grid.append(h('div', { class: 'card' }, cutoffChart(g)));
+  grid.append(h('div', { class: 'card' }, michaelChart(g)));
   out.push(grid);
 
   // Omori synthetic
@@ -203,16 +204,15 @@ function drawMethods(root, g, sq, man) {
 }
 
 function plateChart(g, gs) {
-  const names = { SUB: 'Subduction', CCB: 'Cont. convergent', OCB: 'Ocean. convergent', CTF: 'Cont. transform', OTF: 'Ocean. transform', CRB: 'Cont. rift', OSR: 'Spreading ridge', none: '> 200 km from boundary' };
+  const names = { SUB: 'Subduction', CCB: 'Continental convergent', OCB: 'Oceanic convergent', CTF: 'Continental transform', OTF: 'Oceanic transform', CRB: 'Continental rift', OSR: 'Oceanic spreading ridge', none: 'Over 200 km from a boundary' };
   const rows = Object.entries(g.plate_boundary_types).map(([k, v]) => ({ k, label: names[k] || k, v: v.b, lo: v.ci95[0], hi: v.ci95[1], n: v.n_b, text: f.interval(v.b, v.ci95[0], v.ci95[1], f.b3) })).sort((a, b) => b.v - a.v);
   const vals = rows.flatMap((r) => [r.lo, r.hi]);
   return h('div', {}, forestChart({
-    title: 'b by plate-boundary class',
-    sub: `Shallow ISC-GEM events, 95 % intervals. Line: global shallow b ${f.b3(gs.b)}.`,
+    sub: `Grey band and line: global shallow b ${f.interval(gs.b, gs.ci95[0], gs.ci95[1], f.b3)}.`,
     alt: 'b-value by plate boundary class with intervals',
-    rows: rows.map((r) => ({ ...r, color: 'var(--s1)', tipName: `n = ${f.int(r.n)}` })),
+    rows: rows.map((r) => ({ ...r, color: 'var(--v-close-fg)', tipName: `n = ${f.int(r.n)}` })),
     domain: [Math.floor(Math.min(...vals) * 10) / 10, Math.ceil(Math.max(...vals) * 10) / 10],
-    ref: { value: gs.b, lo: gs.ci95[0], hi: gs.ci95[1] }, labelWidth: 150, tickFmt: (v) => v.toFixed(1),
+    ref: { value: gs.b, lo: gs.ci95[0], hi: gs.ci95[1] }, labelWidth: 200, tickFmt: (v) => v.toFixed(1),
     table: { columns: ['Class', 'b', '95 % low', '95 % high', 'Events'], rows: rows.map((r) => [r.label, f.b3(r.v), f.b3(r.lo), f.b3(r.hi), f.int(r.n)]) },
     note: 'Oceanic ridges and transforms have the highest b; convergent margins the lowest, as in published global studies.',
   }));
@@ -271,7 +271,7 @@ function michaelChart(g) {
 export function renderAbout(root, ctx) {
   const man = ctx.manifest;
   const out = [];
-  out.push(h('h1', { text: 'About the data' }));
+  out.push(h('h1', { text: 'About & data' }));
   out.push(h('p', { class: 'notice' }, h('strong', { text: 'Not a forecast. Not an official hazard map. ' }), man.disclaimer, ' For seismic hazard, use your national agency or the ', h('a', { href: 'https://maps.openquake.org/map/global-seismic-hazard-map/', target: '_blank', rel: 'noopener', text: 'GEM Global Seismic Hazard Map' }), ' (link only; it is not part of this atlas).'));
   out.push(h('p', { class: 'lede', text: 'The atlas describes two open earthquake catalogues: how complete they are, what their magnitude distributions look like, and where they agree. Its main message is where catalogue numbers can be trusted, and where they cannot.' }));
 
@@ -295,7 +295,7 @@ export function renderAbout(root, ctx) {
     h('li', {}, h('strong', { text: 'Atlas data and figures: ' }), `${man.licence.data}. ShareAlike carries over from ISC-GEM.`),
     h('li', {}, h('strong', { text: 'Code: ' }), man.licence.code),
     h('li', {}, h('strong', { text: 'Map software: ' }), 'MapLibre GL JS 5.24.0, BSD 3-Clause (vendored, ', h('a', { href: 'vendor/maplibre-gl-5.24.0/LICENSE.txt', text: 'licence' }), ').'),
-    h('li', {}, h('strong', { text: 'Typeface: ' }), 'Atkinson Hyperlegible Next, SIL Open Font License 1.1 (vendored, ', h('a', { href: 'vendor/fonts/OFL.txt', text: 'licence' }), ').'),
+    h('li', {}, h('strong', { text: 'Typefaces: ' }), 'Inter and IBM Plex Mono, SIL Open Font License 1.1 (vendored; ', h('a', { href: 'vendor/fonts/OFL-Inter.txt', text: 'Inter licence' }), ', ', h('a', { href: 'vendor/fonts/OFL-IBMPlexMono.txt', text: 'Plex licence' }), ').'),
     h('li', {}, h('strong', { text: 'Not redistributed: ' }), 'the GEM Global Seismic Hazard Map (CC BY-NC-SA). It is linked, never copied.')));
 
   out.push(h('h2', { text: 'How to cite' }));

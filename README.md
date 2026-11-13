@@ -78,6 +78,27 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 loads lazily, including 1,292 per-cell detail files. The site needs no third-party basemap tiles. See
 [docs/data-schema.md](docs/data-schema.md).
 
+## Website
+
+`site/` is a static site (no build step) that can be served by GitHub Pages as is. Preview it locally:
+
+```bash
+cd site && python3 -m http.server 8000   # then open http://localhost:8000/
+```
+
+- **Map:** b-value with its 95 % interval and quality code, estimate quality, completeness Mc (ISC-GEM and ComCat),
+  catalogue disagreement, M6+ rate; shallow or deeper; plate boundaries; earthquakes M ≥ 6 (M ≥ 5 on request) with
+  a time filter and links to USGS event pages; optional globe view. Hover a cell for its values; click it for the
+  cell panel (frequency-magnitude distribution, Mc over time, b against cutoff, yearly counts, catalogue
+  agreement). The state is kept in the URL hash, so any view can be shared.
+- **Sequences:** Omori-Utsu decay charts and quality badges for the 40 sequences.
+- **Validation:** every test against published values, including the mismatch and the untestable rows.
+- **About & data:** sources, licences, data cut-off, how to cite, downloads.
+- Vendored: MapLibre GL JS 5.24.0 (BSD-3-Clause), Inter and IBM Plex Mono (SIL OFL 1.1). No CDN, no third-party
+  tiles. Design notes: [docs/ux-notes.md](docs/ux-notes.md); open issues: [docs/known-issues.md](docs/known-issues.md).
+
+![Map with a selected cell](docs/img/site-map-panel-light.png)
+
 ## Licences
 
 - **Code:** MIT (see `LICENSE`).

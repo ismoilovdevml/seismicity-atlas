@@ -28,11 +28,11 @@ export function sig2(v) {
 /** "0.98 [0.85, 1.12]" */
 export const interval = (v, lo, hi, f = b2) => `${f(v)} [${f(lo)}, ${f(hi)}]`;
 
-export function latlon(lat, lon) {
+export function latlon(lat, lon, d = 1) {
   let L = ((((lon + 180) % 360) + 360) % 360) - 180;
   const ns = lat >= 0 ? 'N' : 'S';
   const ew = L >= 0 ? 'E' : 'W';
-  return `${Math.abs(lat).toFixed(1)}° ${ns}, ${Math.abs(L).toFixed(1)}° ${ew}`;
+  return `${Math.abs(lat).toFixed(d)}° ${ns}, ${Math.abs(L).toFixed(d)}° ${ew}`;
 }
 
 /** Decimal year (3 decimals, about 9 h) to a UTC date string. */

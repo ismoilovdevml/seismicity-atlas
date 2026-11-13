@@ -51,7 +51,7 @@ export function initMap(ctx, base) {
         { id: 'cells-fill', type: 'fill', source: 'cells', paint: { 'fill-color': cssVar('--nodata'), 'fill-opacity': 0 } },
         { id: 'cells-hatch', type: 'fill', source: 'cells', layout: { visibility: 'none' }, paint: { 'fill-pattern': 'hatch' } },
         { id: 'coast', type: 'line', source: 'coast', paint: { 'line-color': cssVar('--coast'), 'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.45, 6, 1.1] } },
-        { id: 'plates', type: 'line', source: 'plates', paint: { 'line-color': cssVar('--plate'), 'line-opacity': 0.8, 'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.8, 6, 1.8] } },
+        { id: 'plates', type: 'line', source: 'plates', paint: { 'line-color': cssVar('--plate'), 'line-opacity': 0.85, 'line-dasharray': [3, 2], 'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.8, 6, 1.8] } },
         { id: 'cells-hover', type: 'line', source: 'cells', paint: { 'line-color': cssVar('--ink'), 'line-width': 1.4, 'line-opacity': ['case', ['boolean', ['feature-state', 'hover'], false], 0.9, 0] } },
         { id: 'cells-sel-case', type: 'line', source: 'cells', filter: ['==', ['get', 'id'], ''], paint: { 'line-color': cssVar('--surface'), 'line-width': 5 } },
         { id: 'cells-sel', type: 'line', source: 'cells', filter: ['==', ['get', 'id'], ''], paint: { 'line-color': cssVar('--ink'), 'line-width': 2.2 } },
@@ -67,10 +67,8 @@ export function initMap(ctx, base) {
     touchPitch: false,
     attributionControl: false,
   });
-  map.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: 'ISC-GEM (CC BY-SA 3.0), USGS ComCat, PB2002 (Bird 2003), Natural Earth' }), 'bottom-right');
   map.touchZoomRotate.disableRotation();
   if (new URLSearchParams(location.search).has('debug')) window.__map = map; // used by the browser tests
-  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
   map.on('styleimagemissing', (e) => { if (e.id === 'hatch' && !map.hasImage('hatch')) map.addImage('hatch', hatchImage(), { pixelRatio: 2 }); });
 
   const canvas = map.getCanvas();
@@ -85,7 +83,6 @@ export function initMap(ctx, base) {
   return new Promise((resolve) => {
     map.on('load', () => {
       if (!map.hasImage('hatch')) map.addImage('hatch', hatchImage(), { pixelRatio: 2 });
-      if (innerWidth <= 720) document.querySelectorAll('.maplibregl-compact-show').forEach((el) => el.classList.remove('maplibregl-compact-show'));
       wire();
       resolve(map);
     });
@@ -135,8 +132,8 @@ function showTip(pt, node) {
   const t = tip();
   t.replaceChildren(node);
   t.hidden = false;
-  const view = document.getElementById('view-map');
-  const off = document.getElementById('map').offsetLeft;
+  const view = document.getElementById('map-area');
+  const off = 0;
   const W = view.clientWidth, H = view.clientHeight;
   const tw = t.offsetWidth, th = t.offsetHeight;
   let x = pt.x + off + 14, y = pt.y + 14;
@@ -211,7 +208,7 @@ export function applyLayers() {
   currentDef = def;
   const dark = isDark();
   map.setPaintProperty('cells-fill', 'fill-color', def.fill);
-  map.setPaintProperty('cells-fill', 'fill-opacity', def.none ? 0 : ['case', def.valid, 0.9, dark ? 0.16 : 0.17]);
+  map.setPaintProperty('cells-fill', 'fill-opacity', def.none ? 0 : ['case', def.valid, def.opacityB ? ['case', ['==', ['get', `${st.d}_q`], 'B'], 0.5, 0.92] : 0.9, 0.22]);
   map.setLayoutProperty('cells-hatch', 'visibility', def.hatch ? 'visible' : 'none');
   if (def.hatch) map.setFilter('cells-hatch', ['==', ['get', `${st.d}_q`], 'C']);
   map.setLayoutProperty('plates', 'visibility', st.pl ? 'visible' : 'none');
@@ -253,8 +250,7 @@ export function revealCell(lon, lat) {
   const pt = map.project([lon, lat]);
   const panel = document.getElementById('panel');
   if (innerWidth > 720) {
-    const pw = panel.offsetWidth;
-    if (pt.x > box.clientWidth - pw - 30 || pt.x < 0) map.easeTo({ center: [lon, lat], offset: [-pw / 2, 0], duration: 400 });
+    if (pt.x > box.clientWidth - 20 || pt.x < 20 || pt.y < 20 || pt.y > box.clientHeight - 20) map.easeTo({ center: [lon, lat], duration: 400 });
   } else {
     const sh = panel.offsetHeight;
     if (pt.y > box.clientHeight - sh - 20 || pt.y < 0) map.easeTo({ center: [lon, lat], offset: [0, -sh / 2], duration: 400 });
@@ -276,31 +272,46 @@ function renderLegend(def) {
     counts.set(k, (counts.get(k) || 0) + 1);
   }
   const kids = [];
-  if (!def.none) {
-    kids.push(h('p', { class: 'legend-title', text: def.title }));
-    kids.push(h('p', { class: 'legend-unit', text: def.unit }));
-    kids.push(h('ul', { class: 'legend-items', 'aria-label': 'Classes' }, def.items.map((it) => h('li', {},
-      it.swatch ? h('span', { class: `sw sw-${it.swatch}`, 'aria-hidden': 'true' }) : h('span', { class: 'sw', style: `background:${it.color}`, 'aria-hidden': 'true' }),
-      h('span', {}, h('span', { class: 'lab-long', text: it.label }), it.short ? h('span', { class: 'lab-short', text: it.short }) : null),
-      h('span', { class: 'cnt', text: `${f.int(counts.get(it.key) || 0)}` })))));
-    const depthTxt = def.depthAware ? ` ${f.DEPTH_NAMES[st.d]}.` : '';
-    kids.push(h('p', { class: 'legend-note', text: `${def.note}${depthTxt} Numbers are cell counts.` }));
-  } else {
-    kids.push(h('p', { class: 'legend-title', text: 'No cell layer' }));
-    kids.push(h('p', { class: 'legend-unit', text: 'Choose a cell layer to colour the map. Cells stay clickable.' }));
+  kids.push(h('div', { class: 'lg-head' }, h('span', { class: 'lg-title', text: def.title }), def.depthAware ? h('span', { class: 'lg-depth', text: st.d === 'sh' ? 'Shallow ≤ 70 km' : 'Deeper > 70 km' }) : h('span', { class: 'lg-depth', text: def.none ? '' : 'All depths' })));
+  if (def.none) kids.push(h('p', { class: 'lg-unit', text: 'Choose a layer to colour the cells. Cells stay clickable.' }));
+  else kids.push(h('p', { class: 'lg-unit', text: def.unit }));
+  if (def.bar) {
+    const n = def.bar.colors.length;
+    kids.push(h('div', { class: 'lg-bar', style: `grid-template-columns:repeat(${n},minmax(0,1fr))`, 'aria-hidden': 'true' }, def.bar.colors.map((c) => h('div', { style: `background:${c}` }))));
+    if (def.bar.labels) {
+      kids.push(h('div', { class: 'lg-ticks', style: `grid-template-columns:repeat(${n},minmax(0,1fr))` }, def.bar.labels.map((l) => h('span', { text: l }))));
+    } else {
+      const t = h('div', { class: 'lg-ticks', style: 'position:relative;height:14px;display:block' });
+      def.bar.breaks.forEach((b, i) => t.append(h('span', { style: `position:absolute;left:${((i + 1) / n) * 100}%;transform:translateX(-50%)`, text: f.fixed(b, def.bar.d) })));
+      kids.push(t);
+    }
+    kids.push(h('p', { class: 'sr-only', text: `Classes: below ${def.bar.breaks[0]}, ${def.bar.breaks.slice(0, -1).map((b, i) => `${b} to ${def.bar.breaks[i + 1]}`).join(', ')}, ${def.bar.breaks[def.bar.breaks.length - 1]} and above.` }));
   }
+  if (def.items.length) {
+    kids.push(h('ul', { class: 'lg-rows' }, def.items.map((it) => h('li', {},
+      it.swatch ? h('span', { class: `sw sw-${it.swatch}`, 'aria-hidden': 'true' }) : h('span', { class: 'sw', style: `background:${it.color};${it.op ? `opacity:${it.op}` : ''}`, 'aria-hidden': 'true' }),
+      h('span', { text: it.label }),
+      h('span', { class: 'cnt', text: f.int(counts.get(it.key) || 0) })))));
+  }
+  if (def.passKeys) {
+    const pass = def.passKeys.reduce((s, k) => s + (counts.get(k) || 0), 0);
+    kids.push(h('span', { class: 'lg-count', text: `${f.int(pass)} cells pass the quality gate, of ${f.int(C.cells.features.length)} with events.` }));
+  } else if (def.note) kids.push(h('span', { class: 'lg-count', text: def.note }));
   const extra = [];
-  if (st.pl) extra.push(h('ul', { class: 'legend-items' }, h('li', {}, h('span', { class: 'sw sw-line', 'aria-hidden': 'true' }), h('span', { text: 'Plate boundary, PB2002 (Bird 2003)' }), h('span'))));
+  if (st.pl) extra.push(h('div', { style: 'display:flex;align-items:center;gap:8px' }, h('span', { class: 'sw sw-line', 'aria-hidden': 'true' }), 'Plate boundary, PB2002 (Bird 2003)'));
   if (st.ev) {
     const sizes = [6, 7, 8, 9].map((m) => {
       const r = radiusFor(m, map.getZoom());
       return h('span', {}, h('i', { style: `width:${2 * r}px;height:${2 * r}px` }), `M${m}`);
     });
-    extra.push(h('div', {}, h('p', { class: 'legend-unit', style: 'margin:0', text: `Earthquakes, size by magnitude (Mw or Mw proxy). ${evCountText()}` }), h('div', { class: 'legend-sizes', 'aria-hidden': 'true' }, sizes)));
+    extra.push(h('span', { text: `Earthquakes by magnitude. ${evCountText()}` }), h('div', { class: 'lg-sizes', 'aria-hidden': 'true' }, sizes));
   }
-  if (extra.length) kids.push(h('div', { class: 'legend-extra' }, extra));
+  if (extra.length) kids.push(h('div', { class: 'lg-extra' }, extra));
+  el.classList.toggle('has-bar', !!def.bar);
   el.replaceChildren(...kids);
 }
+
+export function zoomBy(dz) { if (map) map.easeTo({ zoom: map.getZoom() + dz, duration: 250 }); }
 
 // ---------- events ----------
 

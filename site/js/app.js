@@ -92,7 +92,7 @@ function showView(v) {
   document.querySelectorAll('.nav a').forEach((a) => (a.dataset.view === v ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current')));
   document.getElementById('nav').classList.remove('open');
   document.getElementById('menu-btn').setAttribute('aria-expanded', 'false');
-  const titles = { map: 'Global Seismicity Atlas', sequences: 'Aftershock sequences', methods: 'Methods and validation', about: 'About the data' };
+  const titles = { map: 'Global Seismicity Atlas', sequences: 'Aftershock sequences', methods: 'Validation', about: 'About and data' };
   document.title = v === 'map' ? titles.map : `${titles[v]} | Global Seismicity Atlas`;
   if (!ctx.manifest) return;
   if (v === 'map') { M.resize(); return; }
@@ -132,9 +132,12 @@ function syncControls() {
   $('depth-hint').textContent = state.l === 'none' ? 'Depth applies to the cell layers and the cell details.' : 'This layer uses all depths. The depth still applies to the cell details.';
   $('chk-plates').checked = !!state.pl;
   $('chk-events').checked = !!state.ev;
-  $('chk-globe').checked = !!state.g;
+  $('chk-m5').checked = state.ev === 5;
+  $('globe-btn').setAttribute('aria-pressed', String(!!state.g));
   $('events-opts').hidden = !state.ev;
-  document.querySelectorAll('input[name=evset]').forEach((i) => { i.checked = +i.value === (state.ev || 6); });
+  document.querySelectorAll('#chips [data-layer]').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.layer === state.l)));
+  $('chip-depth').textContent = state.d === 'sh' ? 'Shallow' : 'Deeper';
+  $('chip-depth').setAttribute('aria-label', `Depth: ${state.d === 'sh' ? 'shallow, 70 km or less' : 'deeper than 70 km'}. Activate to switch.`);
   syncEventControls();
 }
 
@@ -154,7 +157,10 @@ function syncEventControls() {
   $('mmin-out').textContent = mm.toFixed(1);
   $('ev-count').textContent = state.ev ? M.eventCountText() : '';
   const m5 = ctx.manifest && ctx.manifest.files['events_m5.json'];
-  if (m5) $('m5-hint').textContent = state.ev === 5 ? '' : `M5 and above loads ${f.int(ctx.manifest.events['events_m5.json'].n)} events (${mb(m5.bytes)}) when chosen.`;
+  if (m5) {
+    $('lbl-m6').textContent = `Events M ≥ 6 (${f.int(ctx.manifest.events['events_m6.json'].n)})`;
+    $('lbl-m5').textContent = `Events M ≥ 5 (${f.int(ctx.manifest.events['events_m5.json'].n)}, ${mb(m5.bytes)}, loads on demand)`;
+  }
 }
 
 function wireControls() {
@@ -164,9 +170,18 @@ function wireControls() {
   $('sub-select').addEventListener('change', (e) => { state.m = e.target.value; update(); });
   document.querySelectorAll('input[name=depth]').forEach((i) => i.addEventListener('change', () => { state.d = i.value; update(); }));
   $('chk-plates').addEventListener('change', (e) => { state.pl = e.target.checked ? 1 : 0; update(); });
-  $('chk-globe').addEventListener('change', (e) => { state.g = e.target.checked ? 1 : 0; M.setProjection(!!state.g); update(); });
+  $('globe-btn').addEventListener('click', () => { state.g = state.g ? 0 : 1; M.setProjection(!!state.g); update(); });
+  $('zoom-in').addEventListener('click', () => M.zoomBy(1));
+  $('zoom-out').addEventListener('click', () => M.zoomBy(-1));
   $('chk-events').addEventListener('change', (e) => { state.ev = e.target.checked ? 6 : 0; update(); ensureEvents(); });
-  document.querySelectorAll('input[name=evset]').forEach((i) => i.addEventListener('change', () => { state.ev = +i.value; update(); ensureEvents(); }));
+  $('chk-m5').addEventListener('change', (e) => { state.ev = e.target.checked ? 5 : (state.ev ? 6 : 0); state.mm = e.target.checked ? 5 : Math.max(6, state.mm); update(); ensureEvents(); });
+  document.querySelectorAll('#chips [data-layer]').forEach((c) => c.addEventListener('click', () => { state.l = c.dataset.layer; state.m = ''; update(); }));
+  $('chip-depth').addEventListener('click', () => { state.d = state.d === 'sh' ? 'dp' : 'sh'; update(); });
+  $('chip-more').addEventListener('click', () => {
+    const open = !$('controls').classList.contains('open');
+    $('controls').classList.toggle('open', open);
+    $('chip-more').setAttribute('aria-expanded', String(open));
+  });
   const yr = () => {
     let y0 = +$('yr0').value, y1 = +$('yr1').value;
     if (y0 > y1) { if (document.activeElement === $('yr0')) y1 = y0; else y0 = y1; }
@@ -177,11 +192,6 @@ function wireControls() {
   $('yr0').addEventListener('input', yr);
   $('yr1').addEventListener('input', yr);
   $('mmin').addEventListener('input', (e) => { state.mm = +e.target.value; update(); });
-  $('controls-toggle').addEventListener('click', () => {
-    const open = !$('controls').classList.contains('open');
-    $('controls').classList.toggle('open', open);
-    $('controls-toggle').setAttribute('aria-expanded', String(open));
-  });
   $('menu-btn').addEventListener('click', () => {
     const open = !$('nav').classList.contains('open');
     $('nav').classList.toggle('open', open);
@@ -202,10 +212,10 @@ function update() {
 function ensureEvents() {
   if (state.ev === 5) {
     $('ev-count').textContent = 'Loading M5 events…';
-    document.querySelectorAll('input[name=evset]').forEach((i) => { i.disabled = true; });
+    $('chk-m5').disabled = true;
     M.loadM5().then(() => { if (mapReady) M.applyLayers(); syncEventControls(); })
       .catch((e) => { $('ev-count').textContent = `${e.message} Showing M6 and above.`; state.ev = 6; commit(); if (mapReady) M.applyLayers(); })
-      .finally(() => document.querySelectorAll('input[name=evset]').forEach((i) => { i.disabled = false; }));
+      .finally(() => { $('chk-m5').disabled = false; syncControls(); });
   }
 }
 
@@ -218,17 +228,19 @@ function syncPanel() {
     if (key === panelFor) return;
     panelFor = key;
     renderCellList([...ctx.byId.values()], { state, onOpen: selectCell });
+    M.resize();
     return;
   }
   if (!state.c || !ctx.byId.has(state.c)) {
-    if (!$('panel').hidden) $('panel').hidden = true;
+    if (!$('panel').hidden) { $('panel').hidden = true; M.resize(); }
     panelFor = null;
     return;
   }
   const key = `${state.c}|${state.d}`;
   if (key === panelFor) return;
   panelFor = key;
-  renderPanel(ctx.byId.get(state.c), { state, manifest: ctx.manifest, onDepth: (d) => { state.d = d; update(); } });
+  renderPanel(ctx.byId.get(state.c), { state, manifest: ctx.manifest });
+  M.resize();
 }
 
 function selectCell(id) {
@@ -272,8 +284,8 @@ async function start() {
   const status = $('map-status');
   try {
     ctx.manifest = await getJSON('manifest.json');
-    $('brand-meta').textContent = `Data to ${ctx.manifest.data_cutoff_utc}`;
-    $('disclaimer-strip').title = ctx.manifest.disclaimer;
+    $('brand-meta').textContent = `v${ctx.manifest.version} · data to ${ctx.manifest.data_cutoff_utc}`;
+    $('stat-window').textContent = ctx.manifest.method.b_catalogue.replace('-', '–');
     const files = ['cells.geojson', 'land.geojson', 'coastline.geojson', 'plates.geojson'];
     const total = files.reduce((s, k) => s + ctx.manifest.files[k].bytes, 0);
     let done = 0;

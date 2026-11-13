@@ -26,9 +26,35 @@ Browser, GEM OpenQuake map viewer; EMSC from earlier use). What we take, and wha
 
 ## Design decisions
 
-- One typeface, Atkinson Hyperlegible Next (vendored, SIL OFL), chosen for digit legibility: readers compare
-  numbers such as 0.98 and 1.08, and 1/l/I and 0/O must not be confused.
-- Cool, neutral base map (pale ocean, near-white land, hairline coast, dark plate lines) so that the data colours
-  are the only saturated colour on screen. Dark mode uses its own steps, not an inverted light map.
-- Chart colours, marks and hover follow the `dataviz` method: 2 px lines, ≥ 8 px markers with a surface ring,
-  hairline grid, a legend for two or more series, a crosshair tooltip, and a data table under every chart.
+- **Design reference.** The look and structure follow the design mock-ups made for this project (desktop map with a
+  selected cell, 390 × 844 bottom sheet, validation page): header with a version and cut-off label, a persistent
+  disclaimer strip, a left control rail, a legend card on the map, and a right cell panel with b in large mono
+  type, an interval-on-scale bar, a 2 × 2 tile grid, a cumulative FMD with a dashed Mc line and a catalogue
+  agreement list. On phones: a chip row for layers and a bottom sheet with a "Full details and charts" button.
+- **Tokens.** Inter for the interface and IBM Plex Mono for every number (both vendored, SIL OFL). Warm neutral
+  base (page `#F7F6F2`, ocean `#F4F3EF`, land `#E4E1D9`), one UI accent (`#0E6B73`) that never encodes data, and a
+  dark theme derived from the same roles. b classes use the six-step blue to orange-brown palette centred on
+  b = 1; quality B is the same colour at about 55 % opacity, C is hatched, insufficient is a light grey wash.
+- **Charts** follow the `dataviz` method: 2 px lines, markers with a surface ring, hairline grid, a legend for two
+  or more series, a crosshair or per-mark tooltip that also works with the arrow keys, and a data table under every
+  chart. The categorical chart colours were run through the dataviz validator (all-pairs, both modes): pass; the
+  aqua slot is below 3:1 on white, so the data tables are the required relief.
+
+## ui-ux-pro-max
+
+- `--design-system` for "scientific data atlas map research" returned **Minimalism & Swiss Style** (kept: clean,
+  grid-based, functional). Its palette (red primary `#FF4D4D`) and fonts (Exo + Roboto Mono) were **not used**: a
+  red primary reads as alarm on a map that must not look like a hazard map, and the project's design reference
+  sets Inter + IBM Plex Mono.
+- Chart guidance for geographic data: "pair fills with boundaries or patterns; location meaning cannot depend on
+  colour alone; a11y fallback: a region table". Applied: hatch for C cells, values in the tooltip, and a
+  **sortable table of every cell with a b-value** (link under the layer list) that opens each cell.
+- Pre-delivery checklist outcome:
+  - No emoji icons; all icons are inline SVG with one stroke weight. Pass.
+  - Touch targets ≥ 44 px on phones (layer chips, map buttons, close and menu buttons, list rows). Pass.
+  - Contrast (computed, WCAG 2): body and muted text ≥ 5.6:1, accent on white 6.2:1, disclaimer 8.8:1, verdict
+    pills ≥ 7.1:1 in light and ≥ 8.0:1 in dark. Pass.
+  - Visible focus ring on every control; keyboard reaches depth, layers, overlays and theme (tested). Pass.
+  - `prefers-reduced-motion` disables animations. Not tested in a browser.
+  - Responsive: tested at 1440 × 900 and 390 × 844, no horizontal scroll on any page (tested). Landscape and
+    Dynamic Type were not tested.
