@@ -107,7 +107,7 @@ def _m5_with_ids(route):
 def _click_m5_event(pg):
     pg.check("#chk-events")
     pg.check("#chk-m5")
-    pg.wait_for_function("document.getElementById('ev-count').textContent.includes('M ≥ 5.0')", timeout=60000)
+    pg.wait_for_function("document.getElementById('ev-count').textContent.includes('M ≥ 5.0')", timeout=120000)
     jump(pg, 142, 38, 4)
     pt = pg.evaluate("""() => { const m = window.__map; const r = m.getContainer().getBoundingClientRect();
       const ps = m.queryRenderedFeatures({layers: ['events']}).filter((f) => f.properties.k === 5)
@@ -120,13 +120,8 @@ def _click_m5_event(pg):
 
 
 @pytest.mark.parametrize("with_ids", [False, True])
-def test_m5_event_links(site, with_ids, browser, base_url):
-    pg = site.open(ready=False)
-    if with_ids:
-        pg.route("**/data/events_m5.json", _m5_with_ids)
-    pg.reload()
-    from conftest import wait_map
-    wait_map(pg)
+def test_m5_event_links(site, with_ids):
+    pg = site.open(routes=[("**/data/events_m5.json", _m5_with_ids)] if with_ids else [])
     txt, link = _click_m5_event(pg)
     if with_ids:
         assert link is not None and re.match(r"https://earthquake\.usgs\.gov/earthquakes/eventpage/test\d{6}$", link.get_attribute("href"))

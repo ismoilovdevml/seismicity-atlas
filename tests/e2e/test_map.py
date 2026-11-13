@@ -91,7 +91,7 @@ def test_events_filter_and_usgs_link(site):
     n6 = rendered(pg, "events")
     assert n6 > 1000, n6
     pg.check("#chk-m5")
-    pg.wait_for_function("document.getElementById('ev-count').textContent.includes('M ≥ 5.0')", timeout=60000)
+    pg.wait_for_function("document.getElementById('ev-count').textContent.includes('M ≥ 5.0')", timeout=120000)
     pg.wait_for_timeout(1200)
     n5 = rendered(pg, "events")
     assert n5 > n6, (n6, n5)

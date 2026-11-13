@@ -82,13 +82,15 @@ class Site:
         self.base = base_url
         self.pages = []
 
-    def open(self, hash_="", viewport="desktop", scheme="light", regional=False, ready=True, locale="en-US"):
+    def open(self, hash_="", viewport="desktop", scheme="light", regional=False, ready=True, locale="en-US", routes=()):
         w, h = VIEWPORTS[viewport]
         ctx = self.browser.new_context(viewport={"width": w, "height": h}, color_scheme=scheme, locale=locale,
                                        accept_downloads=True)
         ctx.add_init_script(TEST_HOOK)
         if regional:
             ctx.route("**/data/regional/**", _serve_fixture)
+        for pattern, handler in routes:
+            ctx.route(pattern, handler)
         pg = ctx.new_page()
         pg.errors = []
         pg.on("pageerror", lambda e: pg.errors.append(f"pageerror: {e}")
