@@ -18,7 +18,7 @@ General rules
 
 | File | Load | Content |
 |---|---|---|
-| `manifest.json` | first | version, data cut-off, sources, licences, file list with byte sizes, global numbers |
+| `manifest.json` | first | version, data cut-off, sources, licences, file list with byte sizes, global numbers (version and cut-off come from `scripts/release.json`; see [release.md](release.md)) |
 | `cells.geojson` | first | one Polygon feature per H3 resolution-2 cell that holds at least one event |
 | `events_m6.json` | first | deduplicated events M ≥ 6.0, columnar |
 | `events_m5.json` | lazy | deduplicated events M ≥ 5.0, columnar (superset of `events_m6.json`) |
@@ -78,7 +78,7 @@ Catalogue consistency (matched ISC-GEM ↔ ComCat events located in the cell, 19
 Columnar JSON, one array per field, same length:
 
 ```json
-{"n": 123, "fields": ["lon","lat","depth","mag","year","src","mt"],
+{"n": 123, "fields": ["lon","lat","depth","mag","year","src","mt","id"],
  "codes": {"src": {...}, "mt": {...}}, "lon": [...], "lat": [...], ...}
 ```
 
@@ -90,7 +90,7 @@ Columnar JSON, one array per field, same length:
 | `year` | decimal year, 3 decimals | origin time |
 | `src` | code | 0 = both catalogues, 1 = ISC-GEM only, 2 = ComCat only |
 | `mt` | code | 0 = ISC-GEM Mw, 1 = ComCat Mw-type, 2 = ComCat mb → Mw proxy, 3 = ComCat Ms → Mw proxy, 4 = ComCat other (ml, md, ...) unchanged |
-| `id` | string (`events_m6.json` only) | ComCat event id (`https://earthquake.usgs.gov/earthquakes/eventpage/<id>`) |
+| `id` | string | ComCat event id (`https://earthquake.usgs.gov/earthquakes/eventpage/<id>`): the matched ComCat event for `src` 0 and 2; for `src` 1 (ISC-GEM only) the `iscgem<ISC event id>` form that ComCat uses for its ISC-GEM mirror. Present in both files (earlier copies of `events_m5.json` lacked it). |
 
 ## `cells/<h3>.json`
 
@@ -99,17 +99,20 @@ Columnar JSON, one array per field, same length:
  "sh": {"fmd_iscgem": [[m, n], ...], "fmd_comcat": [[m, n], ...],
         "mc_t_iscgem": [[y0, y1, n, mc|null], ...], "mc_t_comcat": [[y0, y1, n, mc|null], ...],
         "b_cutoff": [[mc, b, lo, hi, n], ...],
-        "rate_years": [1973, 2026], "rate_iscgem_above_thr": [...], "rate_comcat_m45": [...],
+        "rate_years": [1973, <cut-off year>], "rate_iscgem_above_thr": [...], "rate_comcat_m45": [...],
         "stats": {...}},
  "dp": {...}}
 ```
 
 - `fmd_*`: non-cumulative counts per 0.1 bin (ISC-GEM 1976–2021 in Mw; ComCat 1973–cut-off as served). The site
   derives the cumulative curve.
-- `mc_t_iscgem`: MAXC + 0.2 in 10-year windows over 1904–2021; `mc_t_comcat`: 5-year windows, as served; `null`
-  when a window has fewer than 50 events.
+- `mc_t_iscgem`: MAXC + 0.2 in 10-year windows over 1904–2021; `mc_t_comcat`: 5-year windows from 1973 to the
+  cut-off year, as served; `null` when a window has fewer than 50 events.
 - `b_cutoff`: b for fixed cutoffs 5.0–7.0 (threshold max(cutoff, period floor)), Shi-Bolt ±1.96 σ, n ≥ 30.
-- `rate_*`: yearly counts 1973–2026; ISC-GEM counts are events above their threshold (1976–2021 only).
+- `rate_*`: yearly counts for every year in `rate_years` (1973 to the cut-off year, inclusive; the cut-off year is
+  partial). `rate_iscgem_above_thr` counts ISC-GEM events above their threshold; it covers only the b period
+  1976–2021 (`manifest.json` → `method.b_catalogue`) and is `null` for the other years (no data, not zero). A `0`
+  inside the period is a real zero. An empty array means the cell has no estimate for that depth class.
 - `stats`: the full output of the cell estimator (raw b, interval, Mc interval, quality) for that depth class.
 - A depth key is absent when the circle holds fewer than 20 ISC-GEM and fewer than 50 ComCat events.
 

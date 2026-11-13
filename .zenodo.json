@@ -1,0 +1,44 @@
+{
+  "title": "Global Seismicity Atlas",
+  "description": "An open, reproducible world map of earthquake-catalogue statistics built from free global catalogues (ISC-GEM and USGS ComCat): magnitude of completeness (Mc) and its change over time, Gutenberg-Richter b-value with 95 % intervals and quality codes, ISC-GEM vs ComCat consistency, and Omori-Utsu parameters for major aftershock sequences since 1990. Includes the analysis code, the website data files and the validation against published values. Descriptive catalogue statistics for research and education: not an earthquake forecast and not a seismic hazard map. Live site: https://ismoilovdevml.github.io/seismicity-atlas/",
+  "upload_type": "software",
+  "creators": [
+    {
+      "name": "ismoilovdevml"
+    }
+  ],
+  "license": "MIT",
+  "access_right": "open",
+  "keywords": [
+    "seismology",
+    "earthquake catalogue",
+    "b-value",
+    "magnitude of completeness",
+    "Gutenberg-Richter",
+    "Omori-Utsu",
+    "ISC-GEM",
+    "ComCat",
+    "open data"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.31905/D808B825",
+      "relation": "isDerivedFrom",
+      "resource_type": "dataset",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "https://earthquake.usgs.gov/data/comcat/",
+      "relation": "isDerivedFrom",
+      "resource_type": "dataset",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://ismoilovdevml.github.io/seismicity-atlas/",
+      "relation": "isDocumentedBy",
+      "resource_type": "other",
+      "scheme": "url"
+    }
+  ],
+  "notes": "Code: MIT. Data and figures (site/data, docs/img, results): CC BY-SA 4.0, derived from the ISC-GEM catalogue (CC BY-SA 3.0). Please also cite ISC-GEM (doi:10.31905/D808B825; Storchak et al. 2013; Di Giacomo et al. 2018) and USGS ComCat."
+}
