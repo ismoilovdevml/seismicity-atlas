@@ -333,6 +333,8 @@ function renderLegend(def) {
       h('strong', { text: t('reg.legendHead', { name: r.name }) }),
       h('span', { text: t('reg.legend', { catalogue: r.catalogue, licence: r.licence, p0: (r.period || [])[0] ?? '–', p1: (r.period || [])[1] ?? '–', mc: r.mc_typical ?? '–' }) }),
       st.l !== 'b' ? h('span', { text: t('reg.alwaysB') }) : null,
+      r.attribution ? h('span', { text: `${t('reg.attribution')}: ${r.attribution}` }) : null,
+      r.caveat ? h('span', { text: `${t('reg.caveat')}: ${r.caveat}` }) : null,
       h('span', { class: 'lg-count', text: t('reg.cells', { n: f.int(region.n), pass: f.int(region.pass) }) })));
   }
   if (extra.length) kids.push(h('div', { class: 'lg-extra' }, extra));
@@ -505,7 +507,11 @@ export function clearRegion() {
 export function fitBbox([w, s, e, n]) {
   if (!map) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  map.fitBounds([[w, s], [e, n]], { padding: { top: 40, bottom: 40, left: 40, right: innerWidth > 720 ? 80 : 40 }, maxZoom: 7, duration: reduce ? 0 : 900 });
+  // keep the region clear of the legend card (bottom left on desktop, top left on phones)
+  const wide = innerWidth > 720;
+  const legend = document.getElementById('legend');
+  const lw = legend ? legend.offsetWidth + 32 : 40;
+  map.fitBounds([[w, s], [e, n]], { padding: { top: wide ? 40 : 60, bottom: 40, left: wide ? Math.min(lw, map.getContainer().clientWidth / 2) : 40, right: wide ? 80 : 40 }, maxZoom: 7, duration: reduce ? 0 : 900 });
 }
 
 /** Regional cells always use the b-value classes and the same quality rules as the global b layer. */

@@ -536,3 +536,6 @@ details.method pre { white-space: pre-wrap; font-family: var(--mono); font-size:
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 @media (forced-colors: active) { .sw, .key, .lg-bar div { forced-color-adjust: none; } }
+.vtable td.num.long { white-space: normal; min-width: 18ch; max-width: 36ch; overflow-wrap: anywhere; }
+.vtable .detail, .vtable td { overflow-wrap: anywhere; }
+.reg-dd { font-family: var(--font) !important; text-align: right; overflow-wrap: anywhere; }

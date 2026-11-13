@@ -117,6 +117,8 @@ const VERDICTS = [
   [/^not testable/i, 'na', 'na'],
   [/^lower by/i, '', 'lower'],
   [/^reference only/i, '', 'ref'],
+  [/^description only/i, '', 'desc'],
+  [/^robust/i, 'ok', 'robust'],
 ];
 
 function verdictEl(text) {
@@ -150,7 +152,7 @@ function drawMethods(root, g, sq, man) {
   const tb = h('tbody');
   for (const r of vt) {
     const v = verdictEl(r.verdict);
-    tb.append(h('tr', {}, h('td', { 'data-h': t('val.colTest'), text: r.test }), h('td', { class: 'num', 'data-h': t('val.colOurs'), text: r.ours }), h('td', { 'data-h': t('val.colPub'), text: r.published }), h('td', { 'data-h': t('val.colVerdict') }, v.el, h('div', { class: 'detail', text: r.verdict }))));
+    tb.append(h('tr', {}, h('td', { 'data-h': t('val.colTest'), text: r.test }), h('td', { class: String(r.ours).length > 32 ? 'num long' : 'num', 'data-h': t('val.colOurs'), text: r.ours }), h('td', { 'data-h': t('val.colPub'), text: r.published }), h('td', { 'data-h': t('val.colVerdict') }, v.el, h('div', { class: 'detail', text: r.verdict }))));
   }
   out.push(h('section', {}, h('h2', { text: t('val.all') }),
     h('div', { class: 'table-card' }, h('table', { class: 'vtable' }, h('caption', { class: 'sr-only', text: t('val.caption') }), h('thead', {}, h('tr', {}, [t('val.colTest'), t('val.colOurs'), t('val.colPub'), t('val.colVerdict')].map((c) => h('th', { scope: 'col', text: c })))), tb)),

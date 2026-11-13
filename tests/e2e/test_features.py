@@ -155,6 +155,7 @@ def test_regional_layer_from_fixture(site, viewport):
     if viewport == "desktop":
         leg = pg.inner_text("#legend")
         assert "Synthetic test catalogue" in leg and "CC0 (test fixture)" in leg and "Fixture region" in leg
+        assert "Test attribution line" in leg and "Test caveat" in leg
     else:
         pg.click("#chip-more")
     # open the regional cell that has a detail file
@@ -164,9 +165,12 @@ def test_regional_layer_from_fixture(site, viewport):
     pg.wait_for_function("location.hash.includes('c=832834fffffffff')")
     if viewport == "phone":
         pg.click("text=Full details and charts")
-    pg.wait_for_selector("#panel-body .chart-svg >> nth=1", timeout=10000)
+    pg.wait_for_selector("#panel-body .chart-svg >> nth=3", timeout=10000)
     txt = pg.inner_text("#panel")
     assert "Synthetic test catalogue" in txt and "Catalogue agreement" not in txt
+    assert "Test caveat: synthetic values only." in txt and "Test attribution line" in txt and "ML (synthetic)" in txt
+    # Mc comes from the detail file's stats for regional cells
+    assert re.search(r"Mc\s+2\.5\s*\(2\.4–2\.7\)", txt), txt[:400]
     ok, r = no_hscroll(pg)
     assert ok, r
     # the regional selection survives a reload from the URL
@@ -203,3 +207,23 @@ def test_language_switcher_round_trip(site):
     pg.select_option("#lang-select", "en")
     pg.wait_for_function("!location.hash.includes('lang=') && document.documentElement.lang === 'en'")
     assert "b-value" in pg.inner_text("#legend") and "2,598" in pg.inner_text("#legend")
+
+
+def _long_validation(route):
+    g = json.load(open(SITE / "data/global.json"))
+    row = dict(g["validation_table"][0])
+    row.update(test="Time windows around large mainshocks, per cell (long test row)",
+               ours="shown (A/B) per window {'pre_5y': 3, 'pre_1y': 0, 'post_0_30d': 2, 'post_30_365d': 2}; 1 pair(s) with both shown; median post - pre +0.032; 0 with separated intervals",
+               verdict="match (global vs local map) [needs a published regional comparison with the same magnitude type and window]")
+    g["validation_table"] = g["validation_table"] + [row] * 20
+    route.fulfill(status=200, body=json.dumps(g), content_type="application/json")
+
+
+@pytest.mark.parametrize("viewport", ["desktop", "phone"])
+def test_validation_page_wraps_long_rows(site, viewport):
+    pg = site.open("#v=methods", viewport=viewport, ready=False, routes=[("**/data/global.json", _long_validation)])
+    pg.wait_for_function("document.querySelectorAll('.vtable tbody tr').length > 20", timeout=20000)
+    ok, r = no_hscroll(pg)
+    assert ok, r
+    over = pg.evaluate("""() => { const c = document.querySelector('.table-card'); return [c.scrollWidth, c.clientWidth]; }""")
+    assert over[0] <= over[1] + 1, over

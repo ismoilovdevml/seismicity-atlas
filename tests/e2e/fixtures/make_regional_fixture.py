@@ -20,8 +20,9 @@ def main():
         ring = [[round(x, 4), round(y, 4)] for y, x in h3.cell_to_boundary(c)]
         ring.append(ring[0])
         q = ["A", "B", "C", "insufficient"][i % 4]
-        p = {"id": c, "lat": round(lat, 3), "lon": round(lon, 3), "detail": i == 0,
-             "sh_q": q, "sh_n": 400 - 10 * i, "sh_nb": 300 - 10 * i, "sh_mc": 2.5, "sh_mc_lo": 2.4, "sh_mc_hi": 2.7}
+        # like the real regional files: Mc is only in the detail file (stats), not in the cell properties
+        p = {"id": c, "lat": round(lat, 3), "lon": round(lon, 3), "detail": i == 0, "magtype": "ML",
+             "sh_q": q, "sh_n": 400 - 10 * i, "sh_nb": 300 - 10 * i}
         if q in ("A", "B"):
             b = 0.8 + 0.03 * i
             w = 0.12 if q == "A" else 0.2
@@ -33,11 +34,20 @@ def main():
     (OUT / RID / "cells.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": feats}))
     first = feats[0]["properties"]
     det = {"h3": first["id"], "lat": first["lat"], "lon": first["lon"],
-           "sh": {"fmd": [[round(2.5 + 0.1 * k, 1), max(1, int(200 * 10 ** (-0.9 * 0.1 * k)))] for k in range(30)],
-                  "b_cutoff": [[2.5, 0.83, 0.71, 0.95, 280], [2.8, 0.85, 0.70, 1.00, 160], [3.1, 0.88, 0.69, 1.07, 90]]}}
+           "radius_km": 30.0, "magtype": "ML", "periods": [[2000, 2010], [2011, 2020]],
+           "sh": {"fmd": [[round(1.0 + 0.1 * k, 1), max(1, int(200 * 10 ** (-0.9 * 0.1 * k)))] for k in range(30)],
+                  "mc_t": [[y, y, 20 + y % 7, 2.4 if y % 3 else None] for y in range(2000, 2021)],
+                  "mc_periods": [[2000, 2010, 160, 2.6], [2011, 2020, 170, 2.4]],
+                  "b_cutoff": [[2.5, 0.83, 0.71, 0.95, 280], [2.8, 0.85, 0.70, 1.00, 160], [3.1, 0.88, 0.69, 1.07, 90]],
+                  "rate_years": [2000, 2020], "rate_above_thr": [8 + y % 5 for y in range(21)],
+                  "rate_all": [20 + y % 9 for y in range(21)],
+                  "stats": {"n_sample": 330, "mc": 2.5, "mc_lo": 2.4, "mc_hi": 2.7}}}
     (OUT / RID / "cells" / f"{first['id']}.json").write_text(json.dumps(det))
     index = {"regions": [{"id": RID, "name": "Fixture region (synthetic)", "bbox": [-124.0, 33.0, -115.0, 40.0],
                           "catalogue": "Synthetic test catalogue", "licence": "CC0 (test fixture)",
+                          "attribution": "Test attribution line", "source_url": "https://example.org/catalogue",
+                          "caveat": "Test caveat: synthetic values only.", "magtype": "ML (synthetic)",
+                          "h3_res": 3, "radius_km": 30.0, "summary": f"regional/{RID}/summary.json",
                           "period": ["2000-01-01", "2020-12-31"], "mc_typical": 2.5,
                           "cells": f"regional/{RID}/cells.geojson", "cell_detail_dir": f"regional/{RID}/cells/"}]}
     (OUT / "index.json").write_text(json.dumps(index, indent=1))

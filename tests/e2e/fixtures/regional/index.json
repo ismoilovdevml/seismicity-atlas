@@ -11,6 +11,13 @@
    ],
    "catalogue": "Synthetic test catalogue",
    "licence": "CC0 (test fixture)",
+   "attribution": "Test attribution line",
+   "source_url": "https://example.org/catalogue",
+   "caveat": "Test caveat: synthetic values only.",
+   "magtype": "ML (synthetic)",
+   "h3_res": 3,
+   "radius_km": 30.0,
+   "summary": "regional/fixture-ca/summary.json",
    "period": [
     "2000-01-01",
     "2020-12-31"

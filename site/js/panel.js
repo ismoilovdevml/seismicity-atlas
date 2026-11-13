@@ -62,7 +62,8 @@ export function renderPanel(p, ctx) {
     top.append(h('div', { class: 'withheld' }, h('strong', { text: t(`panel.noB.${d}`) }), h('p', { text: why }), qPill(q)));
   }
   const tiles = h('div', { class: 'tiles' });
-  tiles.append(tile(reg ? 'Mc' : t('panel.mcIg'), p[`${d}_mc`] !== undefined ? f.mag(p[`${d}_mc`]) : '–', p[`${d}_mc`] !== undefined && p[`${d}_mc_lo`] !== undefined ? `(${f.mag(p[`${d}_mc_lo`])}–${f.mag(p[`${d}_mc_hi`])})` : ''));
+  const mcTile = tile(reg ? 'Mc' : t('panel.mcIg'), p[`${d}_mc`] !== undefined ? f.mag(p[`${d}_mc`]) : '–', p[`${d}_mc`] !== undefined && p[`${d}_mc_lo`] !== undefined ? `(${f.mag(p[`${d}_mc_lo`])}–${f.mag(p[`${d}_mc_hi`])})` : '');
+  tiles.append(mcTile);
   if (reg) tiles.append(tile(t('panel.nAboveMc'), f.int(p[`${d}_nb`])));
   else tiles.append(tile(t('panel.mcCc'), p[`${d}_mc_cc`] !== undefined ? f.mag(p[`${d}_mc_cc`]) : '–'));
   if (q === 'A' || q === 'B') {
@@ -85,6 +86,7 @@ export function renderPanel(p, ctx) {
   const charts = h('div', { style: 'display:contents' });
   full.append(charts);
   if (!reg) full.append(agreementSection(p, ctx));
+  else full.append(regionalSource(reg));
   const detailPath = reg ? (reg.cell_detail_dir ? `${reg.cell_detail_dir.replace(/\/?$/, '/')}${p.id}.json` : null) : `cells/${p.id}.json`;
   const hasDetail = !!(p.detail && detailPath);
   const pinned = ctx.state.k === p.id;
@@ -105,6 +107,11 @@ export function renderPanel(p, ctx) {
     charts.replaceChildren(h('section', {}, h('div', { class: 'loading', role: 'status', text: t('panel.loadingCharts') })));
     getJSON(detailPath).then((det) => {
       if (my !== token) return;
+      if (reg && p[`${d}_mc`] === undefined && det[d] && det[d].stats && f.isNum(det[d].stats.mc)) {
+        // regional cells carry Mc in the detail file only
+        const st = det[d].stats;
+        mcTile.querySelector('.v').replaceChildren(f.mag(st.mc), f.isNum(st.mc_lo) ? h('small', { text: ` (${f.mag(st.mc_lo)}–${f.mag(st.mc_hi)})` }) : '');
+      }
       charts.replaceChildren(...(reg ? regionalCharts(p, det, d, reg) : detailCharts(p, det, d, ctx)));
     }).catch((e) => {
       if (my !== token) return;
@@ -273,21 +280,41 @@ export function renderCellList(cells, ctx) {
   body.replaceChildren(h('p', { class: 'hint', text: t(ctx.state.k ? 'list.hintCompare' : 'list.hint') }), sel, table);
 }
 
-/** Regional cells: the FMD of every catalogue in the detail file, and b against cutoff when present. */
+/** Where a regional cell's numbers come from: catalogue, magnitude type, licence, attribution and caveat. */
+function regionalSource(reg) {
+  const dl = h('dl', { class: 'agree' });
+  const row = (k, v) => { if (v !== undefined && v !== null && v !== '') dl.append(h('dt', { text: k }), h('dd', { class: 'reg-dd', text: String(v) })); };
+  row(t('reg.catalogue'), reg.catalogue);
+  row(t('reg.magtype'), reg.magtype);
+  row(t('about.licence'), reg.licence);
+  row(t('reg.period'), Array.isArray(reg.period) ? t('about.range', { a: reg.period[0], b: reg.period[1] }) : null);
+  row(t('reg.radius'), f.isNum(reg.radius_km) ? f.km(reg.radius_km) : null);
+  const sec = h('section', {}, h('h3', { text: t('reg.sourceH') }), dl);
+  if (reg.attribution) sec.append(h('p', { class: 'hint' }, `${t('reg.attribution')}: ${reg.attribution}`));
+  if (reg.caveat) sec.append(h('p', { class: 'plain', text: `${t('reg.caveat')}: ${reg.caveat}` }));
+  if (typeof reg.source_url === 'string' && /^https:\/\//.test(reg.source_url)) sec.append(h('a', { href: reg.source_url, target: '_blank', rel: 'noopener', text: t('reg.source') }));
+  return sec;
+}
+
+/**
+ * Regional cells (one catalogue per region). Detail keys: fmd, mc_t, mc_periods, b_cutoff, rate_years,
+ * rate_above_thr, rate_all, stats. Older fmd_* keys are also accepted.
+ */
 function regionalCharts(p, det, d, reg) {
   const dd = det[d];
   if (!dd) return [h('section', {}, h('p', { class: 'hint', text: t('panel.noDepth', { depth: f.depthShort(d) }) }))];
   const out = [];
+  const mt = det.magtype || reg.magtype || '';
   const cum = (pairs) => { const o = []; let s = 0; for (let i = pairs.length - 1; i >= 0; i--) { s += pairs[i][1]; o.unshift([pairs[i][0], s]); } return o; };
-  const keys = Object.keys(dd).filter((k) => k.startsWith('fmd') && Array.isArray(dd[k]) && dd[k].length);
+  const keys = Object.keys(dd).filter((k) => /^fmd(_|$)/.test(k) && Array.isArray(dd[k]) && dd[k].length);
   const colors = ['var(--s1)', 'var(--s2)', 'var(--s3)'];
   const series = keys.slice(0, 3).map((k, i) => ({ key: 'line', name: k === 'fmd' ? reg.catalogue : k.replace(/^fmd_/, ''), color: colors[i], type: 'line', points: cum(dd[k]), fmt: (v) => `N = ${f.int(v)}` }));
+  const mc = f.isNum(p[`${d}_mc`]) ? p[`${d}_mc`] : (dd.stats && f.isNum(dd.stats.mc) ? dd.stats.mc : undefined);
   if (series.length) {
     const pts = series.flatMap((s) => s.points);
     const ms = pts.map((x) => x[0]), ns = pts.map((x) => x[1]).filter((n) => n > 0);
-    const mc = p[`${d}_mc`];
     out.push(h('section', {}, h('h3', { text: t('fmd.h') }), xyChart({
-      title: t('fmd.title'), sub: reg.catalogue, alt: t('fmd.alt'),
+      title: t('fmd.title'), sub: [reg.catalogue, mt].filter(Boolean).join('. '), alt: t('fmd.alt'),
       x: { domain: [Math.floor(Math.min(...ms) * 10) / 10 - 0.1, Math.ceil(Math.max(...ms) * 10) / 10 + 0.1], label: t('axis.magnitude') },
       y: { type: 'log', domain: [0.8, Math.max(...ns) * 1.5] },
       series,
@@ -296,20 +323,46 @@ function regionalCharts(p, det, d, reg) {
       table: { columns: ['M', ...series.map((s) => `${s.name} N ≥ M`)], rows: [...new Set(ms)].sort((a, b) => a - b).map((m) => [f.mag(m), ...series.map((s) => f.int((s.points.find((x) => x[0] === m) || [])[1]))]) },
     })));
   }
+  const mcSegs = (Array.isArray(dd.mc_periods) && dd.mc_periods.length ? dd.mc_periods : Array.isArray(dd.mc_t) ? dd.mc_t : [])
+    .map(([y0, y1, n, m]) => [y0, y1 + 1, m, n]);
+  const mcVals = mcSegs.map((s) => s[2]).filter(f.isNum);
+  if (mcVals.length) {
+    out.push(h('section', {}, h('h3', { text: t('mct.h') }), xyChart({
+      title: t('mct.title'), sub: t('reg.mctSub'), alt: t('mct.alt'), height: 150,
+      x: { domain: [Math.min(...mcSegs.map((s) => s[0])) - 1, Math.max(...mcSegs.map((s) => s[1])) + 1], label: t('axis.year') },
+      y: { domain: padDomain(Math.min(...mcVals) - 0.1, Math.max(...mcVals) + 0.1, 0.05) },
+      series: [{ name: 'Mc', color: 'var(--s1)', type: 'segments', segs: mcSegs.map((s) => [s[0], s[1], s[2]]), fmt: (v, x) => { const g = mcSegs.find((s) => x >= s[0] && x <= s[1]); return `Mc ${f.mag(v)} (${g[0]}–${g[1] - 1}, n = ${f.int(g[3])})`; } }],
+      hoverTitle: (x) => t('mct.around', { y: Math.round(x) }),
+      table: { columns: [t('col.window'), t('col.events'), 'Mc'], rows: mcSegs.map((s) => [`${s[0]}–${s[1] - 1}`, f.int(s[3]), f.isNum(s[2]) ? f.mag(s[2]) : t('mct.few')]) },
+    })));
+  }
   const q = p[`${d}_q`];
   if ((q === 'A' || q === 'B') && Array.isArray(dd.b_cutoff) && dd.b_cutoff.length) {
     const bc = dd.b_cutoff;
     const lo = Math.min(...bc.map((r) => r[2])), hi = Math.max(...bc.map((r) => r[3]));
     out.push(h('section', {}, h('h3', { text: t('bc.h') }), xyChart({
       title: t('bc.title'), alt: t('bc.alt'), height: 170,
-      x: { domain: [bc[0][0] - 0.05, bc[bc.length - 1][0] + 0.05], label: 'M' },
+      x: { domain: [bc[0][0] - 0.05, bc[bc.length - 1][0] + 0.05], label: t('axis.magnitude') },
       y: { domain: padDomain(Math.min(lo, 0.9), Math.max(hi, 1.1), 0.04) },
-      series: [{ name: 'b', color: 'var(--s1)', type: 'linedots', points: bc.map((r) => [r[0], r[1]]), band: bc.map((r) => [r[0], r[2], r[3]]), r: 3, noLegend: true, fmt: (v, x) => { const r = bc.find((y) => y[0] === x); return `b ${f.interval(r[1], r[2], r[3])}`; } }],
+      series: [{ name: 'b', color: 'var(--s1)', type: 'linedots', points: bc.map((r) => [r[0], r[1]]), band: bc.map((r) => [r[0], r[2], r[3]]), r: 3, noLegend: true, fmt: (v, x) => { const r = bc.find((y) => y[0] === x); return `b ${f.interval(r[1], r[2], r[3])}${r[4] !== undefined ? `, n = ${f.int(r[4])}` : ''}`; } }],
       yRules: [{ value: 1, label: 'b = 1' }],
       hoverTitle: (x) => t('bc.cutoff', { m: f.mag(x) }),
-      table: { columns: [t('col.cutoff'), 'b', t('col.lo95'), t('col.hi95')], rows: bc.map((r) => [f.mag(r[0]), f.b2(r[1]), f.b2(r[2]), f.b2(r[3])]) },
+      table: { columns: [t('col.cutoff'), 'b', t('col.lo95'), t('col.hi95'), 'n'], rows: bc.map((r) => [f.mag(r[0]), f.b2(r[1]), f.b2(r[2]), f.b2(r[3]), f.int(r[4])]) },
+      note: t('bc.noteReg', { q }),
     })));
   }
-  if (!out.length) out.push(h('section', {}, h('p', { class: 'hint', text: t('panel.noDetail') })));
+  const [ry0] = dd.rate_years || [];
+  if (f.isNum(ry0)) {
+    const sec = h('section', {}, h('h3', { text: t('yr.h') }));
+    for (const [k, title, color] of [['rate_all', t('reg.rateAll'), 'var(--s2)'], ['rate_above_thr', t('reg.rateAbove'), 'var(--s1)']]) {
+      if (!Array.isArray(dd[k]) || !dd[k].length) continue;
+      sec.append(sparkColumns({
+        title, alt: title, x0: ry0, values: dd[k], color, unit: t('yr.unit'),
+        table: { columns: [t('col.year'), t('col.events')], rows: dd[k].map((v, i) => [String(ry0 + i), v === null ? t('yr.nodata') : f.int(v)]) },
+      }));
+    }
+    if (sec.children.length > 1) out.push(sec);
+  }
+  if (!out.length) out.push(h('section', {}, h('p', { class: 'hint', text: t('panel.noDetailReg') })));
   return out;
 }

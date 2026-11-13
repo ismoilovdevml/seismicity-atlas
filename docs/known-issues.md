@@ -30,8 +30,17 @@ Status on 2026-11-13 (branch with the browser suite, comparison, CSV, regional l
 - **Regional layer scope.** Regional cells are always drawn with the b-value classes and quality rules, whatever the
   global layer; the legend says so. Mc, agreement and rate are not drawn for regional cells, because their scales are
   for teleseismic catalogues. The regional panel shows b, Mc, the FMD of every `fmd*` series in the detail file and
-  b against cutoff when present; it has no catalogue-agreement section. The regional contract was tested only with a
-  synthetic fixture (`tests/e2e/fixtures/regional/`), not with a real regional catalogue.
+  b against cutoff when present; it has no catalogue-agreement section. Regional detail files use the keys `fmd`,
+  `mc_t`, `mc_periods`, `b_cutoff`, `rate_years`, `rate_above_thr`, `rate_all` and `stats` (one catalogue per
+  region); regional cell properties carry no Mc, so the Mc tile is filled from `stats.mc` once the detail file has
+  loaded. The panel and the legend show the index fields `catalogue`, `magtype`, `licence`, `period`, `radius_km`,
+  `attribution`, `caveat` and `source_url`. The committed tests use a synthetic fixture
+  (`tests/e2e/fixtures/regional/`); the four real regional catalogues (Italy, New Zealand, southern California,
+  Iceland) were checked locally from a temporary copy in Chromium, Firefox and WebKit (every region drew its cells and
+  opened a quality A/B cell with 5 charts and the caveat, no page errors) but are not part of this branch.
+- **Validation table.** Long "this atlas" values (over 32 characters) and verdict notes wrap inside the table card;
+  verdicts "description only" and "robust" have their own labels. Tested with a synthetic table of long rows, not with
+  the final 43-row table from the science branch.
 - **Comparison.** The verdict reads only the two 95 % intervals ("overlap", "do not overlap", or "no comparison"
   when either cell has no b). Touching intervals count as overlapping. It is a conservative check, not a formal test,
   and the text says so; it also notes when the two sampling circles share events.
