@@ -1,6 +1,6 @@
 {
  "note": "Regional layers use each network's own local magnitude and are never merged with the global cells. Not a forecast and not a hazard map.",
- "generated_utc": "2026-11-13T10:58:49Z",
+ "generated_utc": "2026-11-13T10:59:32Z",
  "regions": [
   {
    "id": "italy",
@@ -125,10 +125,64 @@
    "cell_detail_dir": "regional/nz/cells/",
    "summary": "regional/nz/summary.json",
    "bytes": 806882
+  },
+  {
+   "id": "iceland",
+   "name": "Iceland",
+   "bbox": [
+    -25.0,
+    62.5,
+    -12.0,
+    67.5
+   ],
+   "catalogue": "Icelandic Met Office (IMO) Quakes API, SeisComP system, reviewed events",
+   "licence": "CC BY 4.0",
+   "attribution": "Icelandic Met Office (Vedurstofa Islands), Quakes API",
+   "source_url": "https://api.vedur.is/quakes/",
+   "period": [
+    "2020-01-01",
+    "2026-10-31"
+   ],
+   "mc_periods": [
+    [
+     2020,
+     2021
+    ],
+    [
+     2022,
+     2023
+    ],
+    [
+     2024,
+     2026
+    ]
+   ],
+   "mc_typical": 0.8,
+   "magtype": "IMO SeisComP local magnitude, reviewed (manual) events only; about 0.6 lower than the legacy SIL magnitude, so the two are never mixed",
+   "h3_res": 5,
+   "radius_km": 15.0,
+   "n_events": 244008,
+   "n_cells": 326,
+   "quality_counts": {
+    "sh": {
+     "insufficient": 143,
+     "A": 118,
+     "C": 41,
+     "B": 24
+    }
+   },
+   "depth_classes": [
+    "sh"
+   ],
+   "cells": "regional/iceland/cells.geojson",
+   "cell_detail_dir": "regional/iceland/cells/",
+   "summary": "regional/iceland/summary.json",
+   "bytes": 606499
   }
  ],
  "sha256": {
   "italy": "8e01f7479a51935d1114acaa04b8b9b8e6ebacce4d7e90f5f907d2e582c5c092",
-  "nz": "70ba276f76e990e749c2f989555536b71d20d61ac08cac0135385be4e2bf9f19"
+  "nz": "70ba276f76e990e749c2f989555536b71d20d61ac08cac0135385be4e2bf9f19",
+  "iceland": "94057d7b8c9913137d3aa19aaa2595fc8f6922ecb52f5f3b92b8dacf3fa8e6e3"
  }
 }

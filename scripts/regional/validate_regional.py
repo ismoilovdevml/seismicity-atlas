@@ -46,6 +46,21 @@ def region_report(rid):
                                         [f["properties"][f"{dc}_b"] for f in feats if f"{dc}_bpos" in f["properties"]]
                                     ))), 3) if bp else None,
                                     "bpos_inside_ci_frac": round(float(np.mean(inside)), 3) if inside else None}
+    # cutoff sensitivity of the shown cells (stats in the detail files)
+    for dc in ("sh", "dp"):
+        st = []
+        for f in (d / "cells").glob("*.json"):
+            x = json.loads(f.read_text()).get(dc, {}).get("stats", {})
+            if x.get("quality") in ("A", "B"):
+                st.append(x)
+        if st:
+            g = lambda k: np.array([np.nan if x.get(k) is None else x[k] for x in st], float)  # noqa: E731
+            b = g("b_raw")
+            rep[f"{dc}_cutoff_sensitivity"] = {
+                "n": len(st), "median_b02_minus_b": round(float(np.nanmedian(g("b_plus02") - b)), 3),
+                "median_b04_minus_b": round(float(np.nanmedian(g("b_plus04") - b)), 3),
+                "unstable_frac": round(float(np.mean([bool(x.get("cutoff_unstable")) for x in st])), 3),
+                "median_bdecl_minus_b": round(float(np.nanmedian(g("b_decl") - b)), 3)}
     rep["region_b"] = {k: {kk: ([round(vv["b"], 3), round(vv["lo"], 3), round(vv["hi"], 3), vv["n"]]
                                if isinstance(vv, dict) and vv.get("b") is not None else vv) for kk, vv in v.items()}
                        for k, v in s["region_b"].items()}
