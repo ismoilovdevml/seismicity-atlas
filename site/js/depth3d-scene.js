@@ -207,19 +207,28 @@ export function createScene(stage, canvas, { t }) {
       requestRender();
     }).catch(() => {});
 
-    const span = Math.max(geo.W, geo.D, geo.H);
-    home = { az: -0.55, el: 0.42, dist: (span * 0.95) / Math.tan((35 * Math.PI) / 360) / 2 + span * 0.25, target: new THREE.Vector3(0, -geo.H / 2, 0) };
+    home = { az: -0.55, el: 0.42, dist: fitDistance(), target: new THREE.Vector3(0, -geo.H / 2, 0) };
+    resize();
     if (!setData.kept || setData.kept !== keyOf(d)) reset();
     setData.kept = keyOf(d);
-    resize();
     requestRender();
   }
   const keyOf = (d) => d.bbox.join(',');
 
   function wrap(lon, lon0) { return ((((lon - lon0 + 180) % 360) + 360) % 360) - 180 + lon0; }
 
+  /** Camera distance at which the whole box (its bounding sphere) fits the narrower field of view. */
+  function fitDistance() {
+    const r = 0.5 * Math.hypot(geo.W, geo.D, geo.H);
+    const v = (camera.fov * Math.PI) / 180;
+    const hz = 2 * Math.atan(Math.tan(v / 2) * (camera.aspect || 1));
+    // a little tighter than the sphere on wide screens (the box rarely fills it), a margin on narrow ones
+    return (r / Math.sin(Math.min(v, hz) / 2)) * ((camera.aspect || 1) < 1 ? 1.05 : 0.92);
+  }
+
   function reset() {
     if (!home) return;
+    home.dist = fitDistance();
     orbit.az = home.az; orbit.el = home.el; orbit.dist = home.dist; orbit.target.copy(home.target);
     requestRender();
   }
@@ -230,6 +239,7 @@ export function createScene(stage, canvas, { t }) {
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    if (home && orbit.dist === home.dist) { home.dist = fitDistance(); orbit.dist = home.dist; } // not zoomed: refit
     requestRender();
   }
   const ro = new ResizeObserver(resize);
@@ -264,6 +274,13 @@ export function createScene(stage, canvas, { t }) {
       const near = pr.sort((a, b) => a.z - b.z).slice(0, 2);
       const left = (near[0].x < near[1].x ? near[0] : near[1]).i;
       geo.edges.forEach((e, i) => e.els.forEach((el) => { el.hidden = el.hidden || i !== left; }));
+      // thin out tick labels closer than 15 px on screen (short edges on phones)
+      let lastY = -Infinity;
+      for (const el of geo.edges[left].els) {
+        if (el.hidden || el.classList.contains('unit')) continue;
+        const y = parseFloat(el.style.transform.split(',')[1]);
+        if (y - lastY < 15) el.hidden = true; else lastY = y;
+      }
     }
     canvas.dataset.view = `${orbit.az.toFixed(3)},${orbit.el.toFixed(3)},${orbit.dist.toFixed(3)}`;
   }
