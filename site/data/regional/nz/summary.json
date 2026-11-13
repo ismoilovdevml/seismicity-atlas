@@ -1,0 +1,388 @@
+{
+ "id": "nz",
+ "counts": {
+  "downloaded": 236551,
+  "excluded_event_types": {
+   "outside of network interest": 610,
+   "quarry blast": 533,
+   "not locatable": 520,
+   "volcano-tectonic": 94,
+   "landslide": 28,
+   "explosion": 13,
+   "experimental explosion": 4,
+   "other": 2,
+   "debris avalanche": 1,
+   "sonic boom": 1,
+   "volcanic long-period": 1
+  },
+  "after_filters_all_types": 234744,
+  "other_magtype": {
+   "ML": 694,
+   "Mw(mB)": 84,
+   "mB": 2,
+   "mb": 1,
+   "Ms(BB)": 1
+  },
+  "local_magnitude_rejected_far": 31,
+  "local_magnitude_substituted": 369,
+  "local_magnitude_missing": {
+   "ML": 348,
+   "Mw(mB)": 61,
+   "mB": 2,
+   "mb": 1,
+   "Ms(BB)": 1
+  },
+  "substituted_pref_minus_local_median": 0.03,
+  "substituted_mag_range": [
+   1.0,
+   5.1
+  ],
+  "excluded_other_magtype": {
+   "ML": 348,
+   "Mw(mB)": 61,
+   "mB": 2,
+   "mb": 1,
+   "Ms(BB)": 1
+  },
+  "used": 234331
+ },
+ "floors": {
+  "sh": [
+   {
+    "period": [
+     2013,
+     2016
+    ],
+    "n": 67843,
+    "floor": 3.7,
+    "maxc02": 2.2,
+    "mbs": 3.7
+   },
+   {
+    "period": [
+     2017,
+     2020
+    ],
+    "n": 57067,
+    "floor": 2.6,
+    "maxc02": 2.1,
+    "mbs": 2.6
+   },
+   {
+    "period": [
+     2021,
+     2025
+    ],
+    "n": 58325,
+    "floor": 3.8,
+    "maxc02": 2.0,
+    "mbs": 3.8
+   }
+  ],
+  "dp": [
+   {
+    "period": [
+     2013,
+     2016
+    ],
+    "n": 15739,
+    "floor": 3.7,
+    "maxc02": 2.6,
+    "mbs": 3.7
+   },
+   {
+    "period": [
+     2017,
+     2020
+    ],
+    "n": 14355,
+    "floor": 2.4,
+    "maxc02": 2.4,
+    "mbs": 2.3
+   },
+   {
+    "period": [
+     2021,
+     2025
+    ],
+    "n": 21002,
+    "floor": 3.9,
+    "maxc02": 2.4,
+    "mbs": 3.9
+   }
+  ]
+ },
+ "region_b": {
+  "sh_2.5": {
+   "all": {
+    "b": 0.8774624105201164,
+    "lo": 0.8702260830253651,
+    "hi": 0.8850740409475188,
+    "n": 51144,
+    "sigma_shibolt": 0.0037972891931224895
+   },
+   "2013-2016": {
+    "b": 0.8592531759394885,
+    "lo": 0.847615098573657,
+    "hi": 0.8695119490963074,
+    "n": 22393,
+    "sigma_shibolt": 0.0057236012698909265
+   },
+   "2017-2020": {
+    "b": 0.9465471252223526,
+    "lo": 0.9318353231059877,
+    "hi": 0.960700399153089,
+    "n": 13878,
+    "sigma_shibolt": 0.007791424099842895
+   },
+   "2021-2025": {
+    "b": 0.8468108982789244,
+    "lo": 0.8347014584855303,
+    "hi": 0.8604092061878393,
+    "n": 14873,
+    "sigma_shibolt": 0.006609343191847127
+   },
+   "with_excluded_types": {
+    "b": 0.8748424660975862,
+    "lo": 0.8691429135375243,
+    "hi": 0.8818491953239194,
+    "n": 51314,
+    "sigma_shibolt": 0.0037864585057886045
+   },
+   "excluded_types_above": 170
+  },
+  "sh_3.0": {
+   "all": {
+    "b": 0.872634098118832,
+    "lo": 0.8630981873370538,
+    "hi": 0.8836746413314316,
+    "n": 18315,
+    "sigma_shibolt": 0.0061941718606830206
+   },
+   "2013-2016": {
+    "b": 0.8205281336683846,
+    "lo": 0.8052905582579682,
+    "hi": 0.8349986504253604,
+    "n": 7961,
+    "sigma_shibolt": 0.008778284454055233
+   },
+   "2017-2020": {
+    "b": 0.9572596818265469,
+    "lo": 0.9291671791905871,
+    "hi": 0.9842137434830366,
+    "n": 4586,
+    "sigma_shibolt": 0.013785037498126365
+   },
+   "2021-2025": {
+    "b": 0.8880496921504386,
+    "lo": 0.8677742972841399,
+    "hi": 0.9052518679454991,
+    "n": 5768,
+    "sigma_shibolt": 0.011084212792824224
+   },
+   "with_excluded_types": {
+    "b": 0.8690322995068928,
+    "lo": 0.8565713517711463,
+    "hi": 0.8836375660183803,
+    "n": 18426,
+    "sigma_shibolt": 0.006166468286725921
+   },
+   "excluded_types_above": 111
+  },
+  "sh_3.5": {
+   "all": {
+    "b": 0.8862561618032351,
+    "lo": 0.868636705949949,
+    "hi": 0.9093376711679816,
+    "n": 6732,
+    "sigma_shibolt": 0.010021184347430786
+   },
+   "2013-2016": {
+    "b": 0.8423039212109611,
+    "lo": 0.8126244499070998,
+    "hi": 0.8758002032833615,
+    "n": 3134,
+    "sigma_shibolt": 0.013991939577390226
+   },
+   "2017-2020": {
+    "b": 0.9456033088406425,
+    "lo": 0.9015381837192437,
+    "hi": 0.9959468185243171,
+    "n": 1509,
+    "sigma_shibolt": 0.02226904818093115
+   },
+   "2021-2025": {
+    "b": 0.9164515103751638,
+    "lo": 0.8793484037859706,
+    "hi": 0.9528044744238752,
+    "n": 2089,
+    "sigma_shibolt": 0.01853566374424462
+   },
+   "with_excluded_types": {
+    "b": 0.8817226601872741,
+    "lo": 0.8633370302953854,
+    "hi": 0.901815031015428,
+    "n": 6794,
+    "sigma_shibolt": 0.009997756486065684
+   },
+   "excluded_types_above": 62
+  }
+ },
+ "generated_utc": "2026-11-13T11:12:03Z",
+ "n_cells": 387,
+ "n_detail": 245,
+ "quality_counts": {
+  "sh": {
+   "insufficient": 227,
+   "A": 110,
+   "B": 34,
+   "C": 16
+  },
+  "dp": {
+   "insufficient": 316,
+   "A": 29,
+   "B": 22,
+   "C": 20
+  }
+ },
+ "mc_cells_latest_period": {
+  "n": 164,
+  "median": 2.2,
+  "p10": 1.8,
+  "p90": 2.8
+ },
+ "checkpoints": {
+  "Gisborne (northern Hikurangi, onshore)": {
+   "id": "84bb0a1ffffffff",
+   "sh_n": 3283,
+   "sh_mc": 1.9,
+   "sh_mc_lo": 1.9,
+   "sh_mc_hi": 2.1,
+   "sh_b": 1.028,
+   "sh_b_lo": 0.983,
+   "sh_b_hi": 1.078,
+   "sh_q": "A",
+   "sh_ciw": 0.094,
+   "mc_periods": [
+    [
+     2013,
+     2016,
+     1049,
+     2.0
+    ],
+    [
+     2017,
+     2020,
+     1003,
+     2.1
+    ],
+    [
+     2021,
+     2025,
+     1231,
+     1.9
+    ]
+   ],
+   "mc_all_periods": 2.0
+  },
+  "offshore northern Hikurangi": {
+   "id": "84bb1d3ffffffff",
+   "sh_n": 98,
+   "sh_mc": null,
+   "sh_mc_lo": null,
+   "sh_mc_hi": null,
+   "sh_b": null,
+   "sh_b_lo": null,
+   "sh_b_hi": null,
+   "sh_q": "insufficient",
+   "sh_ciw": 0.991,
+   "mc_periods": [
+    [
+     2013,
+     2016,
+     35,
+     3.7
+    ],
+    [
+     2017,
+     2020,
+     18,
+     2.6
+    ],
+    [
+     2021,
+     2025,
+     45,
+     3.8
+    ]
+   ],
+   "mc_all_periods": 2.5
+  },
+  "Whataroa (central Alpine Fault)": {
+   "id": "84da91bffffffff",
+   "sh_n": 56,
+   "sh_mc": null,
+   "sh_mc_lo": null,
+   "sh_mc_hi": null,
+   "sh_b": null,
+   "sh_b_lo": null,
+   "sh_b_hi": null,
+   "sh_q": "insufficient",
+   "sh_ciw": null,
+   "mc_periods": [
+    [
+     2013,
+     2016,
+     16,
+     3.7
+    ],
+    [
+     2017,
+     2020,
+     15,
+     2.6
+    ],
+    [
+     2021,
+     2025,
+     25,
+     3.8
+    ]
+   ],
+   "mc_all_periods": 2.3
+  },
+  "Wellington": {
+   "id": "84bb295ffffffff",
+   "sh_n": 2532,
+   "sh_mc": 1.8,
+   "sh_mc_lo": 1.8,
+   "sh_mc_hi": 1.9,
+   "sh_b": 0.944,
+   "sh_b_lo": 0.906,
+   "sh_b_hi": 0.999,
+   "sh_q": "A",
+   "sh_ciw": 0.093,
+   "mc_periods": [
+    [
+     2013,
+     2016,
+     754,
+     1.8
+    ],
+    [
+     2017,
+     2020,
+     868,
+     1.9
+    ],
+    [
+     2021,
+     2025,
+     910,
+     1.8
+    ]
+   ],
+   "mc_all_periods": 1.8
+  }
+ }
+}
