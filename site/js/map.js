@@ -6,6 +6,7 @@ import * as f from './fmt.js';
 import { h } from './charts.js';
 import { getJSON, ruleNumber } from './data.js';
 import { t } from './i18n/index.js';
+import * as B from './basemap.js';
 
 let map = null;
 let C = null; // context: {state, manifest, cells, byId, lookup(id), onSelect, onView, onEventsLoaded}
@@ -37,6 +38,7 @@ export function initMap(ctx, base) {
   C = ctx;
   const st = C.state;
   const v = st.at || defaultView();
+  const bm = B.styleParts();
   map = new maplibregl.Map({
     container: 'map',
     style: {
@@ -46,10 +48,12 @@ export function initMap(ctx, base) {
         coast: { type: 'geojson', data: base.coast },
         plates: { type: 'geojson', data: base.plates },
         cells: { type: 'geojson', data: C.cells, promoteId: 'id' },
+        ...bm.sources,
       },
       layers: [
         { id: 'bg', type: 'background', paint: { 'background-color': cssVar('--ocean') } },
         { id: 'land', type: 'fill', source: 'land', paint: { 'fill-color': cssVar('--land') } },
+        ...bm.layers,
         { id: 'cells-fill', type: 'fill', source: 'cells', paint: { 'fill-color': cssVar('--nodata'), 'fill-opacity': 0 } },
         { id: 'cells-hatch', type: 'fill', source: 'cells', layout: { visibility: 'none' }, paint: { 'fill-pattern': 'hatch' } },
         { id: 'coast', type: 'line', source: 'coast', paint: { 'line-color': cssVar('--coast'), 'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.45, 6, 1.1] } },
@@ -64,8 +68,9 @@ export function initMap(ctx, base) {
     minZoom: 0,
     maxZoom: 8,
     renderWorldCopies: true,
+    // Rotation and pitch stay off on the flat map; the 3D terrain switch enables them (basemap.js).
     dragRotate: false,
-    pitchWithRotate: false,
+    pitchWithRotate: true,
     touchPitch: false,
     attributionControl: false,
   });
@@ -88,6 +93,7 @@ export function initMap(ctx, base) {
     map.on('load', () => {
       if (!map.hasImage('hatch')) map.addImage('hatch', hatchImage(), { pixelRatio: 2 });
       wire();
+      B.attach(map, C.state);
       resolve(map);
     });
   });
@@ -229,6 +235,7 @@ export function applyLayers() {
   map.setFilter('cells-sel-case', ['in', ['get', 'id'], selIds]);
   applyRegion(st);
   applyEvents();
+  B.apply();
   renderLegend(def);
 }
 
@@ -242,6 +249,7 @@ export function applyTheme() {
   map.setPaintProperty('cells-sel', 'line-color', cssVar('--ink'));
   map.setPaintProperty('cells-sel-case', 'line-color', cssVar('--surface'));
   if (map.hasImage('hatch')) map.updateImage('hatch', hatchImage());
+  B.applyTheme();
   if (map.getLayer('rcells-line')) {
     map.setPaintProperty('rcells-line', 'line-color', cssVar('--ink-3'));
     map.setPaintProperty('rcells-hover', 'line-color', cssVar('--ink'));
@@ -527,4 +535,5 @@ function applyRegion(st) {
 /** Re-apply the strings that live on the map canvas after a language change. */
 export function relabel() {
   if (map) map.getCanvas().setAttribute('aria-label', t('map.canvas'));
+  B.relabel();
 }

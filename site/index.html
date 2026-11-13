@@ -28,6 +28,7 @@
 <link rel="preload" href="vendor/fonts/inter-400-700-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="vendor/maplibre-gl-5.24.0/maplibre-gl.css">
 <link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/terrain3d.css">
 <script>
   try { var t = localStorage.getItem('gsa-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
 </script>
@@ -46,6 +47,7 @@
   <nav class="nav" id="nav" data-i18n-attr="aria-label:nav.label" aria-label="Main">
     <a href="#v=map" data-view="map" data-i18n="nav.map">Map</a>
     <a href="#v=sequences" data-view="sequences" data-i18n="nav.sequences">Sequences</a>
+    <a href="#v=depth" data-view="depth" data-i18n="nav.depth">Depth 3D</a>
     <a href="#v=methods" data-view="methods" data-i18n="nav.methods">Validation</a>
     <a href="#v=about" data-view="about" data-i18n="nav.about">About &amp; data</a>
   </nav>
@@ -174,6 +176,7 @@
 
   <section id="view-sequences" class="view page" hidden data-i18n-attr="aria-label:seq.h1" aria-label="Aftershock sequences"><div class="page-inner" id="seq-root"></div></section>
   <section id="view-methods" class="view page" hidden data-i18n-attr="aria-label:nav.methods" aria-label="Validation and methods"><div class="page-inner" id="methods-root"></div></section>
+  <section id="view-depth" class="view page depth-view" hidden data-i18n-attr="aria-label:d3.h1" aria-label="Earthquakes in depth"><div class="d3-root" id="depth-root"></div></section>
   <section id="view-about" class="view page" hidden data-i18n-attr="aria-label:nav.about" aria-label="About and data"><div class="page-inner" id="about-root"></div></section>
 </main>
 

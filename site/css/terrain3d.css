@@ -1,0 +1,125 @@
+/* Relief and water tokens, the terrain credits box, and the "Depth 3D" view. Uses the tokens of app.css. */
+
+:root { --water-line: #a7b5bf; --d3-stage: #fbfaf7; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) { --water-line: #3f4c57; --d3-stage: #15181b; }
+}
+:root[data-theme='dark'] { --water-line: #3f4c57; --d3-stage: #15181b; }
+
+/* ---------- terrain credits on the map ---------- */
+.attrib-terrain {
+  position: absolute; right: 12px; bottom: 30px; z-index: 3; max-width: min(460px, calc(100% - 24px));
+  font-size: 11px; line-height: 1.45; color: var(--ink-4); background: color-mix(in srgb, var(--surface) 92%, transparent);
+  padding: 4px 8px; border-radius: 6px; border: 1px solid var(--rule);
+}
+.attrib-terrain .link-btn { font-size: 11px; margin: 0; padding: 0; }
+.attrib-terrain ul { margin: 4px 0 0; padding-left: 16px; max-height: 180px; overflow-y: auto; }
+@media (max-width: 720px) { .attrib-terrain { right: 6px; bottom: 22px; font-size: 10px; } }
+
+/* ---------- depth view ---------- */
+.depth-view .d3-root { max-width: 1400px; margin: 0 auto; padding: 24px 24px 56px; display: flex; flex-direction: column; gap: 16px; }
+.d3-head h1 { font-size: 28px; }
+.d3-lead { margin: 6px 0 0; max-width: 70ch; }
+.d3-grid { display: grid; grid-template-columns: 250px minmax(0, 1fr); grid-template-areas: 'ctl stage' 'stats stats'; gap: 20px; }
+.d3-controls { grid-area: ctl; display: flex; flex-direction: column; gap: 18px; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; align-self: start; }
+.d3-controls .range-row { grid-template-columns: 1fr 38px; }
+.d3-controls .small-btn { align-self: flex-start; }
+.d3-controls .small-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.d3-stage-wrap { grid-area: stage; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.d3-stage {
+  position: relative; height: min(68vh, 680px); min-height: 360px; border: 1px solid var(--rule); border-radius: 12px;
+  background: var(--d3-stage); overflow: hidden;
+}
+.d3-stage.is-xs { height: auto; min-height: 0; overflow: visible; padding: 8px 0 4px; }
+.d3-canvas { display: block; width: 100%; height: 100%; cursor: grab; outline: none; }
+.d3-canvas:active { cursor: grabbing; }
+.d3-canvas:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); border-radius: 12px; }
+.d3-canvas[hidden] { display: none; }
+.d3-status { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 4; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 12px; font-size: 13px; color: var(--ink-3); }
+.d3-status[hidden] { display: none; }
+.d3-status.error { color: var(--v-bad-fg); }
+.d3-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.d3-label { position: absolute; left: 0; top: 0; font-family: var(--mono); font-size: 11px; color: var(--ink-3); white-space: nowrap; margin: -7px 0 0 -6px; translate: -100% 0; }
+.d3-label.unit { translate: -100% 6px; color: var(--ink-4); }
+.d3-label.split { translate: 8px -50%; margin: 0; font-family: var(--font); font-size: 11.5px; color: var(--ink-3); }
+.d3-label.north { translate: -50% -130%; margin: 0; font-weight: 500; color: var(--ink-2); }
+.d3-label[hidden] { display: none; }
+.d3-tip { position: absolute; }
+.d3-caption { margin: 0; }
+.d3-nowebgl { margin: 0 12px 8px; padding: 8px 10px; border-radius: 8px; background: var(--note-bg); color: var(--note-fg); border: 1px solid var(--note-border); font-size: 13px; }
+
+.d3-legend { display: flex; flex-wrap: wrap; gap: 10px 28px; align-items: flex-start; font-size: 12px; color: var(--ink-3); }
+.d3-lg-block { display: flex; flex-direction: column; gap: 4px; }
+.d3-lg-title { font-weight: 600; color: var(--ink-2); font-size: 12px; }
+.d3-lg-ramp { display: flex; gap: 2px; }
+.d3-lg-step { display: flex; flex-direction: column; gap: 3px; align-items: center; min-width: 46px; font-size: 11px; color: var(--ink-4); }
+.d3-lg-step i { display: block; width: 100%; height: 12px; }
+.d3-lg-step:first-child i { border-radius: 3px 0 0 3px; }
+.d3-lg-step:last-child i { border-radius: 0 3px 3px 0; }
+.d3-lg-sizes { display: flex; align-items: flex-end; gap: 12px; font-family: var(--mono); font-size: 11px; color: var(--ink-4); }
+.d3-lg-sizes span { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.d3-lg-sizes i { display: block; border-radius: 50%; background: var(--ink-3); box-shadow: 0 0 0 1px var(--surface); }
+
+/* cross-section */
+.d3-xs { position: relative; }
+.d3-xs-svg { display: block; width: 100%; height: auto; font-family: var(--mono); }
+.d3-xs > .hint { margin: 2px 12px 0; }
+.xs-grid { stroke: var(--grid); stroke-width: 1; }
+.xs-surface { stroke: var(--ink-3); stroke-width: 1.2; }
+.xs-split { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 5 4; }
+.xs-tick { fill: var(--ink-3); font-size: 11px; }
+.xs-note { fill: var(--ink-3); font-size: 11px; font-family: var(--font); }
+.xs-end { fill: var(--ink-2); font-size: 11.5px; font-weight: 500; }
+.xs-slab { fill: none; stroke: var(--ink-2); stroke-width: 2; stroke-linejoin: round; opacity: 0.75; }
+.xs-events circle { stroke: var(--surface); stroke-width: 0.8; }
+
+/* statistics */
+.d3-stats { grid-area: stats; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.d3-card { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.d3-card h2 { font-size: 15px; }
+.d3-card .hint { margin: 0; }
+.d3-stats-note { grid-column: 1 / -1; margin: 0; }
+.d3-bins { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 4px; }
+.d3-bins th, .d3-bins td { padding: 3px 6px 3px 0; text-align: left; font-weight: 400; }
+.d3-bins thead th { color: var(--ink-3); font-size: 11.5px; font-weight: 600; }
+.d3-bins tbody th { color: var(--ink-2); white-space: nowrap; }
+.d3-bins .num { text-align: right; width: 4.5em; color: var(--ink); }
+.d3-bins .bar { width: 55%; }
+.d3-bins .bar span { display: block; height: 12px; min-width: 2px; border-radius: 0 3px 3px 0; }
+.d3-bins tr.split-before th, .d3-bins tr.split-before td { border-top: 1px dashed var(--rule-strong); }
+.d3-split-line { margin: 4px 0 0; font-size: 12.5px; }
+.d3-split-line strong { font-weight: 600; }
+.d3-forest { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.d3-forest li { display: grid; grid-template-columns: 6.5em minmax(60px, 1fr) auto; gap: 8px; align-items: center; font-size: 11.5px; min-height: 20px; }
+.d3-cell { color: var(--accent); white-space: nowrap; text-decoration: none; }
+.d3-cell:hover, .d3-cell:focus-visible { text-decoration: underline; }
+.d3-val { color: var(--ink-2); white-space: nowrap; }
+.d3-ci { position: relative; height: 14px; }
+.d3-ci i { position: absolute; top: 50%; }
+.d3-ci .ref { width: 0; height: 14px; top: 0; border-left: 1px dashed var(--ink-3); opacity: 0.6; }
+.d3-ci .iv { height: 2px; margin-top: -1px; background: var(--ink-2); border-radius: 1px; }
+.d3-ci .pt { width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 2px var(--surface); }
+.d3-ci .pt.qB { background: var(--surface); border: 1.5px solid var(--ink); box-sizing: border-box; }
+.d3-axis { position: relative; height: 14px; margin-left: calc(6.5em + 8px); margin-right: 9.5em; font-size: 10.5px; color: var(--ink-4); }
+.d3-axis span { position: absolute; top: 0; }
+.d3-axis span:first-child { left: 0; }
+.d3-axis span:nth-child(2) { translate: -50% 0; }
+.d3-axis span:last-child { right: 0; }
+
+@media (max-width: 1100px) {
+  .d3-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .depth-view .d3-root { padding: 16px 14px 40px; gap: 12px; }
+  .d3-head h1 { font-size: 22px; }
+  .d3-lead { font-size: 14px; }
+  .d3-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'ctl' 'stage' 'stats'; gap: 12px; }
+  .d3-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; padding: 12px; }
+  .d3-controls > :first-child, .d3-controls > :nth-child(2) { grid-column: 1 / -1; }
+  .d3-controls #d3-help, .d3-controls #d3-slab-hint { display: none; }
+  .d3-controls .check, .d3-controls .seg label { min-height: 44px; }
+  .d3-controls .small-btn { min-height: 44px; }
+  .d3-stage { height: 58vh; min-height: 300px; }
+  .d3-stats { grid-template-columns: minmax(0, 1fr); }
+  .d3-lg-step { min-width: 40px; }
+}

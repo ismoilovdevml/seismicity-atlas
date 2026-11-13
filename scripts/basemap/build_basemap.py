@@ -7,8 +7,8 @@ Sources (public domain, https://www.naturalearthdata.com/about/terms-of-use/):
   - Natural Earth 1:50m lakes and 1:50m rivers + lake centrelines
 
 relief: Web-Mercator raster tiles, 512 px, zoom 0-4, lossy WebP with alpha. The grey shaded relief is turned into
-  a theme-neutral overlay: each pixel keeps its grey, and its alpha grows with the distance from the flat value
-  (206, also the ocean value): proportional to the shadow below it and to the highlight above it. Flat land and the
+  a theme-neutral overlay: dark ink with alpha growing with the shadow below the flat value (206, also the ocean
+  value), and white with alpha growing with the highlight above it. Each zoom samples an area-averaged copy. Flat land and the
   ocean are fully transparent, and tiles with nothing in them are not written; index.json lists the tiles that
   exist, so the site never requests a missing tile.
 water: lakes (polygons) and rivers (lines) in one GeoJSON, simplified, coordinates rounded to 0.01 degree.
@@ -39,8 +39,11 @@ RIVERS = (f"{NE}/50m/physical/ne_50m_rivers_lake_centerlines.zip", "ne_50m_river
 TILE = 256
 ZMAX = 4             # 256 px tiles at z4 = 4096 px around the equator (the source has 10800); see docs/basemap.md
 FLAT = 206           # grey value of flat land and of the ocean in SR_50M
-SHADOW_GAIN = 1.0    # alpha = gain * (FLAT - v) / FLAT for shadows
-LIGHT_GAIN = 0.7     # alpha = gain * (v - FLAT) / (255 - FLAT) for highlights
+SHADOW_SCALE = 110   # alpha = ((FLAT - v) / SHADOW_SCALE) ** GAMMA for shadows (dark ink)
+LIGHT_SCALE = 45     # alpha = LIGHT_MAX * ((v - FLAT) / LIGHT_SCALE) ** GAMMA for highlights (white)
+LIGHT_MAX = 0.8
+GAMMA = 0.8
+SHADOW_INK = 40      # grey of the shadow ink
 WEBP_Q = 60
 WEBP_ALPHA_Q = 50
 RIVER_MAX_RANK = 6   # keep rivers with Natural Earth scalerank 1-5
@@ -68,6 +71,19 @@ def tile_lonlat(z: int, x: int, y: int):
     return np.meshgrid(lon, lat)
 
 
+def pyramid(src: np.ndarray) -> dict:
+    """Area-averaged copies of the source for each zoom, so low zooms are filtered instead of point-sampled."""
+    out = {}
+    for z in range(ZMAX + 1):
+        w = TILE * 2 ** z
+        if w >= src.shape[1]:
+            out[z] = src
+        else:
+            im = Image.fromarray(src).resize((w, w // 2), Image.Resampling.BOX)
+            out[z] = np.asarray(im, dtype=np.float32)
+    return out
+
+
 def render_tile(src: np.ndarray, z: int, x: int, y: int):
     lon, lat = tile_lonlat(z, x, y)
     H, W = src.shape
@@ -76,28 +92,29 @@ def render_tile(src: np.ndarray, z: int, x: int, y: int):
     cj = (90.0 - lat) / 180.0 * H - 0.5
     # wrap in longitude (antimeridian), clamp in latitude
     v = ndimage.map_coordinates(src, [cj.ravel(), ci.ravel()], order=1, mode="grid-wrap").reshape(lon.shape)
-    if z < ZMAX:  # mild pre-filter so low zooms do not alias
-        v = ndimage.gaussian_filter(v, sigma=0.6)
-    shadow = np.clip((FLAT - v) / FLAT * SHADOW_GAIN, 0, 1)
-    light = np.clip((v - FLAT) / (255 - FLAT) * LIGHT_GAIN, 0, 1)
+    shadow = np.clip((FLAT - v) / SHADOW_SCALE, 0, 1) ** GAMMA
+    light = LIGHT_MAX * np.clip((v - FLAT) / LIGHT_SCALE, 0, 1) ** GAMMA
     alpha = np.where(v < FLAT, shadow, light)
-    alpha = np.where(alpha < 0.02, 0, alpha)
+    alpha = np.where(alpha < 0.03, 0, alpha)
     if not alpha.any():
         return None
-    rgb = np.clip(np.round(v), 0, 255).astype(np.uint8)  # the grey itself: smooth, so it compresses well
+    # dark ink under shadows, white under highlights, blended over a few grey levels around the flat value so
+    # the colour channel stays smooth (it compresses far better than a hard switch)
+    k = np.clip((v - (FLAT - 6)) / 12, 0, 1)
+    rgb = np.round(SHADOW_INK + (255 - SHADOW_INK) * k).astype(np.uint8)
     rgba = np.dstack([rgb, rgb, rgb, np.round(alpha * 255).astype(np.uint8)])
     return Image.fromarray(rgba, "RGBA")
 
 
 def build_relief():
-    src = load_relief()
+    pyr = pyramid(load_relief())
     out = OUT / "relief"
     tiles, total = [], 0
     for z in range(ZMAX + 1):
         n = 2 ** z
         for x in range(n):
             for y in range(n):
-                im = render_tile(src, z, x, y)
+                im = render_tile(pyr[z], z, x, y)
                 if im is None:
                     continue
                 p = out / str(z) / str(x) / f"{y}.webp"

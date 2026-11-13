@@ -297,6 +297,7 @@ export function renderAbout(root, ctx) {
     h('li', {}, h('strong', { text: `${t('about.dataLic')}: ` }), `${man.licence.data}. ${t('about.shareAlike')}`),
     h('li', {}, h('strong', { text: `${t('about.code')}: ` }), man.licence.code),
     h('li', {}, h('strong', { text: `${t('about.mapSw')}: ` }), `MapLibre GL JS 5.24.0, BSD 3-Clause (${t('about.vendored')}, `, h('a', { href: 'vendor/maplibre-gl-5.24.0/LICENSE.txt', text: t('about.licenceLink') }), ').'),
+    h('li', {}, h('strong', { text: `${t('about.terrainH')}: ` }), t('about.terrainTxt'), ' ', h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/blob/main/docs/basemap.md', text: 'docs/basemap.md' })),
     h('li', {}, h('strong', { text: `${t('about.fonts')}: ` }), `Inter, IBM Plex Mono, SIL Open Font License 1.1 (${t('about.vendored')}; `, h('a', { href: 'vendor/fonts/OFL-Inter.txt', text: 'Inter' }), ', ', h('a', { href: 'vendor/fonts/OFL-IBMPlexMono.txt', text: 'IBM Plex Mono' }), ').'),
     h('li', {}, h('strong', { text: `${t('about.notRedist')}: ` }), t('about.notRedistTxt'))));
 
