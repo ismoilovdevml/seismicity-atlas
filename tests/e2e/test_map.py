@@ -152,7 +152,9 @@ def test_globe_and_cell_list(site):
     pg.click("#globe-btn")
     pg.click("#list-btn")
     pg.wait_for_timeout(300)
-    assert pg.evaluate("document.querySelectorAll('#panel-body tbody tr').length") == 204
+    # one row per shallow cell with a shown b (quality A or B), read from the data so data refreshes do not break it
+    shown = pg.evaluate("fetch('data/cells.geojson').then((r) => r.json()).then((g) => g.features.filter((f) => ['A', 'B'].includes(f.properties.sh_q)).length)")
+    assert pg.evaluate("document.querySelectorAll('#panel-body tbody tr').length") == shown
     pg.click("#panel-body tbody tr >> nth=0 >> button")
     pg.wait_for_timeout(500)
     assert re.search(r"c=[0-9a-f]{15}", pg.evaluate("location.hash"))
