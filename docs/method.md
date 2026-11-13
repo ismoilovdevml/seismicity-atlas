@@ -39,8 +39,9 @@ reach the sample size.
 ## 2. Catalogue and magnitude for b: ISC-GEM Mw, 1976–2021
 
 - **b is computed only on ISC-GEM Mw.** It is the only open global catalogue with one magnitude scale. After 1976
-  it is mostly direct Mw from the Global CMT project (Di Giacomo et al. 2015). Pre-1976 Mw values are proxies
-  converted from Ms and mb, so they are excluded from b.
+  it is mostly direct Mw from the Global CMT project (Di Giacomo et al. 2015). Pre-1976 Mw values are mostly proxies
+  converted from Ms and mb, so they are excluded from b. Since v0.2 the proxies of 1976–2021 are excluded too
+  (§2.1).
 - **Why ComCat is not used for b.** ComCat's preferred magnitude is mb for 80 % of M ≥ 4.5 events and Mw for the
   larger ones. A b-value fitted on that mixture depends on where the type switches.
 - **Our Mw proxy.** Mw = 0.92 + 0.85 mb. The slope 0.85 is the published global value (Scordilis 2006). The
@@ -57,19 +58,99 @@ reach the sample size.
   - Conclusion: **no b-value is computed from mb-converted magnitudes.** The proxy is used only to put ComCat-only
     events on a common scale in the event layer (code `mt` = 2).
 
+## 2.1 Direct-Mw b sample (since v0.2)
+
+**Rule.** Every b-value (map cells, declustered b, b-positive, the validation rows and the b(t) windows) uses only
+ISC-GEM events of 1976–2021 whose Mw uncertainty is 0.10, i.e. direct Mw. Proxy Mw (converted from Ms or mb) are
+left out. Rates, cell counts, Mc(t), the event layers and the Michael (2014) comparison keep every event. The
+period floors (§3) are estimated on the same direct-Mw sample, so the thresholds match the sample. Code:
+`common.b_sample_mask`. Switch: environment variable `ATLAS_B_MAGERR_MAX` (default `0.10`; `all` restores the v0.1
+behaviour, every event). The validation outputs carry the all-events numbers next to the new ones
+(`*_all_events` in `results/validation.json`, `results/val_literature.json`, `results/val_chile.json`).
+
+**What ISC-GEM says about magnitude origin.**
+
+- Catalogue overview (isc.ac.uk/iscgem/overview.php, read 2026-11-13): "Where possible we used Mw based on a
+  reliable value of seismic moment" (GCMT, and a literature search for earlier events), and "Proxy Mw were used in
+  all other cases (the majority)". *These two quotes came through a web-page summariser; they need a human check
+  against the page.*
+- The official CSV flags the origin per event. The v3.0 read-me (OasisHUB distribution, 2016-01-28 release) lists
+  the columns "Mw – Moment Magnitude", "Mw Uncertainty", "Mw Quality : A (Highest) / B (Medium) / C (Lowest)",
+  "Source : P = proxy ; d = direct computation" and "Scalar Moment author (mo_auth)". The current release (13.0)
+  is handed out only through a request form, so its header was not checked.
+- Di Giacomo, Engdahl & Storchak (2018, ESSD 10, 1877): "we largely list direct Mw from GCMT", with quality flags
+  "from A to D". *Also through a summariser; needs a human check.*
+
+**What the ComCat copy that we use contains.** Only `mag`, `magType`, `magError` and `magSource` describe the
+magnitude. `magType` is `mw` and `magSource` is `iscgem` for all 74,153 events, so neither separates direct from
+proxy. The ComCat QuakeML of an ISC-GEM event (checked for `iscgem652155`) holds the value, the uncertainty and
+the type `mw`: no method, moment, quality or source flag. **The direct/proxy field does not exist in our copy.**
+The uncertainty (`magError`, 0.10 to 0.70) is the best available marker.
+
+**Why uncertainty 0.10 marks direct Mw in 1976–2021.** No event has an uncertainty between 0.10 and 0.20.
+
+| Period | 0.10 | 0.20 | > 0.20 | All |
+|---|---|---|---|---|
+| 1900–1963 | 17 | 4,106 | 5,502 | 9,625 |
+| 1964–1975 | 158 | 3,696 | 4,089 | 7,943 |
+| 1976–2009 | 29,670 | 2,428 | 3,499 | 35,597 |
+| 2010–2021 | 19,866 | 471 | 651 | 20,988 |
+
+| Mw, 1976–2021 | 0.10 | 0.20 | > 0.20 | Share > 0.10 |
+|---|---|---|---|---|
+| < 5.6 | 35,481 | 2,308 | 2,786 | 12.6 % |
+| 5.6–5.99 | 8,437 | 502 | 1,149 | 16.4 % |
+| 6.0–6.49 | 3,855 | 77 | 188 | 6.4 % |
+| 6.5–6.99 | 1,209 | 10 | 24 | 2.7 % |
+| ≥ 7.0 | 554 | 2 | 3 | 0.9 % |
+
+- The 0.10 class starts with the GCMT era: 175 events before 1976 (from 1962), 49,536 after.
+- Cross-check against ComCat (matched pairs, 1976–2021). Of the 25,540 matched events whose ComCat magnitude comes
+  from GCMT (`magSource` `hrv` 18,254, `gcmt` 7,282, `us_gcmt` 4), **25,532 (99.97 %) have ISC-GEM uncertainty
+  0.10**. Of the 6,979 matched events with a larger uncertainty, only 8 have a GCMT magnitude in ComCat.
+- Where ComCat has an Mwc/Mww value, it differs from ISC-GEM by a median 0.03 for uncertainty 0.10 (n = 25,068)
+  and 0.17 for the rest (n = 35).
+- Limits: 9,925 matched 0.10 events have an mb preferred magnitude in ComCat, so for them the GCMT link is not
+  checked event by event. Before 1976 the classes do not map onto direct/proxy (literature Mw may carry 0.20), so
+  the rule is used only for the 1976–2021 b period.
+
+**Choice: leave proxies out (option a).** We compared three options: (a) direct Mw only, (b) weight by
+uncertainty, (c) a Tinti–Mulargia correction for magnitude error.
+
+- The published global references (Kagan 2002, 2010; Bird & Kagan 2004; Kagan & Jackson 2013) fit GCMT moment
+  magnitudes only. The direct sample is the same population, and it is what ISC-GEM itself prefers.
+- (c) does not fit the problem. Tinti & Mulargia (1985, BSSA 75(6)) show that Gaussian errors of constant size
+  shift the a-value but leave b unbiased; the size-dependent correction moves a magnitude by only βσ²/2, about
+  0.05–0.18 for σ = 0.2–0.4. The proxies alone give b = 1.736 [1.633, 1.850] (`results/val_literature.json`,
+  1982–2008, m ≥ 5.6), far more than noise explains. The excess comes from *which* events got proxies (GCMT
+  missed them; mostly near the threshold) and from regression conversion, which biases b (Castellaro, Mulargia &
+  Kagan 2006, GJI 165, 913). We did not separate the two parts.
+- (b) has no standard estimator to point to and would need its own validation; it was not adopted.
+
+**Cost.** 7,049 of 56,585 events of 1976–2021 (12.5 %) leave the b sample. The direct sample is less complete at
+small magnitudes in 1976–2003, so the shallow floors rise by 0.1 (§3). Shown shallow cells fall from 204 to 170.
+
+**Open point.** In the 77 shallow cells with b and b-positive in both versions, b fell by a median 0.022 but
+b-positive moved by only +0.002, and b-positive now lies inside the b interval in 65 % of shown cells (88 % in
+v0.1). b-positive is insensitive to incompleteness, so part of the per-cell drop may be events that GCMT missed
+just above the floor. This was not resolved.
+
+**Official file.** With the official CSV (`scripts/iscgem_official.py`), the per-event source column would be the
+exact selector. The reader does not use it yet, because the current header could not be checked.
+
 ## 3. Completeness Mc, including its change over time
 
 - **Estimator.** Maximum curvature + 0.2 (MAXC + 0.2; Woessner & Wiemer 2005). It is robust for samples of
   50–500 events. GFT (Wiemer & Wyss 2000) and MBS (Cao & Gao 2002) are computed for the global comparison.
   - MAXC tends to underestimate Mc and MBS to overestimate it (Mignan & Woessner 2012). The two together bracket
     the truth.
-- **Global period floors**, per depth class, taken as max(MAXC + 0.2, MBS) of the global ISC-GEM events of the
-  period:
+- **Global period floors**, per depth class, taken as max(MAXC + 0.2, MBS) of the global ISC-GEM direct-Mw
+  events of the period (§2.1; v0.1 values on every event in brackets):
 
   | Depth | 1976–2003 | 2004–2021 |
   |---|---|---|
-  | ≤ 70 km | **5.7** (MAXC 5.4, MBS 5.7, GFT 5.3) | **5.2** (MAXC 5.2, MBS 5.0, GFT 5.0) |
-  | > 70 km | **5.4** (MAXC 5.4, MBS 5.4, GFT 5.3) | **5.4** (MAXC 5.2, MBS 5.4, GFT 5.0) |
+  | ≤ 70 km | **5.8** (MAXC 5.4, MBS 5.8, GFT 5.3; v0.1 5.7) | **5.3** (MAXC 5.2, MBS 5.3, GFT 5.0; v0.1 5.2) |
+  | > 70 km | **5.4** (MAXC 5.4, MBS 5.3, GFT 5.2; v0.1 5.4) | **5.2** (MAXC 5.2, MBS 5.1, GFT 5.0; v0.1 5.4) |
 
 - **Per-event threshold.** Each event's threshold is max(cell Mc, floor of its period). Cell Mc is the MAXC + 0.2
   of the sample in the circle. A cell can therefore raise the threshold where the network was worse than
@@ -98,7 +179,7 @@ reach the sample size.
   A wider interval gives `C`: b is withheld and only the width is shown. Fewer than 50 events gives
   `insufficient`. This is the hard rule of the atlas: **no b-value without its interval and quality code.**
 - **Cutoff stability flag.** `*_unstable` is true when b at threshold + 0.2 and at + 0.4 both fall outside the
-  interval, on the same side. It is true for 4.9 % of shown shallow cells.
+  interval, on the same side. It is true for 4.7 % of shown shallow cells.
 - **Finite-sample bias.** Marzocchi et al. (2020) show that b from small samples is biased and correlates with
   the largest event in the sample, so apparent spatial b contrasts need significance checks. Adjacent cells
   overlap and are not independent. The site should compare two places only through their intervals.
@@ -108,20 +189,21 @@ reach the sample size.
 b-positive (van der Elst 2021) is computed on successive positive magnitude differences ≥ 0.2, using events
 above the period floor in time order. It is insensitive to the short-term incompleteness after large events.
 
-- Shown cells: the median of b⁺ − b is +0.029.
-- b⁺ falls inside the bootstrap interval of b in 87.8 % of cells (`results/validation.json`, `cells_summary`).
+- Shown cells: the median of b⁺ − b is +0.046 (v0.1, all events: +0.029).
+- b⁺ falls inside the bootstrap interval of b in 64.9 % of cells (v0.1: 87.8 %; `results/validation.json`,
+  `cells_summary`). The drop came with the direct-Mw sample; see the open point in §2.1.
 
 ## 6. Shallow vs deeper events, and declustering
 
 - **Depth classes.** ≤ 70 km and > 70 km are mapped separately (`sh_*`, `dp_*`). The two populations have
-  different b: globally, 1976–2021, b = 1.043 [1.025, 1.059] shallow (n = 15,827) and 0.969 [0.945, 0.996]
-  deeper (n = 5,419).
+  different b: globally, 1976–2021, direct Mw, b = 1.035 [1.018, 1.052] shallow (n = 15,725) and
+  0.936 [0.911, 0.961] deeper (n = 4,976). (v0.1, every event: 1.043 and 0.969.)
   - For the comparison with Michael (2014) we used his 60 km split.
 - **Declustering is not applied to the main b.** Gardner-Knopoff windows (as in ZMAP and OpenQuake) mark 51 % of
   ISC-GEM events as dependent. At M ≥ 6.5 the windows last years, so for a global M ≥ 5 catalogue they remove
   much more than aftershocks.
-  - Global shallow b falls from 1.043 to 0.895 [0.877, 0.914].
-  - Across shown cells, the median declustered-minus-full difference is −0.192.
+  - Global shallow b falls from 1.035 to 0.887 [0.868, 0.906].
+  - Across shown cells, the median declustered-minus-full difference is −0.202.
 
   A declustered b therefore mostly reflects the window choice. The declustered b is still published per cell
   (`*_bdecl`, with its interval) so the effect can be seen, but the map shows the full catalogue.
@@ -173,14 +255,15 @@ kept.
    ComCat covers those years and its magnitudes are mixed (§2).
 2. **Large footprint.** b and Mc are teleseismic-scale quantities (Mw ≥ 5.2–5.7) averaged over 300 km. They are
    not comparable to b-values from local networks at M 1–3, and they cannot resolve asperity-scale structure.
-3. **Few trusted cells.** Only 204 shallow and 70 deeper cells pass the quality gate. Most of the world shows
+3. **Few trusted cells.** Only 170 shallow and 73 deeper cells pass the quality gate. Most of the world shows
    "insufficient". This is the honest result for a global M ≥ 5 catalogue, not missing work.
 4. **Overlapping circles.** Neighbouring cells share events, so a smooth-looking pattern is partly
    autocorrelation.
 5. **Boundary classes are approximate.** Each event gets the class of the nearest PB2002 step within 200 km.
    Bird & Kagan (2004) used a more careful assignment, and subduction-zone intraslab events can be mislabelled.
-6. **ISC-GEM proxies.** ISC-GEM's own Mw proxies (pre-1976 and some later events) cannot be separated from direct
-   Mw in the ComCat copy.
+6. **ISC-GEM proxies.** The ComCat copy has no direct/proxy flag. Since v0.2 the b sample uses the magnitude
+   uncertainty (0.10) as the marker (§2.1). It is checked against GCMT magnitudes in ComCat, not against ISC-GEM's
+   own source column.
 7. **Lower Mc than Michael (2014).** Our global Mc values are lower than his. This is expected because the
    catalogue has changed since his v1 analysis (§ validation), but it means our floors are less conservative
    than his.
