@@ -139,7 +139,8 @@ def test_m5_event_links(site, with_ids):
 
 
 def test_regional_hidden_without_index(site):
-    pg = site.open()
+    # Simulate a deployment without regional layers: the index request fails.
+    pg = site.open(routes=[("**/data/regional/index.json", lambda route: route.fulfill(status=404, body="not found"))])
     pg.wait_for_timeout(800)
     assert pg.is_hidden("#reg-group")
     assert pg.evaluate("window.__map.getLayer('rcells-fill') === undefined")
