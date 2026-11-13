@@ -105,7 +105,17 @@ cd site && python3 -m http.server 8000   # then open http://localhost:8000/
   `pip install playwright pytest && python -m playwright install chromium && python -m pytest tests/e2e`;
   set `E2E_BROWSERS=chromium,firefox,webkit` for all three engines. CI: `.github/workflows/test-site.yml`.
 
+- **Relief and 3D (added 2026-11-14):** Natural Earth shaded relief, lakes and rivers under the cells (on by default,
+  served with the site, about 4 MB of WebP tiles and GeoJSON); optional 3D terrain from AWS Terrain Tiles (off by
+  default, the only external tile source, credits shown on the map); and a **Depth 3D** view with hypocentres below
+  the surface for six regions or the current map view, USGS Slab2 slab contours, a 2D cross-section (also the fallback
+  without WebGL 2), and the atlas statistics for the region (events per depth class, shallow and deeper cell b-values
+  with their intervals). three.js 0.170.0 (MIT) is vendored and loads only in that view. Sources, licences and
+  sizes: [docs/basemap.md](docs/basemap.md).
+
 ![Map with a selected cell](docs/img/site-map-panel-light.png)
+
+![Depth 3D view, Japan with Slab2](docs/img/site-3d-light.png)
 
 ## How to cite
 
@@ -128,4 +138,8 @@ the validation table (with the paper, the magnitude type and the completeness us
   - U.S. Geological Survey ComCat (U.S. public domain).
   - Plate boundaries: Bird (2003), G3 4(3), 1027, via github.com/fraxen/tectonicplates (ODC-BY 1.0).
   - Natural Earth (public domain).
+  - Slab2: Hayes et al. (2018), Science 362, 58–61, doi:10.1126/science.aat4723; data doi:10.5066/F7PV6JNV (U.S. public
+    domain).
+  - Optional 3D terrain only: Terrain Tiles on AWS Open Data (Tilezen Joerd sources; the full credit list is shown on
+    the map and in [docs/basemap.md](docs/basemap.md)).
 - **Not redistributed:** the GEM Global Seismic Hazard Map (CC BY-NC-SA). The site may link to it only.
