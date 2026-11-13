@@ -204,10 +204,13 @@ def build_region(rid):
                 rd = rl.cell_b_tv(m[ms], per[ms], fl, nboot=100, rng=rng)
                 rp = rl.bpos_above_thr(m, rl.thresholds_time_order(r))
             show = r.get("quality") in ("A", "B")
+            # Mc is published only when the latest period was measured (>= NMIN_P events), not a fallback value
+            mc_ok = bool(r.get("n_periods")) and r["n_periods"][-1] >= rl.NMIN_P
             pre = f"{d}_"
             props.update({pre + "n": int(r.get("n_sample", 0)), pre + "nb": int(r.get("n_b", 0)),
-                          pre + "mc": R(r.get("mc", np.nan), 1), pre + "mc_lo": R(r.get("mc_lo", np.nan), 1),
-                          pre + "mc_hi": R(r.get("mc_hi", np.nan), 1),
+                          pre + "mc": R(r["mc"], 1) if mc_ok else None,
+                          pre + "mc_lo": R(r["mc_lo"], 1) if mc_ok else None,
+                          pre + "mc_hi": R(r["mc_hi"], 1) if mc_ok else None,
                           pre + "b": R(r.get("b", np.nan), 3), pre + "b_lo": R(r.get("b_lo", np.nan), 3),
                           pre + "b_hi": R(r.get("b_hi", np.nan), 3), pre + "q": r.get("quality", "insufficient"),
                           pre + "ciw": R(r.get("b_hi_raw", np.nan) - r.get("b_lo_raw", np.nan), 3),
@@ -262,7 +265,7 @@ def build_region(rid):
                     "mc_cells_latest_period": {"n": len(est), "median": R(np.median(est), 1) if est else None,
                                                "p10": R(np.percentile(est, 10), 1) if est else None,
                                                "p90": R(np.percentile(est, 90), 1) if est else None},
-                    "checkpoints": checkpoints(rid, cfg, feats)})
+                    "checkpoints": checkpoints(rid, cfg, feats, details)})
     jdump(summary, rdir / "summary.json", indent=1)
     size = sum(f.stat().st_size for f in rdir.rglob("*") if f.is_file())
     summary["bytes"] = size
@@ -270,13 +273,17 @@ def build_region(rid):
     return summary
 
 
-def checkpoints(rid, cfg, feats):
+def checkpoints(rid, cfg, feats, details):
     by = {f["properties"]["id"]: f["properties"] for f in feats}
     out = {}
     for name, (la, lo) in CHECKPOINTS.get(rid, {}).items():
-        p = by.get(h3.latlng_to_cell(la, lo, cfg["h3_res"]), {})
+        h = h3.latlng_to_cell(la, lo, cfg["h3_res"])
+        p = by.get(h, {})
         out[name] = {k: p.get(k) for k in ("id", "sh_n", "sh_mc", "sh_mc_lo", "sh_mc_hi", "sh_b", "sh_b_lo",
                                             "sh_b_hi", "sh_q", "sh_ciw")}
+        st = details.get(h, {}).get("sh", {})
+        out[name]["mc_periods"] = st.get("mc_periods")      # [y0, y1, n, mc]; mc is a fallback when n < 50
+        out[name]["mc_all_periods"] = st.get("stats", {}).get("mc_all")
     return out
 
 

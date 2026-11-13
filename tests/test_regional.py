@@ -96,3 +96,22 @@ def test_parse_fdsn_text_geonet_padding_and_ingv():
         assert len(df) == 1 and df.magtype[0] == mt and df.mag[0] == mag and df.depth[0] == depth
         assert isinstance(df.time.dtype, pd.DatetimeTZDtype)
     assert parse_fdsn_text("").empty
+
+
+def test_parse_magnitudes_and_pick_local_prefers_bulletin():
+    from fetch_regional import parse_magnitudes, pick_local
+    xml = ("<event><stationMagnitude publicID=\"s1\"><mag><value>9.9</value></mag><type>ML</type></stationMagnitude>"
+           "<magnitude publicID=\"m1\"><mag><value>6.5</value></mag><type>Mw</type>"
+           "<creationInfo><author>tdmt_reviewer</author></creationInfo></magnitude>"
+           "<magnitude publicID=\"m2\"><mag><value>6.2</value></mag><type>ML</type>"
+           "<creationInfo><author>hew1_mole</author></creationInfo></magnitude>"
+           "<magnitude publicID=\"m3\"><mag><value>6.1</value></mag><type>ML</type>"
+           "<creationInfo><author>BULLETIN-INGV</author></creationInfo></magnitude>"
+           "<magnitude publicID=\"m4\"><mag><value>6.0</value></mag><type>ML</type>"
+           "<creationInfo><author>SURVEY-INGV</author></creationInfo></magnitude></event>")
+    mags = parse_magnitudes(xml)
+    assert [m[0] for m in mags] == ["Mw", "ML", "ML", "ML"]          # station magnitudes ignored
+    cfg = {"altmag_type": "ML", "altmag_authors": ["BULLETIN-INGV", "SURVEY-INGV"]}
+    assert pick_local(mags, cfg) == 6.1
+    assert pick_local(mags, {"altmag_type": "ml"}) == 6.0             # case-insensitive, last listed
+    assert pick_local(mags, {"altmag_type": "MLv"}) is None

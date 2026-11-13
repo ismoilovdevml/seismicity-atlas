@@ -1,0 +1,134 @@
+{
+ "note": "Regional layers use each network's own local magnitude and are never merged with the global cells. Not a forecast and not a hazard map.",
+ "generated_utc": "2026-11-13T10:58:49Z",
+ "regions": [
+  {
+   "id": "italy",
+   "name": "Italy",
+   "bbox": [
+    6.0,
+    35.5,
+    19.0,
+    47.5
+   ],
+   "catalogue": "INGV earthquake catalogue (ISIDe), FDSN event service",
+   "licence": "CC BY 4.0",
+   "attribution": "ISIDe Working Group (2007), INGV, doi:10.13127/ISIDE",
+   "source_url": "https://terremoti.ingv.it/en/iside",
+   "period": [
+    "2010-01-01",
+    "2025-12-31"
+   ],
+   "mc_periods": [
+    [
+     2010,
+     2013
+    ],
+    [
+     2014,
+     2017
+    ],
+    [
+     2018,
+     2021
+    ],
+    [
+     2022,
+     2025
+    ]
+   ],
+   "mc_typical": 1.5,
+   "magtype": "ML (INGV local magnitude, as served by the INGV event service)",
+   "h3_res": 4,
+   "radius_km": 30.0,
+   "n_events": 265071,
+   "n_cells": 408,
+   "quality_counts": {
+    "sh": {
+     "insufficient": 255,
+     "A": 90,
+     "B": 55,
+     "C": 8
+    },
+    "dp": {
+     "insufficient": 400,
+     "C": 3,
+     "A": 3,
+     "B": 2
+    }
+   },
+   "depth_classes": [
+    "sh",
+    "dp"
+   ],
+   "cells": "regional/italy/cells.geojson",
+   "cell_detail_dir": "regional/italy/cells/",
+   "summary": "regional/italy/summary.json",
+   "bytes": 654673
+  },
+  {
+   "id": "nz",
+   "name": "New Zealand",
+   "bbox": [
+    165.0,
+    -48.0,
+    179.99,
+    -34.0
+   ],
+   "catalogue": "GeoNet Aotearoa New Zealand Earthquake Catalogue, FDSN event service",
+   "licence": "CC BY 3.0 NZ",
+   "attribution": "GeoNet Aotearoa New Zealand Earthquake Catalogue, doi:10.21420/0S8P-TZ38. We acknowledge the New Zealand GeoNet programme and its sponsors NHC, Earth Sciences NZ, LINZ, NEMA and MBIE for providing data used in this study.",
+   "source_url": "https://www.geonet.org.nz/data/access/FDSN",
+   "period": [
+    "2013-01-01",
+    "2025-12-31"
+   ],
+   "mc_periods": [
+    [
+     2013,
+     2016
+    ],
+    [
+     2017,
+     2020
+    ],
+    [
+     2021,
+     2025
+    ]
+   ],
+   "mc_typical": 2.2,
+   "magtype": "GeoNet preferred magnitude M / MLv (SeisComP era; M equals MLv for small events)",
+   "h3_res": 4,
+   "radius_km": 30.0,
+   "n_events": 234362,
+   "n_cells": 387,
+   "quality_counts": {
+    "sh": {
+     "insufficient": 227,
+     "A": 108,
+     "B": 36,
+     "C": 16
+    },
+    "dp": {
+     "insufficient": 316,
+     "A": 29,
+     "B": 23,
+     "C": 19
+    }
+   },
+   "depth_classes": [
+    "sh",
+    "dp"
+   ],
+   "cells": "regional/nz/cells.geojson",
+   "cell_detail_dir": "regional/nz/cells/",
+   "summary": "regional/nz/summary.json",
+   "bytes": 806882
+  }
+ ],
+ "sha256": {
+  "italy": "8e01f7479a51935d1114acaa04b8b9b8e6ebacce4d7e90f5f907d2e582c5c092",
+  "nz": "70ba276f76e990e749c2f989555536b71d20d61ac08cac0135385be4e2bf9f19"
+ }
+}
