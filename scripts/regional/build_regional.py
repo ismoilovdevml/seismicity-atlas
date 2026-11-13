@@ -26,7 +26,7 @@ import atlaslib as al  # noqa: E402
 import regionlib as rl  # noqa: E402
 import seislib as sl  # noqa: E402
 from common import jdump  # noqa: E402
-from fetch_regional import WORK, fetch  # noqa: E402
+from fetch_regional import WORK, fetch, fetch_altmag  # noqa: E402
 from regions import REGIONS  # noqa: E402
 
 ROOT = HERE.parents[1]
@@ -35,6 +35,7 @@ DEPTH_SPLIT = 70.0
 NBOOT = 200
 RNG = 20261113
 MIN_CELL_EVENTS = 3        # a cell is drawn when it holds at least this many events (all depths)
+KEEP_ETYPES = {"earthquake", "unknown", "", "nan", "induced or triggered event"}
 MIN_DETAIL = 50            # a depth class gets a detail block when its circle holds at least this many events
 
 # named places used in the validation (docs/regional.md); Mc is read from the cell that contains the point
@@ -82,7 +83,7 @@ def mc_windows(m, years, y0, y1, nmin=50):
 def b_cutoff_curve(m, cutoffs):
     rows = []
     for c in cutoffs:
-        b, sig, n = sl.b_aki(m, c)
+        b, sig, n, _ = sl.b_aki(m, c)
         if n >= 30 and np.isfinite(b):
             rows.append([round(float(c), 1), round(b, 3), round(b - 1.96 * sig, 3), round(b + 1.96 * sig, 3), int(n)])
     return rows
@@ -96,7 +97,10 @@ def load_catalogue(cfg):
     y0, y1 = cfg["periods"][0][0], cfg["periods"][-1][1]
     cnt = {"downloaded": int(len(df))}
     sel = (df.lon >= w) & (df.lon <= e) & (df.lat >= s) & (df.lat <= n) & (df.year >= y0) & (df.year < y1 + 1)
-    sel &= df.etype.astype(str).str.lower().str.contains("earthquake")
+    # natural or unclassified events only: GeoNet leaves most pre-2019 events 'unknown', IMO most events untyped
+    et = df.etype.fillna("").astype(str).str.lower()
+    sel &= et.isin(KEEP_ETYPES)
+    cnt["excluded_event_types"] = {k: int(v) for k, v in et[~et.isin(KEEP_ETYPES)].value_counts().items()}
     if cfg.get("authors"):
         sel &= df.author.isin(cfg["authors"])
     if "status" in df:
@@ -106,7 +110,23 @@ def load_catalogue(cfg):
     is_t = df.magtype.isin(cfg["magtypes"])
     other = df[~is_t]
     cnt["other_magtype"] = {k: int(v) for k, v in other.magtype.value_counts().items()}
-    df = df[is_t].reset_index(drop=True)
+    keep = df[is_t]
+    alt = other[other.magtype.isin(cfg.get("altmag_from", [])) & (other.mag >= cfg.get("altmag_minmag", -9))]
+    if len(alt):  # larger events whose preferred magnitude is Mw/mB: use their local magnitude instead
+        am = fetch_altmag(cfg["id"], alt.id.tolist())
+        v = pd.to_numeric(alt.id.map(am), errors="coerce")
+        ok = v.notna().to_numpy()
+        rep = alt[ok].copy()
+        rep["mag_pref"], rep["magtype_pref"] = rep.mag, rep.magtype
+        rep["mag"], rep["magtype"] = v[ok].astype(float), cfg["magtypes"][0]
+        cnt["local_magnitude_substituted"] = int(ok.sum())
+        cnt["local_magnitude_missing"] = {k: int(n_) for k, n_ in alt[~ok].magtype.value_counts().items()}
+        cnt["substituted_pref_minus_local_median"] = R(float(np.median(rep.mag_pref - rep.mag)), 2) if ok.any() else None
+        cnt["substituted_mag_range"] = [R(rep.mag.min(), 1), R(rep.mag.max(), 1)] if ok.any() else None
+        keep = pd.concat([keep, rep]).sort_values("time", kind="stable")
+        other = other.drop(rep.index)
+    cnt["excluded_other_magtype"] = {k: int(v) for k, v in other.magtype.value_counts().items()}
+    df = keep.reset_index(drop=True)
     df["mag"] = sl.bin_mag(df.mag.to_numpy())
     cnt["used"] = int(len(df))
     return df, cnt, other
@@ -145,22 +165,20 @@ def build_region(rid):
             summary["floors"].setdefault(d, []).append({"period": [a, b], "n": int((dd.per == k).sum()),
                                                         "floor": f, "maxc02": mx, "mbs": mbs})
         fl = np.array(fl, float)
-        thr = fl[dd.per.to_numpy()]
-        rb = {"all": rl.b_region(dd.mag.to_numpy(), thr, rng=rng)}
+        sets[d] = (dd, fl, cKDTree(xyz(dd.lat.to_numpy(), dd.lon.to_numpy())))
+    # region-wide b at fixed thresholds (whole region and per period): a stability check of the magnitude scale
+    dd = sets["sh"][0]
+    m_o = sl.bin_mag(other[other.depth <= DEPTH_SPLIT].mag.to_numpy())
+    for c in cfg["b_thresholds"]:
+        rb = {"all": rl.b_region(dd.mag.to_numpy(), np.full(len(dd), c), rng=rng)}
         for k, (a, b) in enumerate(periods):
             s_ = dd.per.to_numpy() == k
-            rb[f"{a}-{b}"] = rl.b_region(dd.mag.to_numpy()[s_], thr[s_], rng=rng)
-        summary["region_b"][d] = rb
-        sets[d] = (dd, fl, cKDTree(xyz(dd.lat.to_numpy(), dd.lon.to_numpy())))
-    # sensitivity: region-wide shallow b when events with another preferred magnitude type are included
-    if len(other):
-        o = other[other.depth <= DEPTH_SPLIT]
-        o_per = rl.period_index(o.year.to_numpy(), periods)
-        fl = sets["sh"][1]
-        m_all = np.r_[sets["sh"][0].mag.to_numpy(), sl.bin_mag(o.mag.to_numpy())]
-        t_all = np.r_[fl[sets["sh"][0].per.to_numpy()], fl[o_per]]
-        summary["region_b"]["sh_with_other_types"] = rl.b_region(m_all, t_all, rng=rng)
-        summary["other_types_above_floor"] = int((sl.bin_mag(o.mag.to_numpy()) >= fl[o_per] - 1e-9).sum())
+            rb[f"{a}-{b}"] = rl.b_region(dd.mag.to_numpy()[s_], np.full(s_.sum(), c), rng=rng)
+        # sensitivity: also count the excluded events of other magnitude types (as if on the same scale)
+        m_all = np.r_[dd.mag.to_numpy(), m_o]
+        rb["with_excluded_types"] = rl.b_region(m_all, np.full(m_all.size, c), rng=rng)
+        rb["excluded_types_above"] = int((m_o >= c - 1e-9).sum())
+        summary["region_b"][f"sh_{c:.1f}"] = rb
 
     df["h3"] = [h3.latlng_to_cell(a, b, cfg["h3_res"]) for a, b in zip(df.lat, df.lon)]
     ncell = df.groupby("h3").size()
@@ -267,7 +285,7 @@ def index_entry(rid, s):
     mc = s["mc_cells_latest_period"]
     return {"id": rid, "name": cfg["name"], "bbox": cfg["bbox"], "catalogue": cfg["catalogue"],
             "licence": cfg["licence"], "attribution": cfg["attribution"], "source_url": cfg["source_url"],
-            "period": [cfg["start"], (pd.Timestamp(cfg["end"]) - pd.Timedelta(days=1)).strftime("%Y-%m-%d")],
+            "period": [f"{cfg['periods'][0][0]}-01-01", (pd.Timestamp(cfg["end"]) - pd.Timedelta(days=1)).strftime("%Y-%m-%d")],
             "mc_periods": cfg["periods"], "mc_typical": mc["median"], "magtype": cfg["magtype_label"],
             "h3_res": cfg["h3_res"], "radius_km": cfg["radius_km"], "n_events": s["counts"]["used"],
             "n_cells": s["n_cells"], "quality_counts": s["quality_counts"],
@@ -283,16 +301,18 @@ def main():
     a = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     idx_path = OUT / "index.json"
-    old = {r["id"]: r for r in json.loads(idx_path.read_text())["regions"]} if idx_path.exists() else {}
-    failed = []
+    new, failed = {}, []
     for rid in a.regions:
         try:
             if not a.no_fetch or not (WORK / f"{rid}.pkl").exists():
                 fetch(rid)
-            old[rid] = index_entry(rid, build_region(rid))
+            new[rid] = index_entry(rid, build_region(rid))
         except Exception:  # keep the previous output of this region; never break the whole run
             traceback.print_exc()
             failed.append(rid)
+    # re-read the index just before writing, so that parallel builds of different regions do not drop entries
+    old = {r["id"]: r for r in json.loads(idx_path.read_text())["regions"]} if idx_path.exists() else {}
+    old.update(new)
     regions = [old[r] for r in REGIONS if r in old]
     jdump({"note": ("Regional layers use each network's own local magnitude and are never merged with the global "
                     "cells. Not a forecast and not a hazard map."),

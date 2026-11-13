@@ -17,6 +17,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import re
 import sys
 import time
 from datetime import datetime, timedelta, timezone
@@ -175,6 +176,92 @@ def imo_window(cfg, t0, t1, refresh, out):
         "time": pd.to_datetime(df["time"], utc=True, format="ISO8601"), "lat": df["latitude"], "lon": df["longitude"],
         "depth": df["depth"], "mag": df["magnitude"], "magtype": cfg["magtype_label_short"],
         "author": df["evaluation_mode"].astype(str), "id": df["event_id"], "etype": df["type"].astype(str)}))
+
+
+# ------------------------------------------------------------------------------------------------ per-event magnitudes
+# Large events usually have Mw (or mB) as their preferred magnitude, so a catalogue filtered on the local magnitude
+# loses its largest events and b is biased high. For those events the region's own local magnitude is read from the
+# per-event QuakeML (all magnitudes) and used instead. Results are cached per event as small JSON files.
+MAG_RE = re.compile(r"<magnitude publicID=\"[^\"]*\"(.*?)</magnitude>", re.S)
+
+
+def parse_magnitudes(xml: str) -> list:
+    """[(type, value, author)] of the event-level <magnitude> elements (station magnitudes are ignored)."""
+    out = []
+    for blk in MAG_RE.findall(xml):
+        t = re.search(r"<type>([^<]*)</type>", blk)
+        v = re.search(r"<mag>\s*<value>([^<]*)</value>", blk)
+        a = re.search(r"<author>([^<]*)</author>", blk)
+        if t and v:
+            out.append((t.group(1).strip(), float(v.group(1)), a.group(1).strip() if a else ""))
+    return out
+
+
+def pick_local(mags: list, cfg) -> float | None:
+    """The region's local magnitude for one event: the last listed value of the wanted type, preferring the
+    authors listed first in cfg['altmag_authors'] (e.g. the reviewed INGV bulletin)."""
+    want = cfg["altmag_type"].lower()
+    cand = [(t, v, a) for t, v, a in mags if t.lower() == want]
+    if not cand:
+        return None
+    for pref in cfg.get("altmag_authors", []):
+        c = [x for x in cand if x[2] == pref]
+        if c:
+            return c[-1][1]
+    return cand[-1][1]
+
+
+def _get_prefix(url: str, params: dict, stop: bytes, max_bytes: int = 3_000_000) -> str:
+    """Stream a response and stop at the first `stop` marker (amplitudes follow the magnitudes)."""
+    for k in range(4):
+        try:
+            with requests.get(url, params=params, headers=UA, timeout=(10, 30), stream=True) as r:
+                if r.status_code == 204:
+                    return ""
+                r.raise_for_status()
+                buf = b""
+                for chunk in r.iter_content(65536):
+                    buf += chunk
+                    if stop in buf or len(buf) > max_bytes:
+                        break
+                return buf.decode("utf-8", errors="replace")
+        except requests.RequestException:
+            time.sleep(5 * (k + 1))
+    raise RuntimeError(f"per-event magnitudes failed: {url} {params}")
+
+
+def fetch_altmag(rid: str, ids, refresh: bool = False, workers: int = 3) -> dict:
+    """Local magnitude for each event id in `ids` (None when the event has none). Cached per event.
+
+    At most `workers` requests run at the same time (the per-event service is slow but light)."""
+    from concurrent.futures import ThreadPoolExecutor
+    cfg = REGIONS[rid]
+    d = RAW / rid / "altmag"
+    d.mkdir(parents=True, exist_ok=True)
+    pre = cfg.get("altmag_id_prefix", "")
+
+    def one(eid):
+        f = d / f"{eid}.json"
+        if f.exists() and not refresh:
+            return eid, json.loads(f.read_text())
+        qid = str(eid)[len(pre):] if pre and str(eid).startswith(pre) else str(eid)
+        try:
+            xml = _get_prefix(cfg["altmag_url"], {"eventid": qid, **cfg.get("altmag_params", {})}, b"<amplitude ")
+        except RuntimeError as e:   # not cached: retried on the next run
+            print(f"  {e}", flush=True)
+            return eid, []
+        mags = parse_magnitudes(xml)
+        f.write_text(json.dumps(mags))
+        time.sleep(PAUSE_S)
+        return eid, mags
+
+    out = {}
+    with ThreadPoolExecutor(workers) as ex:
+        for k, (eid, mags) in enumerate(ex.map(one, list(ids))):
+            out[eid] = pick_local([tuple(x) for x in mags], cfg)
+            if k % 100 == 0:
+                print(f"  {rid} per-event magnitudes {k}/{len(ids)}", flush=True)
+    return out
 
 
 # ------------------------------------------------------------------------------------------------ driver

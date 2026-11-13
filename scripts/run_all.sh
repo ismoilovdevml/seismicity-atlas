@@ -13,4 +13,5 @@ $PY -I scripts/validate.py
 $PY -I scripts/sequences.py
 $PY -I scripts/site_layers.py
 $PY -I scripts/figures.py
+[ "${SKIP_REGIONAL:-0}" = 1 ] || $PY -I scripts/regional/build_regional.py || echo "regional layers: build failed, previous output kept"
 $PY -I -m pytest -q tests

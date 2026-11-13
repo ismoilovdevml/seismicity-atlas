@@ -1,0 +1,341 @@
+{
+ "id": "italy",
+ "counts": {
+  "downloaded": 284664,
+  "excluded_event_types": {
+   "quarry blast": 2507,
+   "controlled explosion": 122,
+   "experimental explosion": 72,
+   "explosion": 36,
+   "landslide": 6,
+   "anthropogenic event": 3,
+   "volcanic eruption": 2,
+   "other event": 2,
+   "accidental explosion": 1
+  },
+  "after_filters_all_types": 275244,
+  "other_magtype": {
+   "Md": 10173,
+   "Mw": 684
+  },
+  "local_magnitude_substituted": 684,
+  "local_magnitude_missing": {},
+  "substituted_pref_minus_local_median": -0.1,
+  "substituted_mag_range": [
+   2.3,
+   6.4
+  ],
+  "excluded_other_magtype": {
+   "Md": 10173
+  },
+  "used": 265071
+ },
+ "floors": {
+  "sh": [
+   {
+    "period": [
+     2010,
+     2013
+    ],
+    "n": 49587,
+    "floor": 2.3,
+    "maxc02": 1.4,
+    "mbs": 2.3
+   },
+   {
+    "period": [
+     2014,
+     2017
+    ],
+    "n": 117613,
+    "floor": 2.1,
+    "maxc02": 1.5,
+    "mbs": 2.1
+   },
+   {
+    "period": [
+     2018,
+     2021
+    ],
+    "n": 52173,
+    "floor": 2.2,
+    "maxc02": 1.3,
+    "mbs": 2.2
+   },
+   {
+    "period": [
+     2022,
+     2025
+    ],
+    "n": 42113,
+    "floor": 2.1,
+    "maxc02": 1.2,
+    "mbs": 2.1
+   }
+  ],
+  "dp": [
+   {
+    "period": [
+     2010,
+     2013
+    ],
+    "n": 804,
+    "floor": 2.5,
+    "maxc02": 2.5,
+    "mbs": 2.5
+   },
+   {
+    "period": [
+     2014,
+     2017
+    ],
+    "n": 1096,
+    "floor": 2.4,
+    "maxc02": 2.4,
+    "mbs": 2.3
+   },
+   {
+    "period": [
+     2018,
+     2021
+    ],
+    "n": 857,
+    "floor": 2.4,
+    "maxc02": 2.4,
+    "mbs": 2.2
+   },
+   {
+    "period": [
+     2022,
+     2025
+    ],
+    "n": 828,
+    "floor": 2.4,
+    "maxc02": 2.4,
+    "mbs": 2.2
+   }
+  ]
+ },
+ "region_b": {
+  "sh_2.0": {
+   "all": {
+    "b": 1.0082482608715477,
+    "lo": 0.9977838226051369,
+    "hi": 1.0173708619867832,
+    "n": 42475,
+    "sigma_shibolt": 0.0047451077120778526
+   },
+   "2010-2013": {
+    "b": 0.9718946207888356,
+    "lo": 0.952076015410482,
+    "hi": 0.9907155960075869,
+    "n": 8708,
+    "sigma_shibolt": 0.010024467391790267
+   },
+   "2014-2017": {
+    "b": 1.0412711620763522,
+    "lo": 1.0277476872569251,
+    "hi": 1.0553198964348114,
+    "n": 19627,
+    "sigma_shibolt": 0.007209888167178422
+   },
+   "2018-2021": {
+    "b": 0.9943834859769459,
+    "lo": 0.9713885152685293,
+    "hi": 1.0133566721793115,
+    "n": 7342,
+    "sigma_shibolt": 0.011277460200373565
+   },
+   "2022-2025": {
+    "b": 0.9802230777842245,
+    "lo": 0.9586511421506895,
+    "hi": 1.0064906651785774,
+    "n": 6798,
+    "sigma_shibolt": 0.011558295830900362
+   },
+   "with_excluded_types": {
+    "b": 1.012591777694202,
+    "lo": 1.004736165157086,
+    "hi": 1.0216670122700733,
+    "n": 42855,
+    "sigma_shibolt": 0.0047536693546500735
+   },
+   "excluded_types_above": 380
+  },
+  "sh_2.5": {
+   "all": {
+    "b": 1.0330194435222315,
+    "lo": 1.0148999596205353,
+    "hi": 1.048488421601362,
+    "n": 13303,
+    "sigma_shibolt": 0.008732779184993192
+   },
+   "2010-2013": {
+    "b": 1.0165508263188336,
+    "lo": 0.9809789810603209,
+    "hi": 1.0509933528413986,
+    "n": 2867,
+    "sigma_shibolt": 0.018840963686062584
+   },
+   "2014-2017": {
+    "b": 1.0645146421083513,
+    "lo": 1.043637628055573,
+    "hi": 1.0908825893163623,
+    "n": 5963,
+    "sigma_shibolt": 0.013164475888930263
+   },
+   "2018-2021": {
+    "b": 1.0166344355056187,
+    "lo": 0.979614046196673,
+    "hi": 1.0596337561509193,
+    "n": 2319,
+    "sigma_shibolt": 0.02085375928437972
+   },
+   "2022-2025": {
+    "b": 0.9904397183902643,
+    "lo": 0.952028471332112,
+    "hi": 1.0285856333363648,
+    "n": 2154,
+    "sigma_shibolt": 0.02098798054918076
+   },
+   "with_excluded_types": {
+    "b": 1.0348303535041905,
+    "lo": 1.0199260202856928,
+    "hi": 1.0511997663576913,
+    "n": 13343,
+    "sigma_shibolt": 0.008743266484716522
+   },
+   "excluded_types_above": 40
+  },
+  "sh_3.0": {
+   "all": {
+    "b": 1.062501300493006,
+    "lo": 1.0339638619541334,
+    "hi": 1.0936049727754809,
+    "n": 4087,
+    "sigma_shibolt": 0.01632778337269946
+   },
+   "2010-2013": {
+    "b": 1.000151787512424,
+    "lo": 0.9410794894269835,
+    "hi": 1.0670477592635026,
+    "n": 875,
+    "sigma_shibolt": 0.032826125036055254
+   },
+   "2014-2017": {
+    "b": 1.1180860341269705,
+    "lo": 1.0664753879333744,
+    "hi": 1.1619545532346809,
+    "n": 1767,
+    "sigma_shibolt": 0.025604593571975535
+   },
+   "2018-2021": {
+    "b": 1.0610685069878596,
+    "lo": 0.9723061835320336,
+    "hi": 1.1379971296446292,
+    "n": 742,
+    "sigma_shibolt": 0.03995076191908348
+   },
+   "2022-2025": {
+    "b": 1.0158343729096195,
+    "lo": 0.9563171248588973,
+    "hi": 1.0907113060192286,
+    "n": 703,
+    "sigma_shibolt": 0.03774359228007624
+   },
+   "with_excluded_types": {
+    "b": 1.0627294636780165,
+    "lo": 1.0314033714296615,
+    "hi": 1.0912759809042456,
+    "n": 4088,
+    "sigma_shibolt": 0.016332391253951323
+   },
+   "excluded_types_above": 1
+  }
+ },
+ "generated_utc": "2026-11-13T10:50:54Z",
+ "n_cells": 408,
+ "n_detail": 221,
+ "quality_counts": {
+  "sh": {
+   "insufficient": 255,
+   "A": 90,
+   "B": 55,
+   "C": 8
+  },
+  "dp": {
+   "insufficient": 400,
+   "C": 3,
+   "A": 3,
+   "B": 2
+  }
+ },
+ "mc_cells_latest_period": {
+  "n": 139,
+  "median": 1.5,
+  "p10": 1.2,
+  "p90": 2.1
+ },
+ "checkpoints": {
+  "L'Aquila (central Apennines)": {
+   "id": "841e80bffffffff",
+   "sh_n": 20575,
+   "sh_mc": 1.3,
+   "sh_mc_lo": 1.3,
+   "sh_mc_hi": 1.5,
+   "sh_b": 1.141,
+   "sh_b_lo": 1.092,
+   "sh_b_hi": 1.155,
+   "sh_q": "A",
+   "sh_ciw": 0.063
+  },
+  "Norcia (central Apennines)": {
+   "id": "841e855ffffffff",
+   "sh_n": 95603,
+   "sh_mc": 1.2,
+   "sh_mc_lo": 1.2,
+   "sh_mc_hi": 1.3,
+   "sh_b": 1.085,
+   "sh_b_lo": 1.079,
+   "sh_b_hi": 1.138,
+   "sh_q": "A",
+   "sh_ciw": 0.06
+  },
+  "Lecce (southern Apulia)": {
+   "id": null,
+   "sh_n": null,
+   "sh_mc": null,
+   "sh_mc_lo": null,
+   "sh_mc_hi": null,
+   "sh_b": null,
+   "sh_b_lo": null,
+   "sh_b_hi": null,
+   "sh_q": null,
+   "sh_ciw": null
+  },
+  "Trapani (western Sicily)": {
+   "id": "84386d3ffffffff",
+   "sh_n": 17,
+   "sh_mc": null,
+   "sh_mc_lo": null,
+   "sh_mc_hi": null,
+   "sh_b": null,
+   "sh_b_lo": null,
+   "sh_b_hi": null,
+   "sh_q": "insufficient",
+   "sh_ciw": null
+  },
+  "Cagliari (Sardinia)": {
+   "id": null,
+   "sh_n": null,
+   "sh_mc": null,
+   "sh_mc_lo": null,
+   "sh_mc_hi": null,
+   "sh_b": null,
+   "sh_b_lo": null,
+   "sh_b_hi": null,
+   "sh_q": null,
+   "sh_ciw": null
+  }
+ }
+}

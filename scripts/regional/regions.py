@@ -8,10 +8,12 @@ IMO = "https://api.vedur.is/quakes"
 
 REGIONS = {
     "italy": {
-        "id": "italy", "name": "Italy", "client": "fdsn_text", "url": INGV, "row_limit": 10000,
+        "id": "italy", "b_thresholds": [2.0, 2.5, 3.0], "name": "Italy", "client": "fdsn_text", "url": INGV, "row_limit": 10000,
         "bbox": [6.0, 35.5, 19.0, 47.5], "start": "2010-01-01", "end": "2026-01-01", "download_minmag": 1.0,
-        "magtypes": ["ML"], "authors": ["BULLETIN-INGV", "SURVEY-INGV"],
+        "magtypes": ["ML"], "authors": ["BULLETIN-INGV", "BULLETIN-SISPICK", "SURVEY-INGV"],
         "magtype_label": "ML (INGV local magnitude, as served by the INGV event service)",
+        "altmag_from": ["Mw", "Mwp", "M", "mb"], "altmag_type": "ML", "altmag_url": INGV,
+        "altmag_params": {"includeallmagnitudes": "true"}, "altmag_authors": ["BULLETIN-INGV", "SURVEY-INGV"],
         "catalogue": "INGV earthquake catalogue (ISIDe), FDSN event service",
         "licence": "CC BY 4.0", "attribution": "ISIDe Working Group (2007), INGV, doi:10.13127/ISIDE",
         "source_url": "https://terremoti.ingv.it/en/iside",
@@ -19,10 +21,11 @@ REGIONS = {
         "depth_split": True, "h3_res": 4, "radius_km": 30.0,
     },
     "nz": {
-        "id": "nz", "name": "New Zealand", "client": "fdsn_text", "url": GEONET, "row_limit": 10000,
+        "id": "nz", "b_thresholds": [2.5, 3.0, 3.5], "name": "New Zealand", "client": "fdsn_text", "url": GEONET, "row_limit": 10000,
         "bbox": [165.0, -48.0, 179.99, -34.0], "start": "2013-01-01", "end": "2026-01-01", "download_minmag": 1.5,
         "magtypes": ["M", "MLv"], "authors": None,
         "magtype_label": "GeoNet preferred magnitude M / MLv (SeisComP era; M equals MLv for small events)",
+        "altmag_from": ["ML", "Mw(mB)", "mB", "mb", "Ms(BB)", "Mw"], "altmag_type": "MLv", "altmag_url": GEONET,
         "catalogue": "GeoNet Aotearoa New Zealand Earthquake Catalogue, FDSN event service",
         "licence": "CC BY 3.0 NZ",
         "attribution": ("GeoNet Aotearoa New Zealand Earthquake Catalogue, doi:10.21420/0S8P-TZ38. We acknowledge the "
@@ -33,20 +36,23 @@ REGIONS = {
         "depth_split": True, "h3_res": 4, "radius_km": 30.0,
     },
     "socal": {
-        "id": "socal", "name": "Southern California", "client": "comcat", "url": COMCAT, "comcat_catalog": "ci",
+        "id": "socal", "b_thresholds": [1.8, 2.5, 3.0], "name": "Southern California", "client": "comcat", "url": COMCAT, "comcat_catalog": "ci",
         "bbox": [-121.0, 32.0, -114.5, 36.5], "start": "2000-01-01", "end": "2026-01-01", "download_minmag": 1.0,
         "magtypes": ["ml"], "authors": None,
         "magtype_label": "ML (Southern California Seismic Network local magnitude, ComCat catalog=ci)",
+        "altmag_from": ["mw", "mh", "mlr", "me", "mwr", "mww", "md"], "altmag_type": "ml",
+        "altmag_url": "https://service.scedc.caltech.edu/fdsnws/event/1/query", "altmag_id_prefix": "ci", "altmag_minmag": 2.0,
+        "altmag_params": {"includeallmagnitudes": "true"},
         "catalogue": "Southern California Seismic Network (SCSN) via USGS ComCat, catalog=ci",
         "licence": "Public domain (U.S. Government work)",
         "attribution": ("USGS ComCat; Southern California Seismic Network, Caltech (1926), doi:10.7914/SN/CI; "
                         "SCEDC (2013), doi:10.7909/C3WD3xH1"),
         "source_url": "https://earthquake.usgs.gov/fdsnws/event/1/",
-        "periods": [[2000, 2004], [2005, 2009], [2010, 2014], [2015, 2019], [2020, 2025]],
+        "periods": [[2006, 2009], [2010, 2013], [2014, 2017], [2018, 2021], [2022, 2025]],
         "depth_split": False, "h3_res": 4, "radius_km": 30.0,
     },
     "iceland": {
-        "id": "iceland", "name": "Iceland", "client": "imo", "url": IMO, "imo_system": "seiscomp",
+        "id": "iceland", "b_thresholds": [0.5, 1.0, 1.5], "name": "Iceland", "client": "imo", "url": IMO, "imo_system": "seiscomp",
         "imo_depth_max": 40, "row_limit": 20000,
         "bbox": [-25.0, 62.5, -12.0, 67.5], "start": "2020-01-01", "end": "2026-11-01", "download_minmag": None,
         "magtypes": ["ML_seiscomp"], "magtype_label_short": "ML_seiscomp", "authors": None,
