@@ -29,6 +29,17 @@ General rules
 | `global.json` | lazy | global charts: Mc by period vs Michael (2014), b vs cutoff, b by boundary class, validation table |
 | `cells/<h3>.json` | lazy, on click | per-cell detail: FMDs, Mc(t), b(cutoff), yearly rates |
 
+### `manifest.json` → `method` (b sample, since v0.2)
+
+| Key | Type | Meaning |
+|---|---|---|
+| `b_catalogue` | string | catalogue and years of every b, `"ISC-GEM Mw 1976-2021"` (unchanged; the site parses the two years) |
+| `b_sample` | string | which events enter b: `"Mw uncertainty <= 0.10 (direct Mw)"`, or `"all events"` when built with `ATLAS_B_MAGERR_MAX=all` |
+| `b_magerr_max` | number or `null` | the uncertainty limit (0.1), `null` = every event (v0.1 behaviour) |
+
+The site does not show `b_sample` yet. Suggested later UI (not done, site code unchanged): add it to the b layer's
+unit line and to the method step on the about page, e.g. "ISC-GEM Mw 1976–2021, direct Mw only".
+
 ## `cells.geojson` feature properties
 
 Cell identity and counts (the cell itself, not the sampling circle):
@@ -104,13 +115,15 @@ Columnar JSON, one array per field, same length:
  "dp": {...}}
 ```
 
-- `fmd_*`: non-cumulative counts per 0.1 bin (ISC-GEM 1976–2021 in Mw; ComCat 1973–cut-off as served). The site
-  derives the cumulative curve.
-- `mc_t_iscgem`: MAXC + 0.2 in 10-year windows over 1904–2021; `mc_t_comcat`: 5-year windows from 1973 to the
+- `fmd_*`: non-cumulative counts per 0.1 bin (ISC-GEM 1976–2021 in Mw, the b sample: direct Mw only since v0.2;
+  ComCat 1973–cut-off as served). The site derives the cumulative curve.
+- `mc_t_iscgem`: MAXC + 0.2 in 10-year windows over 1904–2021, every event (not only the b sample); `mc_t_comcat`: 5-year windows from 1973 to the
   cut-off year, as served; `null` when a window has fewer than 50 events.
-- `b_cutoff`: b for fixed cutoffs 5.0–7.0 (threshold max(cutoff, period floor)), Shi-Bolt ±1.96 σ, n ≥ 30.
+- `b_cutoff`: b for fixed cutoffs 5.0–7.0 (threshold max(cutoff, period floor)), Shi-Bolt ±1.96 σ, n ≥ 30, on
+  the b sample.
 - `rate_*`: yearly counts for every year in `rate_years` (1973 to the cut-off year, inclusive; the cut-off year is
-  partial). `rate_iscgem_above_thr` counts ISC-GEM events above their threshold; it covers only the b period
+  partial). `rate_iscgem_above_thr` counts ISC-GEM b-sample events (direct Mw since v0.2) above their threshold;
+  it covers only the b period
   1976–2021 (`manifest.json` → `method.b_catalogue`) and is `null` for the other years (no data, not zero). A `0`
   inside the period is a real zero. An empty array means the cell has no estimate for that depth class.
 - `stats`: the full output of the cell estimator (raw b, interval, Mc interval, quality) for that depth class.
@@ -127,7 +140,10 @@ day bins, for the decay chart).
 ## `global.json`
 
 Chart-ready global series: `michael_periods`, `michael_pooled`, `b_cutoff_2004_2021`, `plate_boundary_types`,
-`slab_age_groups`, `validation_table`, `floors`. Field names follow `results/validation.json`.
+`slab_age_groups`, `validation_table`, `floors`. Field names follow `results/validation.json`. Since v0.2
+`plate_boundary_types`, `slab_age_groups` and `floors` use the direct-Mw b sample; `michael_*` and
+`b_cutoff_2004_2021` (a catalogue comparison) use every ISC-GEM event. The all-events class values are in
+`results/validation.json` (`plate_boundary_types_all_events`), not in `global.json`.
 
 ### `sequences.json`: retrospective b before and after (`bt`, added by `scripts/val_bt.py`)
 

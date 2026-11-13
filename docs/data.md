@@ -29,8 +29,10 @@ Notes on access:
 
 ## Magnitude types
 
-ISC-GEM: every event is listed as `mw` (direct Mw or ISC-GEM's own Mw proxy). The ComCat copy does not say which
-is which, so the two cannot be told apart here. Magnitudes run from 4.75 to 9.55.
+ISC-GEM: every event is listed as `mw` (direct Mw or ISC-GEM's own Mw proxy). The ComCat copy has no direct/proxy
+flag; the magnitude uncertainty (`magError`) is the only marker. In 1976–2021, 0.10 marks direct Mw (checked
+against GCMT magnitudes in ComCat, `method.md` §2.1), and since v0.2 only those events enter b. Magnitudes run from
+4.75 to 9.55.
 
 ComCat preferred magnitudes, all years (M ≥ 4.5):
 
