@@ -1,0 +1,134 @@
+[
+ {
+  "test": "Global b, shallow < 60 km, 1918-2009, Michael's Mc(t)",
+  "ours": "1.078 [1.056, 1.102]",
+  "published": "1.05 (Michael 2014)",
+  "verdict": "close, outside 95 % CI"
+ },
+ {
+  "test": "Global b, depth >= 60 km, 1964-2009, Mc 5.7",
+  "ours": "0.997 [0.962, 1.033]",
+  "published": "0.99 (Michael 2014)",
+  "verdict": "match"
+ },
+ {
+  "test": "Mc, <60 km, 1900-1917 (MAXC+0.2 / MBS)",
+  "ours": "6.5 / 6.8",
+  "published": "7.7 (Michael 2014)",
+  "verdict": "lower by 1.2 (catalogue version differs)"
+ },
+ {
+  "test": "Mc, <60 km, 1918-1939 (MAXC+0.2 / MBS)",
+  "ours": "6.0 / 6.1",
+  "published": "7.0 (Michael 2014)",
+  "verdict": "lower by 1.0 (catalogue version differs)"
+ },
+ {
+  "test": "Mc, <60 km, 1940-1954 (MAXC+0.2 / MBS)",
+  "ours": "6.2 / 6.1",
+  "published": "6.8 (Michael 2014)",
+  "verdict": "lower by 0.6 (catalogue version differs)"
+ },
+ {
+  "test": "Mc, <60 km, 1955-1963 (MAXC+0.2 / MBS)",
+  "ours": "6.0 / 6.0",
+  "published": "6.5 (Michael 2014)",
+  "verdict": "lower by 0.5 (catalogue version differs)"
+ },
+ {
+  "test": "Mc, <60 km, 1964-1975 (MAXC+0.2 / MBS)",
+  "ours": "5.7 / 5.7",
+  "published": "6.0 (Michael 2014)",
+  "verdict": "lower by 0.3 (catalogue version differs)"
+ },
+ {
+  "test": "Mc, <60 km, 1976-2003 (MAXC+0.2 / MBS)",
+  "ours": "5.4 / 5.7",
+  "published": "5.8 (Michael 2014)",
+  "verdict": "lower by 0.4 (catalogue version differs)"
+ },
+ {
+  "test": "Mc, <60 km, 2004-2009 (MAXC+0.2 / MBS)",
+  "ours": "5.2 / 5.2",
+  "published": "5.7 (Michael 2014)",
+  "verdict": "lower by 0.5 (catalogue version differs)"
+ },
+ {
+  "test": "Mc, >=60 km, 1900-1963 (MAXC+0.2 / MBS)",
+  "ours": "6.4 / 6.6",
+  "published": "7.1 (Michael 2014)",
+  "verdict": "lower by 0.7 (catalogue version differs)"
+ },
+ {
+  "test": "Mc, >=60 km, 1964-2009 (MAXC+0.2 / MBS)",
+  "ours": "5.7 / 5.8",
+  "published": "5.7 (Michael 2014)",
+  "verdict": "match"
+ },
+ {
+  "test": "Regional b, California, shallow, ISC-GEM 1976-2021",
+  "ours": "0.919 [0.757, 1.111] n=84 q=B",
+  "published": "1.00",
+  "verdict": "match"
+ },
+ {
+  "test": "Regional b, Italy, shallow, ISC-GEM 1976-2021",
+  "ours": "1.183 [0.874, 1.785] n=35 q=insufficient",
+  "published": "1.00",
+  "verdict": "not testable (n<50)"
+ },
+ {
+  "test": "Regional b, Japan, shallow, ISC-GEM 1976-2021",
+  "ours": "0.970 [0.918, 1.027] n=1007 q=A",
+  "published": "no verified published number at Mw>=5.2 found; reported for reference only",
+  "verdict": "reference only"
+ },
+ {
+  "test": "Regional b, Chile, shallow, ISC-GEM 1976-2021",
+  "ours": "0.914 [0.844, 0.984] n=613 q=A",
+  "published": "1.00",
+  "verdict": "mismatch"
+ },
+ {
+  "test": "Regional b, Zagros, shallow, ISC-GEM 1976-2021",
+  "ours": "1.316 [1.036, 1.664] n=65 q=C",
+  "published": "qualitative: Zagros has the highest b of the Iranian units (Iranian Plateau catalogue, J. Seismol. 2020)",
+  "verdict": "reference only"
+ },
+ {
+  "test": "Regional b, Makran, shallow, ISC-GEM 1976-2021",
+  "ours": "0.965 [0.629, 1.551] n=25 q=insufficient",
+  "published": "qualitative: Makran has the lowest b of the Iranian units (same source)",
+  "verdict": "not testable (n<50)"
+ },
+ {
+  "test": "Plate-boundary b, SUB",
+  "ours": "0.999 [0.977, 1.020]",
+  "published": "0.98 (beta 0.654 x 1.5, GCMT subduction, Kagan & Jackson)",
+  "verdict": "match"
+ },
+ {
+  "test": "Plate-boundary b, OSR (spreading ridges)",
+  "ours": "1.447 [1.386, 1.509]",
+  "published": "1.2-1.65 (beta 0.8-1.1, Kagan 2002 via Kagan 2010)",
+  "verdict": "match"
+ },
+ {
+  "test": "Ranking of b by boundary class",
+  "ours": "OSR > OTF > CTF > SUB > CRB > none > OCB > CCB",
+  "published": "spreading highest (TRACE 2026, Kagan); thrust/convergent lowest (Schorlemmer 2005)",
+  "verdict": "match"
+ },
+ {
+  "test": "Subduction b, young vs old slabs",
+  "ours": "young 0.943 [0.872, 1.021], old 1.089 [1.051, 1.127]",
+  "published": "b increases with slab age (Nishikawa & Ide 2014)",
+  "verdict": "match"
+ },
+ {
+  "test": "Omori p recovery, synthetic teleseismic sequence (20 runs)",
+  "ours": "p 1.063 (sd 0.025, mean sigma 0.028)",
+  "published": "true p 1.05",
+  "verdict": "match"
+ }
+]

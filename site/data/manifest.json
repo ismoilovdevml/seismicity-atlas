@@ -1,0 +1,173 @@
+{
+ "name": "Global Seismicity Atlas",
+ "version": "0.1.0",
+ "generated_utc": "2026-11-13T06:22:17Z",
+ "data_cutoff_utc": "2026-11-13",
+ "coverage": {
+  "iscgem": [
+   "1904-04-04 10:02:34.560000+00:00",
+   "2021-12-31 16:56:12.900000+00:00"
+  ],
+  "comcat": [
+   "1973-01-01 03:46:09.800000+00:00",
+   "2026-11-12 22:04:06.729000+00:00"
+  ]
+ },
+ "disclaimer": "Catalogue statistics for research and education. Not an earthquake forecast and not an official seismic hazard map.",
+ "licence": {
+  "data": "CC BY-SA 4.0 (derived from ISC-GEM, CC BY-SA 3.0)",
+  "code": "MIT"
+ },
+ "sources": [
+  {
+   "name": "ISC-GEM Global Instrumental Earthquake Catalogue",
+   "access": "USGS ComCat mirror, catalog=iscgem",
+   "url": "https://www.isc.ac.uk/iscgem/",
+   "licence": "CC BY-SA 3.0",
+   "citation": "Storchak et al. 2013 SRL 84(5); Di Giacomo et al. 2018 ESSD 10, 1877; doi:10.31905/D808B825"
+  },
+  {
+   "name": "USGS ANSS ComprehensiveCatalog (ComCat)",
+   "url": "https://earthquake.usgs.gov/fdsnws/event/1/",
+   "licence": "public domain (U.S. Government work)",
+   "query": "minmagnitude=4.5, 1973-01-01 to cut-off"
+  },
+  {
+   "name": "PB2002 plate boundaries (Bird 2003)",
+   "url": "https://github.com/fraxen/tectonicplates",
+   "licence": "ODC-BY 1.0",
+   "citation": "Bird 2003 G3 4(3) 1027; conversion by Hugo Ahlenius, Nordpil"
+  },
+  {
+   "name": "Natural Earth 1:110m land, 1:50m coastline",
+   "url": "https://www.naturalearthdata.com/",
+   "licence": "public domain"
+  }
+ ],
+ "method": {
+  "cells": "H3 resolution 2",
+  "sample_radius_km": 300.0,
+  "b_catalogue": "ISC-GEM Mw 1976-2021",
+  "floors": {
+   "sh": {
+    "1976-2003": {
+     "n": 21052,
+     "maxc02": 5.4,
+     "mbs": 5.7,
+     "gft": 5.3,
+     "floor": 5.7
+    },
+    "2004-2021": {
+     "n": 25518,
+     "maxc02": 5.2,
+     "mbs": 5.0,
+     "gft": 5.0,
+     "floor": 5.2
+    }
+   },
+   "dp": {
+    "1976-2003": {
+     "n": 5012,
+     "maxc02": 5.4,
+     "mbs": 5.4,
+     "gft": 5.3,
+     "floor": 5.4
+    },
+    "2004-2021": {
+     "n": 5003,
+     "maxc02": 5.2,
+     "mbs": 5.4,
+     "gft": 5.0,
+     "floor": 5.4
+    }
+   }
+  },
+  "nboot": 200,
+  "quality": {
+   "A": "95 % CI width <= 0.30",
+   "B": "<= 0.50",
+   "C": "wider: b masked",
+   "insufficient": "< 50 events above threshold"
+  }
+ },
+ "global": {
+  "b_shallow_1976_2021": {
+   "n_sample": 46570,
+   "n_b": 15827,
+   "mc": 5.4,
+   "b": 1.0432295602478125,
+   "ci95": [
+    1.0254773937508406,
+    1.059415928876279
+   ],
+   "quality": "A"
+  },
+  "b_deep_1976_2021": {
+   "n_sample": 10015,
+   "n_b": 5419,
+   "mc": 5.4,
+   "b": 0.9691925450154326,
+   "ci95": [
+    0.9454054225636151,
+    0.995895342009033
+   ],
+   "quality": "A"
+  }
+ },
+ "files": {
+  "events_m5.json": {
+   "bytes": 5360139,
+   "sha256": "1014806c975a736dc1ce2448f141f439739d86285f61fd7debe1eedb30e16af8"
+  },
+  "events_m6.json": {
+   "bytes": 706506,
+   "sha256": "10bb8bfe413eacbaf76c030ac175ade10fe1f853f296bdb443f868437418d7fc"
+  },
+  "global.json": {
+   "bytes": 8999,
+   "sha256": "a2c9cc2da033fea519c9a5a2982c08121382fd0f3199fc82b820c1caa36ecb1c"
+  },
+  "sequences.json": {
+   "bytes": 30985,
+   "sha256": "c555b289d262a25762f1c9ba3d1412b22b8889f7b9e3f035756ab065f3f67e1b"
+  },
+  "cells.geojson": {
+   "bytes": 1488054,
+   "sha256": "c04437d4aecbe428536a9a89f4edcebd588d9005266cf8ef09e2618d7d565c58"
+  },
+  "coastline.geojson": {
+   "bytes": 384300,
+   "sha256": "488c4a3f1803956aa4a87dedba4b5cc6bc8979d8cedbb7e75e0d6a07a3b3da13"
+  },
+  "land.geojson": {
+   "bytes": 86753,
+   "sha256": "5edb42d3423369c7f4de6cf7b93341f2291d3b498f68f46571faf9764aaf4883"
+  },
+  "plates.geojson": {
+   "bytes": 271625,
+   "sha256": "011641f0ea8bacc065d7f9df4751edee1b50f54a7a31969a9cd1c06cd1af908a"
+  }
+ },
+ "cell_detail_files": {
+  "count": 1292,
+  "bytes": 2596776
+ },
+ "events": {
+  "events_m6.json": {
+   "n": 15000,
+   "src_counts": {
+    "0": 7134,
+    "1": 7127,
+    "2": 739
+   }
+  },
+  "events_m5.json": {
+   "n": 162043,
+   "src_counts": {
+    "0": 58655,
+    "1": 15485,
+    "2": 87903
+   }
+  }
+ }
+}
