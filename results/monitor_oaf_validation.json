@@ -1,0 +1,295 @@
+{
+ "cutoff": "2026-11-13T00:00:00Z",
+ "method": "Reproduce the model parameters of the USGS operational aftershock forecasts (ComCat `oaf` product).\n\nFor every M >= 6.5 mainshock of the last 365 days that has an `oaf` product, read the parameters of the current\nforecast (forecast.json: model name, a, p, c, b, Mc or Mcat, F/G/H, region circle) and refit them with our code on\nComCat data selected the same way: the same circle, the same completeness, the same b, and data from the\nmainshock to the forecast's creation time.\n\n- Reasenberg-Jones products: c and b fixed at the USGS values, (a, p) free. This is a like-for-like comparison of\n  the sequence-specific part. A \"Bayesian Combination\" product also mixes in the generic prior, so a difference is\n  expected there.\n- ETAS products: the USGS ETAS model (van der Elst et al. 2022) separates mainshock productivity (ams) from\n  secondary productivity (a). Our single Omori-Utsu fit lumps all generations together, so only p and c are\n  compared directly; our RJ a is shown next to ams for orientation, not as a test.\n\nWrites results/monitor_oaf_validation.json and prints a Markdown table.",
+ "rows": [
+  {
+   "id": "us6000tkt2",
+   "mag": 7.8,
+   "place": "66 km NNW of Ende, Indonesia",
+   "time": "2026-08-14T21:58:21Z",
+   "model": "Epidemic-Type aftershock model (Bayesian Combination)",
+   "usgs": {
+    "ams": -2.01,
+    "a": -2.28,
+    "b": 1.15,
+    "magMain": 7.8,
+    "p": 0.96,
+    "c": 0.0024,
+    "Mc": 4.85,
+    "regionType": "circle",
+    "regionCenterLat": -8.1248,
+    "regionCenterLon": 120.7092,
+    "regionRadius": 227.8
+   },
+   "forecast_created": "2026-11-09T17:08:15Z",
+   "product_update_ms": 1794244310074,
+   "days_after": 86.8,
+   "ours": {
+    "n_used": 87,
+    "T_days": 86.8,
+    "Mcat": 4.85,
+    "query": {
+     "latitude": -8.1248,
+     "longitude": 120.7092,
+     "maxradiuskm": 227.8,
+     "starttime": "2026-08-14T21:58:21",
+     "endtime": "2026-11-09T17:08:15",
+     "minmagnitude": 4.6
+    },
+    "fixed_c": {
+     "a": -2.44,
+     "sa": 0.047,
+     "p": 0.886,
+     "sp": 0.04
+    },
+    "free_c": {
+     "a": -2.404,
+     "p": 0.925,
+     "sp": 0.06,
+     "c": 0.0105,
+     "sc": 0.0118
+    }
+   }
+  },
+  {
+   "id": "us6000u18k",
+   "mag": 7.7,
+   "place": "10 km WSW of Pitaloza Arriba, Panama",
+   "time": "2026-10-09T17:56:05Z",
+   "model": "Epidemic-Type aftershock model (Bayesian Combination)",
+   "usgs": {
+    "ams": -2.26,
+    "a": -2.57,
+    "b": 1.0,
+    "magMain": 7.7,
+    "p": 1.15,
+    "c": 0.0038,
+    "Mc": 4.65,
+    "regionType": "circle",
+    "regionCenterLat": 7.598,
+    "regionCenterLon": -80.8089,
+    "regionRadius": 381.6
+   },
+   "forecast_created": "2026-11-09T16:32:41Z",
+   "product_update_ms": 1794242158067,
+   "days_after": 30.9,
+   "ours": {
+    "n_used": 61,
+    "T_days": 30.94,
+    "Mcat": 4.65,
+    "query": {
+     "latitude": 7.598,
+     "longitude": -80.8089,
+     "maxradiuskm": 381.6,
+     "starttime": "2026-10-09T17:56:05",
+     "endtime": "2026-11-09T16:32:41",
+     "minmagnitude": 4.4
+    },
+    "fixed_c": {
+     "a": -2.261,
+     "sa": 0.056,
+     "p": 1.159,
+     "sp": 0.055
+    },
+    "free_c": {
+     "a": -2.225,
+     "p": 1.308,
+     "sp": 0.116,
+     "c": 0.0192,
+     "sc": 0.0134
+    }
+   }
+  },
+  {
+   "id": "us6000t7zp",
+   "mag": 7.5,
+   "place": "20 km W of Catia La Mar, Venezuela",
+   "time": "2026-06-24T22:05:04Z",
+   "model": "Epidemic-Type aftershock model (Bayesian Combination)",
+   "usgs": {
+    "ams": -2.87,
+    "a": -2.65,
+    "b": 1.0,
+    "magMain": 7.5,
+    "p": 1.03,
+    "c": 0.0373,
+    "Mc": 4.25,
+    "regionType": "circle",
+    "regionCenterLat": 10.604,
+    "regionCenterLon": -67.5488,
+    "regionRadius": 145.2
+   },
+   "forecast_created": "2026-11-09T17:15:02Z",
+   "product_update_ms": 1794244503565,
+   "days_after": 137.8,
+   "ours": {
+    "n_used": 18,
+    "T_days": 137.8,
+    "Mcat": 4.25,
+    "query": {
+     "latitude": 10.604,
+     "longitude": -67.5488,
+     "maxradiuskm": 145.2,
+     "starttime": "2026-06-24T22:05:04",
+     "endtime": "2026-11-09T17:15:02",
+     "minmagnitude": 4.0
+    },
+    "fixed_c": {
+     "a": -2.904,
+     "sa": 0.102,
+     "p": 0.986,
+     "sp": 0.102
+    },
+    "free_c": {
+     "a": -2.572,
+     "p": 1.246,
+     "sp": 0.383,
+     "c": 0.4265,
+     "sc": 0.8352
+    }
+   }
+  },
+  {
+   "id": "us6000tjl2",
+   "mag": 7.4,
+   "place": "4 km SSW of San Jos\u00e9 del Palmar, Colombia",
+   "time": "2026-08-10T12:34:28Z",
+   "model": "Epidemic-Type aftershock model (Bayesian Combination)",
+   "usgs": {
+    "ams": -2.28,
+    "a": -2.13,
+    "b": 1.0,
+    "magMain": 7.4,
+    "p": 0.98,
+    "c": 0.9998,
+    "Mc": 4.55,
+    "regionType": "circle",
+    "regionCenterLat": 4.4791,
+    "regionCenterLon": -76.5739,
+    "regionRadius": 125.4
+   },
+   "forecast_created": "2026-11-09T17:16:47Z",
+   "product_update_ms": 1794244608743,
+   "days_after": 91.2,
+   "ours": {
+    "n_used": 18,
+    "T_days": 91.2,
+    "Mcat": 4.55,
+    "query": {
+     "latitude": 4.4791,
+     "longitude": -76.5739,
+     "maxradiuskm": 125.4,
+     "starttime": "2026-08-10T12:34:28",
+     "endtime": "2026-11-09T17:16:47",
+     "minmagnitude": 4.3
+    },
+    "fixed_c": {
+     "a": -3.36,
+     "sa": 0.102,
+     "p": 0.127,
+     "sp": 0.248
+    },
+    "free_c": {
+     "a": -3.242,
+     "p": 0.212,
+     "sp": NaN,
+     "c": 0.0,
+     "sc": null
+    }
+   }
+  },
+  {
+   "id": "us6000rsy1",
+   "mag": 7.0,
+   "place": "2025 Hubbard Glacier Earthquake",
+   "time": "2025-12-06T20:41:49Z",
+   "model": "Reasenberg-Jones (1989, 1994) aftershock model (Sequence Specific)",
+   "usgs": {
+    "a": -2.11,
+    "b": 1.0,
+    "magMain": 7.0,
+    "p": 1.18,
+    "c": 0.018,
+    "aSigma": 0.0526,
+    "pSigma": 0.0465,
+    "Mcat": 4.0,
+    "F": 1.0,
+    "G": 4.5,
+    "H": 0.75,
+    "regionType": "circle",
+    "regionCenterLat": 60.4967,
+    "regionCenterLon": -139.7824,
+    "regionRadius": 60.0
+   },
+   "forecast_created": "2026-11-07T20:41:49Z",
+   "product_update_ms": 1794084717490,
+   "days_after": 336.0,
+   "ours": {
+    "n_used": 71,
+    "T_days": 336.0,
+    "Mcat": 4.0,
+    "query": {
+     "latitude": 60.4967,
+     "longitude": -139.7824,
+     "maxradiuskm": 60.0,
+     "starttime": "2025-12-06T20:41:49",
+     "endtime": "2026-11-07T20:41:49",
+     "minmagnitude": 3.75
+    },
+    "fixed_c": {
+     "a": -2.109,
+     "sa": 0.052,
+     "p": 1.193,
+     "sp": 0.046
+    },
+    "free_c": {
+     "a": -2.173,
+     "p": 1.123,
+     "sp": 0.056,
+     "c": 0.0051,
+     "sc": 0.0049
+    }
+   }
+  },
+  {
+   "id": "us7000ti1p",
+   "mag": 6.5,
+   "place": "170 km W of Nikolski, Alaska",
+   "time": "2026-09-17T14:19:52Z",
+   "model": "Reasenberg-Jones (1989, 1994) aftershock model (Bayesian Combination)",
+   "usgs": {
+    "a": -3.31,
+    "b": 1.0,
+    "magMain": 6.5,
+    "p": 0.88,
+    "c": 0.018,
+    "aSigma": 0.209,
+    "pSigma": 0.0,
+    "Mcat": 3.5,
+    "F": 1.0,
+    "G": 4.5,
+    "H": 0.75,
+    "regionType": "circle",
+    "regionCenterLat": 52.864,
+    "regionCenterLon": -171.3567,
+    "regionRadius": 18.41
+   },
+   "forecast_created": "2026-11-12T14:19:52Z",
+   "product_update_ms": 1794493805757,
+   "days_after": 56.0,
+   "ours": {
+    "n_used": 3,
+    "T_days": 56.0,
+    "Mcat": 3.5,
+    "query": {
+     "latitude": 52.864,
+     "longitude": -171.3567,
+     "maxradiuskm": 18.41,
+     "starttime": "2026-09-17T14:19:52",
+     "endtime": "2026-11-12T14:19:52",
+     "minmagnitude": 3.25
+    }
+   }
+  }
+ ]
+}

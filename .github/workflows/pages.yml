@@ -10,7 +10,7 @@ on:
   # A push made with GITHUB_TOKEN (the monthly data update) does not start other workflows,
   # so deploy after that workflow finishes successfully.
   workflow_run:
-    workflows: ["Update data"]
+    workflows: ["Update data", "Update monitor"]
     types: [completed]
 
 permissions:
