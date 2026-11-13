@@ -4,6 +4,7 @@ import * as f from './fmt.js';
 import { h, xyChart, forestChart, padDomain } from './charts.js';
 import { getJSON, mb } from './data.js';
 import { t } from './i18n/index.js';
+import { infoButton, infoKey } from './info.js';
 
 const errorBox = (root, e, retry) => root.replaceChildren(h('p', { class: 'error', role: 'alert' }, `${e.message} `, h('button', { class: 'small-btn', type: 'button', onclick: retry, text: t('common.retry') })));
 const loading = (root, what) => root.replaceChildren(h('div', { class: 'loading', role: 'status', text: t('common.loading', { what }) }));
@@ -34,6 +35,7 @@ function drawSequences(root, data, ctx) {
     h('h1', { text: t('seq.h1') }),
     h('p', { class: 'lede', text: t('seq.lede', { n: seqs.length, y: Math.min(...years), m0: f.mag(Math.min(...mags)), m1: f.mag(Math.max(...mags)) }) }),
     h('p', { class: 'summary-line' }, t('seq.summary', { a: counts.A, b: counts.B, c: counts.C, i: counts.insufficient, u: nUnres, n: nFit })),
+    infoKey([['omori-utsu', 'p, c, K'], ['magnitude-of-completeness', 'Mcat'], ['aftershock-productivity-bath', t('seq.contaminated')]]),
   ];
   const seg = (name, opts, cur, on) => h('div', { class: 'seg', role: 'radiogroup', 'aria-label': name === 'seqf' ? t('seq.filter') : t('seq.sortOrder'), style: `grid-template-columns:repeat(${opts.length},auto)` },
     opts.map(([v, lab]) => h('label', {}, h('input', { type: 'radio', name, value: v, checked: v === cur, onchange: () => on(v) }), lab)));
@@ -148,7 +150,7 @@ function drawMethods(root, g, sq, man) {
   out.push(h('section', { 'aria-label': t('val.summary') }, h('div', { class: 'summary-cards' },
     h('div', {}, h('span', { class: 'n', text: String(vt.length) }), h('span', { class: 'pill', text: t('val.total') })),
     [...tally.entries()].map(([k, v]) => h('div', {}, h('span', { class: 'n', text: String(v.n) }), h('span', { class: `pill ${v.cls}`, text: k }))))));
-  out.push(h('section', {}, h('div', { class: 'sec-head' }, h('h2', { text: t('val.plateH') }), h('span', { class: 'sub', text: t('val.plateSub') })), h('div', { class: 'card' }, plateChart(g, gs))));
+  out.push(h('section', {}, h('div', { class: 'sec-head' }, h('h2', {}, t('val.plateH'), infoButton('plate-boundary-classes')), h('span', { class: 'sub', text: t('val.plateSub') })), h('div', { class: 'card' }, plateChart(g, gs))));
   const tb = h('tbody');
   for (const r of vt) {
     const v = verdictEl(r.verdict);
@@ -160,6 +162,7 @@ function drawMethods(root, g, sq, man) {
 
   // method summary
   out.push(h('h2', { text: t('val.howH') }));
+  const stepConcept = ['h3-cells-and-sample-radius', 'direct-vs-proxy-mw', 'magnitude-of-completeness', 'confidence-interval-bootstrap', 'quality-codes', 'b-positive'];
   const steps = [
     [t('step.cells'), t('step.cellsTxt', { cells: m.cells, r: m.sample_radius_km })],
     [t('step.cat'), t('step.catTxt', { cat: m.b_catalogue })],
@@ -168,10 +171,10 @@ function drawMethods(root, g, sq, man) {
     [t('step.gate'), t('step.gateTxt', { a: q.A, b: q.B, c: q.C, i: q.insufficient })],
     [t('step.robust'), t('step.robustTxt')],
   ];
-  out.push(h('dl', { class: 'steps' }, steps.map(([k, v]) => h('div', {}, h('dt', { text: k }), h('dd', { text: v })))));
+  out.push(h('dl', { class: 'steps' }, steps.map(([k, v], i) => h('div', {}, h('dt', {}, k, infoButton(stepConcept[i])), h('dd', { text: v })))));
 
   // global b
-  out.push(h('h3', { text: t('val.globalH') }));
+  out.push(h('h3', {}, t('val.globalH'), infoButton('gutenberg-richter-b-value')));
   out.push(h('p', { class: 'prose', text: t('val.globalTxt', { sh: f.interval(gs.b, gs.ci95[0], gs.ci95[1], f.b3), nsh: f.int(gs.n_b), mc: f.mag(gs.mc), dp: f.interval(gd.b, gd.ci95[0], gd.ci95[1], f.b3), ndp: f.int(gd.n_b) }) }));
 
   // floors table
@@ -190,11 +193,11 @@ function drawMethods(root, g, sq, man) {
 
   // Omori synthetic
   const sc = sq.synthetic_check;
-  out.push(h('h3', { text: t('val.omoriH') }));
+  out.push(h('h3', {}, t('val.omoriH'), infoButton('omori-utsu')));
   out.push(h('p', { class: 'prose', text: t('val.omoriTxt', { p: sc.p_true, c: sc.c_true, pm: f.fixed(sc.p_mean, 3), sd: f.fixed(sc.p_sd_between, 3), se: f.fixed(sc.sp_mean, 3), cm: f.fixed(sc.c_median, 3), n: f.int(sc.n_mean) }) }));
 
   // limitations
-  out.push(h('h2', { text: t('val.limH') }));
+  out.push(h('h2', {}, t('val.limH'), infoButton('not-a-forecast')));
   out.push(h('ul', { class: 'prose' }, [
     t('lim.1', { y: String(man.coverage.iscgem[1]).slice(0, 4) }),
     t('lim.2', { r: m.sample_radius_km }),
@@ -274,7 +277,7 @@ export function renderAbout(root, ctx) {
   const man = ctx.manifest;
   const out = [];
   out.push(h('h1', { text: t('nav.about') }));
-  out.push(h('p', { class: 'notice' }, h('strong', { text: `${t('about.notice')} ` }), man.disclaimer, ` ${t('about.hazard')} `, h('a', { href: 'https://maps.openquake.org/map/global-seismic-hazard-map/', target: '_blank', rel: 'noopener', text: 'GEM Global Seismic Hazard Map' }), ` ${t('about.linkOnly')}`));
+  out.push(h('p', { class: 'notice' }, h('strong', { text: `${t('about.notice')} ` }), man.disclaimer, ` ${t('about.hazard')} `, h('a', { href: 'https://maps.openquake.org/map/global-seismic-hazard-map/', target: '_blank', rel: 'noopener', text: 'GEM Global Seismic Hazard Map' }), ` ${t('about.linkOnly')}`, ' ', infoButton('not-a-forecast')));
   out.push(h('p', { class: 'lede', text: t('about.lede') }));
 
   out.push(h('h2', { text: t('about.versionH') }));
@@ -288,7 +291,7 @@ export function renderAbout(root, ctx) {
   fact(t('about.events'), t('about.eventsVal', { m6: f.int(man.events['events_m6.json'].n), m5: f.int(man.events['events_m5.json'].n) }));
   out.push(dl);
 
-  out.push(h('h2', { text: t('about.sourcesH') }));
+  out.push(h('h2', {}, t('about.sourcesH'), infoButton('catalogue-consistency')));
   out.push(h('ul', { class: 'src-list prose' }, man.sources.map((s) => h('li', {},
     h('strong', { text: s.name }), h('br'),
     `${t('about.licence')}: ${s.licence}. `, s.citation ? `${t('about.cite')}: ${s.citation}. ` : '', s.access ? `${t('about.access')}: ${s.access}. ` : '', s.query ? `${t('about.query')}: ${s.query}. ` : '',

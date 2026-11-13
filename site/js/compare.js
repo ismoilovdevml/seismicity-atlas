@@ -5,6 +5,7 @@ import * as f from './fmt.js';
 import { h, forestChart } from './charts.js';
 import { qPill } from './panel.js';
 import { t } from './i18n/index.js';
+import { infoButton } from './info.js';
 
 const hasB = (p, d) => p && (p[`${d}_q`] === 'A' || p[`${d}_q`] === 'B') && f.isNum(p[`${d}_b`]);
 
@@ -71,17 +72,17 @@ export function renderCompare(a, b, ctx) {
 
   const verdict = h('section', { class: `cmp-verdict ${v.kind}`, role: 'status' });
   if (v.kind === 'missing') {
-    verdict.append(h('strong', { text: t('cmp.missingHead') }), h('p', { text: t('cmp.missing', { cells: v.missing.join(` ${t('cmp.and')} `) }) }));
+    verdict.append(h('strong', {}, t('cmp.missingHead'), infoButton('quality-codes')), h('p', { text: t('cmp.missing', { cells: v.missing.join(` ${t('cmp.and')} `) }) }));
   } else if (v.kind === 'overlap') {
-    verdict.append(h('strong', { text: t('cmp.overlapHead') }), h('p', { text: t('cmp.overlap', { lo: f.b2(v.lo), hi: f.b2(v.hi) }) }));
+    verdict.append(h('strong', {}, t('cmp.overlapHead'), infoButton('confidence-interval-bootstrap')), h('p', { text: t('cmp.overlap', { lo: f.b2(v.lo), hi: f.b2(v.hi) }) }));
   } else {
-    verdict.append(h('strong', { text: t('cmp.separateHead') }), h('p', { text: t('cmp.separate', { k: v.higher, gap: f.b2(v.gap) }) }));
+    verdict.append(h('strong', {}, t('cmp.separateHead'), infoButton('confidence-interval-bootstrap')), h('p', { text: t('cmp.separate', { k: v.higher, gap: f.b2(v.gap) }) }));
   }
   const radius = ctx.manifest.method.sample_radius_km;
   const dist = distanceKm(a, b);
   const shared = !a.regionName && !b.regionName && dist < 2 * radius;
-  verdict.append(h('p', { class: 'hint', text: t('cmp.distance', { km: f.int(dist) }) + (shared ? ` ${t('cmp.shared', { r: radius })}` : '') }));
-  if (!!a.regionName !== !!b.regionName || (a.regionName && a.regionName !== b.regionName)) verdict.append(h('p', { class: 'hint', text: t('cmp.mixedCatalogues') }));
+  verdict.append(h('p', { class: 'hint' }, t('cmp.distance', { km: f.int(dist) }) + (shared ? ` ${t('cmp.shared', { r: radius })}` : ''), shared ? infoButton('h3-cells-and-sample-radius') : null));
+  if (!!a.regionName !== !!b.regionName || (a.regionName && a.regionName !== b.regionName)) verdict.append(h('p', { class: 'hint' }, t('cmp.mixedCatalogues'), infoButton('regional-catalogues')));
   verdict.append(h('p', { class: 'hint', text: t('cmp.caveat') }));
   out.push(verdict);
 

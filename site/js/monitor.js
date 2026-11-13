@@ -5,6 +5,7 @@ import * as f from './fmt.js';
 import { h, xyChart, padDomain } from './charts.js';
 import { getJSON } from './data.js';
 import { t } from './i18n/index.js';
+import { infoButton, infoKey } from './info.js';
 
 const QCLS = { A: 'ok', B: 'close', C: 'na', insufficient: '' };
 const PROD_ARROW = { more: '↑', less: '↓', typical: '≈', insufficient: '' };
@@ -38,7 +39,7 @@ function draw(root, idx, full, ctx) {
   const out = [
     h('h1', { text: t('mon.h1') }),
     h('div', { class: 'notice mon-notice', role: 'note' },
-      h('strong', { text: `${t('mon.noticeStrong')} ` }), t('mon.notice')),
+      h('strong', { text: `${t('mon.noticeStrong')} ` }), t('mon.notice'), ' ', infoButton('not-a-forecast')),
     h('p', { class: 'lede', text: t('mon.lede', { m: f.mag(sel.min_mag), d: sel.window_days }) }),
   ];
   const facts = h('dl', { class: 'facts mon-facts' });
@@ -48,6 +49,8 @@ function draw(root, idx, full, ctx) {
   fact(t('mon.selection'), t('mon.selectionVal', { m: f.mag(sel.min_mag), d: sel.window_days, n: idx.sequences.length }) + (sel.fallback_used ? t('mon.fallback', { m0: f.mag(sel.default_min_mag) }) : ''));
   fact(t('mon.version'), idx.method_version);
   out.push(facts);
+  out.push(infoKey([['omori-utsu', 'p, c, K'], ['gutenberg-richter-b-value', 'b'], ['quality-codes', t('col.quality')], ['b-positive', t('mon.bpos')],
+    ['aftershock-productivity-bath', `${t('mon.prod')}, ${t('mon.largest')}`], ['magnitude-of-completeness', t('mon.nMcat')]]));
   out.push(h('details', { class: 'method card' }, h('summary', { text: t('mon.method') }), h('pre', { text: idx.method })));
 
   let sort = 'time';

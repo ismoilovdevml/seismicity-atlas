@@ -12,6 +12,7 @@ import * as f from './fmt.js';
 import { h } from './charts.js';
 import { t, setLang, LANGS } from './i18n/index.js';
 import { readExtras, writeExtras, setCommit } from './hashx.js';
+import { placeRailInfo } from './info-rail.js';
 import * as D from './depth3d.js';
 
 const VIEWS = ['map', 'sequences', 'monitor', 'methods', 'about', 'depth', 'learn'];
@@ -469,6 +470,7 @@ async function start() {
   setCommit(commit);
   await setLang(state.lang);
   wireControls();
+  placeRailInfo();
   syncControls();
   showView(state.v);
   setThemeLabel();

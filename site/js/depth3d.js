@@ -6,6 +6,7 @@
 import { getJSON, mb } from './data.js';
 import { h, svgEl } from './charts.js';
 import { t } from './i18n/index.js';
+import { infoButton } from './info.js';
 import * as f from './fmt.js';
 import { oklch } from './color.js';
 import { isDark, cssVar } from './layers.js';
@@ -151,7 +152,7 @@ function build() {
           h('div', { class: 'range-row' }, h('input', { type: 'range', id: 'd3-ex', min: 1, max: 20, step: 1 }), h('output', { for: 'd3-ex', id: 'd3-ex-out', class: 'mono' })),
           h('button', { type: 'button', class: 'link-btn', id: 'd3-ex-auto', text: t('d3.exAuto') })),
         h('div', { class: 'group' },
-          h('label', { class: 'check' }, h('input', { type: 'checkbox', id: 'd3-slab' }), h('span', { text: t('d3.slab') })),
+          h('div', { class: 'check-row' }, h('label', { class: 'check' }, h('input', { type: 'checkbox', id: 'd3-slab' }), h('span', { text: t('d3.slab') })), infoButton('depth-and-slabs')),
           h('p', { class: 'hint', id: 'd3-slab-hint' })),
         h('div', { class: 'group' },
           h('button', { type: 'button', class: 'small-btn', id: 'd3-reset', text: t('d3.reset') }),
@@ -464,7 +465,7 @@ function renderStats() {
   const cols = depthColors();
   const sh = counts[0] + counts[1], dp = c.ev.n - sh;
   const bars = h('div', { class: 'd3-card' },
-    h('h2', { text: t('d3.binsH') }),
+    h('h2', {}, t('d3.binsH'), infoButton('depth-and-slabs')),
     h('p', { class: 'hint', text: t('d3.binsSub', { m: c.m, n: f.int(c.ev.n) }) }),
     h('table', { class: 'd3-bins' },
       h('caption', { class: 'sr-only', text: t('d3.binsH') }),
@@ -483,8 +484,8 @@ function bCard(d) {
   const nC = c.cells.filter((p) => p[`${d}_q`] === 'C').length;
   const nI = c.cells.length - rows.length - nC;
   const card = h('div', { class: 'd3-card' },
-    h('h2', { text: t(`d3.bH.${d}`) }),
-    h('p', { class: 'hint', text: t('d3.bSub', { n: f.int(c.cells.length), ab: f.int(rows.length), c: f.int(nC), i: f.int(nI) }) }));
+    h('h2', {}, t(`d3.bH.${d}`), d === 'sh' ? infoButton('gutenberg-richter-b-value') : null),
+    h('p', { class: 'hint' }, t('d3.bSub', { n: f.int(c.cells.length), ab: f.int(rows.length), c: f.int(nC), i: f.int(nI) }), d === 'sh' ? infoButton('quality-codes') : null));
   if (!rows.length) { card.append(h('p', { class: 'muted', text: t('d3.bNone') })); return card; }
   const MAXR = 24;
   const shown = rows.length > MAXR ? rows.filter((_, i) => i % Math.ceil(rows.length / MAXR) === 0) : rows;

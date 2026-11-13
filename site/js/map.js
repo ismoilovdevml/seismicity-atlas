@@ -7,6 +7,10 @@ import { h } from './charts.js';
 import { getJSON, ruleNumber } from './data.js';
 import { t } from './i18n/index.js';
 import * as B from './basemap.js';
+import { infoButton } from './info.js';
+
+// Concept explained by the legend title of each layer (docs/learn.md).
+const LEGEND_CONCEPT = { b: 'gutenberg-richter-b-value', q: 'quality-codes', mc: 'magnitude-of-completeness', cc: 'catalogue-consistency', rate: 'rate-m6' };
 
 let map = null;
 let C = null; // context: {state, manifest, cells, byId, lookup(id), onSelect, onView, onEventsLoaded}
@@ -301,7 +305,8 @@ function renderLegend(def) {
     counts.set(k, (counts.get(k) || 0) + 1);
   }
   const kids = [];
-  kids.push(h('div', { class: 'lg-head' }, h('span', { class: 'lg-title', text: def.title }), def.depthAware ? h('span', { class: 'lg-depth', text: t(`depth.${st.d}.label`) }) : h('span', { class: 'lg-depth', text: def.none ? '' : t('lg.allDepths') })));
+  const lgConcept = LEGEND_CONCEPT[st.l];
+  kids.push(h('div', { class: 'lg-head' }, h('span', { class: 'lg-title' }, def.title, lgConcept && !def.none ? infoButton(lgConcept) : null), def.depthAware ? h('span', { class: 'lg-depth', text: t(`depth.${st.d}.label`) }) : h('span', { class: 'lg-depth', text: def.none ? '' : t('lg.allDepths') })));
   if (def.none) kids.push(h('p', { class: 'lg-unit', text: t('lg.none') }));
   else kids.push(h('p', { class: 'lg-unit', text: def.unit }));
   if (def.bar) {
@@ -327,18 +332,18 @@ function renderLegend(def) {
     kids.push(h('span', { class: 'lg-count', text: t('lg.pass', { pass: f.int(pass), n: f.int(C.cells.features.length) }) }));
   } else if (def.note) kids.push(h('span', { class: 'lg-count', text: def.note }));
   const extra = [];
-  if (st.pl) extra.push(h('div', { style: 'display:flex;align-items:center;gap:8px' }, h('span', { class: 'sw sw-line', 'aria-hidden': 'true' }), t('lg.plates')));
+  if (st.pl) extra.push(h('div', { style: 'display:flex;align-items:center;gap:8px' }, h('span', { class: 'sw sw-line', 'aria-hidden': 'true' }), h('span', {}, t('lg.plates'), infoButton('plate-boundary-classes'))));
   if (st.ev) {
     const sizes = [6, 7, 8, 9].map((m) => {
       const r = radiusFor(m, map.getZoom());
       return h('span', {}, h('i', { style: `width:${2 * r}px;height:${2 * r}px` }), `M${m}`);
     });
-    extra.push(h('span', { text: `${t('lg.quakes')} ${evCountText()}` }), h('div', { class: 'lg-sizes', 'aria-hidden': 'true' }, sizes));
+    extra.push(h('span', {}, `${t('lg.quakes')} ${evCountText()}`, infoButton('magnitude-types')), h('div', { class: 'lg-sizes', 'aria-hidden': 'true' }, sizes));
   }
   if (region) {
     const r = region.meta;
     extra.push(h('div', { class: 'lg-region' },
-      h('strong', { text: t('reg.legendHead', { name: r.name }) }),
+      h('strong', {}, t('reg.legendHead', { name: r.name }), infoButton('regional-catalogues')),
       h('span', { text: t('reg.legend', { catalogue: r.catalogue, licence: r.licence, p0: (r.period || [])[0] ?? '–', p1: (r.period || [])[1] ?? '–', mc: r.mc_typical ?? '–' }) }),
       st.l !== 'b' ? h('span', { text: t('reg.alwaysB') }) : null,
       r.attribution ? h('span', { text: `${t('reg.attribution')}: ${r.attribution}` }) : null,

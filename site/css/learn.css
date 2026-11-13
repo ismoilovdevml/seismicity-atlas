@@ -1,12 +1,22 @@
 /* Learn: concept index and concept pages. Uses the tokens of app.css; nothing here changes the map views. */
 
-/* ---------- info (i) link, placed next to labels in phase 2 ---------- */
+/* ---------- info (i) buttons, next to labels across the site ---------- */
 .info-btn {
-  display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin: -6px -4px -6px 0;
-  border-radius: 50%; color: var(--ink-3); vertical-align: middle; flex: none;
+  display: inline-flex; align-items: center; justify-content: center; flex: none; width: 24px; height: 24px; padding: 0;
+  margin: -3px 0 -3px 4px; border: 0; border-radius: 50%; background: transparent; color: var(--ink-3); cursor: pointer;
+  vertical-align: middle; font: inherit; line-height: 1;
 }
-.info-btn svg { width: 17px; height: 17px; }
+.info-btn svg { width: 16px; height: 16px; }
 .info-btn:hover { color: var(--accent); background: var(--accent-bg); }
+.info-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ll-row, .check-row { display: flex; align-items: center; gap: 6px; }
+.ll-row > label, .check-row > label { flex: 1; min-width: 0; }
+.ll-row > .info-btn, .check-row > .info-btn { margin: 0 4px 0 0; }
+.group-title .info-btn, legend .info-btn { margin-top: -5px; margin-bottom: -5px; }
+.info-key { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 10px 14px; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); font-size: 13px; color: var(--ink-2); }
+.info-key-lbl { font-weight: 600; color: var(--ink-3); }
+.info-key ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.info-key li { display: inline-flex; align-items: center; }
 
 /* ---------- shared ---------- */
 .lr-root { max-width: 960px; }

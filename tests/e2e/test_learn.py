@@ -171,7 +171,7 @@ def test_info_button_back_and_show_on_map(site):
     pg.evaluate("""import('./js/info.js').then((m) => {
       const a = m.infoButton('quality-codes', 'Quality'); a.id = 'test-info'; document.querySelector('.legend').append(a); })""")
     pg.wait_for_selector("#test-info")
-    assert pg.get_attribute("#test-info", "aria-label") == "What is Quality? Open the explanation"
+    assert pg.get_attribute("#test-info", "aria-label") == "About Quality codes A, B, C and insufficient"
     pg.click("#test-info")
     pg.wait_for_selector(".lr-page[data-concept='quality-codes'] .lr-diagram[data-ready='1']")
     assert "t=quality-codes" in pg.evaluate("location.hash")

@@ -1,24 +1,53 @@
-// infoButton(conceptId, label): the small (i) link placed next to a label or metric. It opens the Learn page of
-// that concept (#v=learn&t=<id>); the page offers a "back to where I was" link to the previous state.
-// Phase 2 places these in the panel, layer list, legend and pages; see docs/learn.md for the mapping.
+// Info (i) buttons: a small button placed right after a label or heading. It opens the Learn page of one concept
+// (#v=learn&t=<id>); that page offers "Back to where I was", which returns to the exact previous URL state.
+// Placement rule (docs/learn.md): one button per concept per block (panel section, legend, card, control group),
+// always right after the label it explains, never on every number. List pages use one key strip (infoKey).
 
 import { h } from './charts.js';
-import { t } from './i18n/index.js';
+import { t, onLang } from './i18n/index.js';
 
 const ICON = '<svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v4.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="6.4" r="1" fill="currentColor"/></svg>';
 
-/**
- * conceptId: an id from site/js/learn/registry.js; label: the visible name of the thing being explained, used in
- * the accessible name ("What is b-value? Open the explanation").
- */
-export function infoButton(conceptId, label) {
-  const a = h('a', {
-    class: 'info-btn',
-    href: `#v=learn&t=${encodeURIComponent(conceptId)}`,
-    'aria-label': t('learn.infoAria', { label }),
-    title: t('learn.infoAria', { label }),
-    'data-concept': conceptId,
-  });
-  a.insertAdjacentHTML('afterbegin', ICON);
-  return a;
+const aria = (id) => t('learn.about', { c: t(`learn.c.${id}`) });
+
+/** Open the Learn page of a concept. A plain hash change, so the app records where the visitor came from. */
+export function openConcept(id) {
+  location.hash = `#v=learn&t=${encodeURIComponent(id)}`;
 }
+
+/**
+ * conceptId: an id from site/js/learn/registry.js. The accessible name is "About <concept title>" in the current
+ * language. The second argument is accepted for compatibility and not used.
+ */
+export function infoButton(conceptId) {
+  const b = h('button', { type: 'button', class: 'info-btn', 'data-concept': conceptId, 'aria-label': aria(conceptId), title: aria(conceptId) });
+  b.insertAdjacentHTML('afterbegin', ICON);
+  b.addEventListener('click', (e) => {
+    // the button may sit inside a clickable row, a label or the map legend: only open the concept
+    e.preventDefault();
+    e.stopPropagation();
+    openConcept(conceptId);
+  });
+  return b;
+}
+
+/** Append an info button to an element (a heading, legend or label text) and return the element. */
+export function withInfo(el, conceptId) {
+  if (el) el.append(infoButton(conceptId));
+  return el;
+}
+
+/** A compact key for list pages: [[conceptId, label], ...] shown once above the cards. */
+export function infoKey(items) {
+  return h('div', { class: 'info-key', role: 'group', 'aria-label': t('learn.keyLabel') },
+    h('span', { class: 'info-key-lbl', text: t('learn.keyLabel') }),
+    h('ul', {}, items.map(([id, label]) => h('li', {}, h('span', { text: label }), infoButton(id)))));
+}
+
+// Buttons in static markup (the map controls) are not re-rendered on a language change: relabel them.
+onLang(() => {
+  document.querySelectorAll('.info-btn[data-concept]').forEach((b) => {
+    b.setAttribute('aria-label', aria(b.dataset.concept));
+    b.title = aria(b.dataset.concept);
+  });
+});
