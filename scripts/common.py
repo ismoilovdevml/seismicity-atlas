@@ -1,0 +1,88 @@
+"""Shared paths, constants, loading helpers and figure style."""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+ROOT = Path(__file__).resolve().parents[1]
+PROC = ROOT / "data" / "processed"
+AUX = PROC / "aux"
+WORK = ROOT / "data" / "work"
+RES = ROOT / "results"
+IMG = ROOT / "docs" / "img"
+SITE = ROOT / "site" / "data"
+for d in (WORK, RES, IMG, SITE):
+    d.mkdir(parents=True, exist_ok=True)
+
+CUTOFF = "2026-11-13"          # data cut-off date (UTC) used for the ComCat download
+VERSION = "0.1.0"
+H3_RES = 2                      # display cells: H3 resolution 2 (mean area 86,802 km2)
+SAMPLE_R_KM = 300.0             # sampling radius around each cell centre for Mc / b
+DEPTH_SPLIT = 70.0              # km: shallow <= 70 < intermediate/deep
+DM = 0.1
+MW_TYPES = {"mww", "mwc", "mwb", "mwr", "mw", "mwp", "mi", "mwd"}
+
+# Michael (2014, BSSA 104(4)) ISC-GEM completeness, shallow (< 60 km) and deep events
+MICHAEL_SHALLOW = [(1900, 1917, 7.7), (1918, 1939, 7.0), (1940, 1954, 6.8), (1955, 1963, 6.5),
+                   (1964, 1975, 6.0), (1976, 2003, 5.8), (2004, 2009, 5.7)]
+MICHAEL_DEEP = [(1900, 1963, 7.1), (1964, 2009, 5.7)]
+
+# validated reference palette (dataviz skill): categorical slots in fixed order, text inks, surfaces
+C1, C2, C3, C4, C5, C6, C7, C8 = ("#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6",
+                                  "#e34948")
+INK, INK2, MUTED, GRID, SURFACE = "#0b0b0b", "#52514e", "#8a8984", "#e4e3df", "#fcfcfb"
+SEQ_BLUE = ["#cde2fb", "#b7d3f6", "#9ec5f4", "#86b6ef", "#6da7ec", "#5598e7", "#3987e5", "#2a78d6", "#256abf",
+            "#1c5cab", "#184f95", "#104281", "#0d366b"]
+DIV_NEUTRAL = "#f0efec"
+
+
+def setup_mpl():
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({
+        "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
+        "axes.edgecolor": MUTED, "axes.labelcolor": INK2, "xtick.color": INK2, "ytick.color": INK2,
+        "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.6, "axes.spines.top": False,
+        "axes.spines.right": False, "font.size": 9.5, "axes.titlesize": 10.5, "axes.titleweight": "bold",
+        "axes.titlecolor": INK, "legend.frameon": False, "lines.linewidth": 2.0, "savefig.dpi": 150,
+        "font.family": "DejaVu Sans",
+    })
+    return plt
+
+
+def decimal_year(t: pd.Series) -> np.ndarray:
+    t = pd.DatetimeIndex(t)
+    start = pd.to_datetime(t.year.astype(str) + "-01-01", utc=True)
+    end = pd.to_datetime((t.year + 1).astype(str) + "-01-01", utc=True)
+    return (t.year + (t - start) / (end - start)).to_numpy(float)
+
+
+def jdump(obj, path: Path, indent=None):
+    def conv(o):
+        if isinstance(o, np.floating):
+            return None if not np.isfinite(o) else float(o)
+        if isinstance(o, np.integer):
+            return int(o)
+        if isinstance(o, np.ndarray):
+            return o.tolist()
+        if isinstance(o, np.bool_):
+            return bool(o)
+        return str(o)
+
+    def clean(o):
+        if isinstance(o, float) and not np.isfinite(o):
+            return None
+        if isinstance(o, dict):
+            return {k: clean(v) for k, v in o.items()}
+        if isinstance(o, (list, tuple)):
+            return [clean(v) for v in o]
+        return o
+    path.write_text(json.dumps(clean(obj), indent=indent, default=conv, separators=None if indent else (",", ":")))
+
+
+def load_work(name: str) -> pd.DataFrame:
+    return pd.read_pickle(WORK / f"{name}.pkl")

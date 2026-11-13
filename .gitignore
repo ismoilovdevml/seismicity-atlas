@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+/data/
+.claude/
+CLAUDE.md
+AGENTS.md
+.DS_Store
+.netrc
+*.env
