@@ -92,8 +92,13 @@ def test_events_filter_and_usgs_link(site):
     assert n6 > 1000, n6
     pg.check("#chk-m5")
     pg.wait_for_function("document.getElementById('ev-count').textContent.includes('M ≥ 5.0')", timeout=120000)
-    pg.wait_for_timeout(1200)
-    n5 = rendered(pg, "events")
+    # The 7.5 MB M5 layer can take several seconds to render on slow CI runners: poll instead of a fixed wait.
+    n5 = n6
+    for _ in range(120):
+        pg.wait_for_timeout(500)
+        n5 = rendered(pg, "events")
+        if n5 > n6:
+            break
     assert n5 > n6, (n6, n5)
     pg.evaluate("() => { const e = document.getElementById('yr0'); e.value = 2000; e.dispatchEvent(new Event('input')); }")
     pg.wait_for_timeout(300)

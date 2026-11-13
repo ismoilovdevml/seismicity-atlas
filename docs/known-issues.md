@@ -62,3 +62,6 @@ Status on 2026-11-13 (branch with the browser suite, comparison, CSV, regional l
 - Contrast was computed for the main text tokens (all ≥ 5.6:1 in both themes). Map fill colours were not checked
   against WCAG non-text contrast; the hover tooltip, legend counts and the cell table give the values without
   colour.
+- CI (GitHub Actions, Ubuntu, headless Firefox without a GPU): the cell-comparison tests log a bare
+  `console.error: Error` at teardown. The same tests pass in Firefox on macOS (5/5 locally, 2026-11-13), so this looks
+  specific to the runner's WebGL setup. Firefox and WebKit jobs are `continue-on-error`; Chromium is the required job.
