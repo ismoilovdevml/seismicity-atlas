@@ -73,6 +73,10 @@ jobs:
           key: atlas-raw-${{ github.run_id }}
 
       - name: Run pipeline and tests
+        # Regional layers need per-event lookups (over an hour on a cold cache), so the monthly
+        # global refresh keeps the committed regional output; rebuild regions by hand when needed.
+        env:
+          SKIP_REGIONAL: "1"
         run: PY=python ./scripts/run_all.sh
 
       - name: Drift guard
