@@ -1,0 +1,71 @@
+name: Update monitor
+
+# Daily refresh of the Sequence Monitor (the "Ongoing" view): a descriptive summary of the M >= 7 aftershock
+# sequences of the last 365 days. Queries ComCat (one request per sequence, 1 s apart), rebuilds site/data/monitor,
+# checks it, runs the monitor tests and commits the data to main. Nothing is committed if any step fails.
+# Not a forecast: see docs/monitor.md.
+
+on:
+  schedule:
+    - cron: "41 5 * * *" # 05:41 UTC every day
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-monitor
+  cancel-in-progress: false
+
+jobs:
+  update:
+    if: github.repository == 'ismoilovdevml/seismicity-atlas'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install requirements
+        run: python -m pip install -r requirements.txt
+
+      - name: Restore the tectonic-regime grid cache
+        uses: actions/cache@v4
+        with:
+          path: data/raw/opensha
+          key: monitor-opensha-20431f4
+
+      - name: Fetch ComCat and build the monitor
+        run: python -I scripts/monitor/build_monitor.py
+
+      - name: Check the monitor data
+        run: python -I scripts/monitor/check_monitor.py
+
+      - name: Unit tests
+        run: python -I -m pytest -q -p no:cacheprovider tests/test_monitor.py
+
+      - name: Browser tests of the Ongoing view (Chromium)
+        run: |
+          python -m pip install playwright==1.65.1 pytest==9.2.0
+          python -m playwright install --with-deps chromium
+          python -m pytest -q -p no:cacheprovider tests/e2e/test_monitor.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "ismoilovdevml"
+          git config user.email "107093598+ismoilovdevml@users.noreply.github.com"
+          git add -A site/data/monitor
+          if git diff --cached --quiet -- site/data/monitor; then
+            echo "No change in site/data/monitor; nothing committed."
+            exit 0
+          fi
+          CUTOFF=$(python -I -c 'import json,sys; print(json.load(open(sys.argv[1]))["data_cutoff_utc"])' site/data/monitor/index.json)
+          git commit -m "Update ongoing sequences to cut-off $CUTOFF"
+          git pull --rebase origin main
+          git push origin HEAD:main
