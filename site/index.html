@@ -6,7 +6,25 @@
 <title>Global Seismicity Atlas</title>
 <meta name="description" content="An open world map of earthquake-catalogue statistics: seismicity, completeness, b-value with its uncertainty, catalogue agreement and aftershock decay. It shows where catalogue numbers can be trusted. Not a forecast and not an official hazard map.">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1d21" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://ismoilovdevml.github.io/seismicity-atlas/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Global Seismicity Atlas">
+<meta property="og:title" content="Global Seismicity Atlas">
+<meta property="og:description" content="Where earthquake-catalogue numbers can be trusted: b-value with its 95 % interval, completeness and catalogue agreement, from ISC-GEM and USGS ComCat. Not a forecast and not a hazard map.">
+<meta property="og:url" content="https://ismoilovdevml.github.io/seismicity-atlas/">
+<meta property="og:image" content="https://ismoilovdevml.github.io/seismicity-atlas/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="World map of Gutenberg-Richter b-values around the Pacific, coloured from blue (low) to orange-brown (high), with the atlas title.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Global Seismicity Atlas">
+<meta name="twitter:description" content="Where earthquake-catalogue numbers can be trusted: b-value with its 95 % interval, completeness and catalogue agreement. Not a forecast.">
+<meta name="twitter:image" content="https://ismoilovdevml.github.io/seismicity-atlas/og-image.png">
+<meta name="twitter:image:alt" content="World map of Gutenberg-Richter b-values around the Pacific with the atlas title.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preload" href="vendor/fonts/inter-400-700-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="vendor/maplibre-gl-5.24.0/maplibre-gl.css">
 <link rel="stylesheet" href="css/app.css">
@@ -15,29 +33,39 @@
 </script>
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
+<a class="skip" href="#main" data-i18n="skip">Skip to content</a>
 
 <header class="top">
   <a class="brand" href="#v=map">
     <svg class="logo" viewBox="0 0 28 28" aria-hidden="true"><polygon points="14,2 25,8 25,20 14,26 3,20 3,8"/><polyline points="6,15 10,15 12,9 15,20 17,13 22,13"/></svg>
     <span class="brand-text">
-      <span class="brand-name"><span class="brand-long">Global </span>Seismicity Atlas</span>
-      <span class="brand-tag">Where earthquake-catalogue numbers can be trusted</span>
+      <span class="brand-name"><span class="brand-long" data-i18n="brand.global">Global </span><span data-i18n="brand.name">Seismicity Atlas</span></span>
+      <span class="brand-tag" data-i18n="brand.tag">Where earthquake-catalogue numbers can be trusted</span>
     </span>
   </a>
-  <nav class="nav" id="nav" aria-label="Main">
-    <a href="#v=map" data-view="map">Map</a>
-    <a href="#v=sequences" data-view="sequences">Sequences</a>
-    <a href="#v=methods" data-view="methods">Validation</a>
-    <a href="#v=about" data-view="about">About &amp; data</a>
+  <nav class="nav" id="nav" data-i18n-attr="aria-label:nav.label" aria-label="Main">
+    <a href="#v=map" data-view="map" data-i18n="nav.map">Map</a>
+    <a href="#v=sequences" data-view="sequences" data-i18n="nav.sequences">Sequences</a>
+    <a href="#v=methods" data-view="methods" data-i18n="nav.methods">Validation</a>
+    <a href="#v=about" data-view="about" data-i18n="nav.about">About &amp; data</a>
   </nav>
   <div class="top-right">
     <span class="version mono" id="brand-meta"></span>
+    <label class="lang">
+      <span class="sr-only" data-i18n="lang.label">Language</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>
+      <select id="lang-select">
+        <option value="en" lang="en">EN</option>
+        <option value="uz" lang="uz-Latn">UZ</option>
+        <option value="ru" lang="ru">RU</option>
+        <option value="es" lang="es">ES</option>
+      </select>
+    </label>
     <button class="icon-btn" id="theme-btn" type="button" aria-label="Colour theme: automatic">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
       <span class="sr-only" id="theme-label">automatic</span>
     </button>
-    <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="nav" aria-label="Open menu">
+    <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="nav" data-i18n-attr="aria-label:nav.open" aria-label="Open menu">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
   </div>
@@ -45,78 +73,86 @@
 
 <div class="disclaimer" role="note" id="disclaimer">
   <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v5" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="16.5" r="1.1" fill="currentColor"/></svg>
-  <span><span class="long">Catalogue statistics for research and education. </span><strong>Not an earthquake forecast and not an official seismic hazard map.</strong> <a href="#v=about">About the data</a></span>
+  <span><span class="long" data-i18n="disc.long">Catalogue statistics for research and education. </span><strong data-i18n="disc.strong">Not an earthquake forecast and not an official seismic hazard map.</strong> <a href="#v=about" data-i18n="disc.link">About the data</a></span>
 </div>
 
 <main id="main">
-  <section id="view-map" class="view" aria-label="Map">
-    <div class="chips" id="chips" role="toolbar" aria-label="Map layer">
-      <button type="button" class="chip" data-layer="b">b-value</button>
-      <button type="button" class="chip" data-layer="q">Quality</button>
-      <button type="button" class="chip" data-layer="mc">Mc</button>
-      <button type="button" class="chip" data-layer="cc">Agreement</button>
-      <button type="button" class="chip" data-layer="rate">M6+ rate</button>
+  <section id="view-map" class="view" data-i18n-attr="aria-label:nav.map" aria-label="Map">
+    <div class="chips" id="chips" role="toolbar" data-i18n-attr="aria-label:chips.label" aria-label="Map layer">
+      <button type="button" class="chip" data-layer="b" data-i18n="chip.b">b-value</button>
+      <button type="button" class="chip" data-layer="q" data-i18n="chip.q">Quality</button>
+      <button type="button" class="chip" data-layer="mc" data-i18n="chip.mc">Mc</button>
+      <button type="button" class="chip" data-layer="cc" data-i18n="chip.cc">Agreement</button>
+      <button type="button" class="chip" data-layer="rate" data-i18n="chip.rate">M6+ rate</button>
       <button type="button" class="chip chip-depth" id="chip-depth">Shallow</button>
-      <button type="button" class="chip" id="chip-more" aria-expanded="false" aria-controls="controls">More</button>
+      <button type="button" class="chip" id="chip-more" aria-expanded="false" aria-controls="controls" data-i18n="chip.more">More</button>
     </div>
 
-    <aside class="rail" id="controls" aria-label="Map controls">
+    <aside class="rail" id="controls" data-i18n-attr="aria-label:rail.label" aria-label="Map controls">
       <fieldset class="group">
-        <legend class="group-title">Depth</legend>
+        <legend class="group-title" data-i18n="rail.depth">Depth</legend>
         <div class="seg" id="depth-seg">
-          <label><input type="radio" name="depth" value="sh"> Shallow ≤ 70 km</label>
-          <label><input type="radio" name="depth" value="dp"> Deeper &gt; 70 km</label>
+          <label><input type="radio" name="depth" value="sh"> <span data-i18n="depth.sh.label">Shallow ≤ 70 km</span></label>
+          <label><input type="radio" name="depth" value="dp"> <span data-i18n="depth.dp.label">Deeper &gt; 70 km</span></label>
         </div>
         <p class="hint" id="depth-hint" hidden></p>
       </fieldset>
 
       <fieldset class="group">
-        <legend class="group-title">Layer</legend>
+        <legend class="group-title" data-i18n="rail.layer">Layer</legend>
         <div class="layer-list" id="layer-list">
-          <label><input type="radio" name="layer" value="b"><span class="ll-name">b-value with 95 % interval</span><span class="ll-hint">Quality-gated</span></label>
-          <label><input type="radio" name="layer" value="q"><span class="ll-name">Estimate quality</span><span class="ll-hint">A / B / C / insufficient</span></label>
-          <label><input type="radio" name="layer" value="mc"><span class="ll-name">Completeness Mc</span><span class="ll-hint">ISC-GEM or ComCat</span></label>
-          <label><input type="radio" name="layer" value="cc"><span class="ll-name">Catalogue disagreement</span><span class="ll-hint">ComCat vs ISC-GEM</span></label>
-          <label><input type="radio" name="layer" value="rate"><span class="ll-name">Mw ≥ 6 rate</span><span class="ll-hint">per 100,000 km² per year</span></label>
-          <label><input type="radio" name="layer" value="none"><span class="ll-name">No cell layer</span><span class="ll-hint">Base map and overlays only</span></label>
+          <label><input type="radio" name="layer" value="b"><span class="ll-name" data-i18n="ll.b">b-value with 95 % interval</span><span class="ll-hint" data-i18n="ll.bHint">Quality-gated</span></label>
+          <label><input type="radio" name="layer" value="q"><span class="ll-name" data-i18n="ll.q">Estimate quality</span><span class="ll-hint" data-i18n="ll.qHint">A / B / C / insufficient</span></label>
+          <label><input type="radio" name="layer" value="mc"><span class="ll-name" data-i18n="ll.mc">Completeness Mc</span><span class="ll-hint" data-i18n="ll.mcHint">ISC-GEM or ComCat</span></label>
+          <label><input type="radio" name="layer" value="cc"><span class="ll-name" data-i18n="ll.cc">Catalogue disagreement</span><span class="ll-hint" data-i18n="ll.ccHint">ComCat vs ISC-GEM</span></label>
+          <label><input type="radio" name="layer" value="rate"><span class="ll-name" data-i18n="ll.rate">Mw ≥ 6 rate</span><span class="ll-hint" data-i18n="ll.rateHint">per 100,000 km² per year</span></label>
+          <label><input type="radio" name="layer" value="none"><span class="ll-name" data-i18n="ll.none">No cell layer</span><span class="ll-hint" data-i18n="ll.noneHint">Base map and overlays only</span></label>
         </div>
-        <label class="sr-only" for="sub-select">Variant of the layer</label>
+        <label class="sr-only" for="sub-select" data-i18n="rail.variant">Variant of the layer</label>
         <select class="select" id="sub-select" hidden></select>
       </fieldset>
 
+      <fieldset class="group" id="reg-group" hidden>
+        <legend class="group-title" data-i18n="reg.group">Regional catalogues (higher resolution)</legend>
+        <label class="sr-only" for="reg-select" data-i18n="reg.select">Regional catalogue</label>
+        <select class="select" id="reg-select"></select>
+        <p class="hint" id="reg-status" aria-live="polite" data-i18n="reg.hint">Drawn over the global cells with the same b classes and quality rules.</p>
+      </fieldset>
+
       <fieldset class="group">
-        <legend class="group-title">Overlays</legend>
-        <label class="check"><input type="checkbox" id="chk-plates"> Plate boundaries (PB2002)</label>
+        <legend class="group-title" data-i18n="rail.overlays">Overlays</legend>
+        <label class="check"><input type="checkbox" id="chk-plates"> <span data-i18n="rail.plates">Plate boundaries (PB2002)</span></label>
         <label class="check"><input type="checkbox" id="chk-events"> <span id="lbl-m6">Events M ≥ 6</span></label>
         <label class="check"><input type="checkbox" id="chk-m5"> <span id="lbl-m5">Events M ≥ 5, loads on demand</span></label>
         <div class="events-opts" id="events-opts" hidden>
-          <div class="range-row"><label for="yr0">From</label><input type="range" id="yr0"><output for="yr0" id="yr0-out" class="mono"></output></div>
-          <div class="range-row"><label for="yr1">To</label><input type="range" id="yr1"><output for="yr1" id="yr1-out" class="mono"></output></div>
-          <div class="range-row"><label for="mmin">Min M</label><input type="range" id="mmin" min="5" max="8.5" step="0.5"><output for="mmin" id="mmin-out" class="mono"></output></div>
+          <div class="range-row"><label for="yr0" data-i18n="rail.from">From</label><input type="range" id="yr0"><output for="yr0" id="yr0-out" class="mono"></output></div>
+          <div class="range-row"><label for="yr1" data-i18n="rail.to">To</label><input type="range" id="yr1"><output for="yr1" id="yr1-out" class="mono"></output></div>
+          <div class="range-row"><label for="mmin" data-i18n="rail.minM">Min M</label><input type="range" id="mmin" min="5" max="8.5" step="0.5"><output for="mmin" id="mmin-out" class="mono"></output></div>
           <p class="hint" id="ev-count" aria-live="polite"></p>
         </div>
       </fieldset>
 
       <div class="group stat-window">
-        <span class="group-title">Statistics window</span>
+        <span class="group-title" data-i18n="rail.window">Statistics window</span>
         <span class="mono" id="stat-window"></span>
-        <span class="hint">b-values use direct Mw only. Converted mb is never used for b.</span>
-        <button class="link-btn" id="list-btn" type="button">List the cells with a b-value as a table</button>
+        <span class="hint" data-i18n="rail.windowHint">b-values use direct Mw only. Converted mb is never used for b.</span>
+        <button class="link-btn" id="list-btn" type="button" data-i18n="rail.list">List the cells with a b-value as a table</button>
       </div>
     </aside>
 
     <div class="map-area" id="map-area">
-      <div id="map" role="region" aria-label="World map of catalogue statistics"></div>
+      <div id="map" role="region" data-i18n-attr="aria-label:map.region" aria-label="World map of catalogue statistics"></div>
       <div class="map-buttons">
-        <button type="button" class="map-btn" id="zoom-in" aria-label="Zoom in">+</button>
-        <button type="button" class="map-btn" id="zoom-out" aria-label="Zoom out">−</button>
-        <button type="button" class="map-btn" id="globe-btn" aria-pressed="false" aria-label="Globe projection">
+        <button type="button" class="map-btn" id="zoom-in" data-i18n-attr="aria-label:map.zoomIn" aria-label="Zoom in">+</button>
+        <button type="button" class="map-btn" id="zoom-out" data-i18n-attr="aria-label:map.zoomOut" aria-label="Zoom out">−</button>
+        <button type="button" class="map-btn" id="globe-btn" aria-pressed="false" data-i18n-attr="aria-label:map.globe" aria-label="Globe projection">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>
         </button>
       </div>
-      <section class="legend" id="legend" aria-label="Legend" aria-live="polite"></section>
+      <div class="cmp-banner" id="cmp-banner" role="status" hidden><span id="cmp-banner-text"></span> <button type="button" class="small-btn" id="cmp-banner-cancel" data-i18n="cmp.cancel">Cancel comparison</button></div>
+      <section class="legend" id="legend" data-i18n-attr="aria-label:lg.label" aria-label="Legend" aria-live="polite"></section>
       <span class="attrib">ISC-GEM (CC BY-SA) · USGS ComCat · PB2002 · Natural Earth</span>
-      <div class="map-status" id="map-status" role="status">Loading map data…</div>
+      <div class="map-status" id="map-status" role="status" data-i18n="map.loading">Loading map data…</div>
       <div class="tooltip" id="tooltip" hidden></div>
     </div>
 
@@ -128,7 +164,7 @@
           <h2 id="panel-title">Cell</h2>
           <p class="meta" id="panel-meta"></p>
         </div>
-        <button class="icon-btn" id="panel-close" type="button" aria-label="Close cell details">
+        <button class="icon-btn" id="panel-close" type="button" data-i18n-attr="aria-label:panel.close" aria-label="Close cell details">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
       </div>
@@ -136,9 +172,9 @@
     </aside>
   </section>
 
-  <section id="view-sequences" class="view page" hidden aria-label="Aftershock sequences"><div class="page-inner" id="seq-root"></div></section>
-  <section id="view-methods" class="view page" hidden aria-label="Validation and methods"><div class="page-inner" id="methods-root"></div></section>
-  <section id="view-about" class="view page" hidden aria-label="About and data"><div class="page-inner" id="about-root"></div></section>
+  <section id="view-sequences" class="view page" hidden data-i18n-attr="aria-label:seq.h1" aria-label="Aftershock sequences"><div class="page-inner" id="seq-root"></div></section>
+  <section id="view-methods" class="view page" hidden data-i18n-attr="aria-label:nav.methods" aria-label="Validation and methods"><div class="page-inner" id="methods-root"></div></section>
+  <section id="view-about" class="view page" hidden data-i18n-attr="aria-label:nav.about" aria-label="About and data"><div class="page-inner" id="about-root"></div></section>
 </main>
 
 <script src="vendor/maplibre-gl-5.24.0/maplibre-gl.js"></script>

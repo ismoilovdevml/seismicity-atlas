@@ -4,10 +4,12 @@
 import { layerDef, isDark, cssVar, CC_RULES } from './layers.js';
 import * as f from './fmt.js';
 import { h } from './charts.js';
-import { getJSON, mb, ruleNumber } from './data.js';
+import { getJSON, ruleNumber } from './data.js';
+import { t } from './i18n/index.js';
 
 let map = null;
-let C = null; // context: {state, manifest, cells, byId, onSelect, onView, onEventsLoaded}
+let C = null; // context: {state, manifest, cells, byId, lookup(id), onSelect, onView, onEventsLoaded}
+let region = null; // {meta, data, n, pass} while a regional catalogue is shown
 let hoverId = null;
 let popup = null;
 let events = { e6: null, e5: null, loading5: null, added: false, years: [1904, 2026] };
@@ -68,15 +70,17 @@ export function initMap(ctx, base) {
     attributionControl: false,
   });
   map.touchZoomRotate.disableRotation();
-  if (new URLSearchParams(location.search).has('debug')) window.__map = map; // used by the browser tests
+  // Test hook: the browser tests define this function in an init script before the page loads. Normal visits
+  // never define it, so the map object is not exposed on window.
+  if (typeof window.__gsaTestHook === 'function') window.__gsaTestHook(map);
   map.on('styleimagemissing', (e) => { if (e.id === 'hatch' && !map.hasImage('hatch')) map.addImage('hatch', hatchImage(), { pixelRatio: 2 }); });
 
   const canvas = map.getCanvas();
-  canvas.setAttribute('aria-label', 'Map. Arrow keys pan, plus and minus zoom, Enter opens the cell at the map centre.');
+  canvas.setAttribute('aria-label', t('map.canvas'));
   canvas.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter') return;
     const c = map.project(map.getCenter());
-    const hit = map.queryRenderedFeatures([c.x, c.y], { layers: ['cells-fill'] })[0];
+    const hit = cellAt([c.x, c.y]);
     if (hit) C.onSelect(hit.properties.id);
   });
 
@@ -96,10 +100,10 @@ function wire() {
   });
   map.on('mousemove', (e) => {
     const evHit = queryEvents(e.point);
-    const cell = map.queryRenderedFeatures(e.point, { layers: ['cells-fill'] })[0];
-    setHover(cell ? cell.id : null);
+    const cell = cellAt(e.point);
+    setHover(cell ? { source: cell.source, id: cell.id } : null);
     if (evHit) showTip(e.point, eventTipNode(evHit.properties));
-    else if (cell) showTip(e.point, cellTipNode(C.byId.get(cell.properties.id)));
+    else if (cell && C.lookup(cell.properties.id)) showTip(e.point, cellTipNode(C.lookup(cell.properties.id)));
     else hideTip();
     map.getCanvas().style.cursor = evHit || cell ? 'pointer' : '';
   });
@@ -108,9 +112,18 @@ function wire() {
     hideTip();
     const evHit = queryEvents(e.point);
     if (evHit) { openEventPopup(evHit); return; }
-    const cell = map.queryRenderedFeatures(e.point, { layers: ['cells-fill'] })[0];
+    const cell = cellAt(e.point);
     if (cell) C.onSelect(cell.properties.id);
   });
+}
+
+/** The cell under a point: a regional cell when a regional catalogue is shown there, else the global cell. */
+function cellAt(pt) {
+  if (region && map.getLayer('rcells-fill')) {
+    const r = map.queryRenderedFeatures(pt, { layers: ['rcells-fill'] })[0];
+    if (r) return r;
+  }
+  return map.queryRenderedFeatures(pt, { layers: ['cells-fill'] })[0];
 }
 
 function queryEvents(pt) {
@@ -121,11 +134,11 @@ function queryEvents(pt) {
   return hits.reduce((a, b) => (b.properties.m > a.properties.m ? b : a));
 }
 
-function setHover(id) {
-  if (id === hoverId) return;
-  if (hoverId !== null) map.setFeatureState({ source: 'cells', id: hoverId }, { hover: false });
-  hoverId = id;
-  if (id !== null) map.setFeatureState({ source: 'cells', id }, { hover: true });
+function setHover(hv) {
+  if ((hv && hoverId && hv.id === hoverId.id && hv.source === hoverId.source) || (!hv && !hoverId)) return;
+  if (hoverId && map.getSource(hoverId.source)) map.setFeatureState(hoverId, { hover: false });
+  hoverId = hv;
+  if (hv) map.setFeatureState(hv, { hover: true });
 }
 
 function showTip(pt, node) {
@@ -151,9 +164,9 @@ export function hideTip() { const t = tip(); if (t) t.hidden = true; }
 export function bSentence(p, d, manifest) {
   const q = p[`${d}_q`];
   const nMin = ruleNumber(manifest.method.quality.insufficient);
-  if (q === 'A' || q === 'B') return { strong: `b ${f.interval(p[`${d}_b`], p[`${d}_b_lo`], p[`${d}_b_hi`])}`, rest: `95 % interval, quality ${q}` };
-  if (q === 'C') return { strong: 'b withheld', rest: `quality C, 95 % interval ${f.b2(p[`${d}_ciw`])} wide` };
-  return { strong: 'b withheld', rest: `insufficient, ${f.int(p[`${d}_nb`] || 0)} events above Mc (${nMin} needed)` };
+  if (q === 'A' || q === 'B') return { strong: `b ${f.interval(p[`${d}_b`], p[`${d}_b_lo`], p[`${d}_b_hi`])}`, rest: t('tt.bRest', { q }) };
+  if (q === 'C') return { strong: t('tt.withheld'), rest: t('tt.withheldC', { w: f.b2(p[`${d}_ciw`]) }) };
+  return { strong: t('tt.withheld'), rest: t('tt.withheldFew', { n: f.int(p[`${d}_nb`] || 0), min: nMin }) };
 }
 
 function layerSentence(p, st) {
@@ -162,23 +175,22 @@ function layerSentence(p, st) {
   switch (st.l) {
     case 'q': {
       const q = p[`${d}_q`];
-      return { strong: `Quality ${q}`, rest: q === 'insufficient' ? `${f.int(p[`${d}_nb`] || 0)} events above Mc` : `95 % interval ${f.b2(p[`${d}_ciw`])} wide` };
+      return { strong: q === 'insufficient' ? t('q.insufficient') : t('q.quality', { q }), rest: q === 'insufficient' ? t('cmp.nAbove', { n: f.int(p[`${d}_nb`] || 0) }) : t('tt.ciw', { w: f.b2(p[`${d}_ciw`]) }) };
     }
     case 'mc': {
-      if ((sub || 'ig') === 'ig') return p[`${d}_mc`] !== undefined ? { strong: `Mc ${f.mag(p[`${d}_mc`])} [${f.mag(p[`${d}_mc_lo`])}, ${f.mag(p[`${d}_mc_hi`])}]`, rest: 'Mw, ISC-GEM 1976–2021' } : { strong: 'No Mc', rest: 'too few ISC-GEM events' };
+      if ((sub || 'ig') === 'ig') return p[`${d}_mc`] !== undefined ? { strong: `Mc ${f.mag(p[`${d}_mc`])} [${f.mag(p[`${d}_mc_lo`])}, ${f.mag(p[`${d}_mc_hi`])}]`, rest: t('tt.mcIg') } : { strong: t('tt.noMc'), rest: t('tt.noMcIg') };
       const prop = sub === 'cc' ? `${d}_mc_cc` : `${d}_mc_cc0`;
-      return p[prop] !== undefined ? { strong: `Mc ${f.mag(p[prop])}`, rest: `ComCat as served, ${sub === 'cc' ? '2010 to cut-off' : '1973–1989'}` } : { strong: 'No Mc', rest: 'fewer than 50 ComCat events' };
+      return p[prop] !== undefined ? { strong: `Mc ${f.mag(p[prop])}`, rest: t(sub === 'cc' ? 'tt.mcCc' : 'tt.mcCc0') } : { strong: t('tt.noMc'), rest: t('tt.noMcCc') };
     }
     case 'cc': {
       if ((sub || 'flag') === 'flag') {
-        const lab = { ok: 'Catalogues agree', check: 'Check: catalogues disagree', few: 'Too few matched events' }[p.c_flag];
-        return { strong: lab, rest: `${f.int(p.c_n)} matched events` };
+        return { strong: t(`tt.flag.${p.c_flag}`), rest: t('tt.matched', { n: f.int(p.c_n) }) };
       }
-      if (sub === 'dmw') return p.c_dmw !== undefined ? { strong: `ΔMw ${f.signed(p.c_dmw)}`, rest: `ComCat − ISC-GEM, ${f.int(p.c_n)} matched events` } : { strong: 'No Mw pairs', rest: '' };
-      return p.c_dloc !== undefined ? { strong: f.km(p.c_dloc), rest: `median epicentre difference, ${f.int(p.c_n)} matched events` } : { strong: 'No matched events', rest: '' };
+      if (sub === 'dmw') return p.c_dmw !== undefined ? { strong: `ΔMw ${f.signed(p.c_dmw)}`, rest: t('tt.dmw', { n: f.int(p.c_n) }) } : { strong: t('tt.noMw'), rest: '' };
+      return p.c_dloc !== undefined ? { strong: f.km(p.c_dloc), rest: t('tt.dloc', { n: f.int(p.c_n) }) } : { strong: t('tt.noMatched'), rest: '' };
     }
     case 'rate':
-      return { strong: `${f.sig2(p.rate_m6)} M6+ per year`, rest: 'per 100,000 km², 1964–2021' };
+      return { strong: t('tt.rate', { v: f.sig2(p.rate_m6) }), rest: t('tt.rateRest') };
     default:
       return null;
   }
@@ -189,13 +201,13 @@ function cellTipNode(p) {
   const d = st.d;
   const node = h('div');
   const b = bSentence(p, d, C.manifest);
-  const main = st.l === 'b' || st.l === 'none' ? null : layerSentence(p, st);
+  const main = st.l === 'b' || st.l === 'none' || p.regionId ? null : layerSentence(p, st);
   const line = (s, cls) => h('div', { class: cls }, h('strong', { text: s.strong }), s.rest ? ` ${s.rest}` : '');
   if (main) node.append(line(main, 'tt-main'));
   node.append(line(b, main ? 'tt-sub' : 'tt-main'));
-  if (main || st.l === 'b') node.append(h('div', { class: 'tt-sub', text: f.DEPTH_NAMES[d] }));
-  node.append(h('div', { class: 'tt-sub', text: `${f.latlon(p.lat, p.lon)}, ${f.PB_NAMES[p.pb] || p.pb}` }));
-  node.append(h('div', { class: 'tt-foot', text: 'Click for details' }));
+  if (main || st.l === 'b' || p.regionId) node.append(h('div', { class: 'tt-sub', text: f.depthName(d) }));
+  node.append(h('div', { class: 'tt-sub', text: p.regionId ? `${f.latlon(p.lat, p.lon)}, ${p.regionName}` : `${f.latlon(p.lat, p.lon)}, ${f.pbName(p.pb)}` }));
+  node.append(h('div', { class: 'tt-foot', text: t(C.state.k && C.state.k !== p.id ? 'tt.clickCompare' : 'tt.click') }));
   return node;
 }
 
@@ -212,8 +224,10 @@ export function applyLayers() {
   map.setLayoutProperty('cells-hatch', 'visibility', def.hatch ? 'visible' : 'none');
   if (def.hatch) map.setFilter('cells-hatch', ['==', ['get', `${st.d}_q`], 'C']);
   map.setLayoutProperty('plates', 'visibility', st.pl ? 'visible' : 'none');
-  map.setFilter('cells-sel', ['==', ['get', 'id'], st.c || '']);
-  map.setFilter('cells-sel-case', ['==', ['get', 'id'], st.c || '']);
+  const selIds = ['literal', [st.c, st.k].filter(Boolean)];
+  map.setFilter('cells-sel', ['in', ['get', 'id'], selIds]);
+  map.setFilter('cells-sel-case', ['in', ['get', 'id'], selIds]);
+  applyRegion(st);
   applyEvents();
   renderLegend(def);
 }
@@ -228,6 +242,11 @@ export function applyTheme() {
   map.setPaintProperty('cells-sel', 'line-color', cssVar('--ink'));
   map.setPaintProperty('cells-sel-case', 'line-color', cssVar('--surface'));
   if (map.hasImage('hatch')) map.updateImage('hatch', hatchImage());
+  if (map.getLayer('rcells-line')) {
+    map.setPaintProperty('rcells-line', 'line-color', cssVar('--ink-3'));
+    map.setPaintProperty('rcells-hover', 'line-color', cssVar('--ink'));
+    map.setPaintProperty('rcells-sel', 'line-color', cssVar('--ink'));
+  }
   if (map.getLayer('events')) {
     map.setPaintProperty('events', 'circle-color', cssVar('--ink'));
     map.setPaintProperty('events', 'circle-stroke-color', cssVar('--surface'));
@@ -238,6 +257,8 @@ export function applyTheme() {
 export function setProjection(globe) {
   if (!map) return;
   map.setProjection({ type: globe ? 'globe' : 'mercator' });
+  // Outside the globe the canvas is transparent; a darker backdrop than the ocean makes the globe edge visible.
+  document.getElementById('map-area').classList.toggle('globe', !!globe);
 }
 
 /** Pan so a selected cell is not hidden behind the detail panel. */
@@ -272,8 +293,8 @@ function renderLegend(def) {
     counts.set(k, (counts.get(k) || 0) + 1);
   }
   const kids = [];
-  kids.push(h('div', { class: 'lg-head' }, h('span', { class: 'lg-title', text: def.title }), def.depthAware ? h('span', { class: 'lg-depth', text: st.d === 'sh' ? 'Shallow ≤ 70 km' : 'Deeper > 70 km' }) : h('span', { class: 'lg-depth', text: def.none ? '' : 'All depths' })));
-  if (def.none) kids.push(h('p', { class: 'lg-unit', text: 'Choose a layer to colour the cells. Cells stay clickable.' }));
+  kids.push(h('div', { class: 'lg-head' }, h('span', { class: 'lg-title', text: def.title }), def.depthAware ? h('span', { class: 'lg-depth', text: t(`depth.${st.d}.label`) }) : h('span', { class: 'lg-depth', text: def.none ? '' : t('lg.allDepths') })));
+  if (def.none) kids.push(h('p', { class: 'lg-unit', text: t('lg.none') }));
   else kids.push(h('p', { class: 'lg-unit', text: def.unit }));
   if (def.bar) {
     const n = def.bar.colors.length;
@@ -285,7 +306,7 @@ function renderLegend(def) {
       def.bar.breaks.forEach((b, i) => t.append(h('span', { style: `position:absolute;left:${((i + 1) / n) * 100}%;transform:translateX(-50%)`, text: f.fixed(b, def.bar.d) })));
       kids.push(t);
     }
-    kids.push(h('p', { class: 'sr-only', text: `Classes: below ${def.bar.breaks[0]}, ${def.bar.breaks.slice(0, -1).map((b, i) => `${b} to ${def.bar.breaks[i + 1]}`).join(', ')}, ${def.bar.breaks[def.bar.breaks.length - 1]} and above.` }));
+    kids.push(h('p', { class: 'sr-only', text: t('lg.classes', { first: def.bar.breaks[0], mid: def.bar.breaks.slice(0, -1).map((b, i) => `${b}–${def.bar.breaks[i + 1]}`).join(', '), last: def.bar.breaks[def.bar.breaks.length - 1] }) }));
   }
   if (def.items.length) {
     kids.push(h('ul', { class: 'lg-rows' }, def.items.map((it) => h('li', {},
@@ -295,16 +316,26 @@ function renderLegend(def) {
   }
   if (def.passKeys) {
     const pass = def.passKeys.reduce((s, k) => s + (counts.get(k) || 0), 0);
-    kids.push(h('span', { class: 'lg-count', text: `${f.int(pass)} cells pass the quality gate, of ${f.int(C.cells.features.length)} with events.` }));
+    kids.push(h('span', { class: 'lg-count', text: t('lg.pass', { pass: f.int(pass), n: f.int(C.cells.features.length) }) }));
   } else if (def.note) kids.push(h('span', { class: 'lg-count', text: def.note }));
   const extra = [];
-  if (st.pl) extra.push(h('div', { style: 'display:flex;align-items:center;gap:8px' }, h('span', { class: 'sw sw-line', 'aria-hidden': 'true' }), 'Plate boundary, PB2002 (Bird 2003)'));
+  if (st.pl) extra.push(h('div', { style: 'display:flex;align-items:center;gap:8px' }, h('span', { class: 'sw sw-line', 'aria-hidden': 'true' }), t('lg.plates')));
   if (st.ev) {
     const sizes = [6, 7, 8, 9].map((m) => {
       const r = radiusFor(m, map.getZoom());
       return h('span', {}, h('i', { style: `width:${2 * r}px;height:${2 * r}px` }), `M${m}`);
     });
-    extra.push(h('span', { text: `Earthquakes by magnitude. ${evCountText()}` }), h('div', { class: 'lg-sizes', 'aria-hidden': 'true' }, sizes));
+    extra.push(h('span', { text: `${t('lg.quakes')} ${evCountText()}` }), h('div', { class: 'lg-sizes', 'aria-hidden': 'true' }, sizes));
+  }
+  if (region) {
+    const r = region.meta;
+    extra.push(h('div', { class: 'lg-region' },
+      h('strong', { text: t('reg.legendHead', { name: r.name }) }),
+      h('span', { text: t('reg.legend', { catalogue: r.catalogue, licence: r.licence, p0: (r.period || [])[0] ?? '–', p1: (r.period || [])[1] ?? '–', mc: r.mc_typical ?? '–' }) }),
+      st.l !== 'b' ? h('span', { text: t('reg.alwaysB') }) : null,
+      r.attribution ? h('span', { text: `${t('reg.attribution')}: ${r.attribution}` }) : null,
+      r.caveat ? h('span', { text: `${t('reg.caveat')}: ${r.caveat}` }) : null,
+      h('span', { class: 'lg-count', text: t('reg.cells', { n: f.int(region.n), pass: f.int(region.pass) }) })));
   }
   if (extra.length) kids.push(h('div', { class: 'lg-extra' }, extra));
   el.classList.toggle('has-bar', !!def.bar);
@@ -398,7 +429,7 @@ function evCountText() {
   const count = (e, keep) => { for (let i = 0; i < e.n; i++) if (e.year[i] >= y0 && e.year[i] < y1 + 1 && e.mag[i] >= minM && (!keep || keep(i))) n++; };
   count(events.e6);
   if (C.state.ev === 5 && events.e5) count(events.e5, (i) => events.e5.mag[i] < 6);
-  return `${f.int(n)} shown, ${y0}–${y1}, M ≥ ${minM.toFixed(1)}.`;
+  return t('ev.count', { n: f.int(n), y0, y1, m: minM.toFixed(1) });
 }
 
 export function eventCountText() { return evCountText(); }
@@ -419,27 +450,81 @@ function eventTipNode(p) {
   const codes = (events.e6 || {}).codes || { src: {}, mt: {} };
   return h('div', {},
     h('div', { class: 'tt-main' }, h('strong', { text: `M ${f.mag(p.m)}` }), ` ${f.decYearDate(p.y)}`),
-    h('div', { class: 'tt-sub', text: `Depth ${f.int(p.d)} km, ${codes.mt[String(p.t)] || ''}` }),
-    h('div', { class: 'tt-foot', text: 'Click for the event link' }));
+    h('div', { class: 'tt-sub', text: t('ev.depthLine', { d: f.int(p.d), mt: codes.mt[String(p.t)] || '' }) }),
+    h('div', { class: 'tt-foot', text: t('ev.clickLink') }));
 }
 
 function openEventPopup(hit) {
   const p = hit.properties;
   const e = p.k === 6 ? events.e6 : events.e5;
   const codes = events.e6.codes;
-  const id = p.k === 6 && e.id ? e.id[p.i] : null;
+  // events_m5.json may or may not carry the id column (same meaning as in events_m6.json); link when it does
+  const id = Array.isArray(e.id) && e.id[p.i] ? String(e.id[p.i]) : null;
   const node = h('div', { class: 'ev-pop' },
-    h('h3', { text: `M ${f.mag(p.m)} earthquake` }),
+    h('h3', { text: t('ev.title', { m: f.mag(p.m) }) }),
     h('dl', {},
-      h('dt', { text: 'Date (UTC)' }), h('dd', { text: `${f.decYearDate(p.y)}, ±1 day` }),
-      h('dt', { text: 'Depth' }), h('dd', { text: `${f.int(p.d)} km` }),
-      h('dt', { text: 'Location' }), h('dd', { text: f.latlon(e.lat[p.i], e.lon[p.i]) }),
-      h('dt', { text: 'Magnitude' }), h('dd', { text: codes.mt[String(p.t)] || '' }),
-      h('dt', { text: 'In' }), h('dd', { text: codes.src[String(p.s)] || '' })),
+      h('dt', { text: t('ev.date') }), h('dd', { text: t('ev.dateVal', { d: f.decYearDate(p.y) }) }),
+      h('dt', { text: t('ev.depth') }), h('dd', { text: `${f.int(p.d)} km` }),
+      h('dt', { text: t('ev.location') }), h('dd', { text: f.latlon(e.lat[p.i], e.lon[p.i]) }),
+      h('dt', { text: t('ev.magnitude') }), h('dd', { text: codes.mt[String(p.t)] || '' }),
+      h('dt', { text: t('ev.in') }), h('dd', { text: codes.src[String(p.s)] || '' })),
     id
-      ? h('a', { href: `https://earthquake.usgs.gov/earthquakes/eventpage/${encodeURIComponent(id)}`, target: '_blank', rel: 'noopener', text: `USGS event page (${id})` })
-      : h('p', { class: 'muted', style: 'margin:0', text: 'The M5 file carries no event id, so there is no direct link. Events of M6 and above link to USGS.' }));
+      ? h('a', { href: `https://earthquake.usgs.gov/earthquakes/eventpage/${encodeURIComponent(id)}`, target: '_blank', rel: 'noopener', text: t('ev.usgs', { id }) })
+      : h('p', { class: 'muted', style: 'margin:0', text: t(p.k === 5 ? 'ev.noIdM5' : 'ev.noId') }));
   if (popup) popup.remove();
   popup = new maplibregl.Popup({ closeButton: true, maxWidth: '290px', focusAfterOpen: true })
     .setLngLat(hit.geometry.coordinates).setDOMContent(node).addTo(map);
+}
+
+// ---------- regional catalogues ----------
+
+const R_LAYERS = ['rcells-fill', 'rcells-hatch', 'rcells-line', 'rcells-hover', 'rcells-sel'];
+
+/** Show a regional catalogue's cells (same property names as cells.geojson). meta: one entry of regional/index.json. */
+export function setRegion(meta, data, classify) {
+  const feats = data.features || [];
+  region = { meta, data, n: feats.length, pass: feats.filter((ft) => classify(ft.properties)).length };
+  if (map.getSource('rcells')) map.getSource('rcells').setData(data);
+  else {
+    map.addSource('rcells', { type: 'geojson', data, promoteId: 'id' });
+    const before = 'coast';
+    map.addLayer({ id: 'rcells-fill', type: 'fill', source: 'rcells', paint: { 'fill-color': cssVar('--nodata'), 'fill-opacity': 0.9 } }, before);
+    map.addLayer({ id: 'rcells-hatch', type: 'fill', source: 'rcells', paint: { 'fill-pattern': 'hatch' } }, before);
+    map.addLayer({ id: 'rcells-line', type: 'line', source: 'rcells', paint: { 'line-color': cssVar('--ink-3'), 'line-width': 0.6, 'line-opacity': 0.55 } }, before);
+    map.addLayer({ id: 'rcells-hover', type: 'line', source: 'rcells', paint: { 'line-color': cssVar('--ink'), 'line-width': 1.4, 'line-opacity': ['case', ['boolean', ['feature-state', 'hover'], false], 0.9, 0] } });
+    map.addLayer({ id: 'rcells-sel', type: 'line', source: 'rcells', filter: ['==', ['get', 'id'], ''], paint: { 'line-color': cssVar('--ink'), 'line-width': 2.2 } });
+  }
+  for (const id of R_LAYERS) map.setLayoutProperty(id, 'visibility', 'visible');
+  applyLayers();
+}
+
+export function clearRegion() {
+  region = null;
+  if (map && map.getSource('rcells')) for (const id of R_LAYERS) map.setLayoutProperty(id, 'visibility', 'none');
+  if (map) applyLayers();
+}
+
+export function fitBbox([w, s, e, n]) {
+  if (!map) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // keep the region clear of the legend card (bottom left on desktop, top left on phones)
+  const wide = innerWidth > 720;
+  const legend = document.getElementById('legend');
+  const lw = legend ? legend.offsetWidth + 32 : 40;
+  map.fitBounds([[w, s], [e, n]], { padding: { top: wide ? 40 : 60, bottom: 40, left: wide ? Math.min(lw, map.getContainer().clientWidth / 2) : 40, right: wide ? 80 : 40 }, maxZoom: 7, duration: reduce ? 0 : 900 });
+}
+
+/** Regional cells always use the b-value classes and the same quality rules as the global b layer. */
+function applyRegion(st) {
+  if (!region || !map.getLayer('rcells-fill')) return;
+  const def = layerDef({ ...st, l: 'b', m: '' }, C.manifest);
+  map.setPaintProperty('rcells-fill', 'fill-color', def.fill);
+  map.setPaintProperty('rcells-fill', 'fill-opacity', ['case', def.valid, ['case', ['==', ['get', `${st.d}_q`], 'B'], 0.5, 0.92], 0.22]);
+  map.setFilter('rcells-hatch', ['==', ['get', `${st.d}_q`], 'C']);
+  map.setFilter('rcells-sel', ['in', ['get', 'id'], ['literal', [st.c, st.k].filter(Boolean)]]);
+}
+
+/** Re-apply the strings that live on the map canvas after a language change. */
+export function relabel() {
+  if (map) map.getCanvas().setAttribute('aria-label', t('map.canvas'));
 }

@@ -93,12 +93,17 @@ cd site && python3 -m http.server 8000   # then open http://localhost:8000/
   catalogue disagreement, M6+ rate; shallow or deeper; plate boundaries; earthquakes M ≥ 6 (M ≥ 5 on request) with
   a time filter and links to USGS event pages; optional globe view. Hover a cell for its values; click it for the
   cell panel (frequency-magnitude distribution, Mc over time, b against cutoff, yearly counts, catalogue
-  agreement). The state is kept in the URL hash, so any view can be shared.
+  agreement), with a per-cell CSV download and a side-by-side comparison of two cells' b intervals. Regional
+  higher-resolution catalogues appear as an extra layer when `site/data/regional/index.json` is present. The state,
+  including the language (English, Uzbek, Russian, Spanish), is kept in the URL hash, so any view can be shared.
 - **Sequences:** Omori-Utsu decay charts and quality badges for the 40 sequences.
 - **Validation:** every test against published values, including the mismatch and the untestable rows.
 - **About & data:** sources, licences, data cut-off, how to cite, downloads.
 - Vendored: MapLibre GL JS 5.24.0 (BSD-3-Clause), Inter and IBM Plex Mono (SIL OFL 1.1). No CDN, no third-party
   tiles. Design notes: [docs/ux-notes.md](docs/ux-notes.md); open issues: [docs/known-issues.md](docs/known-issues.md).
+- Browser tests: `tests/e2e/` (Playwright for Python; serves `site/` locally). Run
+  `pip install playwright pytest && python -m playwright install chromium && python -m pytest tests/e2e`;
+  set `E2E_BROWSERS=chromium,firefox,webkit` for all three engines. CI: `.github/workflows/test-site.yml`.
 
 ![Map with a selected cell](docs/img/site-map-panel-light.png)
 

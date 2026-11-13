@@ -1,0 +1,30 @@
+{
+ "regions": [
+  {
+   "id": "fixture-ca",
+   "name": "Fixture region (synthetic)",
+   "bbox": [
+    -124.0,
+    33.0,
+    -115.0,
+    40.0
+   ],
+   "catalogue": "Synthetic test catalogue",
+   "licence": "CC0 (test fixture)",
+   "attribution": "Test attribution line",
+   "source_url": "https://example.org/catalogue",
+   "caveat": "Test caveat: synthetic values only.",
+   "magtype": "ML (synthetic)",
+   "h3_res": 3,
+   "radius_km": 30.0,
+   "summary": "regional/fixture-ca/summary.json",
+   "period": [
+    "2000-01-01",
+    "2020-12-31"
+   ],
+   "mc_typical": 2.5,
+   "cells": "regional/fixture-ca/cells.geojson",
+   "cell_detail_dir": "regional/fixture-ca/cells/"
+  }
+ ]
+}

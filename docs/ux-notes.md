@@ -58,3 +58,31 @@ Browser, GEM OpenQuake map viewer; EMSC from earlier use). What we take, and wha
   - `prefers-reduced-motion` disables animations. Not tested in a browser.
   - Responsive: tested at 1440 × 900 and 390 × 844, no horizontal scroll on any page (tested). Landscape and
     Dynamic Type were not tested.
+
+## Additions on 2026-11-13
+
+- **Compare two cells.** "Compare with another cell" in the cell panel pins the cell as A (`k=` in the URL, a banner
+  on the map and a second outline); the next cell clicked on the map or in the cell table becomes B. The panel then
+  shows both b-values with their intervals as two cards and a two-row interval chart with a b = 1 reference line, and
+  one plain verdict that reads only the intervals: "overlap" (with the shared range and "these data do not show that
+  b differs"), "do not overlap" (with the gap, and that this is a conservative check, not a test) or "no comparison"
+  when a cell has no b. It never says "different" for overlapping intervals; this is covered by a browser test. It
+  also says how far apart the centres are and, when the sampling circles overlap, that the cells share events.
+  Following the `dataviz` method: one hue for both rows (identity comes from the row labels A and B), thin interval
+  bars, a hover/keyboard readout and a data table.
+- **Per-cell CSV.** "Download CSV" builds one tidy table in the browser (`section,depth,catalogue,name,magnitude,value`)
+  from the cell properties and `cells/<id>.json`: every summary value of the cell, and the FMD as counts and cumulative
+  counts per 0.1 bin. Lines starting with `#` carry version, cut-off, licence and the schema link.
+- **Regional catalogues.** A "Regional catalogues (higher resolution)" group appears only when
+  `data/regional/index.json` exists. Choosing a region draws its cells over the global cells with the same b classes,
+  B transparency, C hatching and grey wash, flies to its bounding box, and adds a legend block naming the catalogue,
+  licence, period and typical Mc. The choice is kept in the URL (`r=`).
+- **Languages.** English, Oʻzbekcha (Latin), Русский and Español, chosen with a compact globe-and-code menu in the
+  header and kept in the URL (`lang=`). Strings live in `site/js/i18n/<code>.js`; English is the fallback for any
+  missing key. Scientific symbols (b, Mc, Mw, mb) and catalogue names stay as they are. Decimal points are kept in
+  every language because intervals use commas as separators; thousands use a narrow no-break space outside English.
+- **Globe edge.** In globe view the space around the globe now uses its own darker token (`--space`, light and dark
+  themes), so the limb is visible against it.
+- **Sharing.** Open Graph and Twitter card tags, a canonical URL, `theme-color` for both schemes, a 1200 × 630 card
+  rendered from the real map (`og-image.png`, about 120 KB) and an `apple-touch-icon.png`. The favicon now uses the
+  brand mark (hexagon and trace on the accent colour) instead of a generic seismogram on black.

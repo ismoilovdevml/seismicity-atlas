@@ -4,8 +4,13 @@
 //   magnitudes and Mc: 1 decimal (data are binned to 0.1)
 //   distances: whole km; counts: thousands separators; rates: 2 significant digits
 
+import { t, lang } from './i18n/index.js';
+
 const MINUS = '−';
 const nf = new Intl.NumberFormat('en-US');
+// Decimals always use a point: intervals are written "0.98 [0.85, 1.12]", so a decimal comma would be ambiguous.
+// Thousands use a comma in English and a narrow no-break space (SI style) in the other languages.
+const group = (n) => (lang() === 'en' ? nf.format(n) : nf.format(n).replace(/,/g, '\u202f'));
 
 export const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
 const neg = (s) => s.replace(/^-/, MINUS);
@@ -13,8 +18,8 @@ const neg = (s) => s.replace(/^-/, MINUS);
 export const b2 = (v) => (isNum(v) ? v.toFixed(2) : '–');
 export const b3 = (v) => (isNum(v) ? v.toFixed(3) : '–');
 export const mag = (v) => (isNum(v) ? neg(v.toFixed(1)) : '–');
-export const int = (v) => (isNum(v) ? nf.format(Math.round(v)) : '–');
-export const km = (v) => (isNum(v) ? nf.format(Math.round(v)) + ' km' : '–');
+export const int = (v) => (isNum(v) ? group(Math.round(v)) : '–');
+export const km = (v) => (isNum(v) ? group(Math.round(v)) + ' km' : '–');
 export const signed = (v, d = 2) => (isNum(v) ? (v > 0 ? '+' : v < 0 ? MINUS : '±') + Math.abs(v).toFixed(d) : '–');
 export const fixed = (v, d) => (isNum(v) ? neg(v.toFixed(d)) : '–');
 
@@ -30,8 +35,8 @@ export const interval = (v, lo, hi, f = b2) => `${f(v)} [${f(lo)}, ${f(hi)}]`;
 
 export function latlon(lat, lon, d = 1) {
   let L = ((((lon + 180) % 360) + 360) % 360) - 180;
-  const ns = lat >= 0 ? 'N' : 'S';
-  const ew = L >= 0 ? 'E' : 'W';
+  const ns = t(lat >= 0 ? 'dir.N' : 'dir.S');
+  const ew = t(L >= 0 ? 'dir.E' : 'dir.W');
   return `${Math.abs(lat).toFixed(d)}° ${ns}, ${Math.abs(L).toFixed(d)}° ${ew}`;
 }
 
@@ -45,16 +50,6 @@ export function decYearDate(y) {
 
 export const isoDate = (s) => (s ? String(s).slice(0, 10) : '–');
 
-export const PB_NAMES = {
-  SUB: 'Subduction',
-  CCB: 'Continental convergent boundary',
-  OCB: 'Oceanic convergent boundary',
-  CTF: 'Continental transform fault',
-  OTF: 'Oceanic transform fault',
-  CRB: 'Continental rift',
-  OSR: 'Oceanic spreading ridge',
-  none: 'More than 200 km from a plate boundary',
-};
-
-export const DEPTH_NAMES = { sh: 'Shallow, depth ≤ 70 km', dp: 'Deeper, depth > 70 km' };
-export const DEPTH_SHORT = { sh: 'shallow', dp: 'deeper' };
+export const pbName = (code) => t(`pb.${code}`);
+export const depthName = (d) => t(`depth.${d}.name`);
+export const depthShort = (d) => t(`depth.${d}.short`);
