@@ -25,11 +25,32 @@ let regionLoading = null;
 
 const lookup = (id) => ctx.byId.get(id) || ctx.rById.get(id) || null;
 
+// ---------------------------------------------------------------- language preference
+
+const LANG_KEY = 'gsa-lang';
+function storedLang() {
+  try { const v = localStorage.getItem(LANG_KEY); return LANGS[v] ? v : null; } catch (e) { return null; }
+}
+function saveLang(code) {
+  try { localStorage.setItem(LANG_KEY, code); } catch (e) { /* storage blocked */ }
+}
+/** Language when the URL does not name one: the visitor's last choice, else the browser language, else English. */
+function preferredLang() {
+  const saved = storedLang();
+  if (saved) return saved;
+  for (const l of navigator.languages || [navigator.language || '']) {
+    const base = String(l).toLowerCase().split('-')[0];
+    if (LANGS[base]) return base;
+  }
+  return 'en';
+}
+
 // ---------------------------------------------------------------- hash state
 
-function parseHash() {
+/** fallbackLang: the language to keep when the hash does not name one (the current one after start-up). */
+function parseHash(fallbackLang = preferredLang()) {
   const p = new URLSearchParams(location.hash.replace(/^#/, ''));
-  const s = { ...DEFAULTS };
+  const s = { ...DEFAULTS, lang: fallbackLang };
   if (VIEWS.includes(p.get('v'))) s.v = p.get('v');
   if (LAYERS.includes(p.get('l'))) s.l = p.get('l');
   const subOk = (SUBS[s.l] || []).some((x) => x.id === p.get('m'));
@@ -66,7 +87,8 @@ function hashOf(s) {
   if (!s.pl) p.set('pl', '0');
   if (s.g) p.set('g', '1');
   if (s.at) p.set('at', `${s.at.z}/${s.at.lat}/${s.at.lon}`);
-  if (s.lang !== 'en') p.set('lang', s.lang);
+  // Always name the language, so a shared link opens in the language it was copied in.
+  p.set('lang', s.lang);
   return `#${p.toString().replace(/%2F/g, '/')}`;
 }
 
@@ -83,7 +105,9 @@ window.addEventListener('hashchange', () => { if (!writing) applyHash(); });
 window.addEventListener('popstate', () => applyHash());
 
 async function applyHash() {
-  const s = parseHash();
+  // Navigation links such as "#v=about" carry no language: keep the one in use.
+  const s = parseHash(state.lang);
+  const hashHadLang = new URLSearchParams(location.hash.replace(/^#/, '')).has('lang');
   const viewChanged = s.v !== state.v;
   const atChanged = JSON.stringify(s.at) !== JSON.stringify(state.at);
   const langChanged = s.lang !== state.lang;
@@ -101,6 +125,8 @@ async function applyHash() {
     syncPanel();
   }
   if (viewChanged) window.scrollTo(0, 0);
+  // Put the language back into the URL so a reload keeps it.
+  if (!hashHadLang) commit();
 }
 
 // ---------------------------------------------------------------- views
@@ -232,7 +258,7 @@ function wireControls() {
   $('list-btn').addEventListener('click', () => { state.c = 'list'; update(); $('panel').focus({ preventScroll: true }); });
   $('cmp-banner-cancel').addEventListener('click', unpin);
   $('reg-select').addEventListener('change', (e) => selectRegion(e.target.value || null, true));
-  $('lang-select').addEventListener('change', async (e) => { state.lang = e.target.value; await applyLang(); commit(); });
+  $('lang-select').addEventListener('change', async (e) => { state.lang = e.target.value; saveLang(state.lang); await applyLang(); commit(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('panel').hidden && state.v === 'map') closePanel(); });
 }
 

@@ -211,9 +211,26 @@ def test_language_switcher_round_trip(site):
     pg.select_option("#lang-select", "ru")
     pg.wait_for_function("location.hash.includes('lang=ru') && document.documentElement.lang === 'ru'")
     assert "Карта" in pg.inner_text("#nav")
+    # The choice survives page navigation (links like "#v=about" carry no language) and a reload.
+    pg.click("a[data-view='about']")
+    pg.wait_for_function("location.hash.includes('v=about') && location.hash.includes('lang=ru')")
+    assert pg.evaluate("document.documentElement.lang") == "ru"
+    pg.reload()
+    pg.wait_for_function("document.documentElement.lang === 'ru'")
     pg.select_option("#lang-select", "en")
-    pg.wait_for_function("!location.hash.includes('lang=') && document.documentElement.lang === 'en'")
-    assert "b-value" in pg.inner_text("#legend") and "2,598" in pg.inner_text("#legend")
+    pg.wait_for_function("location.hash.includes('lang=en') && document.documentElement.lang === 'en'")
+    pg.click("a[data-view='map']")
+    pg.wait_for_function("location.hash.includes('v=map') && document.getElementById('legend').innerText.includes('2,598')", timeout=15000)
+    assert "b-value" in pg.inner_text("#legend")
+
+
+def test_language_remembered_without_hash(site):
+    pg = site.open()
+    pg.select_option("#lang-select", "uz")
+    pg.wait_for_function("document.documentElement.lang.startsWith('uz')")
+    pg.goto(pg.url.split("#")[0])
+    pg.wait_for_function("document.documentElement.lang.startsWith('uz')")
+    assert pg.input_value("#lang-select") == "uz"
 
 
 def _long_validation(route):
