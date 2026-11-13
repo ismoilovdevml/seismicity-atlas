@@ -98,10 +98,16 @@ def test_cell_csv_download(site, viewport):
 
 
 def _m5_with_ids(route):
+    """A small copy of events_m5.json (around Japan only) with an id column added, as the pipeline will write it."""
     e = json.load(open(SITE / "data/events_m5.json"))
-    e["id"] = [f"test{i:06d}" for i in range(e["n"])]
-    e["fields"] = e["fields"] + ["id"]
-    route.fulfill(status=200, body=json.dumps(e), content_type="application/json")
+    keep = [i for i in range(e["n"]) if 130 < e["lon"][i] < 155 and 28 < e["lat"][i] < 48]
+    out = {k: v for k, v in e.items() if not isinstance(v, list) or k == "fields"}
+    for f in e["fields"]:
+        out[f] = [e[f][i] for i in keep]
+    out["n"] = len(keep)
+    out["id"] = [f"test{i:06d}" for i in keep]
+    out["fields"] = e["fields"] + ["id"]
+    route.fulfill(status=200, body=json.dumps(out), content_type="application/json")
 
 
 def _click_m5_event(pg):
