@@ -32,8 +32,8 @@ cut-off date). Steps:
    and the map layers come from the cache; they are downloaded only when the cache is empty.
 4. Saves the cache, then runs `scripts/run_all.sh`: the whole pipeline and the tests (`pytest`).
 5. Drift guard (`scripts/check_drift.py`) against the `site/data/` of the previous commit. The run fails when:
-   - global b, deeper than 70 km, leaves 0.95–1.05 (0.969 in 0.1.0);
-   - global b, shallow, leaves 0.98–1.10 (1.043 in 0.1.0);
+   - global b, deeper than 70 km, leaves 0.89–0.99 (0.969 in 0.1.0, 0.936 in 0.2.0, after the direct-Mw b sample);
+   - global b, shallow, leaves 0.98–1.10 (1.043 in 0.1.0, 1.035 in 0.2.0);
    - the number of cells with a shown b (quality A or B) changes by more than 25 % in either depth class;
    - the number of cells changes by more than 10 %;
    - `events_m5.json` or `events_m6.json` shrinks by more than 2 % (a truncated download);

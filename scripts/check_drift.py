@@ -13,8 +13,8 @@ import json
 import sys
 from pathlib import Path
 
-B_DEEP_RANGE = (0.95, 1.05)       # global b, depth > 70 km, ISC-GEM 1976-2021 (0.969 in v0.1.0)
-B_SHALLOW_RANGE = (0.98, 1.10)    # global b, depth <= 70 km (1.043 in v0.1.0)
+B_DEEP_RANGE = (0.89, 0.99)       # global b, depth > 70 km, ISC-GEM 1976-2021 (0.969 in v0.1.0, 0.936 in v0.2.0)
+B_SHALLOW_RANGE = (0.98, 1.10)    # global b, depth <= 70 km (1.043 in v0.1.0, 1.035 in v0.2.0)
 MAX_REL_CHANGE_CELLS_WITH_B = 0.25  # cells with a shown b (quality A or B), per depth class
 MAX_REL_CHANGE_CELLS = 0.10       # cells that hold events
 MAX_EVENT_DROP = 0.02             # events_m5 / events_m6 may not shrink by more than 2 % (truncated download)

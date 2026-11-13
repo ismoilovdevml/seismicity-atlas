@@ -55,7 +55,7 @@ def test_yearly_counts_null_outside_cover():
     assert yearly_counts([1973, 2026], 1973, 2026)[0] == 1  # no cover: plain counts, zeros kept
 
 
-def _site(d, cutoff="2026-11-13", b_sh=1.04, b_dp=0.97, n_b_sh=200, n_cells=100, m5=1000):
+def _site(d, cutoff="2026-11-13", b_sh=1.035, b_dp=0.936, n_b_sh=200, n_cells=100, m5=1000):
     d.mkdir(parents=True, exist_ok=True)
     man = {"data_cutoff_utc": cutoff, "version": "0.1.0",
            "global": {"b_shallow_1976_2021": {"b": b_sh}, "b_deep_1976_2021": {"b": b_dp}},
