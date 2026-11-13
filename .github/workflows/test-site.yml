@@ -1,0 +1,48 @@
+name: Test site
+
+# Browser tests for the static site. This workflow only reads the repository: it builds nothing and deploys nothing.
+
+on:
+  push:
+    paths:
+      - "site/**"
+      - "tests/e2e/**"
+      - ".github/workflows/test-site.yml"
+  pull_request:
+    paths:
+      - "site/**"
+      - "tests/e2e/**"
+      - ".github/workflows/test-site.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: test-site-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: e2e (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    # Chromium is required; Firefox and WebKit run too but do not fail the workflow.
+    continue-on-error: ${{ matrix.browser != 'chromium' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Playwright and pytest
+        run: python -m pip install playwright==1.65.1 pytest==9.2.0
+      - name: Install the browser
+        run: python -m playwright install --with-deps ${{ matrix.browser }}
+      - name: Run the browser tests
+        env:
+          E2E_BROWSERS: ${{ matrix.browser }}
+        run: python -m pytest tests/e2e -q -p no:cacheprovider
