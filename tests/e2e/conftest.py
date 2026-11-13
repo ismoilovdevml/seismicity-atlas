@@ -32,7 +32,9 @@ IGNORED_CONSOLE = (
     "GPU stall due to ReadPixels",  # headless Chromium WebGL driver
     "READ-usage buffer",
     "WebGL warning",  # Firefox software WebGL
-    "Failed to load resource",  # expected 404 for the optional regional index; HTTP errors are checked separately
+    "Failed to load resource",
+    # Benign by spec (resize observers re-notified in the same frame); Firefox reports it as an error event
+    "ResizeObserver loop completed with undelivered notifications",  # expected 404 for the optional regional index; HTTP errors are checked separately
 )
 
 
@@ -89,7 +91,8 @@ class Site:
             ctx.route("**/data/regional/**", _serve_fixture)
         pg = ctx.new_page()
         pg.errors = []
-        pg.on("pageerror", lambda e: pg.errors.append(f"pageerror: {e}"))
+        pg.on("pageerror", lambda e: pg.errors.append(f"pageerror: {e}")
+              if not any(s in str(e) for s in IGNORED_CONSOLE) else None)
         pg.on("console", lambda m: pg.errors.append(f"console.{m.type}: {m.text}")
               if m.type == "error" and not any(s in m.text for s in IGNORED_CONSOLE) else None)
         pg.on("response", lambda r: pg.errors.append(f"HTTP {r.status} {r.url}")

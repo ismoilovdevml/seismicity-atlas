@@ -240,6 +240,8 @@ export function applyTheme() {
 export function setProjection(globe) {
   if (!map) return;
   map.setProjection({ type: globe ? 'globe' : 'mercator' });
+  // Outside the globe the canvas is transparent; a darker backdrop than the ocean makes the globe edge visible.
+  document.getElementById('map-area').classList.toggle('globe', !!globe);
 }
 
 /** Pan so a selected cell is not hidden behind the detail panel. */

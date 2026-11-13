@@ -25,6 +25,7 @@
   --accent-bg: #eef5f5;
   --accent-border: #a9d0d3;
   --ocean: #f4f3ef;
+  --space: #d6d2c8;
   --land: #e4e1d9;
   --coast: #c9c4b8;
   --plate: #3b4350;
@@ -54,7 +55,7 @@
     --ink: #eceae4; --ink-2: #d3cfc6; --ink-3: #a3a9b1; --ink-4: #c2c7ce;
     --rule: #30353b; --rule-soft: #282c31; --rule-strong: #3e444c;
     --accent: #63bcc3; --accent-hover: #8ad0d5; --accent-bg: #17302f; --accent-border: #2d6268;
-    --ocean: #14171a; --land: #2a2e33; --coast: #4b5159; --plate: #b9c0c9; --nodata: #7a7f86; --hatch: #aab1bb;
+    --ocean: #14171a; --space: #050607; --land: #2a2e33; --coast: #4b5159; --plate: #b9c0c9; --nodata: #7a7f86; --hatch: #aab1bb;
     --note-bg: #2b2414; --note-fg: #f1d9a2; --note-border: #4a3c1d;
     --v-ok-fg: #86d7aa; --v-ok-bg: #12301f; --v-ok-bd: #24553a;
     --v-close-fg: #a4c2ec; --v-close-bg: #16243a; --v-close-bd: #2b4466;
@@ -72,7 +73,7 @@
   --ink: #eceae4; --ink-2: #d3cfc6; --ink-3: #a3a9b1; --ink-4: #c2c7ce;
   --rule: #30353b; --rule-soft: #282c31; --rule-strong: #3e444c;
   --accent: #63bcc3; --accent-hover: #8ad0d5; --accent-bg: #17302f; --accent-border: #2d6268;
-  --ocean: #14171a; --land: #2a2e33; --coast: #4b5159; --plate: #b9c0c9; --nodata: #7a7f86; --hatch: #aab1bb;
+  --ocean: #14171a; --space: #050607; --land: #2a2e33; --coast: #4b5159; --plate: #b9c0c9; --nodata: #7a7f86; --hatch: #aab1bb;
   --note-bg: #2b2414; --note-fg: #f1d9a2; --note-border: #4a3c1d;
   --v-ok-fg: #86d7aa; --v-ok-bg: #12301f; --v-ok-bd: #24553a;
   --v-close-fg: #a4c2ec; --v-close-bg: #16243a; --v-close-bd: #2b4466;
@@ -183,6 +184,7 @@ main { flex: 1 1 auto; position: relative; min-height: 0; }
 
 .map-area { grid-column: 2; position: relative; min-width: 0; overflow: hidden; background: var(--ocean); }
 #map { position: absolute; inset: 0; }
+.map-area.globe { background: radial-gradient(circle at 50% 50%, var(--space) 0, var(--space) 60%, color-mix(in srgb, var(--space) 80%, var(--ink)) 100%); }
 .map-buttons { position: absolute; top: 16px; right: 16px; z-index: 4; display: flex; flex-direction: column; gap: 6px; }
 .map-btn {
   width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--rule-strong); background: var(--surface); font-size: 20px;

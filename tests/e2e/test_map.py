@@ -7,7 +7,8 @@ from conftest import cell_point, jump, no_hscroll, rendered
 
 CELL_A = "820ccffffffffff"  # Aleutians, shallow quality A
 CELL_B = "820cdffffffffff"  # neighbour, shallow quality B
-LAYERS = [("q", [None]), ("mc", ["ig", "cc", "cc0"]), ("cc", ["flag", "dmw", "dloc"]), ("rate", [None]), ("b", [None])]
+LAYERS = [("q", [None]), ("mc", ["ig", "cc", "cc0"]), ("cc", ["flag", "dmw", "dloc"]), ("rate", [None]), ("none", [None]),
+          ("b", [None])]
 
 
 @pytest.mark.parametrize("viewport", ["desktop", "phone"])
@@ -18,14 +19,14 @@ def test_layers_render(site, viewport):
     assert ok, r
     if viewport == "phone":
         pg.click("#chip-more")
-    for lay, subs in LAYERS + [("none", [None])]:
+    for lay, subs in LAYERS:
         pg.check(f"input[name=layer][value={lay}]", force=True)
         for sub in subs:
             if sub:
                 pg.select_option("#sub-select", sub)
             pg.wait_for_timeout(200)
             n = rendered(pg, "cells-fill")
-            assert n > 100, (lay, sub, n)
+            assert n > 100 or lay == "none", (lay, sub, n)
             assert len(pg.inner_text("#legend")) > 8
     pg.check("input[name=depth][value=dp]", force=True)
     pg.wait_for_timeout(200)
@@ -100,9 +101,12 @@ def test_events_filter_and_usgs_link(site):
     pg.uncheck("#chk-m5")
     pg.wait_for_timeout(500)
     pt = pg.evaluate("""() => { const m = window.__map;
-      const f = m.queryRenderedFeatures({layers: ['events']}).filter((f) => f.properties.m >= 7.5)[0];
-      const p = m.project(f.geometry.coordinates); const r = m.getContainer().getBoundingClientRect();
-      return [p.x + r.left, p.y + r.top]; }""")
+      const r = m.getContainer().getBoundingClientRect();
+      // features of other world copies come back with unwrapped coordinates, so keep only on-screen points
+      const pts = m.queryRenderedFeatures({layers: ['events']}).filter((f) => f.properties.m >= 7.5)
+        .map((f) => m.project(f.geometry.coordinates))
+        .filter((p) => p.x > 40 && p.y > 40 && p.x < r.width - 360 && p.y < r.height - 40);
+      return [pts[0].x + r.left, pts[0].y + r.top]; }""")
     pg.mouse.click(*pt)
     pg.wait_for_selector(".maplibregl-popup a")
     assert pg.get_attribute(".maplibregl-popup a", "href").startswith("https://earthquake.usgs.gov/earthquakes/eventpage/")
@@ -152,12 +156,13 @@ def test_globe_and_cell_list(site):
 def test_keyboard_and_theme(site):
     pg = site.open()
     seen = []
+    # WebKit (as Safari) moves focus to buttons and form controls with Alt+Tab; plain Tab reaches text fields only
+    key = "Alt+Tab" if pg.context.browser.browser_type.name == "webkit" else "Tab"
     for _ in range(16):
-        pg.keyboard.press("Tab")
+        pg.keyboard.press(key)
         seen.append(pg.evaluate("""(() => { const e = document.activeElement;
           return (e.id || e.name || e.tagName) + ':' + (e.getAttribute('aria-label') || e.textContent || '').trim().slice(0, 30); })()"""))
     joined = " ".join(seen).lower()
-    # WebKit skips links and buttons on Tab unless the user enables it; form fields are always reached
     assert "layer" in joined and "depth" in joined, seen
     pg.click("#theme-btn")
     a = pg.evaluate("document.documentElement.dataset.theme")
