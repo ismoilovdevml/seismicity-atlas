@@ -56,6 +56,7 @@ Full tables and the reasons for each verdict: [docs/validation.md](docs/validati
 - [docs/validation.md](docs/validation.md): synthetic, global, regional and plate-boundary tests
 - [docs/data.md](docs/data.md): sources, magnitude types, depth, duplicates, coverage
 - [docs/data-schema.md](docs/data-schema.md): the data contract for the website (`site/data/`)
+- [docs/monitor.md](docs/monitor.md): the Sequence Monitor (ongoing sequences), its validation and limits
 - [docs/prior-work.md](docs/prior-work.md): existing tools and literature, and the gap this atlas fills
 - [docs/ai-in-seismology.md](docs/ai-in-seismology.md): ML catalogues and LLM agents, and what they can and
   cannot add here
@@ -73,6 +74,24 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 
 - Downloads are treated as untrusted data: parsed as CSV/JSON only, and Python always runs with `-I`.
 - ComCat changes over time. Use `scripts/fetch.py all --refresh --end <date>` to rebuild against newer data.
+
+## Sequence Monitor (ongoing sequences)
+
+A daily, descriptive view of every ComCat M ≥ 7 mainshock of the last 365 days (14 sequences at the
+2026-11-13 cut-off). **It is not a forecast**: it gives no probabilities and no expected future counts, and every
+fitted curve stops at the data cut-off. For official aftershock forecasts, use the USGS event pages.
+
+```bash
+.venv/bin/python -I scripts/monitor/build_monitor.py        # cut-off = now (UTC hour); writes site/data/monitor/
+.venv/bin/python -I scripts/monitor/check_monitor.py        # structure, no-forecast rules, size (< 3 MB)
+.venv/bin/python -I scripts/monitor/validate_oaf.py --end 2026-11-13T00:00:00   # compare with the USGS oaf product
+```
+
+- Validation: on the one like-for-like USGS product (Reasenberg-Jones, sequence specific: 2025 Hubbard Glacier
+  M 7.0) we get a = −2.109 ± 0.052 and p = 1.193 ± 0.046; the USGS gives −2.11 ± 0.053 and 1.18 ± 0.047. The
+  USGS ETAS products are compared too, with their differences explained.
+- Automation: `.github/workflows/update-monitor.yml` (daily); Pages redeploys after it.
+- Method, the current table, validation and limitations: [docs/monitor.md](docs/monitor.md).
 
 ## Outputs for the website
 
@@ -97,6 +116,10 @@ cd site && python3 -m http.server 8000   # then open http://localhost:8000/
   higher-resolution catalogues appear as an extra layer when `site/data/regional/index.json` is present. The state,
   including the language (English, Uzbek, Russian, Spanish), is kept in the URL hash, so any view can be shared.
 - **Sequences:** Omori-Utsu decay charts and quality badges for the 40 sequences.
+- **Ongoing:** the Sequence Monitor, updated daily. One card per M ≥ 7 mainshock of the last 365 days: counts,
+  Omori-Utsu fit, b with its interval and quality code, the largest aftershock, productivity compared with the
+  regional generic values of Page et al. (2016), and a cumulative chart that stops at the data cut-off.
+  Descriptive only, not a forecast. See below.
 - **Validation:** every test against published values, including the mismatch and the untestable rows.
 - **About & data:** sources, licences, data cut-off, how to cite, downloads.
 - Vendored: MapLibre GL JS 5.24.0 (BSD-3-Clause), Inter and IBM Plex Mono (SIL OFL 1.1). No CDN, no third-party

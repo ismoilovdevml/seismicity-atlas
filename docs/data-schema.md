@@ -26,6 +26,8 @@ General rules
 | `land.geojson` | first | Natural Earth 1:110m land polygons (fill) |
 | `coastline.geojson` | first | Natural Earth 1:50m coastline, simplified (outline) |
 | `sequences.json` | lazy | Omori-Utsu fits for the 40 largest independent sequences since 1990 |
+| `monitor/index.json` | lazy | Sequence Monitor: cut-off, update time, selection, disclaimer, one summary per ongoing sequence |
+| `monitor/<event id>.json` | lazy | one ongoing sequence: counts, Omori fit, b, b-positive, productivity, daily and cumulative counts |
 | `global.json` | lazy | global charts: Mc by period vs Michael (2014), b vs cutoff, b by boundary class, validation table |
 | `cells/<h3>.json` | lazy, on click | per-cell detail: FMDs, Mc(t), b(cutoff), yearly rates |
 
@@ -153,3 +155,45 @@ The threshold of each event is the largest of three values:
 - the atlas floor for its period and depth class;
 - `mc_window`;
 - after the mainshock only, Mc(t) = Mm − 4.5 − 0.75 log₁₀(t / day).
+
+## `monitor/` (Sequence Monitor, updated daily)
+
+**Descriptive only, not a forecast.** Every value covers the time from the mainshock to `data_cutoff_utc`. The
+files hold no probability and no expected future count; `scripts/monitor/check_monitor.py` rejects forecast-like
+keys and any curve past the cut-off. Method: [monitor.md](monitor.md). These files are rebuilt daily by
+`.github/workflows/update-monitor.yml`, independently of the monthly atlas release.
+
+`index.json`:
+
+| Property | Meaning |
+|---|---|
+| `method_version` | `monitor-<major>.<minor>`; changes when a definition below changes |
+| `generated_utc`, `data_cutoff_utc` | build time and the end of the ComCat queries (ISO 8601 UTC) |
+| `disclaimer` | the "not a forecast" statement (English data text; the site shows its own translated notice) |
+| `selection` | `min_mag` used, `default_min_mag` 7.0, `fallback_min_mag` 6.5, `fallback_used`, `window_days` 365, `query_minmag` 2.5, `catalogue` |
+| `method`, `references` | method text and citations |
+| `sequences` | summaries: `id`, `time`, `lat`, `lon`, `depth`, `mag`, `magtype`, `place`, `url`, `regime`, `radius_km`, `age_days`, `mcat`, `contaminated`, `overlaps`, `n_all`, `n_mcat`, `n_last7`, `omori` {`p`, `p_lo`, `p_hi`, `quality`}, `b` {`b`, `lo`, `hi`, `q`}, `productivity` {`class`, `ratio`, `ratio_lo`, `ratio_hi`, `percentile`}, `largest_aftershock`, `file` |
+
+`<event id>.json` (ComCat id of the mainshock):
+
+| Property | Meaning |
+|---|---|
+| `id`, `time`, `lat`, `lon`, `depth`, `mag`, `magtype`, `place`, `url` | mainshock as served by ComCat; `url` is its USGS event page |
+| `regime` | Garcia et al. (2012) tectonic regime of the epicentre (e.g. `SZ-GENERIC`) |
+| `radius_km`, `age_days` | window radius max(100 km, Wells & Coppersmith L) and days from the mainshock to the cut-off |
+| `absorbed` | larger-sequence members that would otherwise be mainshocks (in-window events or doublets): `id`, `time`, `mag`, `place` |
+| `overlaps` | later M ≥ 6.5 events whose own circle intersects this one: `id`, `time`, `mag`, `dist_km` |
+| `query` | the ComCat query parameters used |
+| `counts` | `n_all` (M ≥ query minimum), `n_mcat` (≥ Mcat), `n_fit` (≥ Mc(t)), `n_last7`, `n_last7_mcat`, `last_event` |
+| `mcat`, `mcat_method` | completeness (`maxc+0.2` or `default` 4.5) |
+| `mc_t` | `F`, `G`, `H` of Mc(t) = max(Mcat, F Mm − G − H log₁₀ t) and `days_until_mcat` |
+| `magtypes` | up to four `[type, share]` pairs of the aftershock magnitude types |
+| `contaminated` | an event within 0.5 units of the mainshock is in or overlaps the window (bars Omori quality A) |
+| `omori` | `n`, `K` (events/day ≥ Mcat), `c` (days), `p`, standard errors `sK`, `sc`, `sp`, 95 % bounds `p_lo`/`p_hi`, `K_lo`/`K_hi`, `c_lo`/`c_hi` (only when `c_resolved`), `c_resolved`, `quality` (`A`/`B`/`C`/`insufficient`; with `insufficient` only `n` is present) |
+| `omori_b`, `omori_b_source` | b used inside the Omori likelihood (`b-positive` or `fixed 1.0`) |
+| `b` | `b` (`null` unless `q` is A/B), `b_raw`, bootstrap 95 % `lo`, `hi`, `n`, `q` |
+| `bpos` | b-positive `b`, `lo`, `hi` (± 1.96 σ), `n` differences; `null` values below 50 differences |
+| `largest_aftershock` | `id`, `time`, `mag`, `magtype`, `days`, `dm` (Mm − Mmax); `bath_typical_dm` = 1.2 |
+| `productivity` | `regime`, `n`, sequence `a` with `a_lo`/`a_hi` (95 %), `a_regional`, `a_regional_sigma`, `p_regional`, `c_regional`, `b_regional`, `typical_lo`/`typical_hi` (25th–75th percentile of the region), `ratio` = 10^(a − mean) with `ratio_lo`/`ratio_hi`, `percentile`, `class` (`more`/`typical`/`less`/`insufficient`) |
+| `daily` | `all`, `mcat`: event counts per whole day since the mainshock (the last day is partial) |
+| `cum` | `t` (days; 1 h, 6 h, 12 h, then whole days, last value = `age_days`), `obs` (cumulative events ≥ Mc(t)), `obs_mcat` (≥ Mcat), `fit` (expected cumulative count ≥ Mc(t) from the Omori fit; absent without a fit) |
