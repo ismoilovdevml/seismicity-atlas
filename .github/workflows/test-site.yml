@@ -30,8 +30,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, firefox, webkit]
-    # Chromium is required; Firefox and WebKit run too but do not fail the workflow.
+        # Pushes and pull requests run Chromium (the required engine). Firefox and WebKit run only on a manual
+        # dispatch: headless Firefox on the Ubuntu runner logs a GPU-related console error that does not occur on
+        # desktop Firefox (see docs/known-issues.md), and a failed optional job would mark every commit red.
+        browser: ${{ fromJSON(github.event_name == 'workflow_dispatch' && '["chromium","firefox","webkit"]' || '["chromium"]') }}
     continue-on-error: ${{ matrix.browser != 'chromium' }}
     steps:
       - uses: actions/checkout@v4
