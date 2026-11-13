@@ -1,0 +1,6 @@
+# SYNTHETIC test sample in the layout expected for the official ISC-GEM CSV. Not real catalogue data.
+#
+#      date               ,    lat   ,    lon    , smajax ,  sminax , strike , q ,  depth ,  unc  , q ,   mw  ,  unc , q , s ,    mo    , fac , mo_auth , mpp , mpr , mrr , mrt , mtp , mtt , str1 , dip1 , rake1 , str2 , dip2 , rake2 , type , eventid
+ 1910-05-06 07:08:09.10 ,   10.000 ,   20.000 ,   30.5 ,   20.1 ,   45.0 , C ,   15.0 ,   5.0 , C ,  7.00 , 0.30 , B , p ,          ,     ,         ,     ,     ,     ,     ,     ,     ,      ,      ,       ,      ,      ,       ,      , 900000001
+ 2004-12-26 00:58:53.45 ,    3.300 ,   95.980 ,    5.0 ,    3.0 ,  100.0 , A ,   30.0 ,   2.0 , A ,  9.10 , 0.10 , A , m , 4.000e+22,   1 , GCMT    ,     ,     ,     ,     ,     ,     ,  329 ,    8 ,   110 ,  128 ,   83 ,    86 ,  TF  , 900000002
+ 1990-01-02 03:04:05.60 ,  -20.500 ,  -70.250 ,   10.0 ,    8.0 ,   10.0 , B ,  110.0 ,       , B ,  6.20 ,      , B , m ,          ,     ,         ,     ,     ,     ,     ,     ,     ,      ,      ,       ,      ,      ,       ,      , 900000003

@@ -17,7 +17,7 @@ from shapely.geometry import box, shape
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import seislib as sl  # noqa: E402
-from common import (AUX, C1, C2, C3, C4, DIV_NEUTRAL, GRID, IMG, INK, INK2, MUTED, RES, SEQ_BLUE, SITE, SURFACE,  # noqa: E402
+from common import (AUX, C1, CUTOFF_YEAR, C2, C3, C4, DIV_NEUTRAL, GRID, IMG, INK, INK2, MUTED, RES, SEQ_BLUE, SITE, SURFACE,  # noqa: E402
                     jdump, load_work, setup_mpl)
 
 plt = setup_mpl()
@@ -184,7 +184,7 @@ def maps(cells):
     bounds = np.round(np.arange(4.45, 5.36, 0.1), 2)
     cmap = ListedColormap([SEQ(x) for x in np.linspace(0.05, 1, len(bounds) - 1)])
     norm = BoundaryNorm(bounds, cmap.N)
-    fig, ax = map_axes("Magnitude of completeness of the USGS M4.5+ catalogue, 2010–2026",
+    fig, ax = map_axes(f"Magnitude of completeness of the USGS M4.5+ catalogue, 2010–{CUTOFF_YEAR}",
                        f"ComCat preferred magnitude as served, MAXC + 0.2, shallow events within 300 km "
                        f"({len(v)} cells with ≥ 50 events).")
     draw_cells(ax, [geoms[h] for h in v.h3], [cmap(norm(x)) for x in v.sh_mc_cc_2010])
@@ -378,7 +378,7 @@ def validation_figs(v, g, c):
     fig, ax = plt.subplots(figsize=(9, 3.6))
     for lab, d, mag, col, step in (("ISC-GEM Mw, shallow", g[~g.deep], "mag", C1, 5),
                                    ("ComCat as served, shallow", c[~c.deep], "mag", C2, 5)):
-        y0s = np.arange(d.year.min() // step * step, 2026, step)
+        y0s = np.arange(d.year.min() // step * step, CUTOFF_YEAR, step)
         mc = [sl.mc_maxc(d[(d.year >= a) & (d.year < a + step)][mag], correction=0.2)
               if ((d.year >= a) & (d.year < a + step)).sum() >= 100 else np.nan for a in y0s]
         ax.step(np.r_[y0s, y0s[-1] + step], np.r_[mc, mc[-1]], where="post", color=col, lw=1.8, label=lab)
