@@ -58,6 +58,8 @@ const shown = (cells, d = 'sh') => cells.filter((p) => ['A', 'B'].includes(p[`${
 function tohoku(seqs) {
   return seqs.find((s) => /tohoku/i.test(s.place)) || seqs.filter((s) => s.quality === 'A').sort((a, b) => b.mag - a.mag)[0] || seqs[0];
 }
+/** A sequence name without a leading year (the text adds the year itself). */
+const seqName = (s) => s.place.replace(/^\d{4}\s+/, '');
 const seqMap = (s) => mapHash({ l: 'none', ev: 6, y: `${s.time.slice(0, 4)}-${s.time.slice(0, 4)}`, at: [4, s.lat, s.lon] });
 const decYear = (iso) => {
   const d = new Date(iso);
@@ -101,7 +103,7 @@ export const EXAMPLES = {
     const s = tohoku(seq.sequences);
     return {
       vars: { n: f.int(ev.n), iscgem: f.int(cnt[0]), mwtype: f.int(cnt[1]), mbproxy: f.int(cnt[2]), msproxy: f.int(cnt[3]), other: f.int(cnt[4]),
-        place: s.place, mag: f.mag(s.mag), magtype: s.magtype, year: s.time.slice(0, 4) },
+        place: seqName(s), mag: f.mag(s.mag), magtype: s.magtype, year: s.time.slice(0, 4) },
       map: mapHash({ l: 'none', ev: 6 }),
       data: { cnt },
     };
@@ -224,7 +226,7 @@ export const EXAMPLES = {
     const sc = seq.synthetic_check;
     const nq = (q) => seq.sequences.filter((x) => x.quality === q).length;
     return {
-      vars: { place: s.place, mag: f.mag(s.mag), year: s.time.slice(0, 4), K: f.sig2(s.K), c: s.c_resolved ? f.sig2(s.c) : '–', p: f.b2(s.p),
+      vars: { place: seqName(s), mag: f.mag(s.mag), year: s.time.slice(0, 4), K: f.sig2(s.K), c: s.c_resolved ? f.sig2(s.c) : '–', p: f.b2(s.p),
         sp: s.sp != null ? f.b2(s.sp) : '–', nFit: f.int(s.n_fit), mcat: f.mag(s.mcat), radius: f.km(s.radius_km), q: s.quality,
         nSeq: f.int(seq.sequences.length), nA: f.int(nq('A')), nB: f.int(nq('B')), pTrue: f.b2(sc.p_true), pMean: f.b3(sc.p_mean), pSd: f.b3(sc.p_sd_between),
         cRes: String(!!s.c_resolved) },
@@ -245,7 +247,7 @@ export const EXAMPLES = {
     const tr = rows.find((r) => r.s === T);
     return {
       vars: { nSeq: f.int(rows.length), nWith: f.int(withA.length), med: f.fixed(median(withA.map((r) => r.d)), 2),
-        place: T.place, mag: f.mag(T.mag), aMag: tr && tr.a !== null ? f.mag(tr.a) : '–', dM: tr && tr.d !== null ? f.fixed(tr.d, 1) : '–',
+        place: seqName(T), mag: f.mag(T.mag), aMag: tr && tr.a !== null ? f.mag(tr.a) : '–', dM: tr && tr.d !== null ? f.fixed(tr.d, 1) : '–',
         K: f.sig2(T.K), p: f.b2(T.p), bSeq: f.b2(T.b_seq), mcat: f.mag(T.mcat) },
       map: seqMap(T),
       data: { rows, T },

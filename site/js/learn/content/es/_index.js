@@ -1,0 +1,21 @@
+// Concept titles and one-line summaries for the Learn index (Spanish). Keys are the registry ids.
+export default {
+  'magnitude-types': [`Tipos de magnitud`, `Mw, mb, Ms, ML y Md miden ondas distintas, y algunas dejan de crecer en los terremotos grandes.`],
+  'direct-vs-proxy-mw': [`Mw directa frente a proxy de Mw`, `Por qué el atlas, desde la v0.2, calcula b solo con magnitudes de momento medidas, no convertidas.`],
+  'magnitude-of-completeness': [`Magnitud de completitud (Mc)`, `El tamaño a partir del cual un catálogo casi no pierde eventos, y cómo cambia con el tiempo.`],
+  'frequency-magnitude-distribution': [`Distribución frecuencia-magnitud`, `Cuántos terremotos hay de cada tamaño: el gráfico básico detrás de Mc y b.`],
+  'gutenberg-richter-b-value': [`Valor b de Gutenberg-Richter`, `La pendiente que indica con qué rapidez los terremotos grandes se vuelven más escasos que los pequeños.`],
+  'confidence-interval-bootstrap': [`Intervalo del 95 % y bootstrap`, `Qué tan seguro es un valor b, estimado volviendo a extraer el catálogo muchas veces.`],
+  'quality-codes': [`Códigos de calidad A, B, C e insuficiente`, `Por qué algunas celdas muestran un valor b y la mayoría no.`],
+  'b-positive': [`b-positive`, `Un valor b basado en diferencias de magnitud que no se deja engañar por las réplicas pequeñas no registradas.`],
+  'declustering': [`Desagrupamiento`, `Eliminar réplicas con ventanas espacio-temporales, y por qué aquí reduce b.`],
+  'omori-utsu': [`Decaimiento de Omori-Utsu`, `Cómo disminuye la tasa de réplicas con el tiempo: K, c y p.`],
+  'aftershock-productivity-bath': [`Productividad de réplicas y ley de Båth`, `Qué tamaño suele tener la mayor réplica y cuántas réplicas cabe esperar.`],
+  'h3-cells-and-sample-radius': [`Celdas H3 y círculo de muestreo`, `Hexágonos para la visualización, un círculo fijo para las estadísticas.`],
+  'plate-boundary-classes': [`Clases de límite de placas`, `Subducción, dorsales, fallas transformantes y rifts en PB2002, y sus valores b.`],
+  'depth-and-slabs': [`Profundidad y placas subducidas`, `Por qué los terremotos someros y los más profundos se cartografían por separado.`],
+  'rate-m6': [`Tasa Mw ≥ 6`, `Con qué frecuencia ocurrieron terremotos grandes en una celda, por área y por año.`],
+  'catalogue-consistency': [`Concordancia entre catálogos`, `Dónde ComCat e ISC-GEM concuerdan o discrepan en magnitud y localización.`],
+  'regional-catalogues': [`Catálogos regionales`, `Las redes nacionales densas detectan terremotos mucho menores, en su propia escala de magnitud.`],
+  'not-a-forecast': [`No es un pronóstico`, `Por qué las estadísticas de los catálogos no dicen cuándo ni dónde será el próximo terremoto.`],
+};
