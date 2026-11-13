@@ -1,9 +1,10 @@
 """Map view: layers, tooltip, cell panel, events, URL state, globe, list, keyboard and theme."""
+import json
 import re
 
 import pytest
 
-from conftest import cell_point, jump, no_hscroll, rendered
+from conftest import SITE, cell_point, jump, no_hscroll, rendered
 
 CELL_A = "820ccffffffffff"  # Aleutians, shallow quality A
 CELL_B = "820cdffffffffff"  # neighbour, shallow quality B
@@ -152,7 +153,10 @@ def test_globe_and_cell_list(site):
     pg.click("#globe-btn")
     pg.click("#list-btn")
     pg.wait_for_timeout(300)
-    assert pg.evaluate("document.querySelectorAll('#panel-body tbody tr').length") == 204
+    # one row per shallow cell with a shown b (quality A or B), counted from the data rather than hard-coded
+    cells = json.load(open(SITE / "data/cells.geojson"))["features"]
+    n_shown = sum(1 for f in cells if f["properties"].get("sh_q") in ("A", "B"))
+    assert pg.evaluate("document.querySelectorAll('#panel-body tbody tr').length") == n_shown
     pg.click("#panel-body tbody tr >> nth=0 >> button")
     pg.wait_for_timeout(500)
     assert re.search(r"c=[0-9a-f]{15}", pg.evaluate("location.hash"))
