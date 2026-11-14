@@ -12,9 +12,9 @@ and `docs/img/sci2-*.png`. Every number below comes from those outputs (runs of 
 |---|---|---|---|---|
 | 1 | Taroni, Zhuang & Marzocchi (2021) HD b map of Italy; comment by Gulia, Gasperini & Wiemer (2022) | paper: author accepted manuscript, CC0 1.0 (INGV Earth-prints); input catalogue: subset of HORUS (CC BY 4.0) released in a GitHub repository without a licence | comparison only; files kept in the local cache, not redistributed | our Italy layer agrees in ranks (Spearman 0.62) with no bias (median −0.013); differences are concentrated in the Po Plain and eastern Sicily |
 | 2 | pybvalue v0.0.1 | MIT | method re-implemented (the archive holds no b-value code) | agrees with our layer when the same +0.2 completeness correction is used (Spearman 0.87, median +0.003) |
-| 3 | GEM Global Seismic Hazard Map v2026.1 | CC BY-NC-SA 4.0 | not redistributed, link only; internal analysis with aggregate statistics only | see §3 |
-| 4 | Zhang, Werner & Goda (2020) ETAS parameters | journal article; parameters quoted as facts | optional data fields of the monitor | see §4 |
-| 5 | Savran et al. (2020); pyCSEP | pyCSEP BSD-3-Clause | the Poisson N-test re-implemented (same definition) for a retrospective check | see §5 |
+| 3 | GEM Global Seismic Hazard Map v2026.1 | CC BY-NC-SA 4.0 | not redistributed, link only; internal analysis with aggregate statistics only | 369 of 555 cells with mean PGA ≥ 0.2 g have no shallow b; the cause is few events, not a high Mc |
+| 4 | Zhang, Werner & Goda (2020) ETAS parameters | journal article; parameters quoted as facts | optional data fields of the monitor | the shallow subduction sequences lie inside the range of the published sequences (ratios 2.3–6.0 vs 1.2–10.4) |
+| 5 | Savran et al. (2020); pyCSEP | pyCSEP BSD-3-Clause | the Poisson N-test re-implemented (same definition) for a retrospective check | the Omori fit extrapolated past its data fails 9 of 12 tests (6 with parameter uncertainty); the monitor stays descriptive |
 
 ## 1. Italy: high-definition b map (Taroni et al. 2021) and the quarry-blast debate
 
@@ -169,6 +169,49 @@ What this shows:
 0.2 lower than our latest-period Mc in the median cell. Global inputs were not run (the Italy cells already test
 the estimator on 144 independent circles).
 
+## 3. GEM Global Seismic Hazard Map v2026.1: high hazard and thin catalogue data
+
+**Licence, read exactly.** Zenodo record 20735384 ("Global Seismic Hazard Map", version v2026.1, 2026-06-23):
+licence `cc-by-nc-sa-4.0`. The archive's README says "License: Creative Commons BY-NC-SA 4.0 (CC BY-NC-SA 4.0)" and
+ships the full legal code (`LICENSE-CC_BY-NC-SA.txt`). The README asks to cite Johnson K, Bayliss K, Villani M,
+Brooks C, Styron R, Simionato M, Chen Y, Rood A, Pagani M (2026), doi:10.5281/zenodo.8409646 (the concept DOI).
+
+- NonCommercial: use for non-commercial purposes only. ShareAlike: adapted material may be shared only under the
+  same or a compatible licence. The atlas data are CC BY-SA 4.0, which is not compatible with NC, so **nothing
+  derived from the map cell by cell is published**: no site layer, no figure, no per-cell table.
+- Non-commercial internal analysis is permitted by the licence. It was run with **output limited to aggregate
+  counts and medians** (`results/sci2_gem_hazard.json`). The map is linked, not redistributed; the GeoPackage
+  (1.8 GB, 14,117,882 points with PGA) is read from a local download and is not cached in the repository's data.
+
+**Method** (`scripts/sci2/gem_hazard.py`). Hazard = mean PGA (g, 10 % in 50 years, rock) of the GEM points inside
+each H3 resolution-2 cell of the global layer (5,882 cells cover the Earth; 2,598 are atlas cells). Classes at
+breaks of the GEM colour table. "Thin" = no atlas cell, or shallow b quality `insufficient` or `C`.
+
+| PGA class | Cells | No atlas cell | Insufficient | C | A or B | Thin share | Median Mc (cells with Mc) | Median ISC-GEM events |
+|---|---|---|---|---|---|---|---|---|
+| < 0.08 g | 4,698 | 3,276 | 1,420 | 1 | 1 | 100 % | 5.4 (96) | 0 |
+| 0.08–0.2 g | 629 | 7 | 590 | 14 | 18 | 97 % | 5.3 (352) | 8 |
+| 0.2–0.35 g | 342 | 1 | 254 | 46 | 41 | 88 % | 5.4 (315) | 42 |
+| ≥ 0.35 g | 213 | 0 | 48 | 21 | 144 | 32 % | 5.4 (213) | 150 |
+
+High hazard (mean PGA ≥ 0.2 g), 555 cells:
+
+- **369 (67 %) have no shallow b** (302 insufficient, 67 C, 1 without an atlas cell); 185 have A or B.
+- Median ISC-GEM events: 44 in the thin cells against 166 in the A/B cells. The thin cells are thin because few
+  events above Mc occurred there in 1976–2021, not because Mc is high: the median measured Mc is 5.3–5.4 in every
+  hazard class, only 27 of the thin high-hazard cells have Mc ≥ 5.6, and the rank correlation of PGA with Mc is
+  0.04 (with the ISC-GEM event count 0.75).
+- Plate-boundary class of the thin high-hazard cells: 81 oceanic transform, 58 oceanic ridge, 73 more than 200 km
+  from a boundary step, 61 subduction, 39 continental convergent, 30 continental transform, 14 continental rift,
+  13 oceanic convergent. Many of them are offshore, where the GEM README notes that hazard values "are affected by
+  significant uncertainty".
+- With the 90th percentile of PGA in a cell instead of the mean, 980 cells reach 0.2 g.
+
+**Verdict.** Where GEM models the highest hazard (≥ 0.35 g), two thirds of the cells have a b-value; at
+0.2–0.35 g only 12 % do. The gap is a sample-size gap of a global M ≥ 5 catalogue over 46 years, not a completeness
+gap, so regional catalogues (as in the regional layers) are the way to fill it, not a lower global Mc. Not done:
+any map or per-cell output (licence), and deeper cells (only the shallow quality was compared).
+
 ## 4. Subduction-zone ETAS productivity (Zhang, Werner & Goda 2020)
 
 Licence: a journal article (BSSA 110(1), 191–212, doi:10.1785/0120190121), read from the annotated manuscript on
@@ -225,8 +268,9 @@ uncertainty).
 | | 30 | 878 | 0.99 | 797 | 445.5 | 1.79 | 0, 1 | 0, 1 |
 
 Summary of the 12 tests: the Poisson N-test rejects 9; with parameter uncertainty 6 are rejected. Observed counts
-are above the extrapolated fit in 10 of 12 (median ratio 1.56). Only Ridgecrest after 10 and 30 days and Noto pass
-both versions.
+are above the extrapolated fit in 10 of 12 (median ratio 1.56). The Poisson test passes only Ridgecrest after 30 days
+and Noto after 10 and 30 days; the mixture also passes Ridgecrest after 10 days, Noto after 3 days and Kamchatka
+after 3 days.
 
 Why the fit under-predicts:
 
@@ -246,3 +290,20 @@ Why the fit under-predicts:
 the cut-off: in 9 of 12 cases the extrapolation is statistically inconsistent with what followed. This supports the
 existing rules (no curve beyond the cut-off, no expected future counts, `check_monitor.py` guards). Nothing from the
 test is written to `site/data`.
+
+## Not verified
+
+- The reply of Taroni et al. (2022) to the comment (behind a login) and the full text of Savran et al. (2020) (only
+  the abstract) were not read. The Gulia et al. text was read from the authors' draft, not the published version.
+- The published HD map exists only as a figure; the reproduction was checked against the published B (1.04) and
+  event count, and against the figure by eye, not number by number.
+- The day/night ratio uses CET without daylight saving, so one hour of summer daytime falls into the night bin;
+  the ratio was not recomputed with local civil time.
+- pybvalue could not be run (no estimator in the archive, repository gone); only its documented method was
+  re-implemented.
+- Zhang et al. per-sequence ETAS parameters were not digitised from their figures; the reference uses Table 2
+  counts and Table 6 parameters only. The p and c uncertainties of Table 6 are not propagated.
+- The N-test uses four sequences and Poisson or bootstrap-mixture distributions; no ETAS simulation
+  (catalogue-based test) was run, and pyCSEP itself was not installed (its N-test definition was re-implemented and
+  checked in `tests/test_sci2.py`).
+- GEM: only the shallow b quality was compared; deeper cells and the 2023.1 map were not.
