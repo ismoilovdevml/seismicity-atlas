@@ -138,3 +138,29 @@ def node_area_m2(lat_deg, dlon_deg, dlat_deg):
     lat = np.radians(np.asarray(lat_deg, float))
     h = np.radians(dlat_deg) / 2.0
     return R_EARTH ** 2 * np.radians(dlon_deg) * (np.sin(lat + h) - np.sin(lat - h))
+
+
+def bandwise_rate_draws(mw, sig, year, bands, t_end, n_draw, rng):
+    """Band-wise moment rate with each event's moment drawn from its Mw uncertainty: M0 = 10^(1.5 (Mw + sig z) + 9.1).
+
+    Band membership (the completeness decision) stays with the catalogue Mw, as completeness is a property of the
+    reported magnitudes; only the moment of a counted event varies.
+    """
+    mw, sig, year = (np.asarray(a, float) for a in (mw, sig, year))
+    if mw.size == 0:
+        return np.zeros(n_draw)
+    w = np.zeros(mw.size)                    # 1 / window length of the event's band, 0 when not counted
+    for lo, hi, y0 in bands:
+        s = (mw >= lo - 1e-9) & (mw < hi - 1e-9) & (year >= y0) & (year < t_end)
+        w[s] = 1.0 / (t_end - y0)
+    k = w > 0
+    if not k.any():
+        return np.zeros(n_draw)
+    m0 = mw_to_m0(mw[k][None, :] + sig[k][None, :] * rng.standard_normal((n_draw, int(k.sum()))))
+    return m0 @ w[k]
+
+
+def kostrov_shortening(m0_sum, mu, h, length, years):
+    """Shortening rate (m/yr) across a belt from a summed moment (N m) of pure thrusts striking along it:
+    u = sum(M) / (2 mu H L T), the Kostrov (1974) average strain times the belt width (as in Molnar & Ghose 2000)."""
+    return m0_sum / (2.0 * mu * h * length * years)

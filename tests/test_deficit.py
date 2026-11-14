@@ -101,3 +101,25 @@ def test_simulated_sums_mean_equals_tgr_rate():
     assert s.mean() / years == pytest.approx(ml.tgr_moment_rate(rate, mt, beta, mc), rel=0.05)
     # heavy tail: the median catalogue sum is below the mean
     assert np.median(s) < s.mean()
+
+
+def test_bandwise_draws_zero_sigma_equals_point_estimate():
+    rng = np.random.default_rng(7)
+    mw = np.array([6.1, 6.9, 7.8, 5.9])
+    yr = np.array([1970.0, 1950.0, 1910.0, 1990.0])
+    bands = [(5.8, 6.0, 1976.0), (6.0, 6.5, 1964.0), (6.5, 6.8, 1955.0), (6.8, 7.0, 1940.0), (7.0, 7.7, 1918.0),
+             (7.7, 99.0, 1904.0)]
+    point, _ = ml.bandwise_moment_rate(mw, yr, bands, 2020.0)
+    d = ml.bandwise_rate_draws(mw, np.zeros(4), yr, bands, 2020.0, 5, rng)
+    assert d == pytest.approx(np.full(5, point))
+    # the 1990 Mw 5.9 event counts, the 1950 Mw 6.9 event counts in the 6.8-7.0 band (complete from 1940)
+    assert point == pytest.approx(ml.mw_to_m0(5.9) / 44 + ml.mw_to_m0(6.1) / 56 + ml.mw_to_m0(6.9) / 80
+                                  + ml.mw_to_m0(7.8) / 116)
+
+
+def test_kostrov_shortening_reproduces_molnar_ghose_2000():
+    # Molnar & Ghose (2000, GRL 27, 2377): M_NN = -16.3e20 N m, mu = 3.3e10 Pa, depth 20 km, length 1800 km,
+    # width 300 km, 100 years -> strain rate -23.1e-9 /yr and 7 mm/yr shortening
+    u = ml.kostrov_shortening(16.3e20, 3.3e10, 20e3, 1800e3, 100.0)
+    assert u / 300e3 == pytest.approx(23.1e-9, rel=0.02)
+    assert u * 1e3 == pytest.approx(7.0, abs=0.2)   # 6.86; the paper rounds to 7
