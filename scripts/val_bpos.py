@@ -257,6 +257,7 @@ def main():
     res["direct_share_by_magnitude"] = dshare
 
     # ---- (a) global per period: b(floor + k) direct vs every event, b-positive, Mc-Lilliefors
+    rng = np.random.default_rng(RNG + 1)   # one stream per section: sections do not shift each other
     glob = {}
     for (a, z), key in zip(PERIODS, ("1976-2003", "2004-2021")):
         ps = (yr >= a) & (yr <= z)
@@ -290,9 +291,10 @@ def main():
                                          (mb[np.round(m01 * 100) % 10 == 5] < m01[np.round(m01 * 100) % 10 == 5]).mean()), 4)}
 
     # ---- blind windows: drop events within T days after a larger event (as above) from b, keep b-positive as is
+    rng = np.random.default_rng(RNG + 2)   # one stream per section: sections do not shift each other
     dt_all = time_after_larger(g.t.to_numpy() * 365.25, g.lat, g.lon, sl.bin_mag(g.mag.to_numpy()))
     win = {}
-    for T in (0.25, 1.0, 2.0):
+    for T in (0.0, 0.25, 1.0, 2.0):
         w = dt_all < T
         row = {}
         for lab, sel in (("direct", direct), ("every", every)):
@@ -311,6 +313,7 @@ def main():
     print("windows done", flush=True)
 
     # ---- per cell (shown shallow cells of the atlas run): direct (atlas), every event at the v0.2 floors, v0.1
+    rng = np.random.default_rng(RNG + 3)   # one stream per section: sections do not shift each other
     variants = {"direct_v02_floors": (direct, fl_direct, True), "every_event_v02_floors": (every, fl_direct, False),
                 "every_event_v01_floors": (every, fl_every, False)}
     P = {}
@@ -338,6 +341,7 @@ def main():
     # ---- (c) iid Gutenberg-Richter null with the real cells' floors and sizes
     E = d[d.q.isin(["A", "B"]) & d.bpos.notna()]
     samp = cell_samples(g, direct, fl_direct, E.index)
+    rng = np.random.default_rng(RNG + 4)   # one stream per section: sections do not shift each other
     null = {}
     for resol in (0.01, 0.1):
         rows = []
@@ -358,6 +362,7 @@ def main():
     res["null_iid_gr_b1"] = null
 
     # ---- synthetic injection: complete, STAI, static ramp above the floor, both
+    rng = np.random.default_rng(RNG + 5)   # one stream per section: sections do not shift each other
     inj = {k: [] for k in ("complete", "stai", "static_ramp", "stai_and_ramp")}
     lost = []
     for rep in range(20):
@@ -378,6 +383,7 @@ def main():
         **{k: {s_: [round(float(np.mean([r[s_] for r in v])), 4), round(float(np.std([r[s_] for r in v])), 4)]
                for s_ in ("b", "bpos", "bpos_shuffled")} for k, v in inj.items()}}
     # ---- order-free part: shape of the distribution (tapered G-R, spatial mixture), iid, floor 5.3, n = 20000
+    rng = np.random.default_rng(RNG + 6)   # one stream per section: sections do not shift each other
     shape = {}
     for name, draw in (("tgr_corner_7.0", lambda n: tgr_draw(n, 7.0, rng)), ("tgr_corner_7.5", lambda n: tgr_draw(n, 7.5, rng)),
                        ("tgr_corner_8.0", lambda n: tgr_draw(n, 8.0, rng)),
@@ -391,6 +397,7 @@ def main():
                        "bpos_minus_b": round(float((v[:, 1] - v[:, 0]).mean()), 4)}
     res["shape_checks_iid"] = shape
     # ---- power of the per-cell Lilliefors test against the static ramp used above (b = 1, floor 5.3)
+    rng = np.random.default_rng(RNG + 7)   # one stream per section: sections do not shift each other
     power = {}
     for n in (170, 600):
         rej = 0

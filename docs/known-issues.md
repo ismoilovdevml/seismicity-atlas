@@ -9,6 +9,17 @@ Status of the website (phase 2) on 2026-11-13. Data issues are documented here, 
   simplified.
 - **ISC-GEM-only events use `iscgem…` ids.** One was checked and resolves on the USGS event page
   (`iscgem610326271`, HTTP 200). The other 7,126 were not checked one by one.
+- **b-positive above b (`sh_bpos` > `sh_b`).** In shown shallow cells the median gap is +0.046, and b-positive
+  lies inside the b interval in 64.9 % of them. This is expected, not a bug (`bpositive.md`):
+  - The direct-Mw b sample lacks many early aftershocks. b-positive partly corrects for that, Aki-Utsu b cannot.
+  - Outside subduction zones the magnitude distribution likely bends at large M.
+
+  Floors and estimators were tested and left unchanged.
+- **0.1 binning of 0.01 magnitudes.** `seislib.bin_mag` rounds 74 % of magnitudes that end in 5 down (floating
+  point and half-to-even rounding). That shifts the effective bin edges by about +0.002 and lowers every Aki-Utsu
+  b by about 0.006 (global shallow direct b: 1.035 binned, 1.041 on the 0.01 values). This is within the global
+  interval (±0.017). b-positive is unaffected. It was not changed because the fix would move every published b;
+  it is a candidate for a future version bump.
 
 ## Website
 

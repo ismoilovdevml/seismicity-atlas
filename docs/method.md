@@ -130,10 +130,17 @@ uncertainty, (c) a Tinti–Mulargia correction for magnitude error.
 **Cost.** 7,049 of 56,585 events of 1976–2021 (12.5 %) leave the b sample. The direct sample is less complete at
 small magnitudes in 1976–2003, so the shallow floors rise by 0.1 (§3). Shown shallow cells fall from 204 to 170.
 
-**Open point.** In the 77 shallow cells with b and b-positive in both versions, b fell by a median 0.022 but
-b-positive moved by only +0.002, and b-positive now lies inside the b interval in 65 % of shown cells (88 % in
-v0.1). b-positive is insensitive to incompleteness, so part of the per-cell drop may be events that GCMT missed
-just above the floor. This was not resolved.
+**b-positive after the change (resolved, `bpositive.md`).** In the 77 shallow cells with b and b-positive in
+both versions, b fell by a median 0.022 while b-positive moved by +0.002. b-positive now lies inside the b
+interval in 65 % of shown cells (88 % in v0.1). The floors are not the cause:
+- raising them moves b by the same amount with or without the proxies;
+- Mc-Lilliefors gives 5.8 for the direct sample of 1976–2003.
+
+The left-out proxies are mostly early aftershocks (52 % of above-floor events in the first day after a larger
+event, 4.4 % later). Leaving them out makes the direct sample transiently incomplete. On the same cells and
+floors, Aki-Utsu b falls by 0.024 and shuffled (order-free) b-positive by 0.026. b-positive in time order falls
+by only 0.011, because it is built to ignore transient incompleteness. No change to floors or estimator was
+justified.
 
 **Official file.** With the official CSV (`scripts/iscgem_official.py`), the per-event source column would be the
 exact selector. The reader does not use it yet, because the current header could not be checked.
@@ -191,7 +198,12 @@ above the period floor in time order. It is insensitive to the short-term incomp
 
 - Shown cells: the median of b⁺ − b is +0.046 (v0.1, all events: +0.029).
 - b⁺ falls inside the bootstrap interval of b in 64.9 % of cells (v0.1: 87.8 %; `results/validation.json`,
-  `cells_summary`). The drop came with the direct-Mw sample; see the open point in §2.1.
+  `cells_summary`). For iid Gutenberg-Richter data with the same cell sizes and floors, the share would be about
+  96 % and the median b⁺ − b +0.005 to +0.008. The excess has two parts, both in `bpositive.md`:
+  - Time order (v0.2 only). The direct-Mw sample misses early aftershocks, and b⁺ partly corrects for that.
+  - Order-free (already in v0.1). It is 4–6 times larger outside subduction zones, which fits a magnitude
+    distribution that bends at large M.
+- Read a b⁺ well above b as a sign of aftershock gaps or a bending distribution, not of a wrong Mc.
 
 ## 6. Shallow vs deeper events, and declustering
 

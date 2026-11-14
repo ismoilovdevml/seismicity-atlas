@@ -187,7 +187,7 @@ Global shallow events, 2004–2021, same years in both catalogues:
 | Check | Result |
 |---|---|
 | Radius 200 / 400 km vs 300 km | median \|Δb\| 0.042 / 0.039 on common cells (v0.1: 0.035 / 0.039) |
-| b-positive vs b (shown cells) | median +0.046; b⁺ inside the b interval in 64.9 % of cells (v0.1: +0.029, 87.8 %; see method §2.1, open point) |
+| b-positive vs b (shown cells) | median +0.046; b⁺ inside the b interval in 64.9 % of cells (v0.1: +0.029, 87.8 %; iid null about 96 %); explained in `bpositive.md` |
 | Gardner-Knopoff declustering | global shallow b 1.035 → 0.887; per-cell median −0.202 (not used for the map, see method §6) |
 | Cutoff-stability flag | 4.7 % of shown shallow cells |
 
@@ -299,8 +299,7 @@ the committed v0.1 outputs exactly (every number in `results/*.json` and every c
 - With every event but the v0.2 floors, global shallow b is 1.053; so the floor change alone moves it by +0.010
   and leaving the proxies out by −0.018.
 - **b-positive did not follow.** In the 77 shallow cells with b and b-positive in both runs, b fell by a median
-  0.022 and b-positive rose by 0.002. Part of the per-cell drop may be incompleteness of the direct sample just
-  above the floor; this is open (`method.md` §2.1).
+  0.022 and b-positive rose by 0.002. §11 and `bpositive.md` explain why.
 
 **Verdicts that changed** (site validation table, `results/validation_table.json`):
 
@@ -333,6 +332,20 @@ the committed v0.1 outputs exactly (every number in `results/*.json` and every c
 | 16 | `petruccelli2018_gcmt_mc_map` | Mc 5.4–5.5 | MAXC+0.2 5.4, MBS 5.6 | MAXC+0.2 5.4, MBS 5.8 | match |
 
 
+## 11. b-positive vs b on the direct-Mw sample
+
+`scripts/val_bpos.py` → `results/val_bpos.json`; full write-up in `bpositive.md`. The cells are the shown shallow
+cells with b-positive; the medians carry 95 % bootstrap intervals over cells.
+
+| Test | Result | Verdict |
+|---|---|---|
+| (a) Floor too low for the direct sample | Raising each cell's threshold by +0.2/+0.4 lifts b by +0.022/+0.054 (direct) and +0.032/+0.062 (every event); the direct − every gap stays −0.024 to −0.028 up to +0.3. Mc-Lilliefors: 5.8 for 1976–2003 (= floor); 6.1 for 2004–2021, the same for every event (pooled-shape rejection). 61/76 cells pass at the atlas threshold. | rejected |
+| (b) Time-correlated thinning | Proxies are 51.8 % of above-floor events in the first day after a larger event, 4.4 % later. Paired, same floors: b −0.024, shuffled b⁺ −0.026, b⁺ −0.011; time-order part +0.013 [−0.000, +0.028]. Synthetic STAI lowers b and shuffled b⁺, not b⁺. Blind windows (0.25–2 d) do not close the gap. | cause of the v0.2 change |
+| (c) b⁺ bias (small n, 0.01 vs 0.1 magnitudes) | iid G-R null with the cells' sizes and floors: b⁺ − b +0.005 / +0.008, inside 96.8 % / 96.4 % | rejected |
+| (d) Boundary class | The time-order part appears in SUB and other cells alike. The order-free part is +0.012 (SUB) vs +0.073 (other) in v0.1; a tapered G-R with corner 7.0 / 7.5 gives +0.061 / +0.020 | order-free part depends on class |
+
+No change to floors or estimators; the global b, A/B cells and validation verdicts are unchanged.
+
 ## Not verified
 
 - The ISC-GEM version of the ComCat copy (not stated by ComCat), and whether results change with v13.0.
@@ -346,7 +359,7 @@ the committed v0.1 outputs exactly (every number in `results/*.json` and every c
 - That ISC-GEM magnitude uncertainty 0.10 marks direct Mw. It is checked against GCMT magnitudes in ComCat
   (99.97 % of GCMT-sourced matches carry 0.10), not against ISC-GEM's own direct/proxy column, which the ComCat
   copy lacks (`method.md` §2.1).
-- Whether the lower per-cell b of v0.2 is partly residual incompleteness of the direct-Mw sample: b-positive did
-  not move (median +0.002 against −0.022 for b in 77 cells; §10).
+- The tapered-distribution reading of the order-free part of b-positive − b (§11): no corner magnitude was fitted
+  per cell. The full text of van der Elst (2021) was not accessible.
 - The ISC-GEM overview and Di Giacomo et al. (2018) quotes in `method.md` §2.1 (read through a summariser).
 - Mc(t) coefficients at teleseismic scale (§9).
