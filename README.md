@@ -1,5 +1,7 @@
 # Global Seismicity Atlas
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24228387.svg)](https://doi.org/10.5281/zenodo.24228387)
+
 **Live site: https://ismoilovdevml.github.io/seismicity-atlas/**
 
 An open, reproducible world map of earthquake-catalogue statistics, built from free global catalogues (ISC-GEM and
@@ -137,8 +139,11 @@ cd site && python3 -m http.server 8000   # preview the site at http://localhost:
 
 ## How to cite
 
-Use the metadata in [CITATION.cff](CITATION.cff) (GitHub shows a "Cite this repository" button), cite the underlying
-catalogues listed below, and quote the data cut-off date shown on the site.
+Cite the archived release on Zenodo: **doi:[10.5281/zenodo.24228387](https://doi.org/10.5281/zenodo.24228387)**
+(this concept DOI always resolves to the latest version; v0.3.1 is
+[10.5281/zenodo.24228388](https://doi.org/10.5281/zenodo.24228388)). The full metadata is in [CITATION.cff](CITATION.cff)
+(GitHub shows a "Cite this repository" button). Also cite the underlying catalogues listed below, and quote the data
+cut-off date shown on the site.
 
 ## Contributing
 
