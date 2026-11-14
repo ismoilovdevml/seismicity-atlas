@@ -1031,4 +1031,9 @@ export default {
   "df.colTgr": "Long-term / geodetic [95 %]",
   "df.colQ": "Quality",
   "df.chartNote": "Data: Ou et al. (2026) and Chang (2025) strain rates, ISC-GEM and ComCat. Method and validation: docs/deficit.md in the repository.",
+  "learn.c.induced-seismicity": "Induced seismicity",
+  "learn.c.seismic-moment-budget": "Seismic moment budget",
+  "learn.group.applied": "Case studies and budgets",
+  "learn.openCase": "Open the Groningen case study",
+  "learn.showDeficit": "Show the deficit layer on the map",
 };

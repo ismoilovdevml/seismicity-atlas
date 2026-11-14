@@ -153,7 +153,7 @@ export async function renderLearn(root, { topic, back }) {
       c.example.title ? html('h3', '', fill(c.example.title, ex.vars)) : null,
       ...c.example.body.map((s) => html('p', '', fill(s, ex.vars))),
       h('p', { class: 'lr-source', text: t('learn.liveData', { v: man.version, cutoff: man.data_cutoff_utc }) }),
-      ex.map ? h('a', { class: 'lr-map-btn', href: ex.map, 'data-learn': 'map', text: t('learn.showMap') }) : null);
+      ex.map ? h('a', { class: 'lr-map-btn', href: ex.map, 'data-learn': 'map', text: t(ex.mapLabel || 'learn.showMap') }) : null);
     for (const [e, tplStr] of templated) e.innerHTML = fill(tplStr, ex.vars, '–');
     const btn = exBox.querySelector('.lr-map-btn');
     if (btn) btn.insertAdjacentHTML('afterbegin', MAP_ICON);

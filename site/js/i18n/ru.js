@@ -1030,4 +1030,9 @@ export default {
   "df.colTgr": "Долгосрочное / геодезическое [95 %]",
   "df.colQ": "Качество",
   "df.chartNote": "Данные: скорости деформации Ou и др. (2026) и Chang (2025), ISC-GEM и ComCat. Метод и проверка: docs/deficit.md в репозитории.",
+  "learn.c.induced-seismicity": "Наведённая сейсмичность",
+  "learn.c.seismic-moment-budget": "Баланс сейсмического момента",
+  "learn.group.applied": "Примеры исследований и балансы",
+  "learn.openCase": "Открыть пример Гронинген",
+  "learn.showDeficit": "Показать слой дефицита на карте",
 };

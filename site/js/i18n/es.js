@@ -1028,4 +1028,9 @@ export default {
   "df.colTgr": "Largo plazo / geodésico [95 %]",
   "df.colQ": "Calidad",
   "df.chartNote": "Datos: tasas de deformación de Ou et al. (2026) y Chang (2025), ISC-GEM y ComCat. Método y validación: docs/deficit.md en el repositorio.",
+  "learn.c.induced-seismicity": "Sismicidad inducida",
+  "learn.c.seismic-moment-budget": "Balance de momento sísmico",
+  "learn.group.applied": "Casos de estudio y balances",
+  "learn.openCase": "Abrir el caso de Groningen",
+  "learn.showDeficit": "Mostrar la capa de déficit en el mapa",
 };

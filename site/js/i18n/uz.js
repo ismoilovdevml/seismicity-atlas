@@ -1029,4 +1029,9 @@ export default {
   "df.colTgr": "Uzoq muddatli / geodezik [95 %]",
   "df.colQ": "Sifat",
   "df.chartNote": "Ma’lumotlar: Ou va boshq. (2026) va Chang (2025) deformatsiya tezliklari, ISC-GEM va ComCat. Usul va tekshiruv: repozitoriydagi docs/deficit.md.",
+  "learn.c.induced-seismicity": "Induksiyalangan seysmiklik",
+  "learn.c.seismic-moment-budget": "Seysmik moment balansi",
+  "learn.group.applied": "Tadqiqot misollari va balanslar",
+  "learn.openCase": "Groningen tadqiqot misolini ochish",
+  "learn.showDeficit": "Taqchillik qatlamini xaritada ko‘rsatish",
 };
