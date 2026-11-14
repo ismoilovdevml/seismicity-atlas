@@ -135,6 +135,90 @@ def mc_mbs(m, dm: float = 0.1, span: float = 0.5, nmin: int = 50):
     return np.nan
 
 
+def _ks_exp(x):
+    """Kolmogorov-Smirnov distance between the sample x >= 0 and an exponential with the sample-mean scale.
+
+    x has shape (..., n); returns shape (...)."""
+    x = np.sort(x, axis=-1)
+    n = x.shape[-1]
+    F = 1.0 - np.exp(-x / x.mean(axis=-1, keepdims=True))
+    i = np.arange(1, n + 1)
+    return np.maximum((i / n - F).max(axis=-1), (F - (i - 1) / n).max(axis=-1))
+
+
+def lilliefors_exp_p(x, nsim: int = 500, rng=None):
+    """Lilliefors (1969) test of exponentiality with unknown scale; Monte Carlo p-value.
+
+    The null distribution of the statistic does not depend on the scale, so it is simulated with unit-rate
+    exponentials of the same size n (in chunks to bound memory)."""
+    rng = np.random.default_rng(rng)
+    x = np.asarray(x, float)
+    d = _ks_exp(x)
+    n = x.size
+    chunk = max(1, int(2e6 // max(n, 1)))
+    ge = 0
+    for s in range(0, nsim, chunk):
+        k = min(chunk, nsim - s)
+        ge += int((_ks_exp(rng.exponential(1.0, (k, n))) >= d).sum())
+    return (ge + 1) / (nsim + 1)
+
+
+def _dither_trexp(m, res: float, beta: float, rng):
+    """Spread magnitudes reported at resolution `res` inside their bin with a truncated exponential of rate beta.
+
+    Uniform dithering of a geometric (binned exponential) sample does not give an exponential; the truncated
+    exponential within each bin does (Stallone & Spassiani, Seismica, doi:10.26443/seismica.v5i1.2257)."""
+    u = rng.random(m.size)
+    # inverse CDF of exp(-beta y) on y in [0, res), measured from the lower bin edge
+    y = -np.log1p(-u * (1.0 - np.exp(-beta * res))) / beta
+    return m - res / 2 + y
+
+
+def lilliefors_offset(m, thr, offsets, res: float = 0.01, step: float = 0.1, alpha: float = 0.1,
+                      ndither: int = 20, nsim: int = 300, nmin: int = 50, rng=None):
+    """Smallest offset k (from `offsets`, increasing) at which the excesses over a per-event threshold thr_i + k
+    pass the Lilliefors exponentiality test (median p over `ndither` dithers >= alpha).
+
+    Thresholds are bin centres on the `step` grid: event i is kept when m_i >= thr_i + k - step/2. Kept
+    magnitudes, reported at resolution `res`, are spread within their `res` bin (truncated-exponential dither) and
+    measured from the lower edge of the lowest kept `res` bin of their own threshold. Under Gutenberg-Richter
+    the pooled excesses are exponential with one rate (memoryless property), as in b_varmc. Returns (k, table)
+    with table rows (k, n, median p); k is NaN when no offset passes with at least nmin events."""
+    rng = np.random.default_rng(rng)
+    m = np.round(np.asarray(m, float) / res) * res
+    thr = np.broadcast_to(np.asarray(thr, float), m.shape)
+    table = []
+    for k in np.round(np.asarray(offsets, float), 6):
+        c = np.round((thr + k) / step) * step
+        keep = m >= c - step / 2 - 1e-9
+        s = m[keep]
+        if s.size < nmin:
+            break
+        edge = np.round((c[keep] - step / 2) / res) * res - res / 2
+        beta = 1.0 / (s - edge).mean()
+        ps = [lilliefors_exp_p(_dither_trexp(s, res, beta, rng) - edge, nsim, rng) for _ in range(ndither)]
+        p = float(np.median(ps))
+        table.append((float(k), int(s.size), p))
+        if p >= alpha:
+            return float(k), table
+    return np.nan, table
+
+
+def mc_lilliefors(m, res: float = 0.01, step: float = 0.1, alpha: float = 0.1, ndither: int = 20,
+                  nsim: int = 300, nmin: int = 50, rng=None, mc_range=None):
+    """Mc-Lilliefors (Herrmann & Marzocchi 2021, SRL 92(2A), doi:10.1785/0220200337), independent implementation.
+
+    Candidates are bin centres on the `step` grid with the same meaning as elsewhere here (candidate Mc keeps
+    magnitudes >= Mc - step/2); see lilliefors_offset for the test. Mc is the smallest candidate whose median
+    p-value is >= alpha. Returns (mc, table) with rows (candidate, n, median p); mc is NaN if none passes."""
+    m = np.asarray(m, float)
+    lo, hi = mc_range if mc_range is not None else (np.floor(m.min() / step) * step, m.max())
+    k, table = lilliefors_offset(m, np.round(lo, 6), np.arange(0, hi - lo + step / 2, step), res, step, alpha,
+                                 ndither, nsim, nmin, rng)
+    table = [(round(lo + t[0], 6), t[1], t[2]) for t in table]
+    return (round(lo + k, 6) if np.isfinite(k) else np.nan), table
+
+
 # ----------------------------------------------------------------------------------------------- declustering
 def gk_windows(m):
     """Gardner & Knopoff (1974) space (km) and time (days) windows, as in ZMAP/OpenQuake."""
