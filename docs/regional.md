@@ -272,3 +272,28 @@ regional service is down, that region is skipped, its previous output is kept an
   QuakeML includes every station amplitude, so the client stops reading each response after the magnitudes.
   Requests are sequential per service, with at most 3 parallel per-event requests and a pause after each.
 - Raw responses are cached in `data/raw/regional/<id>/` (not in git).
+
+## Comparison with the HD b map of Italy (added 2026-11-14)
+
+The Italy layer was compared cell by cell with the weighted-likelihood ("high-definition") b map of Taroni, Zhuang &
+Marzocchi (2021, SRL 92(6), doi:10.1785/0220210017), recomputed from the authors' released catalogue (HORUS subset,
+Mw proxy, 1960–2019) at our cell centres, and checked for the quarry-blast bias raised by Gulia, Gasperini & Wiemer
+(2022, SRL, doi:10.1785/0220210159). Full method, tables and figure: [comparisons.md](comparisons.md) §1–2.
+
+| Check | Result |
+|---|---|
+| Reproduction of their whole-catalogue B | 1.046 ± 0.004 from 56,309 events (published 1.04, same event count) |
+| Ours vs HD b, 120 shown shallow cells inside their study area | Spearman 0.62, Pearson 0.68, median difference (HD − ours) −0.013, RMS 0.10 |
+| Same comparison, 2010–2019 in both | Spearman 0.62, median +0.017 |
+| HD estimator on our own events (method effect only), 144 cells | Spearman 0.60, median +0.076 |
+| Their significant high-b cells (23) | ours above the median in 15, below in none |
+| Their significant low-b cells (52) | ours below the median in 14, above in 3 |
+| Largest differences | Po Plain / northern Apennines (ours 1.0–1.2, HD 0.79–0.89) and eastern Sicily |
+| Day/night ratio of the events used, 144 cells | median 0.99 (p10–p90 0.82–1.27); 5 cells > 1.5; no correlation with b (r = −0.07) |
+| b from night-time events only, 100 cells with A/B | median change −0.006; 11 outside the all-hours interval |
+| Single-Mc estimator (pybvalue method, MAXC + 0.2) on the same circles | Spearman 0.87, median +0.003, 132 of 143 inside our interval |
+
+Reading: the large-scale pattern agrees; individual cells differ by about 0.1, mostly because of the completeness
+model (a local MAXC + 0.2 here, one Mc per period for all of Italy there), so cell-level differences of that size
+should not be interpreted. With the INGV event-type filter (2,507 flagged quarry blasts excluded) no day-time excess
+is visible in the shown cells.
