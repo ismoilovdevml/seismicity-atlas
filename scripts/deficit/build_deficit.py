@@ -358,6 +358,9 @@ def main():
                        "centuries or longer, part of the strain may be released aseismically, and full seismic "
                        "coupling is an assumption. A low ratio is not evidence that an earthquake is due."),
         "licence": {"data": "CC BY-SA 4.0 (derived from ISC-GEM CC BY-SA 3.0 and the strain-rate models CC BY 4.0)"},
+        "attribution": ("Strain rates: Ou et al. (2026), doi:10.5281/zenodo.20293601, and Chang (2025), "
+                        "doi:10.5281/zenodo.16547905, both CC BY 4.0. Earthquakes: ISC-GEM catalogue (CC BY-SA 3.0) "
+                        "and USGS ComCat. Seismic-deficit analysis: Global Seismicity Atlas, CC BY-SA 4.0."),
         "sources": [
             {"name": "GNSS and InSAR velocities, vorticity and strain rates across the Tian Shan",
              "authors": "Ou, Q., Elliott, J., Maghsoudi, Y., Rollins, C., Lazecky, M., Wright, T.", "year": 2026,
@@ -393,6 +396,9 @@ def main():
         "regions": [f["properties"] for f in regions],
         "files": {"regions.geojson": "one polygon per region", "cells.geojson": "one polygon per H3 res-2 cell"},
     }
+    index["files"] = {f: {"what": w, "bytes": (OUT / f).stat().st_size}
+                      for f, w in (("regions.geojson", "one polygon per region"),
+                                   ("cells.geojson", "one polygon per H3 resolution-2 cell"))}
     jdump(index, OUT / "index.json", indent=1)
     jdump(results, WD / "results.json", indent=1)
     for f in ("index.json", "regions.geojson", "cells.geojson"):

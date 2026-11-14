@@ -2,11 +2,12 @@
  "layer": "seismic deficit (pilot: Tien Shan)",
  "version": "0.2.0",
  "data_cutoff_utc": "2026-11-13",
- "generated_utc": "2026-11-14T16:20:55Z",
+ "generated_utc": "2026-11-14T16:22:28Z",
  "disclaimer": "Not a forecast and not a hazard map. The ratio compares about 120 years of earthquakes with a few decades of geodetic strain; recurrence times of the largest Tien Shan earthquakes are centuries or longer, part of the strain may be released aseismically, and full seismic coupling is an assumption. A low ratio is not evidence that an earthquake is due.",
  "licence": {
   "data": "CC BY-SA 4.0 (derived from ISC-GEM CC BY-SA 3.0 and the strain-rate models CC BY 4.0)"
  },
+ "attribution": "Strain rates: Ou et al. (2026), doi:10.5281/zenodo.20293601, and Chang (2025), doi:10.5281/zenodo.16547905, both CC BY 4.0. Earthquakes: ISC-GEM catalogue (CC BY-SA 3.0) and USGS ComCat. Seismic-deficit analysis: Global Seismicity Atlas, CC BY-SA 4.0.",
  "sources": [
   {
    "name": "GNSS and InSAR velocities, vorticity and strain rates across the Tian Shan",
@@ -323,7 +324,13 @@
   }
  ],
  "files": {
-  "regions.geojson": "one polygon per region",
-  "cells.geojson": "one polygon per H3 res-2 cell"
+  "regions.geojson": {
+   "what": "one polygon per region",
+   "bytes": 3055
+  },
+  "cells.geojson": {
+   "what": "one polygon per H3 resolution-2 cell",
+   "bytes": 7083
+  }
  }
 }
