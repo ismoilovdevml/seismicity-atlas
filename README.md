@@ -55,6 +55,30 @@ header) holds the cell statistics behind it. See [Website](#website).
 
 Full tables and the reasons for each verdict: [docs/validation.md](docs/validation.md).
 
+### What changed in v0.3
+
+The statistics are the same as in v0.2 (same method and data cut-off); v0.3 is about the website.
+
+- **Two modes.** The site opens in a **Simple view**: recorded earthquakes as dots, a density shading, a place
+  search and a place card in plain words, with a four-word rating of how well earthquakes are recorded there. The
+  v0.2 interface (cells, b with its interval, quality codes, comparison, CSV) is the **Scientist view**, one switch
+  away; links made before v0.3 open in it.
+- **Globe by default.** Both modes open on a globe turned to the visitor's longitude (taken from the time-zone
+  offset; nothing is asked for or sent). The flat map is one button away; the choice is remembered (`gsa-proj`) and
+  written into every link (`g=1` globe, `g=0` flat). An older link without `g` opens in the visitor's last choice,
+  else on the globe.
+- **Learn pages and (i) buttons.** One page per concept behind the numbers, in four languages, with a real example
+  from the data and an interactive diagram; small (i) buttons next to the labels open them.
+- **Sequence Monitor.** "Recent big quakes" (Simple) / "Ongoing" (Scientist): every M ≥ 7 mainshock of the last
+  365 days, updated daily, descriptive only.
+- **Relief and 3D.** Shaded relief, lakes and rivers on the map, optional 3D terrain, and the Depth 3D view with
+  hypocentres and Slab2 slab contours.
+- **Lighter first load.** The Simple view no longer downloads `cells.geojson` (1.5 MB); its place card reads
+  `site/data/rating.json` (built by `scripts/build_rating.py`) on the first place it opens, and the cells load when
+  the Scientist view or Depth 3D is opened. Search results are ranked by match quality, then population.
+
+Full list: [CHANGELOG.md](CHANGELOG.md).
+
 ### What changed in v0.2
 
 - **b now uses direct Mw only.** ISC-GEM mixes direct moment magnitudes (GCMT) with proxy Mw converted from Ms and
@@ -132,6 +156,8 @@ cd site && python3 -m http.server 8000   # then open http://localhost:8000/
 
 - **Two modes (v0.3).** A "Simple | Scientist" switch in the header; the choice is kept in the URL (`mode=`) and in
   the browser. Links made before v0.3 (any link with a layer, cell or depth) open in the Scientist view.
+- **Globe (v0.3).** Both modes open on a globe; the globe button switches to a flat map and back. The choice is kept
+  in the URL (`g=1` or `g=0`) and in the browser; a link without `g` opens in the last choice, else on the globe.
 - **Simple view (default):** the question "Where do earthquakes happen, and how well are they recorded?", real
   earthquakes as dots sized by magnitude and coloured by depth, a pale shading of where earthquakes have been recorded
   (not a hazard map), plate boundaries and relief. Search a city (offline, from Natural Earth's 7,342 populated
@@ -142,7 +168,7 @@ cd site && python3 -m http.server 8000   # then open http://localhost:8000/
   hazard map." A three-step tip on the first visit; a bottom sheet on phones.
 - **Scientist view (map):** b-value with its 95 % interval and quality code, estimate quality, completeness Mc (ISC-GEM and ComCat),
   catalogue disagreement, M6+ rate; shallow or deeper; plate boundaries; earthquakes M ≥ 6 (M ≥ 5 on request) with
-  a time filter and links to USGS event pages; optional globe view. Hover a cell for its values; click it for the
+  a time filter and links to USGS event pages. Hover a cell for its values; click it for the
   cell panel (frequency-magnitude distribution, Mc over time, b against cutoff, yearly counts, catalogue
   agreement), with a per-cell CSV download and a side-by-side comparison of two cells' b intervals. Regional
   higher-resolution catalogues appear as an extra layer when `site/data/regional/index.json` is present. The state,

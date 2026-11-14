@@ -48,28 +48,34 @@ export function placeName(p, lang) {
 }
 
 /**
- * Rank: exact name 0, name starts with the query 1, a word of the name starts with it 2, contains it 3 (queries of
- * three or more characters). Ties: larger population first (the rows are stored by population).
+ * Rank by match quality, then by population (Natural Earth POP_MAX, column p of places.json):
+ *   class 0  a name of the place starts with the query (the whole name, or its beginning)
+ *   class 1  a word inside a name starts with it ("york" in "New York")
+ *   class 2  a name contains it (queries of three or more characters)
+ * Within a class the larger population comes first, and an exact name counts as ten times its population, so a
+ * town called exactly what was typed beats a slightly larger town that only starts with it, but "San" lists
+ * Santiago, San Francisco and San Diego before San in Mali (41,000 people). An exact match that falls outside the
+ * first `limit` results takes the last places, so every place named exactly as typed stays findable.
+ * Names are the published, ASCII, Russian, Spanish and alternative names, folded by norm().
  */
 export function searchPlaces(rows, query, limit = 8) {
   const q = norm(query);
   if (!q) return [];
   const hits = [];
   for (const p of rows) {
-    let best = 9;
+    let cls = 9, exact = false;
     for (const k of p.keys) {
-      let s = 9;
-      if (k === q) s = 0;
-      else if (k.startsWith(q)) s = 1;
-      else if (k.includes(` ${q}`)) s = 2;
-      else if (q.length >= 3 && k.includes(q)) s = 3;
-      if (s < best) best = s;
-      if (best === 0) break;
+      if (k === q) { exact = true; cls = 0; break; }
+      const c = k.startsWith(q) ? 0 : k.includes(` ${q}`) ? 1 : q.length >= 3 && k.includes(q) ? 2 : 9;
+      if (c < cls) cls = c;
     }
-    if (best < 9) hits.push([best, p.i, p]);
+    if (cls < 9) hits.push({ p, cls, exact, w: (p.pop || 0) * (exact ? 10 : 1) });
   }
-  hits.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
-  return hits.slice(0, limit).map((x) => x[2]);
+  hits.sort((a, b) => a.cls - b.cls || b.w - a.w || a.p.i - b.p.i);
+  const top = hits.slice(0, limit);
+  const missing = hits.slice(limit).filter((x) => x.exact);
+  if (missing.length) top.splice(Math.max(0, limit - missing.length), missing.length, ...missing.slice(0, limit));
+  return top.map((x) => x.p);
 }
 
 /** The listed place nearest to a point, with its distance in km. */
@@ -181,4 +187,42 @@ export function recordingRating(p, globalMc) {
   if (q === 'C' || p.c_flag === 'check') return 'limited';
   if (q === 'A' && p.c_flag === 'ok' && typeof p.sh_mc === 'number' && p.sh_mc <= globalMc + 0.2 + 1e-9) return 'vgood';
   return 'good';
+}
+
+// ---------------------------------------------------------------- the rating lookup (data/rating.json)
+
+let ratingDoc = null;
+
+/**
+ * Load data/rating.json once (on the first place card) and decode it into cells.geojson-like features that carry only
+ * the properties the place card reads: id, lat, lon, area_km2, sh_q, sh_mc, c_flag and the precomputed rating.
+ * The coordinates decode to exactly the doubles of cells.geojson, so cellAtPoint() finds the same cell
+ * (scripts/build_rating.py documents the format).
+ */
+export function loadRating() {
+  if (!ratingDoc) {
+    ratingDoc = getJSON('rating.json').then((doc) => {
+      const c = Object.fromEntries(doc.columns.map((k, i) => [k, i]));
+      return doc.rows.map((r) => {
+        const ring = [];
+        const v = r[c.ring];
+        let x = 0, y = 0;
+        for (let i = 0; i < v.length; i += 2) {
+          x = i ? x + v[i] : v[0];
+          y = i ? y + v[i + 1] : v[1];
+          ring.push([x / 100, y / 100]);
+        }
+        ring.push(ring[0]);
+        return {
+          geometry: { type: 'Polygon', coordinates: [ring] },
+          properties: {
+            id: r[c.id] + doc.id_tail, lat: r[c.lat] / 1000, lon: r[c.lon] / 1000, area_km2: r[c.a] * 1000,
+            sh_q: doc.qualities[r[c.q]], sh_mc: r[c.mc] === null ? undefined : r[c.mc] / 10, c_flag: doc.flags[r[c.f]],
+            rating: doc.ratings[r[c.r]],
+          },
+        };
+      });
+    }).catch((e) => { ratingDoc = null; throw e; });
+  }
+  return ratingDoc;
 }

@@ -33,25 +33,46 @@ function hatchImage() {
   return g.getImageData(0, 0, s, s);
 }
 
-export function defaultView() {
-  const w = document.getElementById('map').clientWidth || 1000;
-  return { z: Math.max(0, +(Math.log2(w / 512) + 0.15).toFixed(2)), lat: 12, lon: 160 };
+/**
+ * The first view when the link has no position. Flat map: the whole world, centred on the Pacific (the Ring of Fire
+ * in one piece). Globe: the whole globe in sight, turned to the visitor's longitude (from the time-zone offset, so no
+ * location is asked for or sent) at 20 degrees north, where most people live.
+ */
+export function defaultView(globe = !!(C && C.state.g)) {
+  const el = document.getElementById('map');
+  const w = el.clientWidth || 1000;
+  if (!globe) return { z: Math.max(0, +(Math.log2(w / 512) + 0.15).toFixed(2)), lat: 12, lon: 160 };
+  const h = el.clientHeight || 700;
+  const lat = 20;
+  // Zoom at which the visible disc has the wanted radius rho. MapLibre's globe has radius R = 512 * 2^z / (2 pi cos lat)
+  // px (it keeps the Mercator scale at the centre latitude) and is seen by a perspective camera at c = 1.5 h px from
+  // the surface (field of view 36.87 degrees), so rho = c R / sqrt(c^2 + 2 c R); solved for R below.
+  const rho = (Math.min(w, h) * (w > 720 ? 0.82 : 0.92)) / 2;
+  const c = 1.5 * h;
+  const R = (rho * rho + rho * Math.sqrt(rho * rho + c * c)) / c;
+  const z = Math.log2((2 * Math.PI * R * Math.cos((lat * Math.PI) / 180)) / 512);
+  let lon = Math.round(-new Date().getTimezoneOffset() / 4);
+  if (!Number.isFinite(lon) || Math.abs(lon) > 180) lon = 150;
+  return { z: Math.max(0, +z.toFixed(2)), lat, lon };
 }
 
 export function initMap(ctx, base) {
   C = ctx;
   const st = C.state;
-  const v = st.at || defaultView();
+  const v = st.at || defaultView(!!st.g);
   const bm = B.styleParts();
   map = new maplibregl.Map({
     container: 'map',
     style: {
       version: 8,
+      // the flat map leaves the projection unset: an explicit Mercator projection moves the camera when the map is
+      // hidden and shown again (another view in between), which would write a position into the URL
+      ...(st.g ? { projection: { type: 'globe' } } : {}),
       sources: {
         land: { type: 'geojson', data: base.land },
         coast: { type: 'geojson', data: base.coast },
         plates: { type: 'geojson', data: base.plates },
-        cells: { type: 'geojson', data: C.cells, promoteId: 'id' },
+        cells: { type: 'geojson', data: C.cells || { type: 'FeatureCollection', features: [] }, promoteId: 'id' },
         ...bm.sources,
       },
       layers: [
@@ -60,7 +81,8 @@ export function initMap(ctx, base) {
         ...bm.layers,
         { id: 'cells-fill', type: 'fill', source: 'cells', paint: { 'fill-color': cssVar('--nodata'), 'fill-opacity': 0 } },
         { id: 'cells-hatch', type: 'fill', source: 'cells', layout: { visibility: 'none' }, paint: { 'fill-pattern': 'hatch' } },
-        { id: 'coast', type: 'line', source: 'coast', paint: { 'line-color': cssVar('--coast'), 'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.45, 6, 1.1] } },
+        // the coastline gets wider when zoomed in on a place, where it is the main landmark under the dots and shading
+        { id: 'coast', type: 'line', source: 'coast', paint: { 'line-color': cssVar('--coast'), 'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.45, 3, 0.8, 6, 1.8] } },
         { id: 'plates', type: 'line', source: 'plates', paint: { 'line-color': cssVar('--plate'), 'line-opacity': 0.85, 'line-dasharray': [3, 2], 'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.8, 6, 1.8] } },
         { id: 'cells-hover', type: 'line', source: 'cells', paint: { 'line-color': cssVar('--ink'), 'line-width': 1.4, 'line-opacity': ['case', ['boolean', ['feature-state', 'hover'], false], 0.9, 0] } },
         { id: 'cells-sel-case', type: 'line', source: 'cells', filter: ['==', ['get', 'id'], ''], paint: { 'line-color': cssVar('--surface'), 'line-width': 5 } },
@@ -282,7 +304,10 @@ export function applyTheme() {
 
 export function setProjection(globe) {
   if (!map) return;
-  map.setProjection({ type: globe ? 'globe' : 'mercator' });
+  const type = globe ? 'globe' : 'mercator';
+  // only on a change: setting the same projection again rebuilds the camera, and while the map is hidden (another
+  // view is shown) that moves it
+  if (((map.getProjection() || {}).type || 'mercator') !== type) map.setProjection({ type });
   // Outside the globe the canvas is transparent; a darker backdrop than the ocean makes the globe edge visible.
   document.getElementById('map-area').classList.toggle('globe', !!globe);
 }
@@ -306,6 +331,9 @@ export function revealCell(lon, lat, panelId = 'panel') {
 
 export function resize() { if (map) map.resize(); }
 
+/** The global cells arrive after the map when the visitor opens the Scientist view from the Simple view. */
+export function setCells(fc) { if (map && map.getSource('cells')) map.getSource('cells').setData(fc); }
+
 export function flyTo(lon, lat, z) { if (map) map.flyTo({ center: [lon, lat], zoom: z, essential: true }); }
 
 // ---------- legend ----------
@@ -314,7 +342,8 @@ function renderLegend(def) {
   const el = document.getElementById('legend');
   const st = C.state;
   const counts = new Map();
-  for (const ft of C.cells.features) {
+  const feats = C.cells ? C.cells.features : [];
+  for (const ft of feats) {
     const k = def.classify(ft.properties);
     counts.set(k, (counts.get(k) || 0) + 1);
   }
@@ -343,7 +372,7 @@ function renderLegend(def) {
   }
   if (def.passKeys) {
     const pass = def.passKeys.reduce((s, k) => s + (counts.get(k) || 0), 0);
-    kids.push(h('span', { class: 'lg-count', text: t('lg.pass', { pass: f.int(pass), n: f.int(C.cells.features.length) }) }));
+    kids.push(h('span', { class: 'lg-count', text: t('lg.pass', { pass: f.int(pass), n: f.int(feats.length) }) }));
   } else if (def.note) kids.push(h('span', { class: 'lg-count', text: def.note }));
   const extra = [];
   if (st.pl) extra.push(h('div', { style: 'display:flex;align-items:center;gap:8px' }, h('span', { class: 'sw sw-line', 'aria-hidden': 'true' }), h('span', {}, t('lg.plates'), infoButton('plate-boundary-classes'))));

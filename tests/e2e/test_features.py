@@ -58,7 +58,7 @@ def test_compare_verdict_boundaries(site):
 
 
 def test_compare_by_clicking(site):
-    pg = site.open()
+    pg = site.open("#g=0")  # clicks cells at their place on the flat world view
     x, y = cell_point(pg, A)
     pg.mouse.click(x, y)
     pg.click("#cmp-btn")

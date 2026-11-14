@@ -35,7 +35,7 @@ def test_layers_render(site, viewport):
 
 
 def test_tooltip_carries_interval_and_quality(site):
-    pg = site.open()
+    pg = site.open("#g=0")  # hovers a cell at its place on the flat world view
     x, y = cell_point(pg, CELL_A)
     pg.mouse.move(x, y)
     pg.wait_for_selector("#tooltip:not([hidden])")
@@ -50,7 +50,7 @@ def test_tooltip_carries_interval_and_quality(site):
 
 @pytest.mark.parametrize("viewport", ["desktop", "phone"])
 def test_cell_panel_and_error_state(site, viewport):
-    pg = site.open(viewport=viewport)
+    pg = site.open("#g=0", viewport=viewport)
     if viewport == "phone":
         jump(pg, -157.4, 55.4, 1.5)
     x, y = cell_point(pg, CELL_A)
@@ -142,9 +142,17 @@ def test_hash_round_trip(site):
 
 def test_globe_and_cell_list(site):
     pg = site.open()
+    # the globe is the default (v0.3); the button switches to the flat map and back
+    assert pg.evaluate("((window.__map.getProjection() || {}).type || 'mercator')") == "globe"
+    assert "g=1" in pg.evaluate("location.hash")
+    assert pg.get_attribute("#globe-btn", "aria-pressed") == "true"
+    pg.click("#globe-btn")
+    assert pg.evaluate("((window.__map.getProjection() || {}).type || 'mercator')") == "mercator"
+    assert "g=0" in pg.evaluate("location.hash")
+    assert pg.get_attribute("#globe-btn", "aria-pressed") == "false"
     pg.click("#globe-btn")
     jump(pg, 180, -15, 1.6)
-    assert pg.evaluate("window.__map.getProjection().type") == "globe"
+    assert pg.evaluate("((window.__map.getProjection() || {}).type || 'mercator')") == "globe"
     assert "g=1" in pg.evaluate("location.hash")
     # the space around the globe differs from the ocean colour, so the globe edge is visible
     bg = pg.evaluate("""() => [getComputedStyle(document.getElementById('map-area')).backgroundColor,
