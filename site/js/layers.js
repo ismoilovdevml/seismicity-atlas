@@ -5,8 +5,11 @@ import { sequential, diverging, oklch, HUE } from './color.js';
 import { ruleNumber } from './data.js';
 import { t } from './i18n/index.js';
 
-// b palette from the design reference: blue for low b, orange-brown for high b, centred on b = 1.
-export const B_LIGHT = ['#1f4e8c', '#4f7fb8', '#9db8d6', '#ebc08f', '#d98a3d', '#a4501b'];
+// b palette: blue for low b, red-brown for high b, centred on b = 1. Light theme (v0.3.1): six steps of the Crameri
+// Scientific colour map vik (doi:10.5281/zenodo.8409685, MIT licence) at positions 0, 0.16, 0.31 | 0.69, 0.84, 1,
+// the same as scripts/crameri.py VIK_B_POS. Dark theme: the custom steps, because no Crameri diverging map passed the
+// dataviz validator against the dark land colour (docs/ux-notes.md, "Crameri colour maps").
+export const B_LIGHT = ['#001261', '#05528a', '#5d9cbb', '#cf8c66', '#a74310', '#590008'];
 export const B_DARK = ['#4a7cc0', '#7ea3d3', '#b4c9e2', '#ebc08f', '#de9550', '#c06a30'];
 
 // Consistency thresholds of c_flag, as defined in docs/data-schema.md.
