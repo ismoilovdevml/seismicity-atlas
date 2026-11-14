@@ -32,11 +32,13 @@ def place(name, country):
     raise LookupError(name)
 
 
-# name: (hash, viewport, scheme, stored mode, actions)
+# name: (hash, viewport, scheme, stored mode, actions). The browser time zone is Asia/Tokyo, so the first globe view
+# (turned to the visitor's time-zone longitude) shows the western Pacific.
 SHOTS = {
-    "site-v3-simple-light": ("#v=map&mode=simple&at=1.75/22/120&lang=en", (1440, 900), "light", None, "search"),
+    "site-v3-simple-light": ("#v=map&mode=simple&lang=en", (1440, 900), "light", None, "search"),
+    "site-v3-phone-globe-light": ("#v=map&mode=simple&lang=en", (390, 844), "light", None, None),
     "site-v3-phone-dark-card": (f"#v=map&mode=simple&p={place('Tokyo', 'Japan')}&lang=en", (390, 844), "dark", None, None),
-    "site-v3-expert": ("#v=map&l=b&d=sh&c=822f5ffffffffff&at=3.4/36.5/141&lang=en", (1440, 900), "light", "pro", None),
+    "site-v3-expert": ("#v=map&l=b&d=sh&c=822f5ffffffffff&at=2.7/30/150&lang=en", (1440, 900), "light", "pro", None),
 }
 
 
@@ -58,7 +60,8 @@ def main():
         for name, (hash_, (w, h), scheme, mode, action) in SHOTS.items():
             if a.only and a.only != name:
                 continue
-            ctx = b.new_context(viewport={"width": w, "height": h}, color_scheme=scheme, device_scale_factor=1)
+            ctx = b.new_context(viewport={"width": w, "height": h}, color_scheme=scheme, device_scale_factor=1,
+                                timezone_id="Asia/Tokyo")
             ctx.add_init_script("window.__gsaTestHook = (m) => { window.__map = m; };")
             ctx.add_init_script("try { localStorage.setItem('gsa-tour', '1'); } catch (e) {}")
             if mode:

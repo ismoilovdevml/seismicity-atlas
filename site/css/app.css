@@ -518,7 +518,7 @@ details.method pre { white-space: pre-wrap; font-family: var(--mono); font-size:
   .legend .lg-rows { gap: 3px; font-size: 11px; }
   .legend .lg-title { font-size: 12px; }
   .legend .lg-bar div { height: 10px; }
-  .legend .lg-ticks { font-size: 9.5px; }
+  .legend .lg-ticks { font-size: 10.5px; }
   .attrib { font-size: 10px; right: 6px; bottom: 4px; }
   .panel {
     position: absolute; z-index: 26; left: 0; right: 0; bottom: 0; width: auto; max-height: 64%; border: 0;

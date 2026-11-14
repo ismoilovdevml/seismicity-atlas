@@ -56,6 +56,9 @@
 .sx-list li[aria-selected='true'] { background: var(--accent-bg); }
 .sx-list li:hover { background: var(--surface-2); }
 .sx-list .sx-empty { cursor: default; color: var(--ink-3); font-size: 13.5px; line-height: 1.45; }
+.sx-list .sx-error, .sx-card .sx-error { color: var(--v-bad-fg); }
+.sx-card .sx-error { margin: 0; font-size: 14px; line-height: 1.5; }
+.sx-card .sx-error .small-btn { margin-left: 4px; }
 .sx-opt-name { font-size: 14.5px; font-weight: 500; color: var(--ink); }
 .sx-opt-where { font-size: 12.5px; color: var(--ink-3); }
 .sx-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

@@ -21,7 +21,7 @@ const LAYERS = ['b', 'q', 'mc', 'cc', 'rate', 'none'];
 const MODES = ['simple', 'pro'];
 // A link that sets any of these and does not name a mode is a Scientist-view link (all links made before v0.3).
 const EXPERT_KEYS = ['l', 'm', 'd', 'c', 'k', 'r', 'ev', 'y', 'mm', 'tr'];
-const DEFAULTS = { mode: 'simple', v: 'map', l: 'b', m: '', d: 'sh', c: null, k: null, r: null, ev: 0, y0: null, y1: null, mm: 6, pl: 1, g: 0, at: null, s: null, lang: 'en', t: null };
+const DEFAULTS = { mode: 'simple', v: 'map', l: 'b', m: '', d: 'sh', c: null, k: null, r: null, ev: 0, y0: null, y1: null, mm: 6, pl: 1, g: 1, at: null, s: null, lang: 'en', t: null };
 const CELL_ID = /^[0-9a-f]{15}$/;
 
 const state = { ...DEFAULTS };
@@ -69,12 +69,24 @@ function modeOf(p, fallback) {
   return fallback;
 }
 
+// ---------------------------------------------------------------- projection preference (globe or flat map)
+
+// The globe is the default (v0.3). A link's g=1 or g=0 wins; a link without g (every link made before v0.3 that did
+// not ask for the globe) opens in the visitor's last choice, else on the globe.
+const PROJ_KEY = 'gsa-proj';
+function storedProj() {
+  try { const v = localStorage.getItem(PROJ_KEY); return v === 'globe' ? 1 : v === 'flat' ? 0 : null; } catch (e) { return null; }
+}
+function saveProj(g) {
+  try { localStorage.setItem(PROJ_KEY, g ? 'globe' : 'flat'); } catch (e) { /* storage blocked */ }
+}
+
 // ---------------------------------------------------------------- hash state
 
 /** fallbackLang: the language to keep when the hash does not name one (the current one after start-up). */
-function parseHash(fallbackLang = preferredLang(), fallbackMode = storedMode() || DEFAULTS.mode) {
+function parseHash(fallbackLang = preferredLang(), fallbackMode = storedMode() || DEFAULTS.mode, fallbackProj = storedProj() ?? DEFAULTS.g) {
   const p = new URLSearchParams(location.hash.replace(/^#/, ''));
-  const s = { ...DEFAULTS, lang: fallbackLang, mode: modeOf(p, fallbackMode) };
+  const s = { ...DEFAULTS, lang: fallbackLang, mode: modeOf(p, fallbackMode), g: fallbackProj };
   if (VIEWS.includes(p.get('v'))) s.v = p.get('v');
   if (LAYERS.includes(p.get('l'))) s.l = p.get('l');
   const subOk = (SUBS[s.l] || []).some((x) => x.id === p.get('m'));
@@ -90,6 +102,7 @@ function parseHash(fallbackLang = preferredLang(), fallbackMode = storedMode() |
   if (mm >= 5 && mm <= 9) s.mm = mm;
   if (p.get('pl') === '0') s.pl = 0;
   if (p.get('g') === '1') s.g = 1;
+  else if (p.get('g') === '0') s.g = 0;
   const at = (p.get('at') || '').split('/').map(Number);
   if (at.length === 3 && at.every(Number.isFinite) && Math.abs(at[1]) <= 85) s.at = { z: at[0], lat: at[1], lon: at[2] };
   if (/^[a-z0-9]{4,24}$/.test(p.get('s') || '')) s.s = p.get('s');
@@ -112,12 +125,12 @@ function hashOf(s) {
   if (s.ev && s.y0 !== null) p.set('y', `${s.y0}-${s.y1}`);
   if (s.ev && s.mm !== DEFAULTS.mm) p.set('mm', String(s.mm));
   if (!s.pl) p.set('pl', '0');
-  if (s.g) p.set('g', '1');
   if (s.at) p.set('at', `${s.at.z}/${s.at.lat}/${s.at.lon}`);
   if (s.s) p.set('s', s.s);
   writeExtras(s, p);
   if (s.v === 'learn' && s.t) p.set('t', s.t);
-  // Always name the mode and the language, so a shared link opens as it was copied.
+  // Always name the projection, the mode and the language, so a shared link opens as it was copied.
+  p.set('g', s.g ? '1' : '0');
   p.set('mode', s.mode);
   p.set('lang', s.lang);
   return `#${p.toString().replace(/%2F/g, '/')}`;
@@ -137,7 +150,7 @@ window.addEventListener('popstate', () => applyHash());
 
 async function applyHash() {
   // Navigation links such as "#v=about" carry no language: keep the one in use.
-  const s = parseHash(state.lang, state.mode);
+  const s = parseHash(state.lang, state.mode, state.g);
   const hp = new URLSearchParams(location.hash.replace(/^#/, ''));
   const hashHadLang = hp.has('lang') && hp.has('mode');
   const modeChanged = s.mode !== state.mode;
@@ -181,7 +194,11 @@ function showView(v) {
   if (v === 'learn') { showLearn(); return; }
   if (!ctx.manifest) return;
   if (v === 'map') { M.resize(); return; }
-  if (v === 'depth') { D.show(document.getElementById('depth-root'), { state, manifest: ctx.manifest, cells: ctx.cells }); return; }
+  if (v === 'depth') {
+    if (!ctx.cells) { ensureCells().then(() => { if (state.v === 'depth') showView('depth'); }).catch(() => {}); return; }
+    D.show(document.getElementById('depth-root'), { state, manifest: ctx.manifest, cells: ctx.cells });
+    return;
+  }
   if (rendered.has(v)) return;
   rendered.add(v);
   const pageCtx = { manifest: ctx.manifest, showOnMap, state };
@@ -286,7 +303,7 @@ function wireControls() {
   $('sub-select').addEventListener('change', (e) => { state.m = e.target.value; update(); });
   document.querySelectorAll('input[name=depth]').forEach((i) => i.addEventListener('change', () => { state.d = i.value; update(); }));
   $('chk-plates').addEventListener('change', (e) => { state.pl = e.target.checked ? 1 : 0; update(); });
-  $('globe-btn').addEventListener('click', () => { state.g = state.g ? 0 : 1; M.setProjection(!!state.g); update(); });
+  $('globe-btn').addEventListener('click', () => { state.g = state.g ? 0 : 1; saveProj(state.g); M.setProjection(!!state.g); update(); });
   $('zoom-in').addEventListener('click', () => M.zoomBy(1));
   $('zoom-out').addEventListener('click', () => M.zoomBy(-1));
   $('chk-events').addEventListener('change', (e) => { state.ev = e.target.checked ? 6 : 0; update(); ensureEvents(); });
@@ -358,8 +375,47 @@ function applyMode() {
   const tag = $('brand-tag');
   tag.dataset.i18n = simple ? 'brand.tagSimple' : 'brand.tag';
   tag.textContent = t(tag.dataset.i18n);
-  if (simple) { $('panel').hidden = true; panelFor = null; M.hideTip(); }
+  if (simple) { $('panel').hidden = true; panelFor = null; M.hideTip(); } else ensureCells().catch(() => {});
   if (mapReady) { M.applyLayers(); M.resize(); }
+}
+
+// ---------------------------------------------------------------- cells (Scientist view and Depth 3D only)
+
+let cellsLoading = null;
+/**
+ * cells.geojson (1.4 MB) is read by the Scientist view, its panels and Depth 3D. The Simple view never loads it: its
+ * place card uses the small rating.json (scripts/build_rating.py). Loaded once, on the first need.
+ */
+function ensureCells() {
+  if (!cellsLoading) {
+    const status = $('map-status');
+    const showStatus = mapReady && state.v === 'map';
+    if (showStatus) {
+      const meta = ctx.manifest && ctx.manifest.files['cells.geojson'];
+      status.classList.remove('error');
+      status.textContent = t('map.loadingSize', { size: meta ? mb(meta.bytes) : '' });
+      status.hidden = false;
+    }
+    cellsLoading = getJSON('cells.geojson').then((cells) => {
+      ctx.cells = cells;
+      for (const ft of cells.features) ctx.byId.set(ft.properties.id, ft.properties);
+      setHexLine();
+      // at start-up the panel opens after the map is made (start() calls syncPanel), so the first view is sized for
+      // the full map width as before
+      if (mapReady) { M.setCells(cells); M.applyLayers(); status.hidden = true; panelFor = null; syncPanel(); }
+      return cells;
+    }).catch((e) => {
+      cellsLoading = null;
+      if (mapReady) {
+        status.hidden = false;
+        status.classList.add('error');
+        status.replaceChildren(h('strong', { text: `${t('map.startError')} ` }), e.message, ' ',
+          h('button', { class: 'small-btn', type: 'button', onclick: () => ensureCells().catch(() => {}), text: t('common.retry') }));
+      }
+      throw e;
+    });
+  }
+  return cellsLoading;
 }
 
 function setMode(m) {
@@ -381,11 +437,13 @@ function openExpert(cellId, lat, lon) {
   if (!['b', 'q', 'mc', 'cc', 'rate'].includes(state.l)) state.l = 'b';
   applyMode();
   showView('map');
-  const p = lookup(cellId);
-  // the cells are about 300 km across: zoom out from the place view so the cell and its neighbours are in sight
-  if (p) { state.at = { z: 3.5, lat: +p.lat.toFixed(2), lon: +p.lon.toFixed(2) }; M.flyTo(p.lon, p.lat, 3.5); }
-  selectCell(cellId);
   commit(true);
+  ensureCells().then(() => {
+    const p = lookup(cellId);
+  // the cells are about 300 km across: zoom out from the place view so the cell and its neighbours are in sight
+    if (p) { state.at = { z: 3.5, lat: +p.lat.toFixed(2), lon: +p.lon.toFixed(2) }; M.flyTo(p.lon, p.lat, 3.5); }
+    selectCell(cellId);
+  }).catch(() => {});
 }
 
 function ensureEvents() {
@@ -592,13 +650,14 @@ async function start() {
     ctx.manifest = await getJSON('manifest.json');
     $('brand-meta').textContent = t('meta.brand', { v: ctx.manifest.version, cutoff: ctx.manifest.data_cutoff_utc });
     $('stat-window').textContent = ctx.manifest.method.b_catalogue.replace('-', '–');
-    const files = ['cells.geojson', 'land.geojson', 'coastline.geojson', 'plates.geojson'];
+    // The Scientist view and Depth 3D wait for the cells; the Simple view starts without them.
+    const needCells = state.mode === 'pro' || state.v === 'depth';
+    const files = [...(needCells ? ['cells.geojson'] : []), 'land.geojson', 'coastline.geojson', 'plates.geojson'];
     const total = files.reduce((s, k) => s + ctx.manifest.files[k].bytes, 0);
     let done = 0;
     status.textContent = t('map.loadingSize', { size: mb(total) });
-    const [cells, land, coast, plates] = await Promise.all(files.map((k) => getJSON(k).then((d) => { done++; status.textContent = t('map.loadingProgress', { size: mb(total), done, n: files.length }); return d; })));
-    ctx.cells = cells;
-    for (const ft of cells.features) ctx.byId.set(ft.properties.id, ft.properties);
+    const got = await Promise.all(files.map((k) => (k === 'cells.geojson' ? ensureCells() : getJSON(k)).then((d) => { done++; status.textContent = t('map.loadingProgress', { size: mb(total), done, n: files.length }); return d; })));
+    const [land, coast, plates] = got.slice(-3);
     setHexLine();
     syncEventControls();
     showView(state.v); // pages can render now that the manifest is here

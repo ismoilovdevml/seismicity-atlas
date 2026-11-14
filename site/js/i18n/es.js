@@ -154,6 +154,7 @@ export default {
   'map.zoomIn': 'Acercar',
   'map.zoomOut': 'Alejar',
   'map.globe': 'Proyección de globo',
+  'map.globeTitle': 'Globo o mapa plano',
   'map.loading': 'Cargando los datos del mapa…',
   'map.loadingSize': 'Cargando los datos del mapa ({size})…',
   'map.loadingProgress': 'Cargando los datos del mapa ({size}): {done} de {n} archivos…',
@@ -814,6 +815,6 @@ export default {
   "tour.heat.title": "El sombreado muestra dónde se concentran",
   "tour.heat.text": "Un sombreado más oscuro significa que allí se registraron más terremotos. Es un registro del pasado, no un mapa de peligro.",
   "tour.search.title": "Busca un lugar",
-  "tour.search.text": "Busca una ciudad o haz clic en el mapa para ver los terremotos registrados alrededor y qué tan bien se registran.",
+  "tour.search.text": "Busca una ciudad o haz clic en el mapa para ver los terremotos registrados alrededor y qué tan bien se registran. Arrastra para girar el globo; el botón del globo a la derecha cambia a un mapa plano.",
   "learn.c.recording-rating": "Qué tan bien se registran los terremotos",
 };

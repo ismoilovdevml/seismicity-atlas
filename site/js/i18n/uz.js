@@ -154,6 +154,7 @@ export default {
   'map.zoomIn': 'Yaqinlashtirish',
   'map.zoomOut': 'Uzoqlashtirish',
   'map.globe': 'Globus proyeksiyasi',
+  'map.globeTitle': 'Globus yoki tekis xarita',
   'map.loading': 'Xarita maʼlumotlari yuklanmoqda…',
   'map.loadingSize': 'Xarita maʼlumotlari yuklanmoqda ({size})…',
   'map.loadingProgress': 'Xarita maʼlumotlari yuklanmoqda ({size}): {n} ta fayldan {done} tasi…',
@@ -815,6 +816,6 @@ export default {
   "tour.heat.title": "Soya zilzilalar toʻplangan joyni koʻrsatadi",
   "tour.heat.text": "Toʻqroq soya u yerda koʻproq zilzila qayd etilganini bildiradi. Bu oʻtmish qaydi, xavf xaritasi emas.",
   "tour.search.title": "Joyni toping",
-  "tour.search.text": "Shaharni qidiring yoki xaritani bosing: atrofida qayd etilgan zilzilalarni va ular qanchalik yaxshi qayd etilganini koʻrasiz.",
+  "tour.search.text": "Shaharni qidiring yoki xaritani bosing: atrofida qayd etilgan zilzilalarni va ular qanchalik yaxshi qayd etilganini koʻrasiz. Globusni aylantirish uchun torting; oʻngdagi globus tugmasi tekis xaritaga oʻtkazadi.",
   "learn.c.recording-rating": "Zilzilalar qanchalik yaxshi qayd etiladi",
 };

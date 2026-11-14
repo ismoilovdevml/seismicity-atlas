@@ -178,6 +178,11 @@ inputs under the word ("quality B, Mc 5.2, ISC-GEM and ComCat agree"), and its (
 table. The rating describes the global catalogue at a few hundred kilometres, not local networks, and is not a hazard
 or risk estimate.
 
+Since v0.3.0 the place card reads the rating from `site/data/rating.json`, which `scripts/build_rating.py` computes
+from `cells.geojson` with this rule and the manifest's global shallow Mc, together with the three inputs, the cell's
+area and its hexagon, so the Simple view does not load `cells.geojson`. `tests/test_rating.py` checks that the file
+is up to date and the rule branch by branch; `tests/e2e/test_v03.py` checks every cell against `recordingRating()`.
+
 ### Map controls (`index.html`, placed by `info-rail.js`)
 
 | UI element | Selector / i18n key | Concept id |

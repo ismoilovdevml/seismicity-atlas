@@ -156,6 +156,7 @@ export default {
   'map.zoomIn': 'Zoom in',
   'map.zoomOut': 'Zoom out',
   'map.globe': 'Globe projection',
+  'map.globeTitle': 'Globe or flat map',
   'map.loading': 'Loading map data…',
   'map.loadingSize': 'Loading map data ({size})…',
   'map.loadingProgress': 'Loading map data ({size}): {done} of {n} files…',
@@ -817,6 +818,6 @@ export default {
   "tour.heat.title": "The shading shows where they cluster",
   "tour.heat.text": "Darker shading means more earthquakes were recorded there. It is a record of the past, not a hazard map.",
   "tour.search.title": "Look up a place",
-  "tour.search.text": "Search a city, or click the map, to see the earthquakes recorded around it and how well they are recorded.",
+  "tour.search.text": "Search a city, or click the map, to see the earthquakes recorded around it and how well they are recorded. Drag to turn the globe; the globe button on the right switches to a flat map.",
   "learn.c.recording-rating": "How well earthquakes are recorded",
 };

@@ -124,7 +124,7 @@ def test_terrain_in_globe_mocked(site):
     tr = Terrain()
     pg = site.open("#v=map&g=1&tr=1&at=3/36/138", routes=tr.routes())
     pg.wait_for_function("window.__map.getTerrain() !== null")
-    assert pg.evaluate("window.__map.getProjection().type") == "globe"
+    assert pg.evaluate("((window.__map.getProjection() || {}).type || 'mercator')") == "globe"
     assert pg.is_checked("#chk-terrain") and tr.aws
 
 

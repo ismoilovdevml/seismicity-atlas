@@ -9,12 +9,12 @@ B_OVER = "820cdffffffffff"   # its comparison partner with an overlapping interv
 
 # The placement table of docs/learn.md, per view: the set of concepts with a visible button.
 VIEWS = {
-    "map": (f"#v=map&l=b&d=sh&c={A}&ev=6&pl=1", ".chart-svg", {
+    "map": (f"#v=map&l=b&d=sh&c={A}&ev=6&pl=1&g=0", ".chart-svg", {
         "depth-and-slabs", "gutenberg-richter-b-value", "quality-codes", "magnitude-of-completeness",
         "catalogue-consistency", "rate-m6", "regional-catalogues", "plate-boundary-classes", "magnitude-types",
         "direct-vs-proxy-mw", "not-a-forecast", "h3-cells-and-sample-radius", "confidence-interval-bootstrap",
         "b-positive", "declustering", "frequency-magnitude-distribution"}),
-    "compare": (f"#v=map&l=b&d=sh&c={B_OVER}&k={A}", ".cmp-verdict", {
+    "compare": (f"#v=map&l=b&d=sh&c={B_OVER}&k={A}&g=0", ".cmp-verdict", {
         "confidence-interval-bootstrap", "h3-cells-and-sample-radius", "depth-and-slabs", "gutenberg-richter-b-value",
         "quality-codes", "magnitude-of-completeness", "catalogue-consistency", "rate-m6", "regional-catalogues",
         "plate-boundary-classes", "magnitude-types", "direct-vs-proxy-mw", "not-a-forecast"}),

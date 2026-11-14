@@ -10,7 +10,7 @@ import { t, lang } from './i18n/index.js';
 import { infoButton } from './info.js';
 import { defineKeys, intIn } from './hashx.js';
 import { mb } from './data.js';
-import { loadPlaces, searchPlaces, placeName, nearestPlace, placeStats, cellAtPoint, recordingRating } from './places.js';
+import { loadPlaces, searchPlaces, placeName, nearestPlace, placeStats, cellAtPoint, loadRating } from './places.js';
 
 defineKeys([
   { key: 'sr', def: 0, parse: (s) => (s === '10' || s === '50' ? +s : undefined) },
@@ -35,6 +35,8 @@ const $ = (id) => document.getElementById(id);
 let S = null; // {state, ctx, update, openExpert}
 let named = null; // the gazetteer place chosen in the search, while the card shows it
 let places = null; // loaded gazetteer rows
+let rating = null; // decoded data/rating.json (the cell under a place and its recording rating), loaded with the first card
+let ratingError = null;
 let cardKey = null;
 let tourStep = -1;
 
@@ -112,10 +114,19 @@ function ensurePlaces() {
 async function runSearch() {
   const q = $('sx-q').value;
   if (!q.trim()) { closeList(); return; }
-  try { await ensurePlaces(); } catch (e) { return; }
+  const list = $('sx-list');
+  const note = (cls, text) => {
+    results = [];
+    list.replaceChildren(h('li', { class: `sx-empty ${cls}`, role: 'option', 'aria-disabled': 'true', text }));
+    list.hidden = false;
+    $('sx-q').setAttribute('aria-expanded', 'true');
+    setActive(-1);
+  };
+  // the gazetteer loads on the first focus; on a slow connection say so instead of showing nothing
+  if (!places) note('sx-wait', t('sx.loadingPlaces'));
+  try { await ensurePlaces(); } catch (e) { if ($('sx-q').value === q) note('sx-error', t('sx.placesError', { msg: e.message })); return; }
   if ($('sx-q').value !== q) return;
   results = searchPlaces(places, q);
-  const list = $('sx-list');
   const L = lang();
   if (!results.length) {
     list.replaceChildren(h('li', { class: 'sx-empty', role: 'option', 'aria-disabled': 'true', text: t('sx.noResults', { q: q.trim() }) }));
@@ -270,14 +281,13 @@ function renderCard() {
     return;
   }
   const ev = M.getEvents().e6;
-  const cells = S.ctx.cells;
   const { lat, lon } = st.p;
   const wasHidden = card.hidden;
   card.hidden = false;
   if (wasHidden) M.resize();
   M.setPlace({ lat, lon, r: st.pr });
   const { y0, y1 } = M.simpleFilterValues();
-  const key = [lat, lon, st.pr, y0, y1, lang(), named ? named.i : '', places ? 1 : 0, ev ? 1 : 0].join('|');
+  const key = [lat, lon, st.pr, y0, y1, lang(), named ? named.i : '', places ? 1 : 0, ev ? 1 : 0, rating ? 1 : 0, ratingError ? 1 : 0].join('|');
   if (key === cardKey) return;
   cardKey = key;
   if (!places) ensurePlaces().catch(() => {}); // names the point; renders the card again when loaded
@@ -285,12 +295,17 @@ function renderCard() {
   $('sx-card-title').textContent = head.title;
   $('sx-card-meta').textContent = head.meta;
   const body = $('sx-card-body');
-  if (!ev || !cells) { body.replaceChildren(h('p', { class: 'muted', text: t('sx.loadingEvents') })); return; }
+  if (!rating && !ratingError) ensureRating();
+  if (ratingError) {
+    body.replaceChildren(h('p', { class: 'sx-error', role: 'alert' }, `${ratingError} `,
+      h('button', { type: 'button', class: 'small-btn', text: t('common.retry'), onclick: () => { ratingError = null; cardKey = null; renderCard(); } })));
+    return;
+  }
+  if (!ev || !rating) { body.replaceChildren(h('p', { class: 'muted sx-loading', text: t('sx.loadingEvents') })); return; }
 
   const s = placeStats(ev, lat, lon, st.pr, y0, y1);
-  const cell = cellAtPoint(cells.features, lat, lon);
-  const gmc = S.ctx.manifest.global.b_shallow_1976_2021.mc;
-  const rating = recordingRating(cell, gmc);
+  const cell = cellAtPoint(rating, lat, lon);
+  const rate = cell ? cell.rating : 'few';
   const radiusSeg = h('div', { class: 'sx-seg sx-radius', role: 'group', 'aria-label': t('sx.radiusLabel') },
     RADII.map((r) => h('button', { type: 'button', 'data-pr': String(r), 'aria-pressed': String(r === st.pr), text: t('sx.within', { km: f.int(r) }), onclick: () => { st.pr = r; S.update(); M.showPlace(lat, lon, r); } })));
 
@@ -309,17 +324,23 @@ function renderCard() {
       h('div', { class: 'sx-row', 'data-row': 'depth' }, h('dt', { text: t('sx.depthHead') }),
         h('dd', { text: t(`sx.depthVal.${s.depthClass}`, { d: f.int(s.medianDepth) }) }))) : null);
 
-  const rate = h('section', { class: 'sx-sec sx-rating', 'data-rating': rating, 'aria-labelledby': 'sx-h-rate' },
+  const rateSec = h('section', { class: 'sx-sec sx-rating', 'data-rating': rate, 'aria-labelledby': 'sx-h-rate' },
     h('h3', { id: 'sx-h-rate' }, t('sx.rateHead'), infoButton('recording-rating')),
     h('div', { class: 'sx-meter-row' },
-      h('span', { class: `sx-meter m-${rating}`, 'aria-hidden': 'true' }, h('i'), h('i'), h('i')),
-      h('strong', { class: 'sx-rate-label', text: t(`sx.rate.${rating}`) })),
-    h('p', { class: 'sx-rate-text', text: t(`sx.rateText.${rating}`) }),
+      h('span', { class: `sx-meter m-${rate}`, 'aria-hidden': 'true' }, h('i'), h('i'), h('i')),
+      h('strong', { class: 'sx-rate-label', text: t(`sx.rate.${rate}`) })),
+    h('p', { class: 'sx-rate-text', text: t(`sx.rateText.${rate}`) }),
     h('p', { class: 'sx-basis', text: basisLine(cell) }),
     cell ? h('button', { type: 'button', class: 'btn-primary sx-pro-btn', 'data-cell': cell.id, onclick: () => S.openExpert(cell.id, lat, lon), text: t('sx.proBtn') }) : null);
 
   const honest = h('p', { class: 'sx-honest', role: 'note', text: t('sx.honest') });
-  body.replaceChildren(counts, rate, honest);
+  body.replaceChildren(counts, rateSec, honest);
+}
+
+/** Load the rating lookup once; the card renders again when it arrives (or shows the error with a retry). */
+function ensureRating() {
+  loadRating().then((r) => { rating = r; cardKey = null; renderCard(); })
+    .catch((e) => { ratingError = e.message; cardKey = null; renderCard(); });
 }
 
 function basisLine(p) {
