@@ -7,6 +7,7 @@ import { renderPanel, renderCellList } from './panel.js';
 import { renderCompare } from './compare.js';
 import { renderSequences, renderMethods, renderAbout } from './pages.js';
 import { renderMonitor, focusSequence } from './monitor.js';
+import { renderCases } from './cases.js';
 import { SUBS, layerName, subLabel } from './layers.js';
 import * as f from './fmt.js';
 import { h } from './charts.js';
@@ -16,11 +17,11 @@ import { placeRailInfo } from './info-rail.js';
 import * as D from './depth3d.js';
 import { initSimple, syncSimple, relabelSimple, startTour, openPlace, loadM5 as simpleLoadM5 } from './simple.js';
 
-const VIEWS = ['map', 'sequences', 'monitor', 'methods', 'about', 'depth', 'learn'];
+const VIEWS = ['map', 'sequences', 'monitor', 'cases', 'methods', 'about', 'depth', 'learn'];
 const LAYERS = ['b', 'q', 'mc', 'cc', 'rate', 'none'];
 const MODES = ['simple', 'pro'];
 // A link that sets any of these and does not name a mode is a Scientist-view link (all links made before v0.3).
-const EXPERT_KEYS = ['l', 'm', 'd', 'c', 'k', 'r', 'ev', 'y', 'mm', 'tr'];
+const EXPERT_KEYS = ['l', 'm', 'd', 'c', 'k', 'r', 'ev', 'y', 'mm', 'tr', 'df'];
 const DEFAULTS = { mode: 'simple', v: 'map', l: 'b', m: '', d: 'sh', c: null, k: null, r: null, ev: 0, y0: null, y1: null, mm: 6, pl: 1, g: 1, at: null, s: null, lang: 'en', t: null };
 const CELL_ID = /^[0-9a-f]{15}$/;
 
@@ -159,6 +160,7 @@ async function applyHash() {
   const langChanged = s.lang !== state.lang;
   const regionChanged = s.r !== state.r;
   const seqChanged = s.s !== state.s;
+  const caseChanged = s.cs !== state.cs;
   // Learn: remember the place the visitor came from, for its "back to where I was" link.
   if (s.v === 'learn' && state.v !== 'learn') learnBack = hashOf(state);
   Object.assign(state, s);
@@ -176,6 +178,7 @@ async function applyHash() {
     syncPanel();
   }
   syncSimple();
+  if (state.v === 'cases' && caseChanged) { rendered.delete('cases'); showView('cases'); }
   if (state.v === 'monitor' && seqChanged && rendered.has('monitor')) focusSequence(state.s);
   else if (viewChanged) window.scrollTo(0, 0);
   // Put the language back into the URL so a reload keeps it.
@@ -204,6 +207,7 @@ function showView(v) {
   const pageCtx = { manifest: ctx.manifest, showOnMap, state };
   if (v === 'sequences') renderSequences(document.getElementById('seq-root'), pageCtx);
   if (v === 'monitor') renderMonitor(document.getElementById('monitor-root'), pageCtx);
+  if (v === 'cases') renderCases(document.getElementById('cases-root'), pageCtx);
   if (v === 'methods') renderMethods(document.getElementById('methods-root'), pageCtx);
   if (v === 'about') renderAbout(document.getElementById('about-root'), pageCtx);
 }

@@ -31,6 +31,7 @@
 <link rel="stylesheet" href="css/terrain3d.css">
 <link rel="stylesheet" href="css/learn.css">
 <link rel="stylesheet" href="css/simple.css">
+<link rel="stylesheet" href="css/cases.css">
 <script>
   try { var t = localStorage.getItem('gsa-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
   // View mode before the first paint, by the same rule as app.js: the hash's mode=, else Scientist for an expert link, else the stored choice, else Simple.
@@ -38,7 +39,7 @@
     var p = new URLSearchParams(location.hash.replace(/^#/, '')), m = p.get('mode');
     if (m !== 'simple' && m !== 'pro') {
       var s = null; try { s = localStorage.getItem('gsa-mode'); } catch (e) {}
-      m = ['l', 'm', 'd', 'c', 'k', 'r', 'ev', 'y', 'mm', 'tr'].some(function (k) { return p.has(k); }) ? 'pro' : (s === 'pro' ? 'pro' : 'simple');
+      m = ['l', 'm', 'd', 'c', 'k', 'r', 'ev', 'y', 'mm', 'tr', 'df'].some(function (k) { return p.has(k); }) ? 'pro' : (s === 'pro' ? 'pro' : 'simple');
     }
     document.documentElement.dataset.mode = m;
   })();
@@ -59,6 +60,7 @@
     <a href="#v=map" data-view="map" data-i18n="nav.map">Map</a>
     <a href="#v=sequences" data-view="sequences" data-pro-only data-i18n="nav.sequences">Sequences</a>
     <a href="#v=monitor" data-view="monitor" id="nav-monitor" data-i18n="nav.monitor">Ongoing</a>
+    <a href="#v=cases" data-view="cases" data-i18n="nav.cases">Case studies</a>
     <a href="#v=depth" data-view="depth" data-i18n="nav.depth">Depth 3D</a>
     <a href="#v=methods" data-view="methods" data-pro-only data-i18n="nav.methods">Validation</a>
     <a href="#v=about" data-view="about" data-i18n="nav.about">About &amp; data</a>
@@ -257,6 +259,7 @@
 
   <section id="view-sequences" class="view page" hidden data-i18n-attr="aria-label:seq.h1" aria-label="Aftershock sequences"><div class="page-inner" id="seq-root"></div></section>
   <section id="view-monitor" class="view page" hidden data-i18n-attr="aria-label:mon.h1" aria-label="Ongoing aftershock sequences"><div class="page-inner" id="monitor-root"></div></section>
+  <section id="view-cases" class="view page" hidden data-i18n-attr="aria-label:nav.cases" aria-label="Case studies"><div class="page-inner cs-root" id="cases-root"></div></section>
   <section id="view-methods" class="view page" hidden data-i18n-attr="aria-label:nav.methods" aria-label="Validation and methods"><div class="page-inner" id="methods-root"></div></section>
   <section id="view-depth" class="view page depth-view" hidden data-i18n-attr="aria-label:d3.h1" aria-label="Earthquakes in depth"><div class="d3-root" id="depth-root"></div></section>
   <section id="view-about" class="view page" hidden data-i18n-attr="aria-label:nav.about" aria-label="About and data"><div class="page-inner" id="about-root"></div></section>
