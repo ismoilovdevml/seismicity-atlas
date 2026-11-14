@@ -12,6 +12,7 @@ CONCEPTS = [
     "omori-utsu", "aftershock-productivity-bath", "h3-cells-and-sample-radius", "plate-boundary-classes",
     "depth-and-slabs", "rate-m6", "catalogue-consistency", "regional-catalogues", "not-a-forecast",
     "recording-rating",  # v0.3: the Simple-view rating
+    "induced-seismicity", "seismic-moment-budget",  # v0.3.1: case study and deficit layer
 ]
 LANGS = {"en": "en", "uz": "uz-Latn", "ru": "ru", "es": "es"}
 
@@ -36,7 +37,7 @@ def test_index_renders(site):
     pg = site.open("#v=learn", ready=False)
     pg.wait_for_selector(".lr-card")
     assert pg.locator(".lr-card").count() == len(CONCEPTS)
-    assert pg.locator(".lr-group").count() == 6
+    assert pg.locator(".lr-group").count() == 7
     assert pg.get_attribute(".nav a[data-view=learn]", "aria-current") == "page"
     assert pg.is_hidden("#view-map")
     assert pg.title().startswith("Learn")
