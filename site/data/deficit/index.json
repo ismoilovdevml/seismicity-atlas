@@ -1,0 +1,336 @@
+{
+ "layer": "seismic deficit (pilot: Tien Shan)",
+ "version": "0.2.0",
+ "data_cutoff_utc": "2026-11-13",
+ "generated_utc": "2026-11-14T16:22:28Z",
+ "disclaimer": "Not a forecast and not a hazard map. The ratio compares about 120 years of earthquakes with a few decades of geodetic strain; recurrence times of the largest Tien Shan earthquakes are centuries or longer, part of the strain may be released aseismically, and full seismic coupling is an assumption. A low ratio is not evidence that an earthquake is due.",
+ "licence": {
+  "data": "CC BY-SA 4.0 (derived from ISC-GEM CC BY-SA 3.0 and the strain-rate models CC BY 4.0)"
+ },
+ "attribution": "Strain rates: Ou et al. (2026), doi:10.5281/zenodo.20293601, and Chang (2025), doi:10.5281/zenodo.16547905, both CC BY 4.0. Earthquakes: ISC-GEM catalogue (CC BY-SA 3.0) and USGS ComCat. Seismic-deficit analysis: Global Seismicity Atlas, CC BY-SA 4.0.",
+ "sources": [
+  {
+   "name": "GNSS and InSAR velocities, vorticity and strain rates across the Tian Shan",
+   "authors": "Ou, Q., Elliott, J., Maghsoudi, Y., Rollins, C., Lazecky, M., Wright, T.",
+   "year": 2026,
+   "doi": "10.5281/zenodo.20293601",
+   "licence": "CC BY 4.0",
+   "role": "strain-rate model ou2026",
+   "files": "dvedx.nc, dvndy.nc, dxy.nc (0.05 degree, nanostrain/yr)"
+  },
+  {
+   "name": "Geodetic Strain Rates, Slip Deficit Rates, and Seismic Potential in Tianshan, Central Asia (data)",
+   "authors": "Chang, F.",
+   "year": 2025,
+   "doi": "10.5281/zenodo.16547905",
+   "licence": "CC BY 4.0",
+   "role": "strain-rate models chang_bforstrain, chang_gpsgridder, chang_locavggrad, chang_visr",
+   "paper": "Chang et al. (2025) GRL 52, e2025GL118470, doi:10.1029/2025GL118470"
+  },
+  {
+   "name": "ISC-GEM Global Instrumental Earthquake Catalogue",
+   "licence": "CC BY-SA 3.0",
+   "role": "seismic moment 1904-2021",
+   "citation": "Storchak et al. 2013; Di Giacomo et al. 2018"
+  },
+  {
+   "name": "USGS ComCat",
+   "licence": "public domain",
+   "role": "seismic moment 2022-cut-off, Mw types only"
+  }
+ ],
+ "not_used": [
+  {
+   "name": "GSRM v2.1 (Kreemer et al. 2014, G3 15, 3849-3889)",
+   "reason": "GEM product page states CC BY-NC-SA 4.0 in its text and CC BY-SA 3.0 in its licence heading; the non-commercial term is incompatible with this atlas's CC BY-SA 4.0 data licence and the page is contradictory, so no global layer was built from it"
+  }
+ ],
+ "method": {
+  "geodetic": "Mdot_g = 2 mu H sum(A max(|e1|,|e2|,|e1+e2|)) (Kostrov 1974; Savage & Simpson 1997), full coupling",
+  "mu_pa": [
+   28000000000.0,
+   33000000000.0
+  ],
+  "h_m": [
+   15000.0,
+   25000.0
+  ],
+  "strain_models": [
+   "ou2026",
+   "chang_bforstrain",
+   "chang_gpsgridder",
+   "chang_locavggrad",
+   "chang_visr"
+  ],
+  "min_model_coverage": 0.7,
+  "seismic_observed": "band-wise sum over each band's complete period (Michael 2014 ISC-GEM shallow)",
+  "bands": [
+   {
+    "mw_lo": 5.8,
+    "mw_hi": 6.0,
+    "from": 1976
+   },
+   {
+    "mw_lo": 6.0,
+    "mw_hi": 6.5,
+    "from": 1964
+   },
+   {
+    "mw_lo": 6.5,
+    "mw_hi": 6.8,
+    "from": 1955
+   },
+   {
+    "mw_lo": 6.8,
+    "mw_hi": 7.0,
+    "from": 1940
+   },
+   {
+    "mw_lo": 7.0,
+    "mw_hi": 7.7,
+    "from": 1918
+   },
+   {
+    "mw_lo": 7.7,
+    "mw_hi": null,
+    "from": 1904
+   }
+  ],
+  "seismic_tgr": "alpha(Mw>=6.0 since 1964) x mean moment of a tapered G-R (Kagan 2002)",
+  "b_whole_belt": {
+   "b": 0.954,
+   "sigma": 0.127,
+   "n": 38,
+   "mw_min": 5.8,
+   "years": [
+    1976,
+    "2026"
+   ]
+  },
+  "corner_mw": [
+   7.75,
+   8.5
+  ],
+  "depth_max_km": 70,
+  "monte_carlo_draws": 20000,
+  "catalogue_sims": 4000,
+  "seed": 20261114
+ },
+ "validation": {
+  "chang2025_west_of_82E": {
+   "chang_bforstrain": {
+    "points_sec_inv": 0.908,
+    "points_ess": 0.91,
+    "area_sec_inv": 0.75,
+    "area_ess": 0.757
+   },
+   "chang_gpsgridder": {
+    "points_sec_inv": 0.906,
+    "points_ess": 0.906,
+    "area_sec_inv": 0.749,
+    "area_ess": 0.749
+   },
+   "chang_locavggrad": {
+    "points_sec_inv": 0.911,
+    "points_ess": 0.912,
+    "area_sec_inv": 0.749,
+    "area_ess": 0.751
+   },
+   "chang_visr": {
+    "points_sec_inv": 0.925,
+    "points_ess": 0.925,
+    "area_sec_inv": 0.794,
+    "area_ess": 0.794
+   },
+   "ou2026_on_chang_domain": {
+    "area_sec_inv": 0.711,
+    "area_ess": 0.719
+   }
+  },
+  "molnar_ghose2000": {
+   "u_paper_from_mnn_mm_yr": 6.86,
+   "u_paper_from_table_sum_mm_yr": 6.94,
+   "u_same_events_iscgem_moments_mm_yr": 14.5,
+   "published": {
+    "u_seis_mm_yr": [
+     7.0,
+     2.0
+    ],
+    "u_gps_west_mm_yr": 20.0
+   },
+   "length_km": 1870.0,
+   "u_seis_ours_mm_yr": {
+    "lo": 10.37659113468545,
+    "med": 13.273973097265156,
+    "hi": 17.868552121196114
+   },
+   "u_geod_ours_mm_yr": {
+    "lo": 8.220226090924369,
+    "med": 9.573096734086992,
+    "hi": 10.109934964779336
+   },
+   "r_obs_iscgem": {
+    "lo": 1.0641771362841839,
+    "med": 1.4132445138870031,
+    "hi": 1.9994314796321193
+   },
+   "r_obs_with_mg2000_moments": {
+    "lo": 0.5380025306428275,
+    "med": 0.7144760951575806,
+    "hi": 1.0108272008596813
+   },
+   "ms_obs_with_mg2000_moments": 1.53e+19
+  }
+ },
+ "regions": [
+  {
+   "id": "tienshan",
+   "name": "Tien Shan (69-92 E)",
+   "area_km2": 697573,
+   "q": "ok",
+   "n6": 31,
+   "n_ev": 106,
+   "mw_max": 8.02,
+   "mw_max_yr": 1911,
+   "models": [
+    "chang_bforstrain",
+    "chang_gpsgridder",
+    "chang_locavggrad",
+    "chang_visr",
+    "ou2026"
+   ],
+   "ms_obs": 3.03e+19,
+   "mg": 2.14e+19,
+   "mg_lo": 1.52e+19,
+   "mg_hi": 2.85e+19,
+   "ms_tgr": 1.98e+19,
+   "ms_tgr_lo": 7.23e+18,
+   "ms_tgr_hi": 5.86e+19,
+   "r_obs": 1.42,
+   "r_obs_lo": 0.906,
+   "r_obs_hi": 8.99,
+   "r_tgr": 0.932,
+   "r_tgr_lo": 0.327,
+   "r_tgr_hi": 2.89,
+   "r_obs_x1": 0.904,
+   "p_full": 0.81,
+   "p_half": 0.98,
+   "mc_bal": 8.15,
+   "unbal": 0.0065,
+   "cov_min": 0.78
+  },
+  {
+   "id": "ts_west",
+   "name": "Western Tien Shan (69-76 E)",
+   "area_km2": 232130,
+   "q": "ok",
+   "n6": 12,
+   "n_ev": 39,
+   "mw_max": 7.54,
+   "mw_max_yr": 1946,
+   "models": [
+    "ou2026"
+   ],
+   "ms_obs": 6.08e+18,
+   "mg": 6.6e+18,
+   "mg_lo": 4.92e+18,
+   "mg_hi": 8.48e+18,
+   "ms_tgr": 7.72e+18,
+   "ms_tgr_lo": 2.54e+18,
+   "ms_tgr_hi": 2.44e+19,
+   "r_obs": 0.921,
+   "r_obs_lo": 0.524,
+   "r_obs_hi": 15.7,
+   "r_tgr": 1.18,
+   "r_tgr_lo": 0.368,
+   "r_tgr_hi": 3.9,
+   "r_obs_x1": 0.563,
+   "p_full": 0.66,
+   "p_half": 0.89,
+   "mc_bal": 7.98,
+   "unbal": 0.0075,
+   "cov_min": 0.75
+  },
+  {
+   "id": "ts_central",
+   "name": "Central Tien Shan (76-82 E)",
+   "area_km2": 209314,
+   "q": "ok",
+   "n6": 15,
+   "n_ev": 44,
+   "mw_max": 8.02,
+   "mw_max_yr": 1911,
+   "models": [
+    "chang_bforstrain",
+    "chang_gpsgridder",
+    "chang_locavggrad",
+    "chang_visr",
+    "ou2026"
+   ],
+   "ms_obs": 1.29e+19,
+   "mg": 8.27e+18,
+   "mg_lo": 6.02e+18,
+   "mg_hi": 1.1e+19,
+   "ms_tgr": 9.63e+18,
+   "ms_tgr_lo": 3.28e+18,
+   "ms_tgr_hi": 2.93e+19,
+   "r_obs": 1.56,
+   "r_obs_lo": 0.575,
+   "r_obs_hi": 5.72,
+   "r_tgr": 1.18,
+   "r_tgr_lo": 0.38,
+   "r_tgr_hi": 3.76,
+   "r_obs_x1": 0.229,
+   "p_full": 0.85,
+   "p_half": 0.98,
+   "mc_bal": 7.98,
+   "unbal": 0.0037,
+   "cov_min": 0.93
+  },
+  {
+   "id": "ts_east",
+   "name": "Eastern Tien Shan (82-92 E)",
+   "area_km2": 256129,
+   "q": "few",
+   "n6": 4,
+   "n_ev": 23,
+   "mw_max": 7.95,
+   "mw_max_yr": 1906,
+   "models": [
+    "chang_bforstrain",
+    "chang_gpsgridder",
+    "chang_locavggrad",
+    "chang_visr"
+   ],
+   "ms_obs": 1.14e+19,
+   "mg": 3.97e+18,
+   "mg_lo": 2.94e+18,
+   "mg_hi": 5.15e+18,
+   "ms_tgr": 2.61e+18,
+   "ms_tgr_lo": 6.24e+17,
+   "ms_tgr_hi": 1.01e+19,
+   "r_obs": 2.87,
+   "r_obs_lo": 1.21,
+   "r_obs_hi": 20.2,
+   "r_tgr": 0.666,
+   "r_tgr_lo": 0.155,
+   "r_tgr_hi": 2.66,
+   "r_obs_x1": 0.695,
+   "p_full": 0.94,
+   "p_half": 0.98,
+   "mc_bal": 8.42,
+   "unbal": 0.02,
+   "cov_min": 0.98
+  }
+ ],
+ "files": {
+  "regions.geojson": {
+   "what": "one polygon per region",
+   "bytes": 3055
+  },
+  "cells.geojson": {
+   "what": "one polygon per H3 resolution-2 cell",
+   "bytes": 7083
+  }
+ }
+}
