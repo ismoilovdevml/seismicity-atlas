@@ -92,10 +92,11 @@ class Site:
              mode="pro", tour=False, size=None):
         """mode: the stored view mode ("pro", "simple" or None for a first visit); tour: show the first-visit tour."""
         w, h = size or VIEWPORTS[viewport]
-        # The globe's first view turns to the visitor's time-zone longitude, so rendered-feature counts depend on
-        # the time zone. Pin it (the CI runner is UTC, which faces the Atlantic); override with E2E_TZ.
+        # The globe's first view turns to the visitor's time-zone longitude. Pin the time zone so runs are the same on
+        # every machine. UTC (the CI runner's own zone) faces the Atlantic, which keeps the default view light to draw
+        # on GPU-less runners; tests that count rendered features set the view explicitly. Override with E2E_TZ.
         ctx = self.browser.new_context(viewport={"width": w, "height": h}, color_scheme=scheme, locale=locale,
-                                       timezone_id=os.environ.get("E2E_TZ", "Asia/Tashkent"), accept_downloads=True)
+                                       timezone_id=os.environ.get("E2E_TZ", "UTC"), accept_downloads=True)
         ctx.add_init_script(TEST_HOOK)
         if mode:
             ctx.add_init_script(_store_default("gsa-mode", mode))

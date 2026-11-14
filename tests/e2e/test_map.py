@@ -85,9 +85,11 @@ def test_cell_panel_and_error_state(site, viewport):
 
 
 def test_events_filter_and_usgs_link(site):
-    pg = site.open()
+    # flat map: on the globe a whole-viewport queryRenderedFeatures also returns far-side features (MapLibre)
+    pg = site.open("#v=map&g=0")
     pg.check("#chk-events")
     pg.wait_for_function("document.getElementById('ev-count').textContent.includes('shown')")
+    jump(pg, 140, 25, 1.6)  # a fixed, earthquake-dense view, so the count does not depend on the first view
     pg.wait_for_timeout(600)
     n6 = rendered(pg, "events")
     assert n6 > 1000, n6

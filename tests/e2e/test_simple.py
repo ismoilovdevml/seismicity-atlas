@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from conftest import SITE, no_hscroll, rendered, wait_map
+from conftest import SITE, jump, no_hscroll, rendered, wait_map
 
 DATA = SITE / "data"
 EVENTS = json.loads((DATA / "events_m6.json").read_text())
@@ -121,6 +121,7 @@ def test_simple_is_the_default_for_new_visitors(site):
     assert pg.is_hidden("#controls") and pg.is_hidden("#legend")
     # real earthquakes and their density, no hexagons
     pg.wait_for_function("window.__map.getLayer('sx-dots')")
+    jump(pg, 140, 25, 1.6)  # a fixed, earthquake-dense view, so the count does not depend on the first view
     pg.wait_for_timeout(400)
     assert rendered(pg, "sx-dots") > 500
     assert pg.evaluate("window.__map.getLayoutProperty('sx-heat', 'visibility')") == "visible"
