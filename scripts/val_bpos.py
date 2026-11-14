@@ -35,6 +35,7 @@ from common import C1, C2, C3, IMG, INK2, MUTED, RES, b_sample_mask, jdump, load
 RNG = 20261114
 LOG10E = np.log10(np.e)
 OFFSETS = (0.0, 0.1, 0.2, 0.3, 0.4)
+NPERM = 400          # random time orders per cell for the shuffled b-positive
 DT_EDGES = (0, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 30, np.inf)   # days after a larger event
 
 
@@ -178,7 +179,7 @@ def per_cell(samples, cells_df, rng, lilliefors=False):
         bp01, n01 = sl.b_positive(np.round(s["m"][keep], 2), dm=0.01, dmc=0.2)[:3:2]
         row["bpos_res001"] = bp01 if n01 >= al.NMIN_B else np.nan
         if np.isfinite(rp["bpos"]):
-            row["bpos_shuf"] = bpos_shuffled(m, f, s["y"] <= 2003, 50, rng)
+            row["bpos_shuf"] = bpos_shuffled(m, f, s["y"] <= 2003, NPERM, rng)
             (row["bpos_le1d"], row["n_le1d"]), (row["bpos_gt1d"], row["n_gt1d"]) = bpos_pairs(m, s["t"], f)
             if lilliefors:
                 k, tab = sl.lilliefors_offset(s["m"], thr, np.arange(0, 0.81, 0.1), ndither=10, nsim=300, rng=rng)
@@ -279,6 +280,36 @@ def main():
     res["global_shallow"] = glob
     print("global done", flush=True)
 
+    # ---- 0.1 binning of 0.01-resolution magnitudes: global direct b at the floors, binned (atlas) vs unbinned
+    f_ = floor_of(yr, fl_direct["sh"])
+    m01 = np.round(s.mag.to_numpy(), 2)
+    k = sd & (m01 >= f_ - 0.05 - 1e-9)
+    res["rounding_global_direct"] = {"b_binned_0.1": round(sl.b_varmc(mb[sd], f_[sd])[0], 4),
+                                     "b_unbinned_0.01": round(float(LOG10E / np.mean(m01[k] - (f_[k] - 0.055))), 4),
+                                     "share_at_x.x5_rounded_down": round(float(
+                                         (mb[np.round(m01 * 100) % 10 == 5] < m01[np.round(m01 * 100) % 10 == 5]).mean()), 4)}
+
+    # ---- blind windows: drop events within T days after a larger event (as above) from b, keep b-positive as is
+    dt_all = time_after_larger(g.t.to_numpy() * 365.25, g.lat, g.lon, sl.bin_mag(g.mag.to_numpy()))
+    win = {}
+    for T in (0.25, 1.0, 2.0):
+        w = dt_all < T
+        row = {}
+        for lab, sel in (("direct", direct), ("every", every)):
+            gg = g[(~g.deep) & (g.year >= Y0) & (g.year <= Y1) & sel & ~w]
+            row[f"global_b_{lab}"] = round(sl.b_varmc(gg.mag.to_numpy(), floor_of(gg.year.to_numpy(), fl_direct["sh"]))[0], 4)
+        Pw = per_cell(cell_samples(g, direct & ~w, fl_direct, shown), cells, rng)
+        Pb = per_cell(cell_samples(g, direct, fl_direct, shown), cells, rng)   # b-positive on the full direct sample
+        Ew = Pw[Pw.q.isin(["A", "B"])].join(Pb[["bpos"]].rename(columns={"bpos": "bpos_full"}))
+        Ew = Ew[Ew.bpos_full.notna()]
+        row["per_cell"] = {"cells": int(len(Ew)), "median_b": round(float(Ew.b.median()), 4),
+                           "bpos_minus_b": med_ci(Ew.bpos_full - Ew.b, rng),
+                           "inside_share": round(float(((Ew.bpos_full >= Ew.b_lo) & (Ew.bpos_full <= Ew.b_hi)).mean()), 4)}
+        win[f"T_{T}"] = row
+    res["blind_windows"] = {"definition": "events within T days after an M >= 6.5 event at least 0.5 larger within 300 km"
+                            " are left out of b (any depth class of the parent, any sample)", **win}
+    print("windows done", flush=True)
+
     # ---- per cell (shown shallow cells of the atlas run): direct (atlas), every event at the v0.2 floors, v0.1
     variants = {"direct_v02_floors": (direct, fl_direct, True), "every_event_v02_floors": (every, fl_direct, False),
                 "every_event_v01_floors": (every, fl_every, False)}
@@ -299,7 +330,10 @@ def main():
         "cells": int(len(common_)),
         "b": med_ci(d.loc[common_, "b"] - e.loc[common_, "b"], rng),
         "bpos": med_ci(d.loc[common_, "bpos"] - e.loc[common_, "bpos"], rng),
-        **{f"b_k{k:.1f}": med_ci(d.loc[common_, f"b_k{k:.1f}"] - e.loc[common_, f"b_k{k:.1f}"], rng) for k in OFFSETS[1:]}}
+        **{f"b_k{k:.1f}": med_ci(d.loc[common_, f"b_k{k:.1f}"] - e.loc[common_, f"b_k{k:.1f}"], rng) for k in OFFSETS[1:]},
+        "bpos_shuffled": med_ci(d.loc[common_, "bpos_shuf"] - e.loc[common_, "bpos_shuf"], rng),
+        "order_term": med_ci((d.loc[common_, "bpos"] - d.loc[common_, "bpos_shuf"]) -
+                             (e.loc[common_, "bpos"] - e.loc[common_, "bpos_shuf"]), rng)}
 
     # ---- (c) iid Gutenberg-Richter null with the real cells' floors and sizes
     E = d[d.q.isin(["A", "B"]) & d.bpos.notna()]
