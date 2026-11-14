@@ -2,28 +2,25 @@
 
 **Live site: https://ismoilovdevml.github.io/seismicity-atlas/**
 
-An open, reproducible world map of earthquake-catalogue statistics, built only from free global catalogues
-(ISC-GEM and USGS ComCat). For each place it gives:
+An open, reproducible world map of earthquake-catalogue statistics, built from free global catalogues (ISC-GEM and
+USGS ComCat). For each place it gives the amount of seismicity, the magnitude of completeness (Mc) and how it changed,
+the Gutenberg-Richter b-value **with its 95 % interval and a quality code**, how well the two catalogues agree, and
+Omori-Utsu decay of the largest aftershock sequences. The main message is **where the catalogue numbers can be
+trusted, and where they cannot.**
 
-- how much seismicity there is;
-- the magnitude of completeness (Mc), and how it has changed over time;
-- the Gutenberg-Richter b-value **with its 95 % interval and a quality code**;
-- how well the two main open global catalogues (ISC-GEM and USGS ComCat) agree;
-- Omori-Utsu decay parameters for the largest aftershock sequences since 1990.
+The site opens in a **Simple view** for everyone (recorded earthquakes, a place search and a plain-language place
+card) on a globe; the **Scientist view** holds the cell statistics behind it. Both run in English, Uzbek, Russian and
+Spanish.
 
-The main message is **where the catalogue numbers can be trusted, and where they cannot.**
+> **Not a forecast. Not a hazard map.** These are descriptive statistics of earthquake catalogues, for research and
+> education. They do not predict earthquakes and must not be used in place of an official seismic hazard assessment.
 
-The website opens in a **Simple view** for everyone: the recorded earthquakes on a map, a place search, and a card
-that says in plain words what was recorded around a place and how well. The **Scientist view** (one switch in the
-header) holds the cell statistics behind it. See [Website](#website).
+![Simple view on the globe with the place search](docs/img/readme/simple-globe.png)
 
-> **Not a forecast. Not a hazard map.** These are descriptive statistics of earthquake catalogues, for research
-> and education. They do not predict earthquakes and must not be used in place of an official seismic hazard
-> assessment.
-
-![b-value map, shallow](docs/img/map_b_sh.png)
-
+<!-- key-results:start -->
 ## Key results (data cut-off 2026-11-13)
+
+Generated from the data files by `scripts/readme_numbers.py`; do not edit by hand.
 
 | | Value |
 |---|---|
@@ -32,10 +29,11 @@ header) holds the cell statistics behind it. See [Website](#website).
 | Global b, ISC-GEM direct Mw 1976–2021 | shallow ≤ 70 km: **1.035 [1.018, 1.052]**; deeper: **0.936 [0.911, 0.961]** |
 | Cells with a trusted b (95 % interval ≤ 0.5) | 170 shallow and 73 deeper, out of 2,598 cells that hold events |
 | Global completeness (ISC-GEM direct Mw, shallow) | Mw 5.8 for 1976–2003, 5.3 for 2004–2021 |
-| USGS M4.5+ feed, as served | complete above about 4.7 (mostly mb) worldwide since 1993 |
+| USGS M4.5+ feed, as served | median Mc 4.7 (mostly mb) over 956 shallow cells, 2010 to the cut-off |
 | Omori fits | 40 sequences since 1990: 17 quality A, 10 B, 8 C, 5 insufficient |
+<!-- key-results:end -->
 
-### Validation (ours vs published)
+## Validation (ours vs published)
 
 | Test | Ours | Published | Verdict |
 |---|---|---|---|
@@ -53,172 +51,99 @@ header) holds the cell statistics behind it. See [Website](#website).
 | Synthetic cells, 100–1000 events | median bias ≤ 0.021, CI coverage 0.88–0.98 | true b | match |
 | Omori p, synthetic | 1.063 ± 0.025 | 1.05 | match |
 
-Full tables and the reasons for each verdict: [docs/validation.md](docs/validation.md).
+Full tables and the reasons for each verdict: [docs/validation.md](docs/validation.md). Since v0.2, b uses direct
+(measured) Mw only; converted Ms and mb are left out of every b ([method §2.1](docs/method.md)).
 
-### What changed in v0.3
+## What changed in v0.3.x
 
-The statistics are the same as in v0.2 (same method and data cut-off); v0.3 is about the website.
+**v0.3.1** (website and new science; the atlas statistics are those of v0.3.0):
 
-- **Two modes.** The site opens in a **Simple view**: recorded earthquakes as dots, a density shading, a place
-  search and a place card in plain words, with a four-word rating of how well earthquakes are recorded there. The
-  v0.2 interface (cells, b with its interval, quality codes, comparison, CSV) is the **Scientist view**, one switch
-  away; links made before v0.3 open in it.
-- **Globe by default.** Both modes open on a globe turned to the visitor's longitude (taken from the time-zone
-  offset; nothing is asked for or sent). The flat map is one button away; the choice is remembered (`gsa-proj`) and
-  written into every link (`g=1` globe, `g=0` flat). An older link without `g` opens in the visitor's last choice,
-  else on the globe.
-- **Learn pages and (i) buttons.** One page per concept behind the numbers, in four languages, with a real example
-  from the data and an interactive diagram; small (i) buttons next to the labels open them.
-- **Sequence Monitor.** "Recent big quakes" (Simple) / "Ongoing" (Scientist): every M ≥ 7 mainshock of the last
-  365 days, updated daily, descriptive only.
-- **Relief and 3D.** Shaded relief, lakes and rivers on the map, optional 3D terrain, and the Depth 3D view with
-  hypocentres and Slab2 slab contours.
-- **Lighter first load.** The Simple view no longer downloads `cells.geojson` (1.5 MB); its place card reads
-  `site/data/rating.json` (built by `scripts/build_rating.py`) on the first place it opens, and the cells load when
-  the Scientist view or Depth 3D is opened. Search results are ranked by match quality, then population.
+- **Case studies: Groningen gas field.** Induced seismicity in the best-recorded European example: a plain-language
+  summary first, then monthly gas production and earthquake rate (two charts on one time axis), phase rates with
+  Poisson intervals, b by phase from three estimators, moving b-positive for the north and south, b maps by period and
+  the comparison with published studies (15 rows). KNMI catalogue (doi:10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5)
+  and NLOG.NL production; no single events are offered for download. [docs/induced.md](docs/induced.md)
+- **Seismic-deficit layer, Tien Shan pilot** (Scientist view). Released seismic moment against the GNSS/InSAR moment
+  rate at full coupling, per region or H3 cell. A ratio is never shown without its 95 % interval and p_full; zones with
+  few events are greyed. Conclusion: **no detectable deficit beyond catalogue noise.** [docs/deficit.md](docs/deficit.md)
+- **Ongoing cards:** a second productivity reference, ETAS fits to global subduction sequences (Zhang & Werner 2020),
+  next to Page et al. (2016), so a "more productive" label is read in context.
+- **Depth 3D:** a Türkiye 2023 (Kahramanmaraş Mw 7.8 and 7.6) preset, with a link to the Lomax (2023) relocations.
+- **Learn:** two new concepts, induced seismicity and the seismic moment budget (21 concepts in four languages).
+- **Colour:** the light-theme b classes are steps of the Crameri Scientific colour map *vik*; it passed the dataviz
+  validator where the old palette did not. Dark theme unchanged (no Crameri map passed there).
+  [docs/ux-notes.md](docs/ux-notes.md)
+- **Paper figures** at 300 dpi with Crameri maps: `scripts/paper_figures.py` → `docs/img/paper/`.
 
-Full list: [CHANGELOG.md](CHANGELOG.md).
+**v0.3.0:** the two modes, the globe by default, Learn pages with (i) buttons, the Sequence Monitor, relief and 3D,
+and a lighter first load. Full list: [CHANGELOG.md](CHANGELOG.md).
 
-### What changed in v0.2
+## Website
 
-- **b now uses direct Mw only.** ISC-GEM mixes direct moment magnitudes (GCMT) with proxy Mw converted from Ms and
-  mb. In 1976–2021 the proxies are 16 % of events at Mw 5.6–6.0 and under 1 % from Mw 7, and alone they give
-  b ≈ 1.74, so they raised every b. The ComCat copy has no direct/proxy flag; the magnitude uncertainty 0.10 marks
-  direct Mw (99.97 % of events with a GCMT magnitude in ComCat carry it). v0.2 leaves the other 7,049 events
-  (12.5 %) out of every b. Details: [method §2.1](docs/method.md), before/after: [validation §10](docs/validation.md).
-- Global b: shallow 1.043 → 1.035, deeper 0.969 → 0.936. Trusted cells: 204 → 170 shallow, 70 → 73 deeper.
-  Median per-cell change −0.019 (shallow) and −0.036 (deeper).
-- Kagan (2010) global and trench b and the Kagan & Jackson (2013) all-subduction b now match (they mismatched).
-- Open point: b-positive did not move with b, so part of the per-cell drop may be incompleteness of the direct
-  sample just above the floor.
-- `ATLAS_B_MAGERR_MAX=all ./scripts/run_all.sh` rebuilds the v0.1 behaviour for comparison.
-  `manifest.json` → `method` gains `b_sample` and `b_magerr_max`.
+`site/` is a static site (no build step) served by GitHub Pages. Views:
+
+- **Map, Simple view:** earthquakes M ≥ 5/6/7 as dots coloured by depth over a density shading, offline place search
+  (Natural Earth, 7,342 places), a place card with counts, the largest and latest event and a recording rating.
+- **Map, Scientist view:** b with its interval and quality code, Mc, catalogue disagreement, M6+ rate; shallow or deeper;
+  a cell panel with FMD, Mc over time, b against cutoff and CSV download; a comparison of two cells; regional
+  catalogues; the seismic-deficit layer.
+- **Ongoing** ("Recent big quakes"): every M ≥ 7 mainshock of the last 365 days, updated daily, descriptive only.
+- **Case studies:** Groningen. **Depth 3D:** hypocentres with Slab2 for seven regions or the map view.
+- **Sequences** and **Validation** (Scientist view), **About & data**, and **Learn** (one page per concept).
+
+The state (view, layer, cell, language, mode, projection) is kept in the URL hash. MapLibre GL JS 5.24.0, three.js
+0.170.0, Inter and IBM Plex Mono are vendored; no CDN, and no third-party tiles except the optional 3D terrain.
+Design notes: [docs/ux-notes.md](docs/ux-notes.md); open issues: [docs/known-issues.md](docs/known-issues.md).
+
+| | |
+|---|---|
+| ![Scientist view with a selected cell](docs/img/readme/scientist.png) | ![Place card on a phone, dark theme](docs/img/readme/phone-place-card.png) |
+| ![Groningen case study](docs/img/readme/groningen.png) | ![Seismic-deficit layer, Tien Shan](docs/img/readme/deficit.png) |
+| ![Ongoing aftershock sequences](docs/img/readme/ongoing.png) | ![Depth 3D, Türkiye 2023](docs/img/readme/depth3d.png) |
+| ![Learn page: induced seismicity](docs/img/readme/learn.png) | |
 
 ## Documentation
 
 - [docs/method.md](docs/method.md): method choices with their reasons, and limitations
 - [docs/validation.md](docs/validation.md): synthetic, global, regional and plate-boundary tests
-- [docs/data.md](docs/data.md): sources, magnitude types, depth, duplicates, coverage
-- [docs/data-schema.md](docs/data-schema.md): the data contract for the website (`site/data/`)
-- [docs/monitor.md](docs/monitor.md): the Sequence Monitor (ongoing sequences), its validation and limits
-- [docs/learn.md](docs/learn.md): the Learn pages (18 concepts, four languages), how to add a concept, and where each
-  (i) button points
-- [docs/prior-work.md](docs/prior-work.md): existing tools and literature, and the gap this atlas fills
-- [docs/ai-in-seismology.md](docs/ai-in-seismology.md): ML catalogues and LLM agents, and what they can and
-  cannot add here
+- [docs/data.md](docs/data.md) and [docs/data-schema.md](docs/data-schema.md): sources and the data contract of `site/data/`
+- [docs/monitor.md](docs/monitor.md): the Sequence Monitor, its validation and limits
+- [docs/induced.md](docs/induced.md): the Groningen case study; [docs/deficit.md](docs/deficit.md): the deficit layer
+- [docs/comparisons.md](docs/comparisons.md), [docs/bpositive.md](docs/bpositive.md), [docs/regional.md](docs/regional.md),
+  [docs/literature-values.md](docs/literature-values.md): further comparisons
+- [docs/learn.md](docs/learn.md): the Learn pages and where each (i) button points
+- [docs/release.md](docs/release.md): versions, the monthly update and how the README stays current
+- [docs/prior-work.md](docs/prior-work.md), [docs/ai-in-seismology.md](docs/ai-in-seismology.md): context
 
 ## How to run
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-./scripts/run_all.sh        # downloads about 75 MB once (cached in data/raw/), then about 1 minute
+./scripts/run_all.sh        # downloads about 75 MB once (cached in data/raw/), then builds everything and runs the tests
+cd site && python3 -m http.server 8000   # preview the site at http://localhost:8000/
 ```
-
-`run_all.sh` fetches the data, prepares and matches the catalogues, and builds the cells (300 km, plus 200 and
-400 km sensitivity runs). It then runs the validation and the Omori fits, writes `site/data/`, draws
-`docs/img/`, and runs the tests (`tests/`, 11 tests).
 
 - Downloads are treated as untrusted data: parsed as CSV/JSON only, and Python always runs with `-I`.
-- ComCat changes over time. Use `scripts/fetch.py all --refresh --end <date>` to rebuild against newer data.
-
-## Sequence Monitor (ongoing sequences)
-
-A daily, descriptive view of every ComCat M ≥ 7 mainshock of the last 365 days (14 sequences at the
-2026-11-13 cut-off). **It is not a forecast**: it gives no probabilities and no expected future counts, and every
-fitted curve stops at the data cut-off. For official aftershock forecasts, use the USGS event pages.
-
-```bash
-.venv/bin/python -I scripts/monitor/build_monitor.py        # cut-off = now (UTC hour); writes site/data/monitor/
-.venv/bin/python -I scripts/monitor/check_monitor.py        # structure, no-forecast rules, size (< 3 MB)
-.venv/bin/python -I scripts/monitor/validate_oaf.py --end 2026-11-13T00:00:00   # compare with the USGS oaf product
-```
-
-- Validation: on the one like-for-like USGS product (Reasenberg-Jones, sequence specific: 2025 Hubbard Glacier
-  M 7.0) we get a = −2.109 ± 0.052 and p = 1.193 ± 0.046; the USGS gives −2.11 ± 0.053 and 1.18 ± 0.047. The
-  USGS ETAS products are compared too, with their differences explained.
-- Automation: `.github/workflows/update-monitor.yml` (daily); Pages redeploys after it.
-- Method, the current table, validation and limitations: [docs/monitor.md](docs/monitor.md).
-
-## Outputs for the website
-
-`site/data/` totals about 11 MB. The files loaded at start-up total about 2.9 MB: `manifest.json`,
-`cells.geojson`, `events_m6.json`, `plates.geojson`, `land.geojson` and `coastline.geojson`. Everything else
-loads lazily, including 1,292 per-cell detail files. The site needs no third-party basemap tiles. See
-[docs/data-schema.md](docs/data-schema.md).
-
-## Website
-
-`site/` is a static site (no build step) that can be served by GitHub Pages as is. Preview it locally:
-
-```bash
-cd site && python3 -m http.server 8000   # then open http://localhost:8000/
-```
-
-- **Two modes (v0.3).** A "Simple | Scientist" switch in the header; the choice is kept in the URL (`mode=`) and in
-  the browser. Links made before v0.3 (any link with a layer, cell or depth) open in the Scientist view.
-- **Globe (v0.3).** Both modes open on a globe; the globe button switches to a flat map and back. The choice is kept
-  in the URL (`g=1` or `g=0`) and in the browser; a link without `g` opens in the last choice, else on the globe.
-- **Simple view (default):** the question "Where do earthquakes happen, and how well are they recorded?", real
-  earthquakes as dots sized by magnitude and coloured by depth, a pale shading of where earthquakes have been recorded
-  (not a hazard map), plate boundaries and relief. Search a city (offline, from Natural Earth's 7,342 populated
-  places, accent-insensitive) or click the map for a place card: M6+ and M7+ counts within 100 or 300 km with the
-  years, the largest and the latest event with USGS links, the typical depth, a four-word rating of how well
-  earthquakes are recorded there (its exact rule is in [docs/learn.md](docs/learn.md)), a button that opens the
-  Scientist view on that place's cell, and the line "This is a record of past earthquakes, not a forecast or a
-  hazard map." A three-step tip on the first visit; a bottom sheet on phones.
-- **Scientist view (map):** b-value with its 95 % interval and quality code, estimate quality, completeness Mc (ISC-GEM and ComCat),
-  catalogue disagreement, M6+ rate; shallow or deeper; plate boundaries; earthquakes M ≥ 6 (M ≥ 5 on request) with
-  a time filter and links to USGS event pages. Hover a cell for its values; click it for the
-  cell panel (frequency-magnitude distribution, Mc over time, b against cutoff, yearly counts, catalogue
-  agreement), with a per-cell CSV download and a side-by-side comparison of two cells' b intervals. Regional
-  higher-resolution catalogues appear as an extra layer when `site/data/regional/index.json` is present. The state,
-  including the language (English, Uzbek, Russian, Spanish), is kept in the URL hash, so any view can be shared.
-- **Sequences** (Scientist view): Omori-Utsu decay charts and quality badges for the 40 sequences.
-- **Ongoing** ("Recent big quakes" in the Simple view): the Sequence Monitor, updated daily. One card per M ≥ 7 mainshock of the last 365 days: counts,
-  Omori-Utsu fit, b with its interval and quality code, the largest aftershock, productivity compared with the
-  regional generic values of Page et al. (2016), and a cumulative chart that stops at the data cut-off.
-  Descriptive only, not a forecast. See below.
-- **Validation** (Scientist view): every test against published values, including the mismatch and the untestable rows.
-- **About & data:** sources, licences, data cut-off, how to cite, downloads.
-- **Learn:** one page per concept behind the numbers (magnitude types, Mc, the FMD, b and its interval, quality
-  codes, b-positive, declustering, Omori-Utsu, Båth's law, H3 cells, plate classes, depth and slabs, rates,
-  catalogue consistency, regional catalogues, why this is not a forecast, how the Simple view rates recording), each with a plain explanation, a real
-  example read from `site/data`, an interactive diagram, technical details and references, in all four languages.
-  Small (i) buttons next to the labels of the map, legend, cell panel, comparison, Sequences, Ongoing, Depth 3D,
-  Validation and About open the matching page; "Back to where I was" returns to the same view. Loaded on demand.
-- Vendored: MapLibre GL JS 5.24.0 (BSD-3-Clause), Inter and IBM Plex Mono (SIL OFL 1.1). No CDN, no third-party
-  tiles. Design notes: [docs/ux-notes.md](docs/ux-notes.md); open issues: [docs/known-issues.md](docs/known-issues.md).
-- Browser tests: `tests/e2e/` (Playwright for Python; serves `site/` locally). Run
-  `pip install playwright pytest && python -m playwright install chromium && python -m pytest tests/e2e`;
-  set `E2E_BROWSERS=chromium,firefox,webkit` for all three engines. CI: `.github/workflows/test-site.yml`.
-
-- **Relief and 3D (added 2026-11-14):** Natural Earth shaded relief, lakes and rivers under the cells (on by default,
-  served with the site, about 4 MB of WebP tiles and GeoJSON); optional 3D terrain from AWS Terrain Tiles (off by
-  default, the only external tile source, credits shown on the map); and a **Depth 3D** view with hypocentres below
-  the surface for six regions or the current map view, USGS Slab2 slab contours, a 2D cross-section (also the fallback
-  without WebGL 2), and the atlas statistics for the region (events per depth class, shallow and deeper cell b-values
-  with their intervals). three.js 0.170.0 (MIT) is vendored and loads only in that view. Sources, licences and
-  sizes: [docs/basemap.md](docs/basemap.md).
-
-![Simple view on the globe: earthquakes, density shading and place search](docs/img/site-v3-simple-light.png)
-
-![Simple view on a phone: the globe on first visit](docs/img/site-v3-phone-globe-light.png)
-
-![Simple view on a phone, dark theme, with a place card](docs/img/site-v3-phone-dark-card.png)
-
-![Scientist view on the globe with a selected cell](docs/img/site-v3-expert.png)
-
-![Depth 3D view, Japan with Slab2](docs/img/site-3d-light.png)
+- Sequence Monitor: `scripts/monitor/build_monitor.py` (daily workflow `update-monitor.yml`); Groningen:
+  `scripts/induced/`; deficit layer: `scripts/deficit/` (see the docs above).
+- README numbers: `.venv/bin/python -I scripts/readme_numbers.py --write` (run by `run_all.sh`; checked by
+  `tests/test_readme.py`).
+- README screenshots: `python tests/e2e/tools/readme_shots.py [--chromium PATH]` (Playwright and Pillow; fixed viewport,
+  time zone, theme and data; refreshed on each release).
+- Paper figures: `.venv/bin/python -I scripts/paper_figures.py` (300 dpi, `docs/img/paper/`).
+- Tests: `.venv/bin/python -I -m pytest -q tests --ignore=tests/e2e`; browser tests: `pip install playwright pytest &&
+  python -m playwright install chromium && python -m pytest tests/e2e` (`E2E_BROWSERS=chromium,firefox,webkit` for all
+  three engines). CI: `.github/workflows/test-site.yml`.
 
 ## How to cite
 
-Use the metadata in [CITATION.cff](CITATION.cff) (GitHub shows a "Cite this repository" button), and cite the
-underlying catalogues listed below. Please quote the data cut-off date shown on the site.
+Use the metadata in [CITATION.cff](CITATION.cff) (GitHub shows a "Cite this repository" button), cite the underlying
+catalogues listed below, and quote the data cut-off date shown on the site.
 
 ## Contributing
 
-Issues and pull requests are welcome, especially published regional b-value or Mc estimates that can be added to
-the validation table (with the paper, the magnitude type and the completeness used).
+Issues and pull requests are welcome, especially published regional b-value or Mc estimates that can be added to the
+validation table (with the paper, the magnitude type and the completeness used).
 
 ## Licences
 
@@ -235,4 +160,12 @@ the validation table (with the paper, the magnitude type and the completeness us
     domain).
   - Optional 3D terrain only: Terrain Tiles on AWS Open Data (Tilezen Joerd sources; the full credit list is shown on
     the map and in [docs/basemap.md](docs/basemap.md)).
+  - Groningen case study: Royal Netherlands Meteorological Institute (KNMI), Netherlands Seismic and Acoustic Network,
+    doi:10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5 (CC BY 4.0; derived aggregates only); production and field
+    outline: Source: NLOG.NL.
+  - Seismic-deficit layer: strain rates of Ou et al. (2026), doi:10.5281/zenodo.20293601, and Chang (2025),
+    doi:10.5281/zenodo.16547905 (both CC BY 4.0).
+  - Colour maps: Crameri, F. (2023), Scientific colour maps 8.0.1, doi:10.5281/zenodo.8409685 (MIT licence).
+- **Linked only:** the Lomax (2023) NLL-SSST-coherence relocations of the 2023 Türkiye sequence,
+  doi:10.5281/zenodo.8089273 (CC BY 4.0; not redistributed here).
 - **Not redistributed:** the GEM Global Seismic Hazard Map (CC BY-NC-SA). The site may link to it only.

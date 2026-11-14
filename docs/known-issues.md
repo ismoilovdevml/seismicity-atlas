@@ -145,3 +145,16 @@ Status on 2026-11-14 (branch `feat/terrain3d`); details in [basemap.md](basemap.
   in Chromium on an Apple M-series laptop.
 - **WebGL 2.** three.js 0.170 needs WebGL 2; without it the view shows the cross-section (tested by disabling WebGL in
   the browser test, not on a real old device).
+
+## v0.3.1: case study, deficit layer, colours
+
+- **Dark-theme b classes** still fail the dataviz normal-vision floor (worst adjacent pair ΔE 11.3 < 15, the two
+  orange classes). No Crameri map passed in the dark theme either ([ux-notes.md](ux-notes.md), "Crameri colour maps").
+- **Case-study text from the data.** Study names, quantities and notes in the Groningen validation table are English
+  data text from `validation.json`; the interface around them is translated.
+- **Lomax (2023) relocations** are linked, not shown: the licence (CC BY 4.0) would allow a subset, but it was not
+  ingested in v0.3.1.
+- **Deficit layer on phones** is reached through "More" (the rail); its panel is the bottom sheet. Tested at 390 px;
+  not tested on real devices.
+- **Paper figures** (`docs/img/paper/`) are drawn from `site/data/` and the matplotlib figures of `scripts/figures.py`
+  (`docs/img/map_*.png`) still use the earlier red-grey-blue b colour map; they were not regenerated in v0.3.1.

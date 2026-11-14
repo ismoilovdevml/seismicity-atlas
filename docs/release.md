@@ -88,11 +88,35 @@ jobs:
 `workflow_run` runs on the latest commit of the default branch, which then includes the data commit. Until this is
 added, run "Deploy site to GitHub Pages" by hand (Actions → Run workflow) after an update.
 
+### README: numbers and screenshots (since v0.3.1)
+
+The README cannot quote numbers older than the data, and its screenshots cannot go stale unnoticed. The simplest
+robust split:
+
+- **Key results are generated.** The table between `<!-- key-results:start -->` and `<!-- key-results:end -->` in
+  `README.md` is written by `scripts/readme_numbers.py --write` from `site/data/manifest.json`, `site/data/cells.geojson`,
+  `results/prepare.json`, `results/atlas_globals.json` and `results/sequences.json`. `scripts/run_all.sh` runs it
+  before the tests, so the monthly workflow rewrites the table and commits `README.md` with the data (it is in the
+  workflow's `git add`). Do not edit the block by hand.
+- **The validation table is curated, its numbers are checked.** Its wording (verdicts, published references) is
+  written by hand, but `tests/test_readme.py` fails if any interval it quotes ("0.997 [0.962, 1.033]") is not in the
+  validation table of `site/data/global.json`. These rows come from ISC-GEM, which the monthly update does not change;
+  after a new ISC-GEM release, update the rows and the test tells you which ones are stale.
+- **Screenshots come from one script.** `python tests/e2e/tools/readme_shots.py` renders every image the README uses
+  into `docs/img/readme/` (fixed viewport, device scale 1, time zone Asia/Tokyo, colour scheme, reduced motion, the
+  committed data; PNGs over 400 KB are reduced to 256 colours). It needs Playwright and Pillow and is not run in CI:
+  refresh the screenshots on each release (minor or patch with interface changes) and look at each one.
+  `tests/test_readme.py` fails if the README uses a missing image, if `docs/img/readme/` holds an image the README
+  does not use, if one is over 400 KB, or if an old-style `docs/img/site-*.png` is left that no document uses.
+- `CITATION.cff` (`version`, `date-released`) is set by hand on each release; the test checks that
+  `scripts/release.json` and `site/data/manifest.json` agree.
+
 ### Not updated automatically
 
-- The numbers quoted in `README.md`, `docs/data.md`, `docs/method.md` and `docs/validation.md` describe release 0.1.0
+- The numbers quoted in `docs/data.md`, `docs/method.md` and `docs/validation.md` describe release 0.1.0/0.2.0
   (cut-off 2026-11-13). The live numbers are in `site/data/manifest.json` and `results/*.json`. Update the text when
   making a GitHub release.
+- README screenshots (see above).
 - ISC-GEM: the ComCat mirror ends in 2021 and changes rarely. Switching to the official release is a manual step
   (below).
 

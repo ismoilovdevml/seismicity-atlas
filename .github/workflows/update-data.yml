@@ -1,7 +1,8 @@
 name: Update data
 
 # Monthly refresh of the ComCat part of the atlas. Re-downloads ComCat up to the new cut-off, rebuilds every output,
-# runs the tests and the drift guard, and commits site/data, docs/img, results and scripts/release.json to main.
+# runs the tests and the drift guard, and commits site/data, docs/img, results, scripts/release.json and README.md (its
+# key-results table is rewritten from the data by scripts/readme_numbers.py inside run_all.sh) to main.
 # Nothing is committed if any step fails. See docs/release.md.
 
 on:
@@ -86,7 +87,7 @@ jobs:
         run: |
           git config user.name "ismoilovdevml"
           git config user.email "107093598+ismoilovdevml@users.noreply.github.com"
-          git add site/data docs/img results scripts/release.json
+          git add site/data docs/img results scripts/release.json README.md
           if git diff --cached --quiet -- site/data ':(exclude)site/data/manifest.json'; then
             echo "No data change beyond manifest.json; nothing committed."
             exit 0

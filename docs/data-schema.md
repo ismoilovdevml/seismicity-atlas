@@ -28,6 +28,8 @@ General rules
 | `sequences.json` | lazy | Omori-Utsu fits for the 40 largest independent sequences since 1990 |
 | `monitor/index.json` | lazy | Sequence Monitor: cut-off, update time, selection, disclaimer, one summary per ongoing sequence |
 | `monitor/<event id>.json` | lazy | one ongoing sequence: counts, Omori fit, b, b-positive, productivity, daily and cumulative counts |
+| `induced/groningen/*.json` | lazy | Case studies view: the Groningen gas-field case study (contract: [induced.md](induced.md#data-contract)) |
+| `deficit/{index.json,regions.geojson,cells.geojson}` | lazy | Scientist view: the seismic-deficit layer, Tien Shan pilot (contract: [deficit.md](deficit.md#data-contract-sitedatadeficit)) |
 | `global.json` | lazy | global charts: Mc by period vs Michael (2014), b vs cutoff, b by boundary class, validation table |
 | `cells/<h3>.json` | lazy, on click | per-cell detail: FMDs, Mc(t), b(cutoff), yearly rates |
 

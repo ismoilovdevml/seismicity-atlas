@@ -21,4 +21,5 @@ $PY -I scripts/site_layers.py
 $PY -I scripts/build_rating.py     # Simple view rating lookup from cells.geojson -> site/data/rating.json
 $PY -I scripts/figures.py
 [ "${SKIP_REGIONAL:-0}" = 1 ] || $PY -I scripts/regional/build_regional.py || echo "regional layers: build failed, previous output kept"
+$PY -I scripts/readme_numbers.py --write   # README key results from the data (tests/test_readme.py checks it)
 $PY -I -m pytest -q tests
