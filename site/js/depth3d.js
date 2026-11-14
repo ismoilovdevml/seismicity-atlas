@@ -21,6 +21,9 @@ export const PRESETS = {
   hindukush: { bbox: [66, 33, 78, 41], slab: true, section: { a: [71, 34], b: [71, 40], w: 120 } },
   italy: { bbox: [6, 36, 20, 47], slab: true, section: { a: [18.5, 37.5], b: [11.5, 41.5], w: 120 } },
   iceland: { bbox: [-25, 62.5, -12, 67.5], slab: false, section: { a: [-24, 64], b: [-13, 64], w: 100 } },
+  // Kahramanmaraş 2023 (Mw 7.8 and 7.6): the East Anatolian Fault zone; the section crosses it from north-west to
+  // south-east through the Mw 7.8 epicentre. No Slab2 model covers it. note: a link shown under the view.
+  turkey: { bbox: [34.5, 35.5, 41.5, 40], slab: false, section: { a: [35.6, 38.9], b: [38.6, 36.3], w: 120 }, note: 'turkey' },
 };
 const PRESET_IDS = [...Object.keys(PRESETS), 'view'];
 
@@ -74,7 +77,7 @@ export function show(el, ctx) {
 export function regionOf(st) {
   if (st.p3 !== 'view') {
     const p = PRESETS[st.p3] || PRESETS.japan;
-    return { id: st.p3, bbox: p.bbox, section: p.section, slab: p.slab };
+    return { id: st.p3, bbox: p.bbox, section: p.section, slab: p.slab, note: p.note || null };
   }
   const at = st.at || { z: 1.5, lat: 12, lon: 160 };
   const lonSpan = Math.min(40, Math.max(4, (360 / 2 ** at.z) * 2.2));
@@ -161,7 +164,8 @@ function build() {
         h('div', { class: 'd3-stage', id: 'd3-stage', role: 'region', 'aria-label': t('d3.stage') },
           h('div', { class: 'd3-status', id: 'd3-status', role: 'status', 'aria-live': 'polite' })),
         h('div', { class: 'd3-legend', id: 'd3-legend' }),
-        h('p', { class: 'hint d3-caption', id: 'd3-caption' })),
+        h('p', { class: 'hint d3-caption', id: 'd3-caption' }),
+        h('p', { class: 'hint d3-note', id: 'd3-note', hidden: true })),
       h('section', { class: 'd3-stats', id: 'd3-stats', 'aria-label': t('d3.statsH') })));
 
   $('d3-preset').addEventListener('change', (e) => { C.state.p3 = e.target.value; C.state.x3 = 0; commit(); sync(); if (scene) scene.reset(); });
@@ -195,6 +199,13 @@ async function sync() {
   $('d3-slab').disabled = !region.slab;
   $('d3-slab-hint').textContent = t(region.slab ? 'd3.slabHint' : region.id === 'view' ? 'd3.slabNoneView' : 'd3.slabNone');
   $('d3-reset').disabled = st.m3 !== '3d' || webgl === false;
+  const note = $('d3-note');
+  note.hidden = !region.note;
+  if (region.note) {
+    // a link only: the relocated catalogue is not redistributed here (docs/basemap.md)
+    note.replaceChildren(t(`d3.note.${region.note}`), ' ',
+      h('a', { href: 'https://doi.org/10.5281/zenodo.8089273', target: '_blank', rel: 'noopener', text: t('d3.note.turkeyLink') }));
+  }
   const my = ++syncToken;
   setStatus(t('d3.loading'));
   let ev, slab = null;

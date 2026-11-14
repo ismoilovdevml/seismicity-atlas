@@ -831,4 +831,7 @@ export default {
   "mon.zwInsuf": "too few events to compare",
   "mon.zwCtxWithin": "“More productive” compares with the typical sequence of Page et al. (2016) for this region. Against ETAS fits to global subduction sequences, this sequence is within the range of global subduction sequences (Zhang & Werner 2020), so the label says more about the reference than about the sequence.",
   "mon.zwCtxAbove": "“More productive” compares with the typical sequence of Page et al. (2016) for this region; it is also above the range of the global subduction sequences of Zhang & Werner (2020).",
+  "d3.p.turkey": "Türkiye 2023 (Kahramanmaraş)",
+  "d3.note.turkey": "The 2023 Mw 7.8 and Mw 7.6 Kahramanmaraş earthquakes ruptured the East Anatolian Fault zone. The dots are the global catalogue (M ≥ 5 or 6); for the full sequence see the",
+  "d3.note.turkeyLink": "high-precision relocations (Lomax 2023, 28,264 events M ≥ 1.5, CC BY 4.0)",
 };

@@ -829,4 +829,7 @@ export default {
   "mon.zwInsuf": "taqqoslash uchun hodisalar juda kam",
   "mon.zwCtxWithin": "“Mahsuldorroq” Page va boshq. (2016) bo‘yicha shu mintaqaning odatiy ketma-ketligi bilan taqqoslaydi. Global subduksiya ketma-ketliklariga moslangan ETAS modellari bilan solishtirilganda bu ketma-ketlik global subduksiya ketma-ketliklari oralig‘ida (Zhang & Werner 2020), demak bu belgi ketma-ketlikdan ko‘ra ko‘proq taqqoslash asosi haqida gapiradi.",
   "mon.zwCtxAbove": "“Mahsuldorroq” Page va boshq. (2016) bo‘yicha shu mintaqaning odatiy ketma-ketligi bilan taqqoslaydi; u Zhang & Werner (2020) global subduksiya ketma-ketliklari oralig‘idan ham yuqori.",
+  "d3.p.turkey": "Turkiya 2023 (Kahramanmarash)",
+  "d3.note.turkey": "2023 yilgi Mw 7.8 va Mw 7.6 Kahramanmarash zilzilalari Sharqiy Anadolu yoriqlar zonasini yorib o‘tdi. Nuqtalar global katalog (M ≥ 5 yoki 6); butun ketma-ketlik uchun qarang:",
+  "d3.note.turkeyLink": "yuqori aniqlikdagi qayta joylashtirishlar (Lomax 2023, 28 264 hodisa M ≥ 1.5, CC BY 4.0)",
 };

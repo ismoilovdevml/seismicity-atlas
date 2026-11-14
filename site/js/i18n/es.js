@@ -828,4 +828,7 @@ export default {
   "mon.zwInsuf": "muy pocos eventos para comparar",
   "mon.zwCtxWithin": "«Más productiva» compara con la secuencia típica de Page et al. (2016) para esta región. Frente a ajustes ETAS de secuencias de subducción globales, esta secuencia está dentro del rango de las secuencias de subducción globales (Zhang & Werner 2020), así que la etiqueta dice más de la referencia que de la secuencia.",
   "mon.zwCtxAbove": "«Más productiva» compara con la secuencia típica de Page et al. (2016) para esta región; también está por encima del rango de las secuencias de subducción globales de Zhang & Werner (2020).",
+  "d3.p.turkey": "Turquía 2023 (Kahramanmaraş)",
+  "d3.note.turkey": "Los terremotos de Kahramanmaraş de 2023 (Mw 7.8 y Mw 7.6) rompieron la zona de falla de Anatolia Oriental. Los puntos son el catálogo global (M ≥ 5 o 6); para la secuencia completa véanse las",
+  "d3.note.turkeyLink": "relocalizaciones de alta precisión (Lomax 2023, 28 264 eventos M ≥ 1.5, CC BY 4.0)",
 };
