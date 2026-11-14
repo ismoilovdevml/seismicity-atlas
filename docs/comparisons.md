@@ -168,3 +168,81 @@ What this shows:
 (Woessner & Wiemer 2005; Mignan & Woessner 2012), which is why the atlas uses MAXC + 0.2. The single-window Mc is
 0.2 lower than our latest-period Mc in the median cell. Global inputs were not run (the Italy cells already test
 the estimator on 144 independent circles).
+
+## 4. Subduction-zone ETAS productivity (Zhang, Werner & Goda 2020)
+
+Licence: a journal article (BSSA 110(1), 191–212, doi:10.1785/0120190121), read from the annotated manuscript on
+Zenodo (record 4270128, marked "other-pd"). Only parameter values are used, quoted as facts with the citation.
+
+The paper's only numeric ETAS table is Table 6, suggested parameters for future M 9.0 events: K0 = 0.04 ± 0.02,
+α = 2.3 (fixed), c = 0.03 ± 0.01 day, p = 1.21 ± 0.08, d = 23.48 ± 18.17 km², γ = 1.61 ± 0.29, q = 1.68 ± 0.55
+(Mcut 4.5, NEIC). Per-region and per-sequence estimates appear only in figures. Table 2 gives the counts of
+M ≥ 4.5 events of the 36 individual sequences, which we use as the reference. The monitor now stores the comparison
+as data fields; the method, table and results are in [monitor.md](monitor.md) §9.
+
+**Verdict:** the seven shallow subduction sequences of the current monitor have count-to-direct-ETAS ratios of
+2.3–6.0, inside the range of the published sequences (1.2–10.4, median 2.9; percentiles 29–86). Six of them are
+"more productive" against the generic Page et al. (2016) parameters, so that label at least partly reflects the
+reference, not unusual sequences.
+
+## 5. CSEP-style testing of the monitor (Savran et al. 2020; pyCSEP)
+
+**Sources and licence.** Savran, W., Werner, M. J., Marzocchi, W., Rhoades, D., Jackson, D., Milner, K., Field, E.,
+Michael, A. (2020), "Pseudoprospective evaluation of UCERF3-ETAS forecasts during the 2019 Ridgecrest sequence",
+BSSA, doi:10.1785/0120200026 (abstract read; full text not read). pyCSEP (github.com/cseptesting/pycsep) is
+BSD-3-Clause. Savran et al. evaluate forecasts made of simulated catalogues, which relaxes the Poisson assumption of
+the older CSEP tests; they found that both UCERF3 variants "mildly overpredict the seismicity rate, on average".
+
+**Is a CSEP test meaningful for a descriptive Omori fit?**
+
+- **In-sample: no.** At the cut-off the fitted expected count equals the observed count by construction (the MLE of
+  K; checked in `tests/test_monitor.py`). An N-test on the fitted data would always pass and says nothing.
+- **Spatial (S) and magnitude (M) tests: no.** The monitor has no spatial model (one circle) and assumes one b.
+- **Out-of-sample number test: yes, as a retrospective check of the model form.** The fit is an inhomogeneous
+  Poisson rate. Integrating it beyond the learning span and comparing with what was recorded later asks whether
+  Omori-Utsu with Mc(t) describes how a sequence continues. This is a property of the description, so it is worth
+  knowing; it is run on completed sequences only and **is not shown on the site**.
+
+**Test.** `scripts/sci2/ntest_omori.py`, output `results/sci2_ntest.json`. For four completed sequences, with the
+monitor's own data rules and fit, learning spans of 3, 10 and 30 days and a testing span from there to day 365:
+the Poisson N-test as defined in pyCSEP (δ1 = P(N ≥ n_obs), δ2 = P(N ≤ n_obs); rejected when either is below
+0.025), and the same test against a Poisson mixture over 200 bootstrap refits of the learning data (parameter
+uncertainty).
+
+| Sequence (circle, Mcat) | Learning days | n learning | p | Observed, testing | Expected | Obs / exp | Poisson δ1, δ2 | Mixture δ1, δ2 |
+|---|---|---|---|---|---|---|---|---|
+| 2019 M 7.1 Ridgecrest (100 km, 2.8–2.9) | 3 | 509 | 1.31 | 615 | 260.9 | 2.36 | 0, 1 | 0, 1 |
+| | 10 | 713 | 1.14 | 411 | 355.9 | 1.15 | 0.002, 0.998 | 0.13, 0.88 |
+| | 30 | 729 | 1.13 | 211 | 189.8 | 1.11 | 0.07, 0.94 | 0.23, 0.79 |
+| 2024 M 7.5 Noto (100 km, 4.5 default) | 3 | 43 | 1.23 | 28 | 15.0 | 1.87 | 0.002, 0.999 | 0.23, 0.79 |
+| | 10 | 54 | 1.07 | 17 | 21.6 | 0.79 | 0.87, 0.19 | 0.66, 0.38 |
+| | 30 | 58 | 1.15 | 13 | 9.8 | 1.33 | 0.19, 0.88 | 0.29, 0.76 |
+| 2021 M 8.2 Chignik (250 km, 2.7–2.8) | 3 | 50 | 1.08 | 821 | 271.7 | 3.02 | 0, 1 | 0.0004, 1 |
+| | 10 | 84 | 1.19 | 787 | 149.7 | 5.26 | 0, 1 | 0, 1 |
+| | 30 | 179 | 1.03 | 587 | 180.3 | 3.26 | 0, 1 | 0, 1 |
+| 2025 M 8.8 Kamchatka (565 km, 4.5–4.6) | 3 | 411 | 0.86 | 874 | 1119.4 | 0.78 | 1, 1.4e−14 | 0.91, 0.09 |
+| | 10 | 700 | 0.94 | 975 | 784.8 | 1.24 | 3e−11, 1 | 0.019, 0.98 |
+| | 30 | 878 | 0.99 | 797 | 445.5 | 1.79 | 0, 1 | 0, 1 |
+
+Summary of the 12 tests: the Poisson N-test rejects 9; with parameter uncertainty 6 are rejected. Observed counts
+are above the extrapolated fit in 10 of 12 (median ratio 1.56). Only Ridgecrest after 10 and 30 days and Noto pass
+both versions.
+
+Why the fit under-predicts:
+
+- **No secondary sequences.** Large aftershocks start their own sequences; a single Omori law fitted to the first
+  days cannot contain them. This is what ETAS adds (Savran et al. use simulated ETAS catalogues for this reason).
+- **No background.** In the Chignik circle (250 km) ComCat lists many M ≥ 2.7 events unrelated to the mainshock.
+  A diagnostic variant adds the rate of the year before the mainshock, but every one of these pre-mainshock years
+  contains another sequence (the 2020 M 7.6 Sand Point earthquake for Chignik, the M 6.4 foreshock for Ridgecrest,
+  the 2025 M 7.4 foreshock for Kamchatka), so that background is an overestimate and the variant is not used for
+  a verdict (stored as `background_test` in the output).
+- **Early fits are steep.** After 3 days, p is resolved poorly or traded against c (Ridgecrest p = 1.31 at day 3,
+  1.14 at day 10). Kamchatka after 3 days has p = 0.86 and over-predicts.
+- **Poisson is too narrow** for clustered seismicity, which is why the parameter-uncertainty mixture rejects fewer
+  cases; a full catalogue-based test would need ETAS simulations.
+
+**Decision.** The monitor remains descriptive. The N-test confirms that the fitted curve must not be extended past
+the cut-off: in 9 of 12 cases the extrapolation is statistically inconsistent with what followed. This supports the
+existing rules (no curve beyond the cut-off, no expected future counts, `check_monitor.py` guards). Nothing from the
+test is written to `site/data`.
