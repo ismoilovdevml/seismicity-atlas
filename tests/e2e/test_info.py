@@ -55,6 +55,12 @@ def test_every_info_button_opens_its_concept_and_back_returns(site, view):
         const k = (blk ? blk.tagName + (blk.id || blk.className) : '') + '|' + b.dataset.concept;
         if (seen.has(k) && seen.get(k) === blk) bad.push(k); seen.set(k, blk); }} return bad; }}""")
     assert not dup, dup
+    # The app rewrites a short hash (e.g. "#v=sequences") into its full form (adds g, mode, lang). On a slow CI
+    # runner that can happen after the page looks ready, so wait for it before recording where we started.
+    try:
+        pg.wait_for_function("location.hash.includes('lang=')", timeout=10000)
+    except Exception:
+        pass
     start = pg.evaluate("location.hash")
     n = len(concepts)
     for i in range(n):
@@ -68,7 +74,8 @@ def test_every_info_button_opens_its_concept_and_back_returns(site, view):
         pg.click(".lr-top [data-learn=back]")
         pg.wait_for_function(f"!location.hash.includes('v=learn')")
         back = pg.evaluate("location.hash")
-        assert params(back) == params(start), (view, cid, start, back)
+        # every parameter of the starting state comes back (the app may add defaults it had not yet written)
+        assert params(start).items() <= params(back).items(), (view, cid, start, back)
         pg.wait_for_selector(ready_sel, timeout=20000)
         pg.wait_for_function(f"({VISIBLE})().length === {n}", timeout=20000)
     if view in ("map", "compare"):
