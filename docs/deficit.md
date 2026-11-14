@@ -21,7 +21,7 @@ Code: `scripts/deficit/` (`fetch_deficit.py`, `build_deficit.py`, `figures_defic
 ```
 
 `fetch_deficit.py` needs `gdal_translate` (GDAL) on the host. It converts the NetCDF-4 grids of Ou et al. to classic
-NetCDF, which scipy can read. These scripts are not yet in `scripts/run_all.sh`; that happens at integration.
+NetCDF, which scipy can read. These scripts are not in `scripts/run_all.sh` (the layer needs GDAL and is rebuilt by hand); the site reads the committed output.
 
 ## Sources and licences
 
@@ -266,7 +266,7 @@ Feature properties (regions and cells):
 | `mc_bal` | Mw | median corner magnitude that balances the full-coupling geodetic budget at the observed Mw ≥ 6 rate |
 | `unbal` | 0–1 | fraction of draws where no corner magnitude ≤ 10.5 balances the budget |
 
-Display guidance (no UI was written): show `r_obs` with its interval and `p_full` together, as in "observed / geodetic
+Display guidance (implemented in v0.3.1 by `site/js/deficit.js`, the Scientist-view layer and its panel): show `r_obs` with its interval and `p_full` together, as in "observed / geodetic
 = 1.4 (0.9–9.0); full-coupling catalogues release less than this 81 % of the time". Grey out `few`. Put the
 disclaimer from `index.json` next to the layer. Never colour a cell red for a "deficit" without `p_full` < 0.05,
 which no zone currently reaches.
