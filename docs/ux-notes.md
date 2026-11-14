@@ -251,3 +251,103 @@ Kiev/Киев, zurich, Ташкент and accent-free queries return the same fi
   shows an error with "Try again" if `rating.json` fails; the Scientist switch shows the loading line while the cells
   load and an error with "Try again" if they fail.
 - b-value legend ticks on phones 9.5 px → 10.5 px.
+
+## v0.3.1 (2026-11-15)
+
+### Crameri colour maps for the b classes
+
+**Licence.** Crameri, F. (2023), *Scientific colour maps* 8.0.1, Zenodo, doi:10.5281/zenodo.8409685. The Zenodo record
+gives the licence id `mit-license`, and `+LICENCE.pdf` in `ScientificColourMaps8.zip` reads: "The Scientific colour maps
+are licensed under a MIT License. Copyright (c) 2023, Fabio Crameri. Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software [...] The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software." The notice is kept in `scripts/crameri.py`, which holds
+the 256-step tables of vik, batlow and lajolla.
+
+**Method.** Six class colours were sampled from each candidate map symmetrically about b = 1 (the map centre) and run
+through the `dataviz` validator (`validate_palette.js`): each arm (centre to end) as an ordinal ramp, and all six as an
+adjacent-pair categorical check for colour-vision deficiency (CVD) and the normal-vision floor, against the land colour
+of each theme (`#e4e1d9` light, `#2a2e33` dark). For vik and berlin the class positions were also searched on a 0.01 grid
+for the best passing set. Results (worst adjacent pair; ΔE is OKLab × 100):
+
+| Palette | Theme | Arms monotone, ΔL ≥ 0.06 | Light-end contrast vs land | CVD ΔE (≥ 8) | Normal-vision ΔE (≥ 15) | Verdict |
+|---|---|---|---|---|---|---|
+| custom (v0.3.0) | light | pass | 1.57 and 1.29 (fail) | 12.1 | 14.3 (fail) | fail |
+| custom (v0.3.0) | dark | pass | 3.21 and 3.48 | 10.7 | 11.3 (fail) | fail |
+| vik, positions 0.06/0.20/0.36 | light | pass | 1.67 (fail) | 9.8 | 13.6 (fail) | fail |
+| **vik, positions 0/0.16/0.31** | **light** | **pass** | **2.0 or more** | **12.3** | **18.1** | **all checks pass** |
+| broc | light | pass | 1.66, 1.23 (fail) | 12.3 | 13.2 (fail) | fail |
+| roma | light | single-hue fail (58°) | 1.39, 1.43 (fail) | 14.5 | 16.1 | fail |
+| vik, best of grid | dark | – | 1.68 | – | 12.7 | no passing set (69 passing sets in light, 0 in dark) |
+| berlin, best of grid | dark | single-hue fail | 1.74 | – | 13.7 | no passing set |
+| batlow, lajolla (6 steps) | both | single-hue fail (124°, 59°) | fail | – | – | not used for the site's one-hue sequential layers |
+
+**Decision.**
+
+- **Light theme: switched to vik.** The classes are `#001261 #05528a #5d9cbb | #cf8c66 #a74310 #590008`
+  (`layers.js` `B_LIGHT`, `scripts/crameri.py` `VIK_B_POS`). This set passes every check where the old palette failed
+  two. On the map the two classes next to b = 1 now stand out from the land colour, and the extremes are darker (navy and
+  dark red-brown).
+- **Dark theme: kept the custom steps.** No Crameri diverging map has a passing set against the dark land colour: vik's
+  ends and berlin's dark centre sink into the land. The dataviz method selects dark-mode steps separately, and the old
+  dark steps are the better of the failing options (contrast passes). Their normal-vision floor (11.3) is listed in
+  known issues.
+- **Sequential layers (Mc, rate, depth) unchanged.** batlow and lajolla are multi-hue, while the site's sequential
+  layers use one hue on purpose, so lightness alone carries the order. batlow, lajolla and vik are used in the paper
+  figures (`scripts/paper_figures.py`), where a Crameri map is the field norm.
+
+Before and after (Scientist view, b layer, light theme, the same view; the "after" image is made by
+`tests/e2e/tools/readme_shots.py --only b-palette-after`; the "before" image was made once with the v0.3.0 palette):
+
+![b classes before (v0.3.0 palette)](img/ux/b-palette-before.png)
+
+![b classes after (Crameri vik)](img/ux/b-palette-after.png)
+
+### Case studies: a view of its own, not a Learn page
+
+The Groningen case study is a separate view (`#v=cases&cs=groningen`, "Case studies" in both menus), not a Learn page.
+A Learn page has a fixed shape (one idea, one example, one diagram) and explains a concept used everywhere; the case
+study is a data product with its own licence duties (the KNMI DOI, "Source: NLOG.NL", no single events), five charts, a
+map and a validation table, and it is the place where later case studies go. Learn links to it from the new concept
+`induced-seismicity` (its example button opens the case study), and the case study's (i) buttons open Learn.
+
+- **Plain language first, for every visitor.** The page opens with the "not a forecast" notice and six sentences whose
+  numbers come from `rates.json` (no number is typed into the text), then "Details for scientists". The order is the same
+  in both modes; a test checks it in the Simple view.
+- **Two measures, two charts.** Monthly production and the 12-month earthquake count are two charts on one time axis
+  (the dataviz rule against dual axes), with the policy milestones as dashed rules and the ML ≥ 3.4 events as solid
+  rules, and a milestone list below.
+- **b everywhere with its interval.** The phase table shows b [95 %] and n for the three estimators and greys quality C
+  and insufficient values; the moving b-positive chart draws both sub-fields with their bootstrap bands; the b map uses
+  the atlas b classes (`--b-0` … `--b-5`, the same steps as the map in each theme), fades quality B and greys C and
+  insufficient nodes, and its hover gives b [95 %] and n.
+
+### Seismic-deficit layer
+
+- **Colour by significance only.** A zone is coloured as a deficit only when `p_full < 0.05`; otherwise it takes one
+  neutral series colour ("no deficit beyond catalogue noise"). The pair (blue `#2a78d6` / orange `#eb6834` in light,
+  `#3987e5` / `#d95926` in dark, the dataviz reference slots 1 and 2) passed the validator in both themes against the
+  land colour (CVD ΔE 21.6 / 20.7, normal-vision ΔE 32.3 / 30.4, contrast ≥ 3:1). Red is never used. `few` and `nogeod`
+  zones take the no-data grey with the atlas hatch.
+- **No ratio without its interval and p_full.** Every ratio string on the page comes from one function
+  (`ratioText()` in `deficit.js`) that prints value, 95 % interval and p_full together; the tooltip, the panel and the
+  chart table use it, and a browser test checks every `[data-ratio]` element and the chart table.
+- **The headline is worded from the data.** "No detectable deficit beyond catalogue noise" is shown when no region
+  with enough events has `p_full < 0.05`, in the legend and at the top of the panel; otherwise the panel names the
+  regions. The five caveats and the disclaimer are always in the panel.
+- **Map data.** The map source gets only `id`, `q` and `p_full`: MapLibre encodes integer feature properties as varints
+  in its worker, and moment rates such as 3.03e19 N m/yr overflow them ("Given varint doesn't fit into 10 bytes"). The
+  tooltip and the panel read the full record by id.
+
+### Other changes
+
+- Ongoing cards: one more line, "Productivity, ETAS reference", and a note when Page et al. (2016) says "more
+  productive" but the sequence is within the Zhang & Werner (2020) range of global subduction sequences.
+- Depth 3D: Türkiye 2023 preset; the relocated catalogue is a link under the view.
+- Learn: a seventh group ("Case studies and budgets") with the two new concepts.
+
+ui-ux-pro-max (`--domain chart`, "confidence interval uncertainty chart") gave "line with confidence band" with a
+visible table as the accessibility fallback; that is how the moving b-positive chart and the interval charts are
+built. frontend-design: the existing tokens (Inter, IBM Plex Mono, accent `#0E6B73`, warm neutrals) were kept; the one
+new emphasis is the summary card at the top of the case study.

@@ -13,11 +13,11 @@ VIEWS = {
         "depth-and-slabs", "gutenberg-richter-b-value", "quality-codes", "magnitude-of-completeness",
         "catalogue-consistency", "rate-m6", "regional-catalogues", "plate-boundary-classes", "magnitude-types",
         "direct-vs-proxy-mw", "not-a-forecast", "h3-cells-and-sample-radius", "confidence-interval-bootstrap",
-        "b-positive", "declustering", "frequency-magnitude-distribution"}),
+        "b-positive", "declustering", "frequency-magnitude-distribution", "seismic-moment-budget"}),
     "compare": (f"#v=map&l=b&d=sh&c={B_OVER}&k={A}&g=0", ".cmp-verdict", {
         "confidence-interval-bootstrap", "h3-cells-and-sample-radius", "depth-and-slabs", "gutenberg-richter-b-value",
         "quality-codes", "magnitude-of-completeness", "catalogue-consistency", "rate-m6", "regional-catalogues",
-        "plate-boundary-classes", "magnitude-types", "direct-vs-proxy-mw", "not-a-forecast"}),
+        "plate-boundary-classes", "magnitude-types", "direct-vs-proxy-mw", "not-a-forecast", "seismic-moment-budget"}),
     "sequences": ("#v=sequences", ".seq", {"omori-utsu", "magnitude-of-completeness", "aftershock-productivity-bath", "not-a-forecast"}),
     "monitor": ("#v=monitor", ".info-key", {"not-a-forecast", "omori-utsu", "gutenberg-richter-b-value", "quality-codes", "b-positive",
                                            "aftershock-productivity-bath", "magnitude-of-completeness"}),
@@ -26,6 +26,8 @@ VIEWS = {
                                          "magnitude-of-completeness", "confidence-interval-bootstrap", "quality-codes", "b-positive",
                                          "gutenberg-richter-b-value", "omori-utsu", "not-a-forecast"}),
     "about": ("#v=about", ".src-list", {"not-a-forecast", "catalogue-consistency"}),
+    "cases": ("#v=cases&cs=groningen", ".cs-bmap svg", {"induced-seismicity", "not-a-forecast", "confidence-interval-bootstrap",
+                                                       "b-positive", "gutenberg-richter-b-value"}),
 }
 
 VISIBLE = """() => [...document.querySelectorAll('.info-btn')].filter((b) => {
@@ -107,6 +109,7 @@ def test_info_buttons_keyboard_and_language(site):
     ("monitor", "#v=monitor", ".info-key", "#view-monitor"),
     ("methods", "#v=methods", ".steps .info-btn", "#view-methods"),
     ("about", "#v=about", ".notice .info-btn", "#view-about"),
+    ("cases", "#v=cases&cs=groningen", ".cs-bmap svg", "#view-cases"),
 ])
 def test_info_buttons_fit_at_360px(site, name, hash_, ready, scope):
     pg = site.open(hash_, viewport="phone", ready=False)

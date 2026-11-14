@@ -19,4 +19,6 @@ export default {
   'catalogue-consistency': [`Concordancia entre catálogos`, `Dónde ComCat e ISC-GEM concuerdan o discrepan en magnitud y localización.`],
   'regional-catalogues': [`Catálogos regionales`, `Las redes nacionales densas detectan terremotos mucho menores, en su propia escala de magnitud.`],
   'not-a-forecast': [`No es un pronóstico`, `Por qué las estadísticas de los catálogos no dicen cuándo ni dónde será el próximo terremoto.`],
+  'induced-seismicity': [`Sismicidad inducida`, `Terremotos causados por las personas: la extracción de gas en Groningen y lo que muestra el registro.`],
+  'seismic-moment-budget': [`Balance de momento sísmico`, `Comparar la deformación que mide el GNSS con los terremotos que la liberaron, y por qué 120 años son pocos.`],
 };

@@ -397,4 +397,39 @@ export const EXAMPLES = {
       data: { counts: full, y0, mean },
     };
   },
+
+  // v0.3.1: the Groningen case study (site/data/induced/groningen/rates.json)
+  async 'induced-seismicity'() {
+    const r = await getJSON('induced/groningen/rates.json');
+    const ph = Object.fromEntries(r.phases.map((p) => [p.start, p]));
+    const rise = ph['2003-01'], restr = ph['2014-01'], after = ph['2023-10'];
+    const a = r.annual;
+    let peak = 0, peakYear = null;
+    a.prod_bcm.forEach((v, i) => { if (v !== null && v > peak) { peak = v; peakYear = a.year[i]; } });
+    const per = (p) => f.interval(p.rate_per_yr, p.rate_lo, p.rate_hi, (v) => f.fixed(v, 1));
+    return {
+      vars: { mc: f.mag(r.mc), rise: per(rise), restr: per(restr), after: per(after), peak: f.fixed(peak, 1), peakYear: String(peakYear),
+        rho: f.fixed(r.correlation.spearman_rho, 2), rho1: f.fixed(r.correlation.lag1_rho, 2), years: r.correlation.years.replace('-', '–') },
+      map: '#v=cases&cs=groningen',
+      mapLabel: 'learn.openCase',
+      data: { years: a.year, n: a.n_ge15, prod: a.prod_bcm, months: a.months, mc: r.mc },
+    };
+  },
+
+  // v0.3.1: the seismic-deficit layer (site/data/deficit/index.json). A ratio is never given without its interval and p_full.
+  async 'seismic-moment-budget'() {
+    const idx = await getJSON('deficit/index.json');
+    const by = Object.fromEntries(idx.regions.map((p) => [p.id, p]));
+    const w = by.tienshan, c = by.ts_central;
+    const r2 = (v) => f.fixed(v, 2);
+    const yrs = +idx.data_cutoff_utc.slice(0, 4) - 1964 + 1;
+    return {
+      vars: { r: r2(w.r_obs), lo: r2(w.r_obs_lo), hi: r2(w.r_obs_hi), p: f.fixed(w.p_full, 2), mg: (w.mg / 1e19).toFixed(2), mgLo: (w.mg_lo / 1e19).toFixed(2), mgHi: (w.mg_hi / 1e19).toFixed(2),
+        cr: r2(c.r_obs), clo: r2(c.r_obs_lo), chi: r2(c.r_obs_hi), cp: f.fixed(c.p_full, 2), cm: f.fixed(c.mw_max, 2), cy: String(c.mw_max_yr), ck: f.fixed(c.r_obs / c.r_obs_x1, 1),
+        bal: f.fixed(w.mc_bal, 2), n6: f.int(w.n6) },
+      map: '#v=map&l=b&d=sh&df=1&dz=tienshan&at=3.6/41.5/80',
+      mapLabel: 'learn.showDeficit',
+      data: { mg: w.mg, rate6: w.n6 / yrs, b: idx.method.b_whole_belt.b, corner: w.mc_bal, robs: w.r_obs, lo: w.r_obs_lo, hi: w.r_obs_hi, p: w.p_full },
+    };
+  },
 };

@@ -34,6 +34,16 @@ const R = {
   iside: { text: 'ISIDe Working Group (2007). Italian Seismological Instrumental and Parametric Database (ISIDe). INGV.', doi: '10.13127/ISIDE' },
   geonet: { text: 'GeoNet Aotearoa New Zealand Earthquake Catalogue. GNS Science.', doi: '10.21420/0S8P-TZ38' },
   h3: { text: 'H3: a hexagonal hierarchical geospatial indexing system (documentation).', url: 'https://h3geo.org/docs/', urlLabel: 'h3geo.org/docs' },
+  dost2017: { text: 'Dost, B., Ruigrok, E. & Spetzler, J. (2017). Development of seismicity and probabilistic hazard assessment for the Groningen gas field. Netherlands Journal of Geosciences, 96(5), s235–s245.', doi: '10.1017/njg.2017.20' },
+  bourne2014: { text: 'Bourne, S. J., Oates, S. J., van Elk, J. & Doornhof, D. (2014). A seismological model for earthquakes induced by fluid extraction from a subsurface reservoir. Journal of Geophysical Research: Solid Earth, 119, 8991–9015.', doi: '10.1002/2014JB011663' },
+  kraaijpoel2022: { text: 'Kraaijpoel, D., Martins, J. E., Osinga, S., Vogelaar, B. & Breunese, J. (2022). Statistical analysis of static and dynamic predictors for seismic b-value variations in the Groningen gas field. Netherlands Journal of Geosciences, 101, e18.', doi: '10.1017/njg.2022.15' },
+  gulia2026: { text: 'Gulia, L. & Wiemer, S. (2026). Confirming b-value spatial variations in Groningen gas field using machine-learning-derived seismic data. Netherlands Journal of Geosciences, 105, e13892.', doi: '10.70712/NJG.v105.13892' },
+  knmi1993: { text: 'KNMI (1993). Netherlands Seismic and Acoustic Network. Royal Netherlands Meteorological Institute.', doi: '10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5' },
+  savage1997: { text: 'Savage, J. C. & Simpson, R. W. (1997). Surface strain accumulation and the seismic moment tensor. BSSA, 87(5), 1345–1353.', doi: '10.1785/BSSA0870051345' },
+  molnar2000: { text: 'Molnar, P. & Ghose, S. (2000). Seismic moments of major earthquakes and the rate of shortening across the Tien Shan. Geophysical Research Letters, 27(16), 2377–2380.', doi: '10.1029/2000GL011637' },
+  kagan2002: { text: 'Kagan, Y. Y. (2002). Seismic moment distribution revisited: I. Statistical results. Geophysical Journal International, 148, 520–541.', doi: '10.1046/j.1365-246X.2002.01594.x' },
+  chang2025: { text: 'Chang, F. et al. (2025). Geodetic strain rates, slip deficit rates, and seismic potential in the Tianshan, Central Asia. Geophysical Research Letters, 52, e2025GL118470.', doi: '10.1029/2025GL118470' },
+  ou2026: { text: 'Ou, Q., Elliott, J., Maghsoudi, Y., Rollins, C., Lazecký, M. & Wright, T. (2026). GNSS and InSAR velocities, vorticity and strain rates across the Tian Shan. Zenodo (data).', doi: '10.5281/zenodo.20293601' },
   gem: { text: 'GEM Foundation: Global Seismic Hazard Map (the official-style hazard product the atlas links to; it is not part of the atlas).', url: 'https://maps.openquake.org/map/global-seismic-hazard-map/', urlLabel: 'maps.openquake.org' },
 };
 
@@ -57,4 +67,6 @@ export const REFS = {
   'depth-and-slabs': [R.nishikawa2014, R.hayes2018, R.michael2014],
   'rate-m6': [R.michael2014, R.birdKagan2004],
   'not-a-forecast': [R.kagan2013, R.marzocchi2020, R.gem],
+  'induced-seismicity': [R.dost2017, R.bourne2014, R.kraaijpoel2022, R.gulia2026, R.knmi1993],
+  'seismic-moment-budget': [R.savage1997, R.molnar2000, R.kagan2002, R.birdKagan2004, R.chang2025, R.ou2026],
 };

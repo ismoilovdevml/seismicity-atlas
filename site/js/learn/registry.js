@@ -2,7 +2,7 @@
 // reading order of the index and of the previous/next links. Text lives in content/<lang>/<id>.js; the real-data
 // example in examples.js; the interactive diagram in diagrams/<diagram>.js.
 
-export const GROUPS = ['magnitudes', 'completeness', 'uncertainty', 'sequences', 'space', 'caveats'];
+export const GROUPS = ['magnitudes', 'completeness', 'uncertainty', 'sequences', 'space', 'caveats', 'applied'];
 
 export const CONCEPTS = [
   { id: 'magnitude-types', group: 'magnitudes', diagram: 'saturation' },
@@ -24,6 +24,9 @@ export const CONCEPTS = [
   { id: 'regional-catalogues', group: 'caveats', diagram: 'regional-ladder' },
   { id: 'not-a-forecast', group: 'caveats', diagram: 'poisson' },
   { id: 'recording-rating', group: 'caveats', diagram: 'rating-ladder' },
+  // v0.3.1: the concepts behind the Case studies view and the seismic-deficit layer
+  { id: 'induced-seismicity', group: 'applied', diagram: 'induced-lag' },
+  { id: 'seismic-moment-budget', group: 'applied', diagram: 'moment-budget' },
 ];
 
 export const byId = new Map(CONCEPTS.map((c) => [c.id, c]));

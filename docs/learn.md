@@ -33,7 +33,8 @@ one stylesheet link. Nothing under `site/js/learn/` is fetched on a first visit 
 ## Concept registry
 
 Groups: **Magnitudes**, **Completeness & b-value**, **Uncertainty & quality**, **Sequences**, **Space & tectonics**,
-**Data & caveats**. Languages: all 19 concepts are complete in English, Uzbek (Latin), Russian and Spanish.
+**Data & caveats**, **Case studies and budgets** (v0.3.1). Languages: all 21 concepts are complete in English, Uzbek
+(Latin), Russian and Spanish.
 
 | # | Concept id | Group | Diagram (module) | Real example: data and selection rule |
 |---|---|---|---|---|
@@ -56,19 +57,24 @@ Groups: **Magnitudes**, **Completeness & b-value**, **Uncertainty & quality**, *
 | 17 | `regional-catalogues` | caveats | Magnitude ladder: regional typical Mc against the global floor (`regional-ladder`) | `regional/index.json`; latest shallow floor from `manifest.json` |
 | 18 | `not-a-forecast` | caveats | Real yearly counts next to a random history with the same mean (animated) (`poisson`) | main cell* `rate_comcat_m45` yearly counts (`cells/<id>.json`) |
 | 19 | `recording-rating` | caveats | Quality code, catalogue check and Mc controls give the rating; bars count the real cells per rating, with a data table (`rating-ladder`) | `cells.geojson` through `recordingRating()` (`places.js`), the same function as the place card; the Very good cell with most events above threshold, the Limited cell with most events; global shallow Mc from `manifest.json` |
+| 20 | `induced-seismicity` | applied | Groningen annual production against the earthquakes of the same, next or second year, with the Spearman ρ recomputed for the chosen lag; play adds the years (`induced-lag`) | `induced/groningen/rates.json`: phase rates with intervals, peak production, correlations; the example button opens the Case studies view |
+| 21 | `seismic-moment-budget` | applied | Geodetic budget of the whole Tien Shan belt against a seeded, fully coupled synthetic catalogue (observed Mw ≥ 6 rate, belt b, balancing corner magnitude); catalogue-length slider and a table of 200 histories (`moment-budget`) | `deficit/index.json`: whole-belt and central ratios, always with 95 % interval and p_full; the example button opens the map with the deficit layer |
 
 \* **Main cell**: the shallow quality-A cell with the most events above threshold inside the Tonga-Kermadec box
 (14–38° S, 172° E–170° W); if there is none, the quality-A cell with the most events anywhere. Selection is by rule,
 so the examples survive the monthly refresh; all numbers in the example text are placeholders filled from the data.
 
 **Synthetic diagrams** (`saturation`, `b-positive`, `decluster`, the strip of the `omori` diagram, the random row of
-`poisson`) say so in their captions and use seeded random numbers, so they look the same on every visit.
+`poisson`, `moment-budget`) say so in their captions and use seeded random numbers, so they look the same on every visit.
 
 **Numbers in the text.** Every result number on a page is a `{placeholder}` filled from `site/data`. The text itself
 contains only method constants that are documented in `docs/method.md` and `docs/data-schema.md` (for example
 MAXC + 0.2, the 70 km depth split, the Gardner-Knopoff window formulas, 1964–2021 for the rate).
 
-**Further reading.** All references are cited in `docs/*.md` or the README, except **Båth (1965)**,
+**Further reading.** The v0.3.1 concepts cite works named in `docs/induced.md` and `docs/deficit.md` (Dost et al. 2017,
+Bourne et al. 2014, Kraaijpoel et al. 2022, Gulia & Wiemer 2026, the KNMI network DOI, Savage & Simpson 1997, Molnar &
+Ghose 2000, Kagan 2002, Bird & Kagan 2004, Chang et al. 2025, Ou et al. 2026); their DOIs were checked against Crossref
+(DataCite for the two data DOIs) on 2026-11-15. All references are cited in `docs/*.md` or the README, except **Båth (1965)**,
 doi:10.1016/0040-1951(65)90003-X, and **Hayes et al. (2018, Slab2)**, doi:10.1126/science.aat4723, which were added
 for Learn. All DOIs except the CORSSA one (DataCite, taken from `docs/prior-work.md`) were checked against Crossref on
 2026-11-14.
@@ -134,7 +140,7 @@ Buttons in the static map controls are placed by `site/js/info-rail.js` and rela
 | View | Buttons |
 |---|---|
 | Disclaimer strip (every view) | 1 |
-| Map controls (rail) | 10 |
+| Map controls (rail) | 11 (v0.3.1: `seismic-moment-budget` next to the deficit overlay) |
 | Legend (b layer with plates and events on; regional block when a region is chosen) | 1 title + 1 per overlay or region block (3 with plates and events) |
 | Cell panel (global cell, with charts) | 12 |
 | Comparison verdict | 2 (3 when the cells come from different catalogues) |
@@ -143,6 +149,8 @@ Buttons in the static map controls are placed by `site/js/info-rail.js` and rela
 | Depth 3D | 4 |
 | Validation | 10 |
 | About | 2 |
+| Case studies (v0.3.1) | 6: `induced-seismicity` (title), `not-a-forecast` (notice), `confidence-interval-bootstrap` (phase rates), `b-positive` (b by phase, moving b-positive), `gutenberg-richter-b-value` (b map) |
+| Deficit legend block and panel (v0.3.1) | 1 each: `seismic-moment-budget` |
 
 ### Simple view (v0.3: `simple.js`)
 

@@ -19,4 +19,6 @@ export default {
   'catalogue-consistency': [`Kataloglar mosligi`, `ComCat va ISC-GEM magnituda va joylashuv boʻyicha qayerda mos keladi yoki farq qiladi.`],
   'regional-catalogues': [`Mintaqaviy kataloglar`, `Zich milliy tarmoqlar oʻz magnituda shkalasida ancha kichik zilzilalarni ham qayd etadi.`],
   'not-a-forecast': [`Prognoz emas`, `Nega katalog statistikasi keyingi zilzila qachon yoki qayerda boʻlishini aytmaydi.`],
+  'induced-seismicity': [`Induksiyalangan seysmiklik`, `Inson faoliyati keltirib chiqargan zilzilalar: Groningendagi gaz qazib olish va yozuvlar nimani ko‘rsatadi.`],
+  'seismic-moment-budget': [`Seysmik moment balansi`, `GNSS o‘lchagan deformatsiyani uni bo‘shatgan zilzilalar bilan taqqoslash va nega 120 yil qisqa.`],
 };

@@ -20,6 +20,21 @@ let popup = null;
 let events = { e6: null, e5: null, loading5: null, added: false, years: [1904, 2026] };
 const tip = () => document.getElementById('tooltip');
 
+// Overlay modules (deficit.js) register hover, click, legend and theme handlers here, so the map keeps one event path.
+// handler: {layers: [ids], tip(props) -> node, click(props), legend() -> node|null, apply(), theme()}
+const overlays = [];
+export function addOverlay(handler) { overlays.push(handler); }
+export const getMap = () => map;
+function overlayAt(pt) {
+  for (const o of overlays) {
+    const ids = o.layers.filter((id) => map.getLayer(id) && map.getLayoutProperty(id, 'visibility') !== 'none');
+    if (!ids.length) continue;
+    const ft = map.queryRenderedFeatures(pt, { layers: ids })[0];
+    if (ft) return { o, ft };
+  }
+  return null;
+}
+
 function hatchImage() {
   const s = 16;
   const c = document.createElement('canvas');
@@ -134,6 +149,8 @@ function wire() {
   map.on('mousemove', (e) => {
     if (simple()) { simpleMove(e); return; }
     const evHit = queryEvents(e.point);
+    const ov = evHit ? null : overlayAt(e.point);
+    if (ov) { setHover(null); showTip(e.point, ov.o.tip(ov.ft.properties)); map.getCanvas().style.cursor = 'pointer'; return; }
     const cell = cellAt(e.point);
     setHover(cell ? { source: cell.source, id: cell.id } : null);
     if (evHit) showTip(e.point, eventTipNode(evHit.properties));
@@ -147,6 +164,8 @@ function wire() {
     if (simple()) { const ll = e.lngLat.wrap(); C.onPlace(ll.lat, ll.lng); return; }
     const evHit = queryEvents(e.point);
     if (evHit) { openEventPopup(evHit); return; }
+    const ov = overlayAt(e.point);
+    if (ov) { ov.o.click(ov.ft.properties); return; }
     const cell = cellAt(e.point);
     if (cell) C.onSelect(cell.properties.id);
   });
@@ -264,6 +283,7 @@ export function applyLayers() {
   map.setFilter('cells-sel', ['in', ['get', 'id'], selIds]);
   map.setFilter('cells-sel-case', ['in', ['get', 'id'], selIds]);
   applyRegion(st);
+  for (const o of overlays) if (o.apply) o.apply();
   applyEvents();
   applySimple();
   B.apply();
@@ -286,6 +306,7 @@ export function applyTheme() {
     map.setPaintProperty('rcells-hover', 'line-color', cssVar('--ink'));
     map.setPaintProperty('rcells-sel', 'line-color', cssVar('--ink'));
   }
+  for (const o of overlays) if (o.theme) o.theme();
   if (map.getLayer('events')) {
     map.setPaintProperty('events', 'circle-color', cssVar('--ink'));
     map.setPaintProperty('events', 'circle-stroke-color', cssVar('--surface'));
@@ -393,6 +414,7 @@ function renderLegend(def) {
       r.caveat ? h('span', { text: `${t('reg.caveat')}: ${r.caveat}` }) : null,
       h('span', { class: 'lg-count', text: t('reg.cells', { n: f.int(region.n), pass: f.int(region.pass) }) })));
   }
+  for (const o of overlays) { const n = o.legend && !simple() ? o.legend() : null; if (n) extra.push(n); }
   if (extra.length) kids.push(h('div', { class: 'lg-extra' }, extra));
   el.classList.toggle('has-bar', !!def.bar);
   el.replaceChildren(...kids);

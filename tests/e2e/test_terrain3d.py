@@ -130,7 +130,7 @@ def test_terrain_in_globe_mocked(site):
 
 # ---------------------------------------------------------------- Depth 3D view
 
-PRESETS = ["japan", "chile", "tonga", "hindukush", "italy", "iceland", "view"]
+PRESETS = ["japan", "chile", "tonga", "hindukush", "italy", "iceland", "turkey", "view"]
 
 
 def open_depth(site, hash_="#v=depth", **kw):
@@ -153,7 +153,7 @@ def test_depth_presets(site):
         pg.wait_for_function("() => /\\d events M/.test(document.getElementById('d3-caption').textContent)")
         n = int(re.search(r"([\d,]+) events M", pg.inner_text("#d3-caption")).group(1).replace(",", ""))
         assert n > 0 or p == "view", (p, n)
-        assert pg.is_disabled("#d3-slab") == (p in ("iceland", "view")), p
+        assert pg.is_disabled("#d3-slab") == (p in ("iceland", "turkey", "view")), p
         rows = pg.locator("#d3-stats .d3-bins tbody tr").count()
         assert rows == 6, (p, rows)
     pg.select_option("#d3-preset", "japan")

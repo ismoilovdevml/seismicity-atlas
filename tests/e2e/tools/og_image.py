@@ -41,7 +41,7 @@ CARD_CSS = """
 
 CARD_JS = """() => {
   const css = getComputedStyle(document.documentElement);
-  const colors = ['#1f4e8c', '#4f7fb8', '#9db8d6', '#ebc08f', '#d98a3d', '#a4501b'];
+  const colors = ['#001261', '#05528a', '#5d9cbb', '#cf8c66', '#a74310', '#590008']; // layers.js B_LIGHT (Crameri vik)
   const card = document.createElement('div');
   card.className = 'og-card';
   card.innerHTML = `<h1>Global Seismicity Atlas</h1>
@@ -70,7 +70,7 @@ def main():
         ctx = b.new_context(viewport={"width": 1200, "height": 630}, color_scheme="light", device_scale_factor=1)
         ctx.add_init_script("window.__gsaTestHook = (m) => { window.__map = m; };")
         pg = ctx.new_page()
-        pg.goto(f"http://127.0.0.1:{srv.server_port}/#v=map&l=b&d=sh&at=1.1/8/-165")
+        pg.goto(f"http://127.0.0.1:{srv.server_port}/#v=map&l=b&d=sh&at=1.1/8/-165&g=0&mode=pro&lang=en")
         pg.wait_for_selector("#map-status", state="hidden", timeout=60000)
         pg.add_style_tag(content=CARD_CSS)
         pg.evaluate(CARD_JS)
@@ -82,7 +82,7 @@ def main():
     srv.shutdown()
     try:
         from PIL import Image
-        im = Image.open(io.BytesIO(png)).convert("RGB").quantize(colors=96, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+        im = Image.open(io.BytesIO(png)).convert("RGB").quantize(colors=256, method=Image.Quantize.FASTOCTREE)
         im.save(OUT, optimize=True)
     except ImportError:
         OUT.write_bytes(png)

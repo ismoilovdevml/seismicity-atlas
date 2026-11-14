@@ -3,6 +3,27 @@
 Versions follow `scripts/release.json` (shown on the site from `site/data/manifest.json`). A patch is a data refresh
 with the same schema, a minor version a method, schema or website change; see [docs/release.md](docs/release.md).
 
+## 0.3.1 (2026-11-15)
+
+Website and new science. The atlas statistics (method, data cut-off) are those of 0.3.0.
+
+- Case studies view (`#v=cases&cs=groningen`): induced seismicity in the Groningen gas field. A plain-language summary,
+  then monthly production and earthquake rate, phase rates with Poisson intervals, b by phase (three estimators),
+  moving b-positive (north, south), b maps by period, and the validation against published studies. Shows "not a
+  forecast", the KNMI attribution with the network DOI and "Source: NLOG.NL"; no single events are offered.
+- Seismic-deficit layer, Tien Shan pilot (Scientist view, `df=1`, `dz=<zone>`, `dv=r|c`): regions or H3 cells, a legend
+  with the headline "no detectable deficit beyond catalogue noise", and a regional panel. Ratios are shown only with
+  their 95 % interval and p_full; `few` and `nogeod` zones are greyed and hatched.
+- Ongoing cards: the Zhang & Werner (2020) ETAS productivity reference next to Page et al. (2016), with a note that puts
+  a "more productive" label in context. `docs/data-schema.md` documents `productivity_zw2020`.
+- Depth 3D: Türkiye 2023 (Kahramanmaraş) preset, with a link to the Lomax (2023) relocated catalogue.
+- Learn: `induced-seismicity` and `seismic-moment-budget` (21 concepts, four languages), in a new group.
+- Light-theme b classes: six steps of the Crameri Scientific colour map vik (MIT licence). The dark theme is unchanged.
+- `scripts/paper_figures.py`: eight key figures at 300 dpi with Crameri maps in `docs/img/paper/`.
+- README: key-results table generated from the data (`scripts/readme_numbers.py`, also run by `run_all.sh` and the
+  monthly update), one screenshot script (`tests/e2e/tools/readme_shots.py`), and `tests/test_readme.py` as a guard.
+  Old v0.2/v0.3 screenshots that no document used were removed; the social card shows the new b classes.
+
 ## 0.3.0 (2026-11-14)
 
 Website release. Method and data cut-off are those of 0.2.0.

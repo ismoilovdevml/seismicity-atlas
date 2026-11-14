@@ -19,4 +19,6 @@ export default {
   'catalogue-consistency': [`Catalogue consistency`, `Where ComCat and ISC-GEM agree or disagree on magnitude and location.`],
   'regional-catalogues': [`Regional catalogues`, `Dense national networks see much smaller earthquakes, on their own magnitude scale.`],
   'not-a-forecast': [`Not a forecast`, `Why catalogue statistics do not say when or where the next earthquake will be.`],
+  'induced-seismicity': [`Induced seismicity`, `Earthquakes caused by people: gas production in Groningen, and what the record shows.`],
+  'seismic-moment-budget': [`Seismic moment budget`, `Comparing the strain that GNSS measures with the earthquakes that released it, and why 120 years is short.`],
 };

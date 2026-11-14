@@ -117,8 +117,13 @@ towards a photographic look, which this atlas avoids.
 
 ### What it shows
 
-- Presets: Japan, Chile and the Andes, Tonga–Kermadec, Hindu Kush–Pamir, Italy, Iceland, and "Current map view"
-  (a box around the map position in the URL, 4°–40° wide). Boxes and cross-section lines are in `PRESETS` in
+- Presets: Japan, Chile and the Andes, Tonga–Kermadec, Hindu Kush–Pamir, Italy, Iceland, Türkiye 2023
+  (Kahramanmaraş Mw 7.8 and 7.6, East Anatolian Fault zone, 34.5–41.5° E, 35.5–40° N; added in v0.3.1) and
+  "Current map view" (a box around the map position in the URL, 4°–40° wide). The Türkiye preset draws the same
+  ISC-GEM/ComCat events as the others and links, under the view, to the high-precision NLL-SSST-coherence relocations
+  of Lomax (2023), doi:10.5281/zenodo.8089273 (28,264 events M ≥ 1.5, 2023-01-01 to 2023-06-24). That catalogue is
+  CC BY 4.0, so redistribution of a subset would be allowed with attribution; it was not ingested in v0.3.1 to keep
+  the view on one event source, and is linked only. Boxes and cross-section lines are in `PRESETS` in
   `site/js/depth3d.js`; the Slab2 boxes in `scripts/basemap/build_slab2.py` must match.
 - Events from `events_m6.json` (default) or `events_m5.json` ("Add M 5–6 events", 7.5 MB, loaded on request), at
   their catalogue depth, coloured by depth class and sized by magnitude (the same size rule in 3D and in the
