@@ -44,7 +44,7 @@ SHOTS = {
     "scientist": ("readme", "#v=map&l=b&d=sh&c=822f5ffffffffff&at=2.7/30/150&lang=en", (1440, 900), "light", "pro",
                   "#panel-body .chart-svg", None),
     "ongoing": ("readme", "#v=monitor&mode=pro&lang=en", (1440, 900), "light", "pro", ".mon-seq .chart-svg", None),
-    "depth3d": ("readme", "#v=depth&p3=turkey&lang=en", (1440, 900), "light", "pro", "canvas.d3-canvas[data-view]", None),
+    "depth3d": ("readme", "#v=depth&p3=turkey&e3=5&lang=en", (1440, 900), "light", "pro", "canvas.d3-canvas[data-view]", None),
     "learn": ("readme", "#v=learn&t=induced-seismicity&mode=simple&lang=en", (1440, 900), "light", None,
               ".lr-diagram[data-ready='1']", None),
     "groningen": ("readme", "#v=cases&cs=groningen&mode=pro&lang=en", (1440, 900), "light", "pro",
