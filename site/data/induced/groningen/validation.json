@@ -1,0 +1,286 @@
+{
+ "rows": [
+  {
+   "id": "K22-n",
+   "source": "Kraaijpoel et al. 2022",
+   "quantity": "events ML>=1.45, 1995-2021, outline",
+   "published": 336,
+   "ours": 332,
+   "verdict": "matches",
+   "note": "NLOG outline vs NAM (2021) outline used in the paper"
+  },
+  {
+   "id": "K22-b",
+   "source": "Kraaijpoel et al. 2022",
+   "quantity": "field b, ML>=1.45, 1995-2021",
+   "published": 0.96,
+   "ours": 0.949,
+   "ours_lo": 0.861,
+   "ours_hi": 1.059,
+   "n": 332,
+   "ours_unbinned": 0.956,
+   "verdict": "consistent",
+   "z": 0.213,
+   "note": "binned Aki-Utsu (atlas) and unbinned MLE (paper's choice) both shown"
+  },
+  {
+   "id": "D17-1996-2003",
+   "source": "Dost et al. 2017",
+   "quantity": "b 1996-2003",
+   "published": 1.06,
+   "published_sigma": 0.07,
+   "published_n_all": 99,
+   "ours_n_all": 89,
+   "ours": 1.164,
+   "ours_lo": 0.751,
+   "ours_hi": 1.803,
+   "ours_mc": 1.8,
+   "n": 13,
+   "b_at_fixed_mc": {
+    "1.0": 0.776,
+    "1.2": 0.916,
+    "1.5": 1.186
+   },
+   "verdict": "not testable",
+   "z": 0.375,
+   "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
+  },
+  {
+   "id": "D17-2003-2017",
+   "source": "Dost et al. 2017",
+   "quantity": "b 2003-2017",
+   "published": 0.93,
+   "published_sigma": 0.03,
+   "published_n_all": 887,
+   "ours_n_all": 883,
+   "ours": 0.919,
+   "ours_lo": 0.808,
+   "ours_hi": 1.013,
+   "ours_mc": 1.4,
+   "n": 281,
+   "b_at_fixed_mc": {
+    "1.0": 0.808,
+    "1.2": 0.908,
+    "1.5": 0.953
+   },
+   "verdict": "consistent",
+   "z": 0.189,
+   "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
+  },
+  {
+   "id": "D17-2004-2010",
+   "source": "Dost et al. 2017",
+   "quantity": "b 2004-2010",
+   "published": 0.91,
+   "published_sigma": 0.06,
+   "published_n_all": 204,
+   "ours_n_all": 200,
+   "ours": 0.917,
+   "ours_lo": 0.756,
+   "ours_hi": 1.128,
+   "ours_mc": 1.4,
+   "n": 89,
+   "b_at_fixed_mc": {
+    "1.0": 0.759,
+    "1.2": 0.914,
+    "1.5": 0.959
+   },
+   "verdict": "consistent",
+   "z": 0.063,
+   "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
+  },
+  {
+   "id": "D17-2010-2013",
+   "source": "Dost et al. 2017",
+   "quantity": "b 2010-2013",
+   "published": 1.06,
+   "published_sigma": 0.07,
+   "published_n_all": 210,
+   "ours_n_all": 211,
+   "ours": 0.915,
+   "ours_lo": 0.8,
+   "ours_hi": 1.308,
+   "ours_mc": 1.1,
+   "n": 127,
+   "b_at_fixed_mc": {
+    "1.0": 0.869,
+    "1.2": 0.987,
+    "1.5": 1.197
+   },
+   "verdict": "consistent",
+   "z": 0.981,
+   "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
+  },
+  {
+   "id": "D17-2013-2015",
+   "source": "Dost et al. 2017",
+   "quantity": "b 2013-2015",
+   "published": 0.88,
+   "published_sigma": 0.06,
+   "published_n_all": 199,
+   "ours_n_all": 200,
+   "ours": 0.879,
+   "ours_lo": 0.684,
+   "ours_hi": 1.06,
+   "ours_mc": 1.1,
+   "n": 121,
+   "b_at_fixed_mc": {
+    "1.0": 0.824,
+    "1.2": 0.892,
+    "1.5": 0.778
+   },
+   "verdict": "consistent",
+   "z": 0.004,
+   "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
+  },
+  {
+   "id": "D17-2015-2017",
+   "source": "Dost et al. 2017",
+   "quantity": "b 2015-2017",
+   "published": 0.93,
+   "published_sigma": 0.06,
+   "published_n_all": 227,
+   "ours_n_all": 228,
+   "ours": 0.815,
+   "ours_lo": 0.686,
+   "ours_hi": 0.985,
+   "ours_mc": 0.8,
+   "n": 115,
+   "b_at_fixed_mc": {
+    "1.0": 0.852,
+    "1.2": 0.919,
+    "1.5": 1.018
+   },
+   "verdict": "consistent",
+   "z": 1.18,
+   "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
+  },
+  {
+   "id": "GW26-ts-north",
+   "source": "Gulia & Wiemer 2026",
+   "quantity": "b north sub-field, 2012-mid 2015",
+   "published": 0.8,
+   "ours": null,
+   "ours_lo": null,
+   "ours_hi": null,
+   "n": 39,
+   "ours_moving_range": [
+    0.707,
+    0.92
+   ],
+   "verdict": "not testable",
+   "note": "ours: b-positive on KNMI only, ML>=0.5, all events of the interval pooled (needs >= 50 differences); moving 200-event windows ending in the interval give the range shown; paper: composite catalogue"
+  },
+  {
+   "id": "GW26-ts-south",
+   "source": "Gulia & Wiemer 2026",
+   "quantity": "b south sub-field, 2012-mid 2015",
+   "published": [
+    1.0,
+    1.3
+   ],
+   "ours": 1.21,
+   "ours_lo": 0.939,
+   "ours_hi": 1.482,
+   "n": 91,
+   "ours_moving_range": [
+    0.991,
+    1.35
+   ],
+   "verdict": "consistent",
+   "note": "ours: b-positive on KNMI only, ML>=0.5, all events of the interval pooled (needs >= 50 differences); moving 200-event windows ending in the interval give the range shown; paper: composite catalogue"
+  },
+  {
+   "id": "GW26-2022-north",
+   "source": "Gulia & Wiemer 2026",
+   "quantity": "b north sub-field around 2022",
+   "published": 0.9,
+   "ours": 0.746,
+   "ours_lo": 0.616,
+   "ours_hi": 0.903,
+   "n": 83,
+   "window_years": [
+    2015.82,
+    2022.54
+   ],
+   "verdict": "consistent",
+   "note": "ours: b-positive, the 200-event window (ML>=0.5, KNMI only) ending closest to mid-2022"
+  },
+  {
+   "id": "GW26-2022-south",
+   "source": "Gulia & Wiemer 2026",
+   "quantity": "b south sub-field around 2022",
+   "published": 0.9,
+   "ours": 1.051,
+   "ours_lo": 0.859,
+   "ours_hi": 1.295,
+   "n": 76,
+   "window_years": [
+    2017.38,
+    2022.29
+   ],
+   "verdict": "consistent",
+   "note": "ours: b-positive, the 200-event window (ML>=0.5, KNMI only) ending closest to mid-2022"
+  },
+  {
+   "id": "GW26-map",
+   "source": "Gulia & Wiemer 2026",
+   "quantity": "b-positive map 2014-2022, mapped nodes",
+   "published": [
+    0.8,
+    1.0
+   ],
+   "ours": 0.681,
+   "ours_lo": 0.625,
+   "ours_hi": 0.749,
+   "n": 75,
+   "n_nodes": 1316,
+   "radius_sensitivity": {
+    "7km": {
+     "n_nodes_mapped": 300,
+     "median": 0.7833579484961439
+    },
+    "10km": {
+     "n_nodes_mapped": 645,
+     "median": 0.8106830328860701
+    }
+   },
+   "verdict": "differs",
+   "note": "ours: median and inter-quartile range of node b-positive (KNMI only, 1-km grid, 5-km radius, >=50 differences); paper: composite catalogue"
+  },
+  {
+   "id": "SIR24-field",
+   "source": "Sirorattanakul et al. 2024 (quoted by Gulia & Wiemer 2026)",
+   "quantity": "field b 2015-2022",
+   "published": 0.86,
+   "ours": 0.799,
+   "ours_lo": 0.714,
+   "ours_hi": 0.893,
+   "ours_mc": 0.8,
+   "n": 409,
+   "ours_bpos": 0.878,
+   "ours_bpos_ci": [
+    0.7744207113652708,
+    0.9819564811046959
+   ],
+   "verdict": "consistent",
+   "note": "the published value comes from a different (deep-learning) catalogue: context, not a strict test"
+  },
+  {
+   "id": "G23-post2014",
+   "source": "Gulia 2023 (quoted by Gulia & Wiemer 2026)",
+   "quantity": "field b 2014-2022",
+   "published": [
+    0.7,
+    0.8
+   ],
+   "ours": 0.785,
+   "ours_lo": 0.705,
+   "ours_hi": 0.909,
+   "ours_mc": 0.8,
+   "n": 482,
+   "verdict": "consistent",
+   "note": "ours: atlas MAXC+0.2 estimator, region pooled; paper's period and estimator details differ"
+  }
+ ]
+}

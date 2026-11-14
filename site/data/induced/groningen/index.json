@@ -1,0 +1,36 @@
+{
+ "id": "groningen",
+ "title": "Groningen gas field (Netherlands)",
+ "contract_version": 1,
+ "catalogue_cutoff_utc": "2026-11-01T00:00:00Z",
+ "region": "NLOG Groningen field outline (FIELD_CODE GRO) buffered by 2 km",
+ "magnitude": "KNMI local magnitude ML (MagType MLn / MLnq), binned to 0.1 for statistics",
+ "n_events_region": 1646,
+ "statement": "Retrospective description of the published catalogue and production record. Not a forecast, not a hazard assessment.",
+ "files": {
+  "bmap.json": 62240,
+  "btime.json": 19584,
+  "rates.json": 10938,
+  "validation.json": 6893
+ },
+ "sources": [
+  {
+   "name": "KNMI earthquake catalogue (FDSN event service rdsa.knmi.nl)",
+   "licence": "CC BY 4.0",
+   "attribution": "Royal Netherlands Meteorological Institute (KNMI); Netherlands Seismic and Acoustic Network, doi:10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5",
+   "redistributed": "derived aggregates and the list of ML >= 3.0 events only"
+  },
+  {
+   "name": "NLOG production figures, Groningen field, monthly gas produced",
+   "licence": "NLOG terms of use: reuse permitted provided NLOG.NL is quoted as the source",
+   "attribution": "Source: NLOG.NL (TNO - Geological Survey of the Netherlands)",
+   "redistributed": "monthly and annual totals"
+  },
+  {
+   "name": "NLOG field outlines (gdw_ng_field_utm_v1, FIELD_CODE GRO)",
+   "licence": "NLOG terms of use: reuse permitted provided NLOG.NL is quoted as the source",
+   "attribution": "Source: NLOG.NL",
+   "redistributed": "outline rings rounded to 1e-4 degrees"
+  }
+ ]
+}
