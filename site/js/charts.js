@@ -295,14 +295,15 @@ export function forestChart(spec) {
       const rowH = 28, lw = Math.min(spec.labelWidth || 150, W * 0.42), vw = W < 380 ? 0 : 120;
       const m = { t: 8, r: vw + 8, b: 30, l: lw };
       const H = m.t + m.b + spec.rows.length * rowH;
-      const xs = scale('lin', spec.domain, [m.l, W - m.r]);
+      // spec.log: a log x axis (ratios), with spec.ticks; values <= 0 are shown as text, never drawn
+      const xs = scale(spec.log ? 'log' : 'lin', spec.domain, [m.l, W - m.r]);
       const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: 'img', 'aria-label': spec.alt, class: 'chart-svg' });
-      const ft = niceTicks(...spec.domain, Math.max(2, Math.floor((W - m.l - m.r) / 80)));
+      const ft = spec.ticks || niceTicks(...spec.domain, Math.max(2, Math.floor((W - m.l - m.r) / 80)));
       const dec = ft.length > 1 && ft[1] - ft[0] < 0.1 - 1e-9 ? 2 : 1;
       for (const v of ft) {
         const x = xs(v);
         svgEl('line', { x1: x, x2: x, y1: m.t, y2: H - m.b, class: 'grid' }, svg);
-        svgEl('text', { x, y: H - m.b + 16, class: 'tick', 'text-anchor': 'middle' }, svg).textContent = v.toFixed(dec);
+        svgEl('text', { x, y: H - m.b + 16, class: 'tick', 'text-anchor': 'middle' }, svg).textContent = spec.log ? String(v) : v.toFixed(dec);
       }
       if (spec.x && spec.x.label) svgEl('text', { x: (m.l + W - m.r) / 2, y: H - 2, class: 'axis-label', 'text-anchor': 'middle' }, svg).textContent = spec.x.label;
       if (spec.ref) {
@@ -315,7 +316,7 @@ export function forestChart(spec) {
         const cy = m.t + i * rowH + rowH / 2;
         const lab = svgEl('text', { x: 0, y: cy + 4, class: r.emph ? 'row-label emph' : 'row-label' }, svg);
         lab.textContent = r.label;
-        if (r.v === null || r.v === undefined) {
+        if (r.v === null || r.v === undefined || (spec.log && !(r.v > 0 && r.lo > 0))) {
           svgEl('text', { x: m.l + 4, y: cy + 4, class: 'tick', 'text-anchor': 'start' }, svg).textContent = r.text || tr('chart.na');
           return;
         }
@@ -323,6 +324,7 @@ export function forestChart(spec) {
         if (r.lo !== undefined && r.lo !== null) svgEl('line', { x1: xs(r.lo), x2: xs(r.hi), y1: cy, y2: cy, class: 'ci', style: st }, svg);
         svgEl('circle', { cx: xs(r.v), cy, r: 5, class: r.hollow ? 'dot hollow' : 'dot', style: st }, svg);
         for (const extra of r.marks || []) svgEl('circle', { cx: xs(extra.v), cy, r: 5, class: extra.hollow ? 'dot hollow' : 'dot', style: `--c:${extra.color}` }, svg);
+        if (r.muted) svgEl('title', {}, svg.lastChild).textContent = r.muted;
         if (vw) svgEl('text', { x: W - 4, y: cy + 4, class: 'row-value', 'text-anchor': 'end' }, svg).textContent = r.text || '';
         marks.push({ cy, r });
       });

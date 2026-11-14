@@ -8,6 +8,7 @@ import { renderCompare } from './compare.js';
 import { renderSequences, renderMethods, renderAbout } from './pages.js';
 import { renderMonitor, focusSequence } from './monitor.js';
 import { renderCases } from './cases.js';
+import { initDeficit, renderDeficitPanel, relabelDeficit } from './deficit.js';
 import { SUBS, layerName, subLabel } from './layers.js';
 import * as f from './fmt.js';
 import { h } from './charts.js';
@@ -470,6 +471,14 @@ function syncPanel() {
     panelFor = null;
     return;
   }
+  if (state.df && state.dz) {
+    const key = `df|${state.dz}|${state.lang}`;
+    if (key === panelFor) return;
+    panelFor = key;
+    renderDeficitPanel(state.dz);
+    M.resize();
+    return;
+  }
   if (state.c === 'list' && ctx.cells) {
     const key = `list|${state.d}|${state.k}|${state.lang}`;
     if (key === panelFor) return;
@@ -512,6 +521,7 @@ function syncPanel() {
 
 function selectCell(id) {
   state.c = id;
+  state.dz = null;
   update();
   if (state.mode !== 'pro') return;
   const p = lookup(id);
@@ -526,6 +536,7 @@ function unpin() {
 
 function closePanel() {
   state.c = null;
+  state.dz = null;
   state.k = null;
   update();
   M.hideTip();
@@ -605,6 +616,7 @@ async function applyLang() {
   if (mapReady) { M.relabel(); M.applyLayers(); syncPanel(); }
   applyMode();
   relabelSimple();
+  relabelDeficit();
   setHexLine();
   showView(state.v);
 }
@@ -676,6 +688,7 @@ async function start() {
     }, { land, coast, plates });
     mapReady = true;
     status.hidden = true;
+    initDeficit({ state, update, onZone: (id) => { state.dz = id; state.c = null; state.k = null; update(); $('panel').focus({ preventScroll: true }); } });
     M.setProjection(!!state.g);
     M.applyLayers();
     syncPanel();

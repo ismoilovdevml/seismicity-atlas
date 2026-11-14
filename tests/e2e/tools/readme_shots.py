@@ -49,7 +49,7 @@ SHOTS = {
               ".lr-diagram[data-ready='1']", None),
     "groningen": ("readme", "#v=cases&cs=groningen&mode=pro&lang=en", (1440, 900), "light", "pro",
                   ".cs-bmap svg", None),
-    "deficit": ("readme", "#v=map&l=b&d=sh&df=1&dz=ts_central&at=4.1/42/80&mode=pro&lang=en", (1440, 900), "light", "pro",
+    "deficit": ("readme", "#v=map&l=b&d=sh&df=1&dz=ts_central&at=3.7/41.5/76.5&mode=pro&lang=en", (1440, 900), "light", "pro",
                 "#panel-body .df-panel", None),
     # The b classes on the Scientist map (light theme), for the palette decision in docs/ux-notes.md.
     "b-palette-after": ("ux", "#v=map&l=b&d=sh&pl=1&at=2.4/-12/170&mode=pro&lang=en", (1200, 760), "light", "pro",
