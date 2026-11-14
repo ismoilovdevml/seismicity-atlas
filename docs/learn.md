@@ -33,7 +33,7 @@ one stylesheet link. Nothing under `site/js/learn/` is fetched on a first visit 
 ## Concept registry
 
 Groups: **Magnitudes**, **Completeness & b-value**, **Uncertainty & quality**, **Sequences**, **Space & tectonics**,
-**Data & caveats**. Languages: all 18 concepts are complete in English, Uzbek (Latin), Russian and Spanish.
+**Data & caveats**. Languages: all 19 concepts are complete in English, Uzbek (Latin), Russian and Spanish.
 
 | # | Concept id | Group | Diagram (module) | Real example: data and selection rule |
 |---|---|---|---|---|
@@ -55,6 +55,7 @@ Groups: **Magnitudes**, **Completeness & b-value**, **Uncertainty & quality**, *
 | 16 | `catalogue-consistency` | caveats | Histogram of per-cell ΔMw or Δmb (`consistency`) | `cells.geojson` `c_*`; the "ok" cell with most matched pairs |
 | 17 | `regional-catalogues` | caveats | Magnitude ladder: regional typical Mc against the global floor (`regional-ladder`) | `regional/index.json`; latest shallow floor from `manifest.json` |
 | 18 | `not-a-forecast` | caveats | Real yearly counts next to a random history with the same mean (animated) (`poisson`) | main cell* `rate_comcat_m45` yearly counts (`cells/<id>.json`) |
+| 19 | `recording-rating` | caveats | Quality code, catalogue check and Mc controls give the rating; bars count the real cells per rating, with a data table (`rating-ladder`) | `cells.geojson` through `recordingRating()` (`places.js`), the same function as the place card; the Very good cell with most events above threshold, the Limited cell with most events; global shallow Mc from `manifest.json` |
 
 \* **Main cell**: the shallow quality-A cell with the most events above threshold inside the Tonga-Kermadec box
 (14–38° S, 172° E–170° W); if there is none, the quality-A cell with the most events anywhere. Selection is by rule,
@@ -142,6 +143,40 @@ Buttons in the static map controls are placed by `site/js/info-rail.js` and rela
 | Depth 3D | 4 |
 | Validation | 10 |
 | About | 2 |
+
+### Simple view (v0.3: `simple.js`)
+
+| UI element | i18n key | Concept id |
+|---|---|---|
+| Legend title "Earthquakes M6+, 1904–2026" | `sx.lgTitle` | `magnitude-types` |
+| Legend shading line ("Not a hazard map") | `sx.lgHeat` | `not-a-forecast` |
+| Legend plate boundaries (when shown) | `sx.lgPlates` | `plate-boundary-classes` |
+| Place card "How well are earthquakes recorded here?" | `sx.rateHead` | `recording-rating` |
+| Disclaimer strip (shared) | `disc.strong` | `not-a-forecast` |
+
+Four buttons in the Simple map view (five with the disclaimer), against 10 in the Scientist rail: the Simple view
+keeps only the concepts a non-specialist meets on that screen. Search, the controls and the counts have none.
+
+### The recording rating (Simple view, "How well are earthquakes recorded here?")
+
+`recordingRating(cell, globalMc)` in `site/js/places.js` reads the **shallow (≤ 70 km)** statistics of the cell that
+contains the place (point in hexagon, trying the longitude ± 360° for cells that cross the antimeridian; the nearest
+cell centre if no hexagon contains it). `globalMc` is `manifest.json` `global.b_shallow_1976_2021.mc` (5.2 in v0.2.0).
+The rules are checked in this order:
+
+| Rating | Card word | Condition |
+|---|---|---|
+| `few` | Too little data | `sh_q` is `insufficient` (fewer than 50 events above Mc, `method.quality.insufficient`) |
+| `limited` | Limited | `sh_q` is `C`, or `c_flag` is `check` (ISC-GEM and ComCat disagree) |
+| `vgood` | Very good | `sh_q` is `A`, `c_flag` is `ok` and `sh_mc` ≤ global shallow Mc + 0.2 (5.4 in v0.2.0) |
+| `good` | Good | every other `A` or `B` cell (B, or A with `c_flag` `few` or a higher Mc) |
+
+In v0.2.0 this gives, over 2,598 cells: 56 Very good, 114 Good, 54 Limited, 2,374 Too little data (computed by the
+browser test from `cells.geojson`; no cell has `c_flag` `check` and quality A or B). The cutoff-stability flag
+(`sh_unstable`) and the deeper statistics are not used; the Scientist view shows them. The card prints the three
+inputs under the word ("quality B, Mc 5.2, ISC-GEM and ComCat agree"), and its (i) opens the Learn page with the same
+table. The rating describes the global catalogue at a few hundred kilometres, not local networks, and is not a hazard
+or risk estimate.
 
 ### Map controls (`index.html`, placed by `info-rail.js`)
 

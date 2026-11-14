@@ -27,6 +27,12 @@ VIEWPORTS = {"desktop": (1440, 900), "phone": (390, 844)}
 # Defined before any page script runs. map.js calls it with the MapLibre map; normal visits never define it.
 TEST_HOOK = "window.__gsaTestHook = (m) => { window.__map = m; };"
 
+# The site opens in the Simple view for new visitors (v0.3). The tests written for the Scientist view open the site as
+# a visitor who chose it before: gsa-mode=pro in localStorage, set only when absent so a test can still change it.
+# Every test also starts with the first-visit tour already seen, except the tests that pass tour=True.
+def _store_default(key, value):
+    return f"try {{ if (localStorage.getItem('{key}') === null) localStorage.setItem('{key}', '{value}'); }} catch (e) {{}}"
+
 # Console noise that does not come from the site's code.
 IGNORED_CONSOLE = (
     "GPU stall due to ReadPixels",  # headless Chromium WebGL driver
@@ -82,11 +88,17 @@ class Site:
         self.base = base_url
         self.pages = []
 
-    def open(self, hash_="", viewport="desktop", scheme="light", regional=False, ready=True, locale="en-US", routes=()):
-        w, h = VIEWPORTS[viewport]
+    def open(self, hash_="", viewport="desktop", scheme="light", regional=False, ready=True, locale="en-US", routes=(),
+             mode="pro", tour=False, size=None):
+        """mode: the stored view mode ("pro", "simple" or None for a first visit); tour: show the first-visit tour."""
+        w, h = size or VIEWPORTS[viewport]
         ctx = self.browser.new_context(viewport={"width": w, "height": h}, color_scheme=scheme, locale=locale,
                                        accept_downloads=True)
         ctx.add_init_script(TEST_HOOK)
+        if mode:
+            ctx.add_init_script(_store_default("gsa-mode", mode))
+        if not tour:
+            ctx.add_init_script(_store_default("gsa-tour", "1"))
         if regional:
             ctx.route("**/data/regional/**", _serve_fixture)
         for pattern, handler in routes:

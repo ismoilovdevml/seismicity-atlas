@@ -14,10 +14,14 @@ import { t, setLang, LANGS } from './i18n/index.js';
 import { readExtras, writeExtras, setCommit } from './hashx.js';
 import { placeRailInfo } from './info-rail.js';
 import * as D from './depth3d.js';
+import { initSimple, syncSimple, relabelSimple, startTour, openPlace, loadM5 as simpleLoadM5 } from './simple.js';
 
 const VIEWS = ['map', 'sequences', 'monitor', 'methods', 'about', 'depth', 'learn'];
 const LAYERS = ['b', 'q', 'mc', 'cc', 'rate', 'none'];
-const DEFAULTS = { v: 'map', l: 'b', m: '', d: 'sh', c: null, k: null, r: null, ev: 0, y0: null, y1: null, mm: 6, pl: 1, g: 0, at: null, s: null, lang: 'en', t: null };
+const MODES = ['simple', 'pro'];
+// A link that sets any of these and does not name a mode is a Scientist-view link (all links made before v0.3).
+const EXPERT_KEYS = ['l', 'm', 'd', 'c', 'k', 'r', 'ev', 'y', 'mm', 'tr'];
+const DEFAULTS = { mode: 'simple', v: 'map', l: 'b', m: '', d: 'sh', c: null, k: null, r: null, ev: 0, y0: null, y1: null, mm: 6, pl: 1, g: 0, at: null, s: null, lang: 'en', t: null };
 const CELL_ID = /^[0-9a-f]{15}$/;
 
 const state = { ...DEFAULTS };
@@ -49,12 +53,28 @@ function preferredLang() {
   return 'en';
 }
 
+// ---------------------------------------------------------------- view mode preference (Simple or Scientist)
+
+const MODE_KEY = 'gsa-mode';
+function storedMode() {
+  try { const v = localStorage.getItem(MODE_KEY); return MODES.includes(v) ? v : null; } catch (e) { return null; }
+}
+function saveMode(m) {
+  try { localStorage.setItem(MODE_KEY, m); } catch (e) { /* storage blocked */ }
+}
+/** Mode for a hash: the one it names; else Scientist for an expert link; else the fallback (current or stored). */
+function modeOf(p, fallback) {
+  if (MODES.includes(p.get('mode'))) return p.get('mode');
+  if (EXPERT_KEYS.some((k) => p.has(k))) return 'pro';
+  return fallback;
+}
+
 // ---------------------------------------------------------------- hash state
 
 /** fallbackLang: the language to keep when the hash does not name one (the current one after start-up). */
-function parseHash(fallbackLang = preferredLang()) {
+function parseHash(fallbackLang = preferredLang(), fallbackMode = storedMode() || DEFAULTS.mode) {
   const p = new URLSearchParams(location.hash.replace(/^#/, ''));
-  const s = { ...DEFAULTS, lang: fallbackLang };
+  const s = { ...DEFAULTS, lang: fallbackLang, mode: modeOf(p, fallbackMode) };
   if (VIEWS.includes(p.get('v'))) s.v = p.get('v');
   if (LAYERS.includes(p.get('l'))) s.l = p.get('l');
   const subOk = (SUBS[s.l] || []).some((x) => x.id === p.get('m'));
@@ -97,7 +117,8 @@ function hashOf(s) {
   if (s.s) p.set('s', s.s);
   writeExtras(s, p);
   if (s.v === 'learn' && s.t) p.set('t', s.t);
-  // Always name the language, so a shared link opens in the language it was copied in.
+  // Always name the mode and the language, so a shared link opens as it was copied.
+  p.set('mode', s.mode);
   p.set('lang', s.lang);
   return `#${p.toString().replace(/%2F/g, '/')}`;
 }
@@ -116,8 +137,10 @@ window.addEventListener('popstate', () => applyHash());
 
 async function applyHash() {
   // Navigation links such as "#v=about" carry no language: keep the one in use.
-  const s = parseHash(state.lang);
-  const hashHadLang = new URLSearchParams(location.hash.replace(/^#/, '')).has('lang');
+  const s = parseHash(state.lang, state.mode);
+  const hp = new URLSearchParams(location.hash.replace(/^#/, ''));
+  const hashHadLang = hp.has('lang') && hp.has('mode');
+  const modeChanged = s.mode !== state.mode;
   const viewChanged = s.v !== state.v;
   const atChanged = JSON.stringify(s.at) !== JSON.stringify(state.at);
   const langChanged = s.lang !== state.lang;
@@ -127,6 +150,7 @@ async function applyHash() {
   if (s.v === 'learn' && state.v !== 'learn') learnBack = hashOf(state);
   Object.assign(state, s);
   if (langChanged) await applyLang();
+  if (modeChanged) applyMode();
   syncControls();
   showView(state.v);
   if (mapReady) {
@@ -135,8 +159,10 @@ async function applyHash() {
     if (atChanged && state.at) M.flyTo(state.at.lon, state.at.lat, state.at.z);
     if (state.ev) ensureEvents();
     if (regionChanged) selectRegion(state.r, false);
+    if (state.mode === 'simple' && state.sm === 5) simpleLoadM5();
     syncPanel();
   }
+  syncSimple();
   if (state.v === 'monitor' && seqChanged && rendered.has('monitor')) focusSequence(state.s);
   else if (viewChanged) window.scrollTo(0, 0);
   // Put the language back into the URL so a reload keeps it.
@@ -174,6 +200,14 @@ function showLearn() {
 }
 
 function showOnMap(s) {
+  if (state.mode === 'simple') {
+    // the simple map has no event filter: open the place card around the earthquake
+    state.v = 'map';
+    commit(true);
+    applyHash();
+    openPlace(+s.lat, +s.lon, { fly: true });
+    return;
+  }
   const yr = +s.time.slice(0, 4);
   Object.assign(state, { v: 'map', ev: state.ev || 6, y0: yr, y1: yr, at: { z: 4, lat: +s.lat.toFixed(2), lon: +s.lon.toFixed(2) } });
   commit(true);
@@ -241,7 +275,7 @@ function syncEventControls() {
 function syncBanner() {
   const pinned = state.k && lookup(state.k);
   const comparing = pinned && state.c && state.c !== state.k && lookup(state.c);
-  $('cmp-banner').hidden = !pinned || !!comparing || state.v !== 'map';
+  $('cmp-banner').hidden = !pinned || !!comparing || state.v !== 'map' || state.mode === 'simple';
   if (pinned) $('cmp-banner-text').textContent = t('cmp.banner', { name: f.latlon(pinned.lat, pinned.lon) });
 }
 
@@ -283,15 +317,75 @@ function wireControls() {
   $('list-btn').addEventListener('click', () => { state.c = 'list'; update(); $('panel').focus({ preventScroll: true }); });
   $('cmp-banner-cancel').addEventListener('click', unpin);
   $('reg-select').addEventListener('change', (e) => selectRegion(e.target.value || null, true));
+  document.querySelectorAll('#mode-seg [data-mode]').forEach((b) => {
+    b.addEventListener('click', () => setMode(b.dataset.mode));
+    b.addEventListener('keydown', (e) => {
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+      e.preventDefault();
+      const next = MODES[(MODES.indexOf(state.mode) + 1) % MODES.length];
+      setMode(next);
+      document.querySelector(`#mode-seg [data-mode=${next}]`).focus();
+    });
+  });
+  $('nav-theme').addEventListener('click', () => $('theme-btn').click());
   $('lang-select').addEventListener('change', async (e) => { state.lang = e.target.value; saveLang(state.lang); await applyLang(); commit(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('panel').hidden && state.v === 'map') closePanel(); });
 }
 
-function update() {
+function update(push = false) {
   syncControls();
   if (mapReady) M.applyLayers();
   syncPanel();
-  commit();
+  syncSimple();
+  commit(push);
+}
+
+// ---------------------------------------------------------------- mode
+
+/** Show the Simple or the Scientist view: page attribute for the CSS, labels, map layers and panels. */
+function applyMode() {
+  const simple = state.mode === 'simple';
+  document.documentElement.dataset.mode = state.mode;
+  // a radio group: one tab stop, arrow keys move between the two modes
+  document.querySelectorAll('#mode-seg [data-mode]').forEach((b) => {
+    const on = b.dataset.mode === state.mode;
+    b.setAttribute('aria-checked', String(on));
+    b.tabIndex = on ? 0 : -1;
+  });
+  const navMon = $('nav-monitor');
+  navMon.dataset.i18n = simple ? 'nav.recent' : 'nav.monitor';
+  navMon.textContent = t(navMon.dataset.i18n);
+  const tag = $('brand-tag');
+  tag.dataset.i18n = simple ? 'brand.tagSimple' : 'brand.tag';
+  tag.textContent = t(tag.dataset.i18n);
+  if (simple) { $('panel').hidden = true; panelFor = null; M.hideTip(); }
+  if (mapReady) { M.applyLayers(); M.resize(); }
+}
+
+function setMode(m) {
+  if (!MODES.includes(m)) return;
+  saveMode(m); // an explicit choice, also when that mode is already shown (e.g. opened from a shared link)
+  if (m === state.mode) return;
+  state.mode = m;
+  applyMode();
+  update(true);
+  if (m === 'pro' && state.c) syncPanel();
+}
+
+/** "Scientist view of this place": the Scientist view with the cell under the place selected. */
+function openExpert(cellId, lat, lon) {
+  state.mode = 'pro';
+  saveMode('pro');
+  state.v = 'map';
+  state.k = null;
+  if (!['b', 'q', 'mc', 'cc', 'rate'].includes(state.l)) state.l = 'b';
+  applyMode();
+  showView('map');
+  const p = lookup(cellId);
+  // the cells are about 300 km across: zoom out from the place view so the cell and its neighbours are in sight
+  if (p) { state.at = { z: 3.5, lat: +p.lat.toFixed(2), lon: +p.lon.toFixed(2) }; M.flyTo(p.lon, p.lat, 3.5); }
+  selectCell(cellId);
+  commit(true);
 }
 
 function ensureEvents() {
@@ -309,6 +403,11 @@ function ensureEvents() {
 let panelFor = null;
 function syncPanel() {
   syncBanner();
+  if (state.mode === 'simple') {
+    if (!$('panel').hidden) { $('panel').hidden = true; M.resize(); }
+    panelFor = null;
+    return;
+  }
   if (state.c === 'list' && ctx.cells) {
     const key = `list|${state.d}|${state.k}|${state.lang}`;
     if (key === panelFor) return;
@@ -352,6 +451,7 @@ function syncPanel() {
 function selectCell(id) {
   state.c = id;
   update();
+  if (state.mode !== 'pro') return;
   const p = lookup(id);
   if (p) M.revealCell(p.lon, p.lat);
   $('panel').focus({ preventScroll: true });
@@ -441,7 +541,17 @@ async function applyLang() {
   rendered.clear();
   syncControls();
   if (mapReady) { M.relabel(); M.applyLayers(); syncPanel(); }
+  applyMode();
+  relabelSimple();
+  setHexLine();
   showView(state.v);
+}
+
+/** The Scientist-view line "What is a hexagon?", with the mean cell area and the sample radius from the data. */
+function setHexLine() {
+  if (!ctx.cells || !ctx.manifest) return;
+  const a = ctx.cells.features.reduce((s, ft) => s + ft.properties.area_km2, 0) / ctx.cells.features.length;
+  $('pro-hex').textContent = t('pro.hex', { area: f.int(Math.round(a / 1000) * 1000), r: f.int(ctx.manifest.method.sample_radius_km) });
 }
 
 // ---------------------------------------------------------------- theme
@@ -453,6 +563,7 @@ function setThemeLabel() {
   $('theme-btn').setAttribute('aria-label', t('theme.aria', { t: lab }));
   $('theme-btn').title = t('theme.title', { t: lab });
   $('theme-label').textContent = lab;
+  $('nav-theme').textContent = t('theme.menu', { t: lab });
 }
 function setTheme(th) {
   if (th === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = th;
@@ -470,6 +581,8 @@ async function start() {
   setCommit(commit);
   await setLang(state.lang);
   wireControls();
+  initSimple({ state, ctx, update, openExpert });
+  applyMode();
   placeRailInfo();
   syncControls();
   showView(state.v);
@@ -486,14 +599,17 @@ async function start() {
     const [cells, land, coast, plates] = await Promise.all(files.map((k) => getJSON(k).then((d) => { done++; status.textContent = t('map.loadingProgress', { size: mb(total), done, n: files.length }); return d; })));
     ctx.cells = cells;
     for (const ft of cells.features) ctx.byId.set(ft.properties.id, ft.properties);
+    setHexLine();
     syncEventControls();
     showView(state.v); // pages can render now that the manifest is here
     await M.initMap({
       ...ctx,
       lookup,
       onSelect: selectCell,
+      onPlace: (lat, lon) => openPlace(lat, lon),
+      onSimpleZoom: () => syncSimple(),
       onView: (v) => { state.at = v; commit(); },
-      onEventsLoaded: (ev) => { evYears = ev.years; syncEventControls(); if (mapReady) M.applyLayers(); },
+      onEventsLoaded: (ev) => { evYears = ev.years; syncEventControls(); if (mapReady) M.applyLayers(); syncSimple(); },
     }, { land, coast, plates });
     mapReady = true;
     status.hidden = true;
@@ -502,7 +618,12 @@ async function start() {
     syncPanel();
     if (state.c && !parseHash().at && ctx.byId.has(state.c)) { const p = ctx.byId.get(state.c); M.revealCell(p.lon, p.lat); }
     // M6 events are a start-up file, fetched right after the first paint
-    M.preloadM6().then(() => { if (state.ev) ensureEvents(); }).catch((e) => { $('ev-count').textContent = e.message; });
+    M.preloadM6().then(() => {
+      if (state.ev) ensureEvents();
+      if (state.mode === 'simple' && state.sm === 5) simpleLoadM5();
+      if (state.p && state.mode === 'simple') M.showPlace(state.p.lat, state.p.lon, state.pr);
+      startTour();
+    }).catch((e) => { $('ev-count').textContent = e.message; });
     loadRegionIndex();
     commit();
   } catch (e) {

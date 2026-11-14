@@ -88,6 +88,7 @@ export function initMap(ctx, base) {
   canvas.setAttribute('aria-label', t('map.canvas'));
   canvas.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter') return;
+    if (simple()) { const ll = map.getCenter().wrap(); C.onPlace(ll.lat, ll.lng); return; }
     const c = map.project(map.getCenter());
     const hit = cellAt([c.x, c.y]);
     if (hit) C.onSelect(hit.properties.id);
@@ -109,6 +110,7 @@ function wire() {
     C.onView({ z: +map.getZoom().toFixed(2), lat: +c.lat.toFixed(2), lon: +c.lng.toFixed(2) });
   });
   map.on('mousemove', (e) => {
+    if (simple()) { simpleMove(e); return; }
     const evHit = queryEvents(e.point);
     const cell = cellAt(e.point);
     setHover(cell ? { source: cell.source, id: cell.id } : null);
@@ -120,6 +122,7 @@ function wire() {
   map.getCanvas().addEventListener('mouseleave', () => { setHover(null); hideTip(); });
   map.on('click', (e) => {
     hideTip();
+    if (simple()) { const ll = e.lngLat.wrap(); C.onPlace(ll.lat, ll.lng); return; }
     const evHit = queryEvents(e.point);
     if (evHit) { openEventPopup(evHit); return; }
     const cell = cellAt(e.point);
@@ -231,7 +234,8 @@ export function applyLayers() {
   const dark = isDark();
   map.setPaintProperty('cells-fill', 'fill-color', def.fill);
   map.setPaintProperty('cells-fill', 'fill-opacity', def.none ? 0 : ['case', def.valid, def.opacityB ? ['case', ['==', ['get', `${st.d}_q`], 'B'], 0.5, 0.92] : 0.9, 0.22]);
-  map.setLayoutProperty('cells-hatch', 'visibility', def.hatch ? 'visible' : 'none');
+  map.setLayoutProperty('cells-hatch', 'visibility', def.hatch && !simple() ? 'visible' : 'none');
+  for (const id of ['cells-fill', 'cells-hover', 'cells-sel', 'cells-sel-case']) map.setLayoutProperty(id, 'visibility', simple() ? 'none' : 'visible');
   if (def.hatch) map.setFilter('cells-hatch', ['==', ['get', `${st.d}_q`], 'C']);
   map.setLayoutProperty('plates', 'visibility', st.pl ? 'visible' : 'none');
   const selIds = ['literal', [st.c, st.k].filter(Boolean)];
@@ -239,6 +243,7 @@ export function applyLayers() {
   map.setFilter('cells-sel-case', ['in', ['get', 'id'], selIds]);
   applyRegion(st);
   applyEvents();
+  applySimple();
   B.apply();
   renderLegend(def);
 }
@@ -263,6 +268,15 @@ export function applyTheme() {
     map.setPaintProperty('events', 'circle-color', cssVar('--ink'));
     map.setPaintProperty('events', 'circle-stroke-color', cssVar('--surface'));
   }
+  if (map.getLayer('sx-dots')) {
+    map.setPaintProperty('sx-dots', 'circle-color', depthColorExpr());
+    map.setPaintProperty('sx-dots', 'circle-stroke-color', cssVar('--surface'));
+    map.setPaintProperty('sx-heat', 'heatmap-color', heatColorExpr());
+    map.setPaintProperty('sx-radius-line', 'line-color', cssVar('--accent'));
+    map.setPaintProperty('sx-radius-fill', 'fill-color', cssVar('--accent'));
+    map.setPaintProperty('sx-pin', 'circle-color', cssVar('--accent'));
+    map.setPaintProperty('sx-pin', 'circle-stroke-color', cssVar('--surface'));
+  }
   applyLayers();
 }
 
@@ -274,14 +288,14 @@ export function setProjection(globe) {
 }
 
 /** Pan so a selected cell is not hidden behind the detail panel. */
-export function revealCell(lon, lat) {
+export function revealCell(lon, lat, panelId = 'panel') {
   if (!map) return;
   const c = map.getCenter().lng;
   while (lon - c > 180) lon -= 360;
   while (c - lon > 180) lon += 360;
   const box = map.getContainer();
   const pt = map.project([lon, lat]);
-  const panel = document.getElementById('panel');
+  const panel = document.getElementById(panelId);
   if (innerWidth > 720) {
     if (pt.x > box.clientWidth - 20 || pt.x < 20 || pt.y < 20 || pt.y > box.clientHeight - 20) map.easeTo({ center: [lon, lat], duration: 400 });
   } else {
@@ -360,14 +374,17 @@ export function zoomBy(dz) { if (map) map.easeTo({ zoom: map.getZoom() + dz, dur
 // ---------- events ----------
 
 const RADIUS_STOPS = [[5, 1.3], [6, 2.2], [7, 4], [8, 7], [9, 12]];
-function radiusFor(m, z) {
+export function radiusFor(m, z, simpleView = false) {
   let r = RADIUS_STOPS[0][1];
   for (let i = 1; i < RADIUS_STOPS.length; i++) {
     const [m0, r0] = RADIUS_STOPS[i - 1], [m1, r1] = RADIUS_STOPS[i];
     if (m >= m0 && m <= m1) r = r0 + ((m - m0) / (m1 - m0)) * (r1 - r0);
     if (m > m1) r = r1;
   }
-  return r * (z > 3 ? 1.6 : 1);
+  if (!simpleView) return r * (z > 3 ? 1.6 : 1);
+  // the simple view's dots: the same zoom interpolation as the sx-dots layer
+  const k = z <= 3 ? 0.62 + (Math.max(0, z) / 3) * (0.85 - 0.62) : z <= 6 ? 0.85 + ((z - 3) / 3) * (1.6 - 0.85) : 1.6;
+  return r * k;
 }
 
 function radiusExpr(k) {
@@ -403,16 +420,20 @@ export function loadM5() {
   if (!events.loading5) {
     events.loading5 = getJSON('events_m5.json').then((e5) => {
       events.e5 = e5;
-      if (events.added) map.getSource('events').setData(eventsGeoJSON());
+      if (map.getSource('events')) map.getSource('events').setData(eventsGeoJSON());
       return e5;
     }).catch((e) => { events.loading5 = null; throw e; });
   }
   return events.loading5;
 }
 
+function ensureEventsSource() {
+  if (!map.getSource('events')) map.addSource('events', { type: 'geojson', data: eventsGeoJSON() });
+}
+
 function ensureEventsLayer() {
   if (events.added || !events.e6) return;
-  map.addSource('events', { type: 'geojson', data: eventsGeoJSON() });
+  ensureEventsSource();
   map.addLayer({
     id: 'events', type: 'circle', source: 'events',
     layout: { 'circle-sort-key': ['get', 'm'] },
@@ -449,7 +470,7 @@ export function eventCountText() { return evCountText(); }
 
 function applyEvents() {
   const st = C.state;
-  if (!st.ev || !events.e6) {
+  if (!st.ev || !events.e6 || simple()) {
     if (map.getLayer('events')) map.setLayoutProperty('events', 'visibility', 'none');
     return;
   }
@@ -459,12 +480,12 @@ function applyEvents() {
   map.setFilter('events', ['all', ['>=', ['get', 'y'], y0], ['<', ['get', 'y'], y1 + 1], ['>=', ['get', 'm'], minM], st.ev === 5 ? true : ['==', ['get', 'k'], 6]]);
 }
 
-function eventTipNode(p) {
+function eventTipNode(p, foot) {
   const codes = (events.e6 || {}).codes || { src: {}, mt: {} };
   return h('div', {},
     h('div', { class: 'tt-main' }, h('strong', { text: `M ${f.mag(p.m)}` }), ` ${f.decYearDate(p.y)}`),
     h('div', { class: 'tt-sub', text: t('ev.depthLine', { d: f.int(p.d), mt: codes.mt[String(p.t)] || '' }) }),
-    h('div', { class: 'tt-foot', text: t('ev.clickLink') }));
+    h('div', { class: 'tt-foot', text: foot || t('ev.clickLink') }));
 }
 
 function openEventPopup(hit) {
@@ -487,6 +508,151 @@ function openEventPopup(hit) {
   if (popup) popup.remove();
   popup = new maplibregl.Popup({ closeButton: true, maxWidth: '290px', focusAfterOpen: true })
     .setLngLat(hit.geometry.coordinates).setDOMContent(node).addTo(map);
+}
+
+
+// ---------- simple view: real earthquakes as dots over a density shading, and the place being looked at ----------
+
+const simple = () => C && C.state.mode === 'simple';
+
+// Depth classes (≤ 70, 70–300, > 300 km): a one-hue ordinal ramp, deeper = more contrast with the map in both themes.
+// Validated with the dataviz validator (--ordinal) against land and ocean, light and dark (docs/ux-notes.md).
+export const DEPTH_RAMP = { light: ['#5598e7', '#1c5cab', '#0d366b'], dark: ['#256abf', '#6da7ec', '#cde2fb'] };
+export const depthRamp = () => DEPTH_RAMP[isDark() ? 'dark' : 'light'];
+function depthColorExpr() {
+  const [a, b, c] = depthRamp();
+  return ['case', ['<=', ['get', 'd'], 70], a, ['<=', ['get', 'd'], 300], b, c];
+}
+// Density shading: a separate warm one-hue ramp (umber), transparent where nothing was recorded. Kept pale so the
+// dots stay the main mark; it is not a hazard surface.
+export const HEAT_RAMP = {
+  light: ['rgba(214,180,140,0)', 'rgba(214,180,140,0.32)', 'rgba(196,140,92,0.5)', 'rgba(166,104,58,0.62)', 'rgba(130,72,34,0.72)'],
+  dark: ['rgba(120,90,60,0)', 'rgba(120,90,60,0.38)', 'rgba(170,120,75,0.5)', 'rgba(215,160,105,0.58)', 'rgba(240,200,150,0.66)'],
+};
+export const heatRamp = () => HEAT_RAMP[isDark() ? 'dark' : 'light'];
+function heatColorExpr() {
+  const r = heatRamp();
+  return ['interpolate', ['linear'], ['heatmap-density'], 0, r[0], 0.12, r[1], 0.35, r[2], 0.65, r[3], 1, r[4]];
+}
+
+/** Years and magnitude shown in the simple view: {y0, y1, minM}; y1 is the last year in the data. */
+export function simpleFilterValues() {
+  const st = C.state;
+  const [a, b] = events.years;
+  const y0 = st.sr ? Math.max(a, b - st.sr + 1) : a;
+  return { y0, y1: b, minM: st.sm };
+}
+
+function simpleFilter() {
+  const { y0, y1, minM } = simpleFilterValues();
+  const useM5 = minM < 6 && events.e5;
+  return ['all', ['>=', ['get', 'y'], y0], ['<', ['get', 'y'], y1 + 1], ['>=', ['get', 'm'], minM], useM5 ? true : ['==', ['get', 'k'], 6]];
+}
+
+/** Number of events the simple view draws with its current filter. */
+export function simpleCount() {
+  if (!events.e6) return 0;
+  const { y0, y1, minM } = simpleFilterValues();
+  let n = 0;
+  const count = (e, keep) => { for (let i = 0; i < e.n; i++) if (e.year[i] >= y0 && e.year[i] < y1 + 1 && e.mag[i] >= minM && (!keep || keep(i))) n++; };
+  count(events.e6);
+  if (minM < 6 && events.e5) count(events.e5, (i) => events.e5.mag[i] < 6);
+  return n;
+}
+
+export const getEvents = () => events;
+export const getZoom = () => (map ? map.getZoom() : 1.5);
+
+function ensureSimpleLayers() {
+  if (map.getLayer('sx-dots') || !events.e6 || !simple()) return;
+  ensureEventsSource();
+  map.addLayer({
+    id: 'sx-heat', type: 'heatmap', source: 'events', maxzoom: 9,
+    paint: {
+      'heatmap-weight': 1,
+      'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 0.5, 4, 1, 8, 1.2],
+      'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 13, 3, 28, 6, 44, 8, 60],
+      'heatmap-color': heatColorExpr(),
+      'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.9, 4, 0.7, 7, 0.4],
+    },
+  }, 'coast');
+  map.addLayer({
+    id: 'sx-dots', type: 'circle', source: 'events',
+    layout: { 'circle-sort-key': ['get', 'm'] },
+    paint: {
+      'circle-color': depthColorExpr(),
+      'circle-opacity': 0.85,
+      'circle-stroke-color': cssVar('--surface'),
+      'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 0, 0.4, 4, 0.9],
+      'circle-stroke-opacity': 0.9,
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 0, radiusExpr(0.62), 3, radiusExpr(0.85), 6, radiusExpr(1.6)],
+    },
+  }, 'cells-hover');
+  map.on('zoomend', () => { if (simple() && C.onSimpleZoom) C.onSimpleZoom(); });
+  map.addSource('sx-place', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+  map.addLayer({ id: 'sx-radius-fill', type: 'fill', source: 'sx-place', filter: ['==', ['get', 'k'], 'r'], paint: { 'fill-color': cssVar('--accent'), 'fill-opacity': 0.06 } });
+  map.addLayer({ id: 'sx-radius-line', type: 'line', source: 'sx-place', filter: ['==', ['get', 'k'], 'r'], paint: { 'line-color': cssVar('--accent'), 'line-width': 1.6, 'line-dasharray': [3, 2] } });
+  map.addLayer({ id: 'sx-pin', type: 'circle', source: 'sx-place', filter: ['==', ['get', 'k'], 'p'], paint: { 'circle-color': cssVar('--accent'), 'circle-radius': 6, 'circle-stroke-color': cssVar('--surface'), 'circle-stroke-width': 2.5 } });
+}
+
+function applySimple() {
+  const on = simple();
+  if (region && map.getSource('rcells')) for (const id of R_LAYERS) map.setLayoutProperty(id, 'visibility', on ? 'none' : 'visible');
+  if (on) ensureSimpleLayers();
+  if (!map.getLayer('sx-dots')) return;
+  const vis = on ? 'visible' : 'none';
+  for (const id of ['sx-heat', 'sx-dots', 'sx-radius-fill', 'sx-radius-line', 'sx-pin']) map.setLayoutProperty(id, 'visibility', vis);
+  if (!on) return;
+  const flt = simpleFilter();
+  map.setFilter('sx-dots', flt);
+  map.setFilter('sx-heat', flt);
+  // the density of M5 events is about ten times that of M6 events: scale the shading so both read alike
+  const k = C.state.sm < 6 && events.e5 ? 0.25 : C.state.sm >= 7 ? 4 : 1;
+  map.setPaintProperty('sx-heat', 'heatmap-intensity', ['interpolate', ['linear'], ['zoom'], 0, 0.5 * k, 4, 1 * k, 8, 1.2 * k]);
+}
+
+/** Draw the looked-at place: a pin and the circle the place card counts in. */
+export function setPlace(pl) {
+  if (!map) return;
+  if (pl && simple()) ensureSimpleLayers();
+  const src = map.getSource('sx-place');
+  if (!src) return;
+  if (!pl) { src.setData({ type: 'FeatureCollection', features: [] }); return; }
+  const ring = [];
+  const R = 6371.0, d = pl.r / R, la = (pl.lat * Math.PI) / 180, lo = (pl.lon * Math.PI) / 180;
+  for (let k = 0; k <= 96; k++) {
+    const th = (2 * Math.PI * k) / 96;
+    const lat2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(th));
+    const lon2 = lo + Math.atan2(Math.sin(th) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(lat2));
+    ring.push([(lon2 * 180) / Math.PI, (lat2 * 180) / Math.PI]);
+  }
+  src.setData({ type: 'FeatureCollection', features: [
+    { type: 'Feature', properties: { k: 'r' }, geometry: { type: 'Polygon', coordinates: [ring] } },
+    { type: 'Feature', properties: { k: 'p' }, geometry: { type: 'Point', coordinates: [pl.lon, pl.lat] } },
+  ] });
+}
+
+/** Fly to a place so its counting circle fits, leaving room for the place card. */
+export function showPlace(lat, lon, r) {
+  if (!map) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const dLat = r / 111, dLon = r / (111 * Math.max(0.2, Math.cos((lat * Math.PI) / 180)));
+  const wide = innerWidth > 720;
+  const H = map.getContainer().clientHeight;
+  const pad = wide ? { top: 80, bottom: 80, left: 80, right: 80 } : { top: 120, bottom: Math.round(H * 0.55), left: 30, right: 30 };
+  map.fitBounds([[lon - dLon * 3, lat - dLat * 3], [lon + dLon * 3, lat + dLat * 3]], { padding: pad, maxZoom: 6, duration: reduce ? 0 : 900 });
+}
+
+function simpleMove(e) {
+  setHover(null);
+  const evHit = map.getLayer('sx-dots') ? (() => {
+    const r = 4;
+    const hits = map.queryRenderedFeatures([[e.point.x - r, e.point.y - r], [e.point.x + r, e.point.y + r]], { layers: ['sx-dots'] });
+    return hits.length ? hits.reduce((a, b) => (b.properties.m > a.properties.m ? b : a)) : null;
+  })() : null;
+  if (evHit) showTip(e.point, eventTipNode(evHit.properties, t('sx.tipClick')));
+  else hideTip();
+  map.getCanvas().style.cursor = 'pointer';
 }
 
 // ---------- regional catalogues ----------

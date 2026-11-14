@@ -66,6 +66,29 @@ Status on 2026-11-13 (branch with the browser suite, comparison, CSV, regional l
   `console.error: Error` at teardown. The same tests pass in Firefox on macOS (5/5 locally, 2026-11-13), so this looks
   specific to the runner's WebGL setup. Firefox and WebKit jobs are `continue-on-error`; Chromium is the required job.
 
+## Simple view (v0.3)
+
+- **Gazetteer coverage.** The place search knows the 7,342 places of Natural Earth 1:10m Populated Places (capitals,
+  regional capitals and larger towns). Villages, streets and postcodes are not found; clicking the map works anywhere.
+  Natural Earth has no Uzbek names, so Uzbek visitors search with the Latin name as published (for example
+  "Tashkent"; "Samarqand" and "Andijon" work through Natural Earth's ASCII and alternative names). Russian and Spanish
+  names match when Natural Earth has them. Some Natural Earth alternative names are truncated in the source (for
+  example "Ciudad de M"); they are used for matching only and never shown.
+- **Counting radius.** Place counts use great-circle distance on a sphere of radius 6,371 km to the epicentre. The
+  100 km and 300 km circles are drawn the same way; at high latitudes they look stretched on the Mercator map.
+- **Magnitudes in the place card.** The card counts the events of `events_m6.json`, which mixes ISC-GEM Mw and
+  ComCat magnitude types (the map tooltip and the event popup name the type). It always counts M6+ and M7+, whatever
+  the magnitude control shows. The years follow the Years control.
+- **M5+ before 1973.** `events_m5.json` has few M5 events before 1973 (ComCat starts in 1973; ISC-GEM is complete for
+  M5 only in places). The legend says so when M5+ is chosen with all years.
+- **Recording rating.** It uses the shallow statistics of one cell and the global shallow Mc; it is not computed for
+  deeper events, and it describes global catalogues, not local networks. The mapping is in `docs/learn.md`.
+- **Density shading.** A MapLibre heatmap of the drawn events: its look depends on zoom (radius in pixels) and on the
+  filter. It has no numeric scale on purpose (it is not a rate or hazard surface); the Scientist view has the M6+ rate
+  per 100,000 km² per year.
+- **Not tested.** Screen readers (VoiceOver, NVDA, TalkBack) on the search combobox and the bottom sheet; a swipe to
+  resize the bottom sheet (it scrolls, it does not drag); real phones; right-to-left languages (none offered).
+
 ## Relief, 3D terrain and the Depth 3D view
 
 Status on 2026-11-14 (branch `feat/terrain3d`); details in [basemap.md](basemap.md).

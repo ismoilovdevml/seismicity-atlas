@@ -86,3 +86,93 @@ Browser, GEM OpenQuake map viewer; EMSC from earlier use). What we take, and wha
 - **Sharing.** Open Graph and Twitter card tags, a canonical URL, `theme-color` for both schemes, a 1200 × 630 card
   rendered from the real map (`og-image.png`, about 120 KB) and an `apple-touch-icon.png`. The favicon now uses the
   brand mark (hexagon and trace on the accent colour) instead of a generic seismogram on black.
+
+## v0.3 two-mode redesign (2026-11-14)
+
+Visitors asked why the site shows hexagons. The hexagons are the statistics cells (H3 resolution 2) in which b and Mc
+are computed; they answer a scientist's question ("where can catalogue numbers be trusted?"), not the first question
+of most visitors ("do earthquakes happen where I live?"). The site now has two modes:
+
+- **Simple** (default for new visitors): real earthquakes as dots over a density shading, a place search, a place
+  card in plain words, four controls and a three-step first-visit tip.
+- **Scientist**: the v0.2 interface unchanged (cells, b with 95 % interval, quality codes, Mc, catalogue
+  consistency, comparison, regional layers, CSV), now labelled "Scientist view", with one legend line that answers
+  "What is a hexagon?" (an equal-area statistics cell; the mean area and the sample radius are read from the data).
+
+### What public earthquake and weather maps do (looked at for this redesign)
+
+Sources: the USGS Latest Earthquakes page (its map is a JavaScript application; an automated fetch on 2026-11-14 saw
+only its header, so the behaviour below is from earlier use and USGS's own map descriptions), USGS image captions of
+world seismicity maps, EMSC's description of LastQuake and the papers on it, GEM's map viewer (looked at on
+2026-11-13), and consumer weather maps of the Windy kind (from general use, not re-checked this session).
+
+1. **A dot per earthquake, sized by magnitude (USGS, EMSC).** Size is the one encoding everyone reads without a
+   legend. We keep it and draw only real events; nothing is interpolated into the dot layer.
+2. **Colour by depth or by age (USGS).** USGS world maps colour by depth (light = shallow, dark = deep); the live map
+   colours by age. A 120-year record has no meaningful "age" colour, so we colour by three depth classes
+   (≤ 70, 70–300, > 300 km) in one blue ramp, deeper = more contrast, validated for colour-vision deficiency.
+3. **Plain language before numbers (EMSC LastQuake).** LastQuake collects felt reports through cartoons rather than
+   intensity numbers. Our first screen asks a question in words, and the place card uses counts, dates and four rating
+   words; Mw, b and quality codes are one click away, not on the first screen.
+4. **The place is the unit (Windy, USGS "Did You Feel It?").** Consumer maps start from "search a place" and answer
+   for that place. We do the same, client-side, and always print the radius and the years the numbers cover.
+5. **One search box, the map is the page, a bottom sheet on phones (Windy).** Search sits top-left; the answer slides
+   up from the bottom on phones and sits beside the map on desktop, so the map stays visible.
+6. **A continuous colour surface reads as a hazard map (GEM).** GEM's hazard maps use a continuous warm surface with
+   a ground-motion scale. Our density shading must not look like that: it is pale umber, has no numeric scale, fades
+   when zoomed in, and is labelled "where earthquakes have been recorded since 1904. Not a hazard map."
+7. **Say what a map is not, where people look (USGS, GEM).** Disclaimers in footers are not read. The place card ends
+   with "This is a record of past earthquakes, not a forecast or a hazard map. For safety information see your
+   national agency." on every place, in all four languages.
+8. **Power tools stay, behind a switch (IRIS IEB, GEM).** Expert viewers keep their filters in the same app. Our
+   Scientist view is the full v0.2 interface; existing links open it unchanged.
+
+### Decisions
+
+- **Mode switch.** A two-option radio group "Simple | Scientist" in the header (one tab stop, arrow keys switch),
+  translated in four languages. The mode is in the URL (`mode=simple|pro`) and, when chosen with the switch, in
+  `localStorage` (`gsa-mode`), following the language pattern (`gsa-lang`, `lang=` always in the hash). Rule, in
+  `app.js` `modeOf()` and repeated in a tiny script in `<head>` so the first paint is already right: the hash's
+  `mode=`; else **Scientist when the link carries any expert key** (`l m d c k r ev y mm tr`, so every link made
+  before v0.3 keeps working); else the stored choice; else Simple.
+- **Navigation per mode.** Simple: Map, Recent big quakes (the Ongoing page, renamed for the public), Depth 3D,
+  Learn, About. Sequences and Validation are research pages (Omori fits, published-value checks) and only appear in
+  the Scientist menu; their URLs still work in either mode. Depth 3D stays in both: hypocentres under the surface are
+  the clearest picture of why earthquakes cluster at plate edges. When the Sequences page is opened by URL in
+  Simple mode, its "Show on map" opens the place card around the mainshock (the Simple map has no event filter).
+- **Dots and shading.** Both read `events_m6.json` (and `events_m5.json` when the visitor picks 5+, loaded on demand,
+  7.5 MB). The shading is a MapLibre heatmap of the same filtered events, weight 1 per event, so it shows where events
+  were recorded, nothing else. Its intensity is scaled ×0.25 for M5+ and ×4 for M7+ so the three filters look alike.
+- **Colours (dataviz validator, `--ordinal`).** Depth: light `#5598e7 #1c5cab #0d366b`, dark `#256abf #6da7ec
+  #cde2fb`; all checks pass against land (`#e4e1d9` / `#2a2e33`) and ocean (`#f4f3ef` / `#14171a`), light-end
+  contrast 2.29–3.33:1 (ordinal floor 2:1). Each dot has a surface ring. The shading uses a separate warm one-hue ramp
+  (umber, transparent at zero), the second sequential hue next to blue, so dots and shading never share a hue. The
+  accent colour marks only the chosen place (pin and radius), never data.
+- **Place search.** Natural Earth 1:10m Populated Places v5.1.2 (public domain), 7,342 places, shipped as
+  `site/data/places.json` (585 KB, 242 KB gzip), loaded on the first focus of the search box or the first map click.
+  Matching folds case and accents (`norm()` in `places.js`), also on the Russian and Spanish names and the
+  alternative names of Natural Earth; results are ranked exact, prefix, word prefix, substring, then by population.
+  Natural Earth has no Uzbek names, so none are shown or invented. Keyboard: arrows, Enter, Escape; IME composition
+  is respected.
+- **Place card.** Counts of M6+ and M7+ events within 100 km or 300 km (a switch; 300 km is the atlas's sample
+  radius), the years they cover (the Years control applies), the largest and the most recent with a USGS link, the
+  median depth in words, the recording rating with its three inputs printed, "Scientist view of this place →", and
+  the honesty line. Every number comes from `placeStats()` and `recordingRating()` in `places.js`; the browser tests
+  recompute them in Python from the JSON files.
+- **Recording rating.** Four words from the shallow statistics of the cell under the place; the exact table is in
+  `docs/learn.md` and on the Learn page "How well earthquakes are recorded" (the card's (i) button).
+- **Controls.** Years (last 10, last 50, all), magnitude (5+, 6+, 7+), plate boundaries, relief. On phones they fold
+  behind an options button in the search field.
+- **First-visit tip.** Three steps (dots, shading, search), each outlining the part of the legend or the search box it
+  explains; Skip or Got it stores `gsa-tour=1`. Not shown in the Scientist view.
+- **Learn buttons.** Three in the Simple legend (magnitudes, not a forecast, plate boundaries) and one on the rating.
+
+### ui-ux-pro-max and frontend-design
+
+- `--design-system` for "public earthquake map consumer calm trustworthy" again returned **Minimalism & Swiss Style**;
+  its palette (navy and blue) and fonts (Lora / Raleway) were not used, because the project's tokens (Inter, IBM Plex
+  Mono, accent `#0E6B73`, warm neutrals) are fixed and a second font family would split the two modes.
+- UX guidance applied: autocomplete as you type with a "no results" message that says what to do next; the IME
+  Enter rule; 44 px targets on phones; visible focus; no horizontal scroll at 360 px (tested).
+- The one bold element is the headline question over the map; everything else stays quiet (one card, one legend, the
+  rest is map). No numbered eyebrows except the tour's "Tip 1 of 3", which is a real sequence.
