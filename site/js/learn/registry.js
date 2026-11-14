@@ -23,6 +23,7 @@ export const CONCEPTS = [
   { id: 'catalogue-consistency', group: 'caveats', diagram: 'consistency' },
   { id: 'regional-catalogues', group: 'caveats', diagram: 'regional-ladder' },
   { id: 'not-a-forecast', group: 'caveats', diagram: 'poisson' },
+  { id: 'recording-rating', group: 'caveats', diagram: 'rating-ladder' },
 ];
 
 export const byId = new Map(CONCEPTS.map((c) => [c.id, c]));

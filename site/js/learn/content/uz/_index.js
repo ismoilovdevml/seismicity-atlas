@@ -7,6 +7,7 @@ export default {
   'gutenberg-richter-b-value': [`Gutenberg-Richter b qiymati`, `Yirik zilzilalar kichiklariga nisbatan qanchalik tez kamayib borishini koʻrsatadigan qiyalik.`],
   'confidence-interval-bootstrap': [`95 % oraliq va bootstrap`, `b qiymati qanchalik ishonchli ekanini katalogni koʻp marta qayta tanlab baholash.`],
   'quality-codes': [`A, B, C va “yetarli emas” sifat kodlari`, `Nega baʼzi kataklarda b qiymati koʻrsatiladi, aksariyatida esa yoʻq.`],
+  'recording-rating': [`Zilzilalar qanchalik yaxshi qayd etiladi`, `Oddiy koʻrinishdagi toʻrt soʻzli baho va uning ortidagi aniq qoida.`],
   'b-positive': [`b-positive`, `Magnituda farqlaridan olinadigan va oʻtkazib yuborilgan kichik aftershoklar chalgʻitmaydigan b qiymati.`],
   'declustering': [`Klasterlardan tozalash`, `Aftershoklarni fazo-vaqt oynalari bilan olib tashlash va nega bu yerda u b ni pasaytiradi.`],
   'omori-utsu': [`Omori-Utsu soʻnishi`, `Aftershoklar chastotasi vaqt oʻtishi bilan qanday pasayadi: K, c va p.`],

@@ -45,6 +45,7 @@ export const REFS = {
   'gutenberg-richter-b-value': [R.kagan2010, R.birdKagan2004, R.michael2014, R.marzocchi2020],
   'confidence-interval-bootstrap': [R.woessner2005, R.marzocchi2020],
   'quality-codes': [R.woessner2005, R.marzocchi2020, R.wiemer2002],
+  'recording-rating': [R.woessner2005, R.wiemer2002, R.storchak2013],
   'b-positive': [R.vanDerElst2021, R.page2016],
   'declustering': [R.gardner1974, R.kagan2010],
   'omori-utsu': [R.helmstetter2006, R.page2016, R.wells1994],

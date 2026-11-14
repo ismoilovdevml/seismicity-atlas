@@ -18,6 +18,16 @@ new Zenodo version, see below) when the data are meant to be cited, for example 
 change. The tag is `v` + the version in `release.json` on that commit (for example `v0.1.3`). Keep `version` in
 `CITATION.cff` equal to the tag.
 
+### Interface-only changes
+
+The version in `release.json` is the version of the **data contract** (`site/data/`): `bump_release.py` writes only
+`release.json`, and the number reaches the site through `site_layers.py`, that is, through a pipeline run. An
+interface change that does not touch `site/data/` schema or numbers (for example the v0.3 two-mode redesign of
+2026-11-14: Simple and Scientist views, place search, place card) therefore does **not** bump the version; the site
+keeps showing the data version (0.2.0). The new `site/data/places.json` is a static gazetteer for the interface
+(Natural Earth, built by `scripts/basemap/build_places.py`), not a pipeline output, and is not listed in
+`manifest.json`. The next data or method release takes the next minor version as usual.
+
 ## Monthly data update (`.github/workflows/update-data.yml`)
 
 Runs at 04:17 UTC on the 2nd of every month, and on demand (Actions → Update data → Run workflow, with an optional

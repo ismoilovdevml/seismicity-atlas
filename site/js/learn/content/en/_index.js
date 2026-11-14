@@ -7,6 +7,7 @@ export default {
   'gutenberg-richter-b-value': [`Gutenberg-Richter b-value`, `The slope that says how quickly large earthquakes become rarer than small ones.`],
   'confidence-interval-bootstrap': [`95 % interval and the bootstrap`, `How sure a b-value is, estimated by re-drawing the catalogue many times.`],
   'quality-codes': [`Quality codes A, B, C and insufficient`, `Why some cells show a b-value and most do not.`],
+  'recording-rating': [`How well earthquakes are recorded`, `The four-word rating in the Simple view, and the exact rule behind it.`],
   'b-positive': [`b-positive`, `A b-value from magnitude differences that is not fooled by missing small aftershocks.`],
   'declustering': [`Declustering`, `Removing aftershocks with space-time windows, and why it lowers b here.`],
   'omori-utsu': [`Omori-Utsu decay`, `How aftershock rates fall with time: K, c and p.`],

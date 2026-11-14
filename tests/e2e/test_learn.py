@@ -11,6 +11,7 @@ CONCEPTS = [
     "gutenberg-richter-b-value", "confidence-interval-bootstrap", "quality-codes", "b-positive", "declustering",
     "omori-utsu", "aftershock-productivity-bath", "h3-cells-and-sample-radius", "plate-boundary-classes",
     "depth-and-slabs", "rate-m6", "catalogue-consistency", "regional-catalogues", "not-a-forecast",
+    "recording-rating",  # v0.3: the Simple-view rating
 ]
 LANGS = {"en": "en", "uz": "uz-Latn", "ru": "ru", "es": "es"}
 

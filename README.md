@@ -13,6 +13,10 @@ An open, reproducible world map of earthquake-catalogue statistics, built only f
 
 The main message is **where the catalogue numbers can be trusted, and where they cannot.**
 
+The website opens in a **Simple view** for everyone: the recorded earthquakes on a map, a place search, and a card
+that says in plain words what was recorded around a place and how well. The **Scientist view** (one switch in the
+header) holds the cell statistics behind it. See [Website](#website).
+
 > **Not a forecast. Not a hazard map.** These are descriptive statistics of earthquake catalogues, for research
 > and education. They do not predict earthquakes and must not be used in place of an official seismic hazard
 > assessment.
@@ -126,23 +130,33 @@ loads lazily, including 1,292 per-cell detail files. The site needs no third-par
 cd site && python3 -m http.server 8000   # then open http://localhost:8000/
 ```
 
-- **Map:** b-value with its 95 % interval and quality code, estimate quality, completeness Mc (ISC-GEM and ComCat),
+- **Two modes (v0.3).** A "Simple | Scientist" switch in the header; the choice is kept in the URL (`mode=`) and in
+  the browser. Links made before v0.3 (any link with a layer, cell or depth) open in the Scientist view.
+- **Simple view (default):** the question "Where do earthquakes happen, and how well are they recorded?", real
+  earthquakes as dots sized by magnitude and coloured by depth, a pale shading of where earthquakes have been recorded
+  (not a hazard map), plate boundaries and relief. Search a city (offline, from Natural Earth's 7,342 populated
+  places, accent-insensitive) or click the map for a place card: M6+ and M7+ counts within 100 or 300 km with the
+  years, the largest and the latest event with USGS links, the typical depth, a four-word rating of how well
+  earthquakes are recorded there (its exact rule is in [docs/learn.md](docs/learn.md)), a button that opens the
+  Scientist view on that place's cell, and the line "This is a record of past earthquakes, not a forecast or a
+  hazard map." A three-step tip on the first visit; a bottom sheet on phones.
+- **Scientist view (map):** b-value with its 95 % interval and quality code, estimate quality, completeness Mc (ISC-GEM and ComCat),
   catalogue disagreement, M6+ rate; shallow or deeper; plate boundaries; earthquakes M ≥ 6 (M ≥ 5 on request) with
   a time filter and links to USGS event pages; optional globe view. Hover a cell for its values; click it for the
   cell panel (frequency-magnitude distribution, Mc over time, b against cutoff, yearly counts, catalogue
   agreement), with a per-cell CSV download and a side-by-side comparison of two cells' b intervals. Regional
   higher-resolution catalogues appear as an extra layer when `site/data/regional/index.json` is present. The state,
   including the language (English, Uzbek, Russian, Spanish), is kept in the URL hash, so any view can be shared.
-- **Sequences:** Omori-Utsu decay charts and quality badges for the 40 sequences.
-- **Ongoing:** the Sequence Monitor, updated daily. One card per M ≥ 7 mainshock of the last 365 days: counts,
+- **Sequences** (Scientist view): Omori-Utsu decay charts and quality badges for the 40 sequences.
+- **Ongoing** ("Recent big quakes" in the Simple view): the Sequence Monitor, updated daily. One card per M ≥ 7 mainshock of the last 365 days: counts,
   Omori-Utsu fit, b with its interval and quality code, the largest aftershock, productivity compared with the
   regional generic values of Page et al. (2016), and a cumulative chart that stops at the data cut-off.
   Descriptive only, not a forecast. See below.
-- **Validation:** every test against published values, including the mismatch and the untestable rows.
+- **Validation** (Scientist view): every test against published values, including the mismatch and the untestable rows.
 - **About & data:** sources, licences, data cut-off, how to cite, downloads.
 - **Learn:** one page per concept behind the numbers (magnitude types, Mc, the FMD, b and its interval, quality
   codes, b-positive, declustering, Omori-Utsu, Båth's law, H3 cells, plate classes, depth and slabs, rates,
-  catalogue consistency, regional catalogues, why this is not a forecast), each with a plain explanation, a real
+  catalogue consistency, regional catalogues, why this is not a forecast, how the Simple view rates recording), each with a plain explanation, a real
   example read from `site/data`, an interactive diagram, technical details and references, in all four languages.
   Small (i) buttons next to the labels of the map, legend, cell panel, comparison, Sequences, Ongoing, Depth 3D,
   Validation and About open the matching page; "Back to where I was" returns to the same view. Loaded on demand.
@@ -160,7 +174,11 @@ cd site && python3 -m http.server 8000   # then open http://localhost:8000/
   with their intervals). three.js 0.170.0 (MIT) is vendored and loads only in that view. Sources, licences and
   sizes: [docs/basemap.md](docs/basemap.md).
 
-![Map with a selected cell](docs/img/site-map-panel-light.png)
+![Simple view: earthquakes, density shading and place search](docs/img/site-v3-simple-light.png)
+
+![Simple view on a phone, dark theme, with a place card](docs/img/site-v3-phone-dark-card.png)
+
+![Scientist view with a selected cell](docs/img/site-v3-expert.png)
 
 ![Depth 3D view, Japan with Slab2](docs/img/site-3d-light.png)
 
