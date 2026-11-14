@@ -103,6 +103,9 @@ Status on 2026-11-13 (branch with the browser suite, comparison, CSV, regional l
 - **`rating.json` follows `cells.geojson`.** It is rebuilt by `scripts/build_rating.py` (in `run_all.sh` after
   `site_layers.py`); `tests/test_rating.py` fails when it is stale.
 - **Uzbek place names.** Still none (Natural Earth has none): "Toshkent" finds nothing, "Tashkent" works.
+- **Tested (2026-11-14, v0.3.0).** The whole browser suite (125 tests) in Chromium; `test_v03.py` (8 tests), the
+  globe test of `test_map.py` and `test_simple.py` (26 tests) also in Firefox and WebKit; unit tests 53 pass. The other
+  older browser tests were not re-run in Firefox and WebKit for this release.
 
 ## Relief, 3D terrain and the Depth 3D view
 
