@@ -180,6 +180,78 @@ Reading the comparison honestly:
 A push made with `GITHUB_TOKEN` does not start other workflows, so `pages.yml` lists "Update monitor" under
 `workflow_run` and redeploys the site after it.
 
+## 9. Productivity compared with Zhang & Werner (2020) (data fields only)
+
+An optional second productivity reference for **subduction-zone regimes** (Garcia `SZ-*`), stored next to the
+Page et al. (2016) comparison as `productivity_zw2020` in each sequence file (and a short version in `index.json`).
+It is not shown in the view yet. Method version `monitor-1.1`.
+
+**Source.** Zhang, L., Werner, M. J., Goda, K. (2020), "Variability of ETAS parameters in global subduction zones and
+applications to mainshock–aftershock hazard assessment", BSSA 110(1), 191–212, doi:10.1785/0120190121; read from
+the annotated manuscript on Zenodo (record 4270128). They fit space-time ETAS models to NEIC data around 36 M ≥ 7.5
+megathrust earthquakes (1999–2017, depth < 100 km, Mcut = 4.5). Their only table of ETAS values is Table 6,
+"Suggested ETAS parameters for future M9.0 events" (median ± standard error):
+
+| K0 (labelled event/day) | α (magnitude⁻¹) | c (day) | p | d (km²) | γ (magnitude⁻¹) | q |
+|---|---|---|---|---|---|---|
+| 0.04 ± 0.02 | 2.3 ± 0 (fixed) | 0.03 ± 0.01 | 1.21 ± 0.08 | 23.48 ± 18.17 | 1.61 ± 0.29 | 1.68 ± 0.55 |
+
+Per-sequence and per-region values (Cases 1–3) are given only in figures; the paper states that for M 7.5–7.9
+individual sequences "K0 from 0.2 to 0.7 and α from 1.0 to 2.0" (free α). Table 2 lists, for each of the 36
+sequences, the number of M ≥ 4.5 events and Mc in their individual-sequence windows (Case 3: 1, 2 or 4 years after
+the mainshock, twice the rupture length and width). Both tables are transcribed in `monitorlib.ZW2020` and
+`monitorlib.ZW2020_TABLE2_CASE3`.
+
+**Maths** (`monitorlib.zw2020_productivity`). Their Omori function v(t) = (p − 1) c^(p−1) (t + c)^(−p) is normalised,
+so K0 e^(α(M − 4.5)) is the expected number of **direct** aftershocks above 4.5 (despite the "event/day" label).
+For our sequence:
+
+1. D = K0 e^(α(Mm − 4.5)) ∫₀ᵀ v(t) 10^(−(Mc(t) − 4.5)) dt, the direct aftershocks above our Mc(t) between the mainshock
+   and the cut-off (b = 1, which α = 2.3 corresponds to);
+2. ratio = n / D, with n our count above Mc(t) (as for Page et al.); 95 % interval from the Poisson error of n and
+   the standard error of K0 (0.02 on 0.04, delta method on log₁₀), so the interval is wide (about ×2.7 each side);
+3. our n contains secondary aftershocks and background events, so the ratio is normally above 1. The reference is
+   the same ratio for their own Case 3 sequences: their Table 2 count divided by D over their window, for the 14
+   sequences with Mc ≤ 4.5, ≥ 100 events and a window defined in their Table 1 (the two M 8.0 events fall between
+   their magnitude classes). Reference ratios: median **2.89**, range **1.22–10.41**;
+4. `class` = "within" / "above" / "below" the reference range (point estimate), `ref_percentile` its position;
+   `in_calibration_range` is false outside M 7.5–9.0 or for depth ≥ 100 km.
+
+**Results at the 2026-11-14 12:00 UTC cut-off** (same data as §4; Colombia has too few events):
+
+| Mainshock | M, depth | In range | n | D | Ratio [95 %] | Percentile of the reference | Page et al. label, ratio |
+|---|---|---|---|---|---|---|---|
+| Panama | 7.7, 10 km | yes | 111 | 45.8 | 2.42 [0.89, 6.57] | 36 | more, 2.8 |
+| Ende, Indonesia | 7.8, 10 km | yes | 239 | 59.8 | 3.99 [1.49, 10.73] | 64 | more, 2.7 |
+| Puerto Madero, Mexico | 7.3, 22 km | no (M) | 116 | 25.4 | 4.57 [1.69, 12.38] | 64 | more, 4.5 |
+| Kablalan, Philippines | 7.8, 57 km | yes | 196 | 49.6 | 3.95 [1.47, 10.63] | 64 | more, 3.7 |
+| Miyako, Japan | 7.4, 25 km | no (M) | 108 | 32.4 | 3.33 [1.23, 9.03] | 64 | more, 3.0 |
+| Bitung, Indonesia | 7.4, 35 km | no (M) | 124 | 20.8 | 5.95 [2.20, 16.11] | 86 | more, 5.1 |
+| Luganville, Vanuatu | 7.3, 121 km | no | 21 | 13.3 | 1.58 [0.54, 4.61] | 7 | typical, 1.4 |
+| Neiafu, Tonga | 7.5, 234 km | no (depth) | 35 | 40.6 | 0.86 [0.31, 2.42] | 0 (below) | typical, 0.8 |
+| Aomori, Japan | 7.6, 41 km | yes | 116 | 51.2 | 2.27 [0.84, 6.14] | 29 | typical, 1.2 |
+
+Reading:
+
+- All seven shallow subduction sequences lie **inside the range** of the Zhang & Werner sequences (percentiles
+  29–86); only the 234 km deep Tonga event falls below, and it is outside their calibration (depth < 100 km).
+- Against Page et al. (2016) six of the same sequences are "more productive". Against the ETAS-based reference
+  they are ordinary. This supports §7, item 3: the "more productive" labels at least partly reflect the reference
+  (generic RJ parameters, window rule, magnitude types), not unusual sequences.
+- Limits: the reference has 14 sequences; their windows (twice the rupture dimensions, 1–4 years, NEIC) differ from
+  ours (circle R, up to 1 year, ComCat as served); our mainshocks M 7.3–7.8 are at or below their lowest magnitude;
+  only the K0 uncertainty is propagated (p, c held at Table 6). The comparison is descriptive and uses only data up
+  to the cut-off.
+
+Tests: `tests/test_sci2.py` (synthetic direct-only sequences with the Table 6 parameters return a mean log₁₀ ratio
+within 0.03 of 0 over 12 runs; a 30-fold productivity gives the ratio within 0.1 in log₁₀ and "above"; the
+reference ratios reproduce the Table 2 arithmetic; non-subduction regimes are not compared).
+
+## 10. CSEP-style consistency check (retrospective, not on the site)
+
+Whether a CSEP number test makes sense for a descriptive Omori fit, and the result of a retrospective N-test on
+four completed sequences, are in [comparisons.md](comparisons.md) §5. Nothing from it is shown on the site.
+
 ## References
 
 - Båth, M. (1965), Tectonophysics 2, 483–514.
@@ -189,4 +261,5 @@ A push made with `GITHUB_TOKEN` does not start other workflows, so `pages.yml` l
 - Reasenberg, P. A., Jones, L. M. (1989), Science 243, 1173–1176; (1994), Science 265, 1251–1252.
 - van der Elst, N. J. (2021), JGR 126, e2020JB021027 (b-positive).
 - Wells, D. L., Coppersmith, K. J. (1994), BSSA 84(4), 974–1002.
+- Zhang, L., Werner, M. J., Goda, K. (2020), BSSA 110(1), 191–212, doi:10.1785/0120190121.
 - USGS OpenSHA OAF software, github.com/opensha/opensha-oaf (generic parameters and regime grid).

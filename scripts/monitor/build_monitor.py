@@ -15,6 +15,9 @@ Omori     : Omori-Utsu MLE above Mc(t) (seislib.omori_fit_mct), b = sequence b-p
             95 % intervals from the observed information; quality A/B/C as in the atlas sequence fits.
 b         : Aki-Utsu with the per-event threshold Mc(t); 200 bootstrap resamples with Mcat re-estimated; shown only
             for quality A (95 % interval <= 0.30) or B (<= 0.50) with >= 50 events. b-positive (van der Elst 2021).
+ZW2020    : optional, subduction-zone regimes only: count above Mc(t) divided by the direct-aftershock count of
+            the Zhang & Werner (2020) Table 6 ETAS parameters over the same span, next to the same ratio for their
+            own Case 3 sequences (descriptive; nothing is extrapolated past the cut-off).
 Productivity : sequence a-value with p, c, b fixed at the generic values of Page et al. (2016) for the Garcia et
             al. (2012) tectonic region of the epicentre, compared with the regional mean a. "more" / "less" only
             when the 95 % interval of the sequence a excludes the regional mean; otherwise "typical".
@@ -46,7 +49,7 @@ from fetch import COMCAT, PAUSE_S, TooMany, cache_get  # noqa: E402
 
 ROOT = HERE.parents[1]
 OUT = ROOT / "site" / "data" / "monitor"
-METHOD_VERSION = "monitor-1.0"
+METHOD_VERSION = "monitor-1.1"
 MIN_MAG_MAIN, FALLBACK_MAG, MIN_SEQUENCES = 7.0, 6.5, 5
 WINDOW_DAYS = 365
 QUERY_MINMAG = 2.5
@@ -124,6 +127,10 @@ def sequence(ms, absorbed, overlaps, end, regimes, refresh):
     prod = ml.productivity(t, m, age, Mm, mcat, regime)
     if prod.get("class") != "insufficient" and fit["quality"] == "insufficient":
         prod["class"] = "insufficient"
+    depth = float(ms.depth) if pd.notna(ms.depth) else None
+    zw = ml.zw2020_productivity(t, m, age, Mm, mcat, regime, depth)
+    if zw.get("applicable") and zw.get("class") != "insufficient" and fit["quality"] == "insufficient":
+        zw["class"] = "insufficient"
 
     largest = None
     if m.size:
@@ -161,6 +168,7 @@ def sequence(ms, absorbed, overlaps, end, regimes, refresh):
         "bpos": {k: (r4(v, 3) if isinstance(v, float) else v) for k, v in bp.items()},
         "largest_aftershock": largest, "bath_typical_dm": 1.2,
         "productivity": {k: (r4(v) if isinstance(v, float) else v) for k, v in prod.items()},
+        "productivity_zw2020": {k: (r4(v) if isinstance(v, float) else v) for k, v in zw.items()},
         "daily": {"all": d_all, "mcat": d_mcat},
         "cum": cum,
     }
@@ -176,6 +184,8 @@ def summary(rec):
              omori={k: o.get(k) for k in ("p", "p_lo", "p_hi", "quality")},
              b={k: b.get(k) for k in ("b", "lo", "hi", "q")},
              productivity={k: p.get(k) for k in ("class", "ratio", "ratio_lo", "ratio_hi", "percentile")},
+             productivity_zw2020={k: rec["productivity_zw2020"].get(k) for k in
+                                  ("applicable", "class", "ratio", "ratio_lo", "ratio_hi", "in_calibration_range")},
              largest_aftershock=rec["largest_aftershock"], file=f"{rec['id']}.json")
     return s
 
@@ -237,6 +247,8 @@ def main():
         "references": {
             "page2016": "Page, M. T., van der Elst, N., Hardebeck, J., Felzer, K., Michael, A. J. (2016), BSSA 106(5), "
                         "2290-2301, doi:10.1785/0120160073",
+            "zw2020": "Zhang, L., Werner, M. J., Goda, K. (2020), BSSA 110(1), 191-212, doi:10.1785/0120190121 "
+                      "(Table 6 ETAS parameters; Table 2 Case 3 counts as the reference ratios)",
             "regimes": "Garcia, D., Wald, D. J., Hearne, M. G. (2012), BSSA 102(1), 185-203; grid from OpenSHA OAF "
                        "(github.com/opensha/opensha-oaf)",
         },

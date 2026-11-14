@@ -213,6 +213,105 @@ def productivity(t, m, T2, mag_main, mcat, regime):
             "class": cls}
 
 
+# ----------------------------------------------------------------------------------------------- Zhang & Werner 2020
+# Zhang, L., Werner, M. J., Goda, K. (2020), "Variability of ETAS parameters in global subduction zones and
+# applications to mainshock-aftershock hazard assessment", BSSA 110(1), 191-212, doi:10.1785/0120190121.
+# Table 6 ("Suggested ETAS parameters for future M9.0 events", median and standard error): K0 = 0.04 +- 0.02
+# (labelled event/day; with their normalised Omori function v(t) of eq. 3 it is the expected number of direct
+# aftershocks above Mcut of an event of magnitude Mcut), alpha = 2.3 (fixed, corresponds to b = 1), c = 0.03 +- 0.01
+# day, p = 1.21 +- 0.08, d = 23.48 +- 18.17 km^2, gamma = 1.61 +- 0.29, q = 1.68 +- 0.55. Mcut = 4.5 (NEIC catalogue).
+ZW2020 = {"K0": 0.04, "K0_se": 0.02, "alpha": 2.3, "c": 0.03, "c_se": 0.01, "p": 1.21, "p_se": 0.08, "mcut": 4.5,
+          "b": 1.0}
+# Their Table 2, "Subduction sequences - Case 3" columns: (index, M, Mc, number of events M >= 4.5), individual
+# sequences in a target window of 1 yr (7.5 <= M < 8.0), 2 yr (8.1 <= M < 8.7) or 4 yr (M >= 8.7) and a spatial
+# window of twice the rupture length and width, depth < 100 km.
+ZW2020_TABLE2_CASE3 = [
+    (1, 7.8, 4.6, 567), (2, 7.8, 4.6, 543), (3, 8.4, 4.6, 299), (4, 7.6, 4.7, 182), (5, 7.5, 4.3, 58),
+    (6, 7.6, 4.0, 8), (7, 8.3, 4.4, 269), (8, 7.8, 4.1, 116), (9, 7.5, 4.3, 111), (10, 9.0, 4.5, 3298),
+    (11, 8.6, 4.5, 2077), (12, 7.7, 4.8, 348), (13, 8.3, 4.5, 1077), (14, 7.5, 4.6, 345), (15, 8.1, 4.6, 593),
+    (16, 8.0, 4.2, 112), (17, 8.5, 4.4, 634), (18, 7.7, 5.2, 115), (19, 7.7, 4.6, 173), (20, 7.8, 4.5, 118),
+    (21, 8.8, 4.6, 1737), (22, 7.8, 4.1, 85), (23, 7.5, 4.5, 40), (24, 7.8, 4.5, 175), (25, 9.0, 5.0, 5022),
+    (26, 7.6, 4.4, 236), (27, 7.6, 4.3, 32), (28, 7.8, 4.0, 80), (29, 8.0, 4.6, 723), (30, 8.2, 4.4, 409),
+    (31, 7.5, 4.4, 356), (32, 7.5, 4.3, 343), (33, 7.5, 4.6, 316), (34, 8.3, 4.2, 623), (35, 7.8, 4.1, 79),
+    (36, 7.6, 4.1, 11),
+]
+
+
+def zw_omori_fraction(T, c=ZW2020["c"], p=ZW2020["p"]):
+    """Fraction of the normalised Omori function v(t) = (p-1) c^(p-1) (t+c)^-p between 0 and T days."""
+    return 1.0 - (1.0 + T / c) ** (1.0 - p)
+
+
+def zw_direct_count(mag_main, T, mag_min=None, K0=ZW2020["K0"]):
+    """Number of direct (first-generation) aftershocks above mag_min (default Mcut) between 0 and T days implied
+    by the Zhang & Werner (2020) Table 6 parameters: K0 exp(alpha (Mm - Mcut)) F(T) 10^(-b (mag_min - Mcut))."""
+    z = ZW2020
+    mag_min = z["mcut"] if mag_min is None else mag_min
+    return K0 * math.exp(z["alpha"] * (mag_main - z["mcut"])) * zw_omori_fraction(T) * 10 ** (-z["b"] * (mag_min - z["mcut"]))
+
+
+def zw_case3_window_days(mag):
+    """Target window of their Case 3; None for M 8.0-8.1, which their Table 1 does not assign."""
+    if 7.5 <= mag < 8.0:
+        return 365.25
+    if 8.1 <= mag < 8.7:
+        return 2 * 365.25
+    if mag >= 8.7:
+        return 4 * 365.25
+    return None
+
+
+def zw_reference_ratios():
+    """Observed / direct-expected count for their own Case 3 sequences: their Table 2 count of M >= 4.5 events
+    divided by zw_direct_count over their window. Kept: Mc <= 4.5 (complete at Mcut), >= 100 events and a defined
+    window (their own robustness rule is Mc <= 4.5 and >= 100 events). The counts include secondary aftershocks
+    and background events, as ours do, so the ratio is normally above 1."""
+    out = []
+    for idx, M, mc, n in ZW2020_TABLE2_CASE3:
+        T = zw_case3_window_days(M)
+        if T is None or mc > ZW2020["mcut"] + 1e-9 or n < 100:
+            continue
+        out.append((idx, M, n, n / zw_direct_count(M, T)))
+    return out
+
+
+def zw2020_productivity(t, m, T2, mag_main, mcat, regime, depth_km):
+    """Optional comparison with the subduction-zone ETAS productivity of Zhang & Werner (2020), next to the Page
+    et al. (2016) comparison. Descriptive: it uses only events between the mainshock and the cut-off.
+
+    The count n of events above Mc(t) (as in `productivity`) is divided by the number of direct aftershocks above
+    Mc(t) that the Table 6 parameters give over the same span, D = K0 e^(alpha (Mm - 4.5)) int_0^T v(t)
+    10^(-b (Mc(t) - 4.5)) dt with b = 1. Both our count and theirs include secondary aftershocks and background
+    events, so the ratio is compared with the same ratio for their own Case 3 sequences (zw_reference_ratios).
+    The interval combines the Poisson error of n with the standard error of K0 (0.02 on 0.04, delta method on
+    log10). Only subduction-zone regimes (SZ-*) are compared."""
+    z = ZW2020
+    if not regime.startswith("SZ-"):
+        return {"applicable": False, "reason": "not a subduction-zone regime"}
+    keep = sl.bin_mag(m, DM) >= mc_t(t, mag_main, mcat) - DM / 2 + 1e-9
+    n = int(keep.sum())
+    g = _grid(T2)
+    v = (z["p"] - 1) * z["c"] ** (z["p"] - 1) * (g + z["c"]) ** (-z["p"])
+    w = 10 ** (-z["b"] * (mc_t(g, mag_main, mcat) - z["mcut"]))
+    integ = float(np.trapezoid(v * w, g))
+    direct = z["K0"] * math.exp(z["alpha"] * (mag_main - z["mcut"])) * integ
+    ref = np.array([x[3] for x in zw_reference_ratios()])
+    out = {"applicable": True, "n": n, "direct_count_zw": direct, "mcut": z["mcut"],
+           "in_calibration_range": bool(7.5 <= mag_main <= 9.0 and (depth_km is None or depth_km < 100)),
+           "ref_ratio_median": float(np.median(ref)), "ref_ratio_min": float(ref.min()),
+           "ref_ratio_max": float(ref.max()), "ref_n": int(ref.size)}
+    if n < 10 or direct <= 0:
+        out["class"] = "insufficient"
+        return out
+    lr = math.log10(n / direct)
+    s = math.sqrt(1.0 / (LN10 ** 2 * n) + (z["K0_se"] / z["K0"] / LN10) ** 2)
+    lo, hi = lr - 1.96 * s, lr + 1.96 * s
+    out.update({"ratio": 10 ** lr, "ratio_lo": 10 ** lo, "ratio_hi": 10 ** hi,
+                "ref_percentile": float(100 * np.mean(ref <= 10 ** lr)),
+                "class": ("above" if 10 ** lr > ref.max() else "below" if 10 ** lr < ref.min() else "within")})
+    return out
+
+
 # ----------------------------------------------------------------------------------------------- b-values
 def b_quality(n, lo, hi):
     if n < 50 or lo is None or hi is None:

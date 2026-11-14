@@ -1,0 +1,92 @@
+{
+ "source": "GEM Global Seismic Hazard Map v2026.1, Johnson et al. (2026), doi:10.5281/zenodo.20735384 (README cites the concept DOI 10.5281/zenodo.8409646)",
+ "licence": "CC BY-NC-SA 4.0 (Zenodo metadata, README.txt and LICENSE-CC_BY-NC-SA.txt in the archive)",
+ "use": "internal, non-commercial comparison; aggregate statistics only; GEM data not redistributed",
+ "gem_points": 14117882,
+ "h3_resolution": 2,
+ "cells_with_gem_points": 5882,
+ "atlas_cells": 2598,
+ "atlas_cells_matched": 2598,
+ "hazard_measure": "mean PGA of the GEM points inside the cell (g, 10 % in 50 years, Vs30 800 m/s)",
+ "thin": "no atlas cell, or shallow b quality insufficient or C",
+ "by_hazard_class": {
+  "< 0.08 g": {
+   "cells": 4698,
+   "no_catalogue_cell": 3276,
+   "insufficient": 1420,
+   "C": 1,
+   "A_or_B": 1,
+   "thin_share": 1.0,
+   "mc_measured_cells": 96,
+   "mc_median": 5.4,
+   "mc_ge_5_6": 11,
+   "iscgem_events_median": 0.0
+  },
+  "0.08-0.2 g": {
+   "cells": 629,
+   "no_catalogue_cell": 7,
+   "insufficient": 590,
+   "C": 14,
+   "A_or_B": 18,
+   "thin_share": 0.971,
+   "mc_measured_cells": 352,
+   "mc_median": 5.3,
+   "mc_ge_5_6": 28,
+   "iscgem_events_median": 8.0
+  },
+  "0.2-0.35 g": {
+   "cells": 342,
+   "no_catalogue_cell": 1,
+   "insufficient": 254,
+   "C": 46,
+   "A_or_B": 41,
+   "thin_share": 0.88,
+   "mc_measured_cells": 315,
+   "mc_median": 5.4,
+   "mc_ge_5_6": 19,
+   "iscgem_events_median": 42.0
+  },
+  ">= 0.35 g": {
+   "cells": 213,
+   "no_catalogue_cell": 0,
+   "insufficient": 48,
+   "C": 21,
+   "A_or_B": 144,
+   "thin_share": 0.324,
+   "mc_measured_cells": 213,
+   "mc_median": 5.4,
+   "mc_ge_5_6": 17,
+   "iscgem_events_median": 150.0
+  }
+ },
+ "high_hazard": {
+  "threshold_g": 0.2,
+  "cells": 555,
+  "no_catalogue_cell": 1,
+  "insufficient": 302,
+  "C": 67,
+  "A_or_B": 185,
+  "thin_share": 0.667,
+  "mc_measured_cells": 528,
+  "mc_median": 5.4,
+  "mc_ge_5_6": 36,
+  "iscgem_events_median": 63.0,
+  "thin_and_mc_ge_5_6": 27,
+  "thin_by_plate_boundary_class": {
+   "OTF": 81,
+   "none": 73,
+   "SUB": 61,
+   "OSR": 58,
+   "CCB": 39,
+   "CTF": 30,
+   "CRB": 14,
+   "OCB": 13,
+   "no atlas cell": 1
+  },
+  "thin_iscgem_events_median": 44.0,
+  "ab_iscgem_events_median": 166.0,
+  "p90_based_cells_ge_0_2": 980
+ },
+ "spearman_pga_vs_mc": 0.037,
+ "spearman_pga_vs_iscgem_events": 0.753
+}
