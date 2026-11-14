@@ -165,8 +165,8 @@
    "ours_hi": null,
    "n": 39,
    "ours_moving_range": [
-    0.7073200030997588,
-    0.919934124228563
+    0.707,
+    0.92
    ],
    "verdict": "not testable",
    "note": "ours: b-positive on KNMI only, ML>=0.5, all events of the interval pooled (needs >= 50 differences); moving 200-event windows ending in the interval give the range shown; paper: composite catalogue"
@@ -184,8 +184,8 @@
    "ours_hi": 1.482,
    "n": 91,
    "ours_moving_range": [
-    0.9908348179718633,
-    1.3496003820101052
+    0.991,
+    1.35
    ],
    "verdict": "consistent",
    "note": "ours: b-positive on KNMI only, ML>=0.5, all events of the interval pooled (needs >= 50 differences); moving 200-event windows ending in the interval give the range shown; paper: composite catalogue"

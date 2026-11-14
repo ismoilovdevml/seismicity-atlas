@@ -9,9 +9,9 @@
  "statement": "Retrospective description of the published catalogue and production record. Not a forecast, not a hazard assessment.",
  "files": {
   "bmap.json": 62240,
-  "btime.json": 19522,
-  "rates.json": 10940,
-  "validation.json": 6946
+  "btime.json": 19584,
+  "rates.json": 10938,
+  "validation.json": 6893
  },
  "sources": [
   {

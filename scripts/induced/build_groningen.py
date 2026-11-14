@@ -39,7 +39,7 @@ MOVING_WINDOW = 200          # events per moving window (Gulia & Wiemer 2026)
 # Milestones. Each one is either a catalogue fact or quoted in docs/induced.md with its source.
 MILESTONES = [
     {"date": "2012-08-16", "label": "Huizinge ML 3.6", "kind": "event", "short": "Huizinge ML 3.6"},
-    {"date": "2014-01-17", "label": "First production restrictions (Loppersum clusters)", "kind": "policy", "short": "Restrictions"},
+    {"date": "2014-01-01", "label": "Production restrictions begin (early 2014)", "kind": "policy", "short": "Restrictions"},
     {"date": "2018-01-08", "label": "Zeerijp ML 3.4", "kind": "event", "short": "Zeerijp ML 3.4"},
     {"date": "2023-10-01", "label": "Production stopped", "kind": "policy", "short": "Production stop"},
     {"date": "2024-04-17", "label": "Closure act (Wet van 17 april 2024)", "kind": "policy", "short": "Closure act"},
@@ -208,7 +208,7 @@ def validation(ev, moving, maps, geom, rng):
                      "quantity": f"b {name} sub-field, 2012-mid 2015",
                      "published": pub[0] if kind == "approx" else list(pub), "ours": p["bpos"], "ours_lo": lo,
                      "ours_hi": hi, "n": p["n_bpos"],
-                     "ours_moving_range": [float(mv.b.min()), float(mv.b.max())] if len(mv) else None,
+                     "ours_moving_range": [round(float(mv.b.min()), 3), round(float(mv.b.max()), 3)] if len(mv) else None,
                      "verdict": v, "note": "ours: b-positive on KNMI only, ML>=0.5, all events of the interval pooled (needs >= 50"
                                                  " differences); moving 200-event windows ending in the interval"
                                                  " give the range shown; paper: composite catalogue"})
@@ -419,7 +419,7 @@ def write_json(ev, pr, gj, monthly, ann, ph, corr, big, phases, moving, maps, ro
         "annual": {"year": ann.year.tolist(), "n_ge15": ann.n_ge15.tolist(),
                    "prod_bcm": [r3(v) for v in ann.prod_bcm], "months": ann.months.tolist()},
         "phases": [{k: (r3(v) if isinstance(v, float) else v) for k, v in p.items()} for p in ph],
-        "correlation": {k: (r3(v) if isinstance(v, float) else v) for k, v in corr.items()},
+        "correlation": {k: (float(f"{v:.3g}") if isinstance(v, float) else v) for k, v in corr.items()},
         "milestones": MILESTONES,
         "events_ge3": {"time": [t.strftime("%Y-%m-%dT%H:%M:%SZ") for t in big.time], "lat": [r3(v) for v in big.lat],
                        "lon": [r3(v) for v in big.lon], "ml": [round(float(v), 2) for v in big.mag],
@@ -436,7 +436,8 @@ def write_json(ev, pr, gj, monthly, ann, ph, corr, big, phases, moving, maps, ro
         return {"label": p["label"], "start": p["start"], "end": p["end"], "n_all": p["n_all"],
                 "atlas": {"b": r3(a["b_raw"]), "lo": r3(a["b_lo_raw"]), "hi": r3(a["b_hi_raw"]), "mc": r3(a["mc"]),
                           "n": a["n_b"], "q": a["quality"]},
-                "mc15": {"b": r3(f["b"]), "lo": r3(f["lo"]), "hi": r3(f["hi"]), "n": f["n"]},
+                "mc15": {"b": r3(f["b"]), "lo": r3(f["lo"]), "hi": r3(f["hi"]), "n": f["n"],
+                         "q": al.quality(f["n"], f["lo"], f["hi"])},
                 "bpos": {"b": r3(q["bpos"]), "lo": r3(q["bpos_lo"]), "hi": r3(q["bpos_hi"]), "n": q["n_bpos"]}}
     common.jdump({"phases": [ph_b(p) for p in phases], "moving": {k: mv(v) for k, v in moving.items()},
                   "window": MOVING_WINDOW, "bpos_floor": BPOS_FLOOR, "ns_split_rd_y": NS_SPLIT_RD_Y},
