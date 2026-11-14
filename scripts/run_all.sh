@@ -17,6 +17,7 @@ $PY -I scripts/val_literature.py # published b / beta / Mc comparison -> results
 $PY -I scripts/sequences.py
 $PY -I scripts/val_bt.py         # retrospective b before/after each sequence -> sequences.json `bt`
 $PY -I scripts/site_layers.py
+$PY -I scripts/build_rating.py     # Simple view rating lookup from cells.geojson -> site/data/rating.json
 $PY -I scripts/figures.py
 [ "${SKIP_REGIONAL:-0}" = 1 ] || $PY -I scripts/regional/build_regional.py || echo "regional layers: build failed, previous output kept"
 $PY -I -m pytest -q tests

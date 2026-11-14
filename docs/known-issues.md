@@ -75,7 +75,7 @@ Status on 2026-11-13 (branch with the browser suite, comparison, CSV, regional l
   names match when Natural Earth has them. Some Natural Earth alternative names are truncated in the source (for
   example "Ciudad de M"); they are used for matching only and never shown.
 - **Counting radius.** Place counts use great-circle distance on a sphere of radius 6,371 km to the epicentre. The
-  100 km and 300 km circles are drawn the same way; at high latitudes they look stretched on the Mercator map.
+  100 km and 300 km circles are drawn the same way; at high latitudes they look stretched on the flat (Mercator) map.
 - **Magnitudes in the place card.** The card counts the events of `events_m6.json`, which mixes ISC-GEM Mw and
   ComCat magnitude types (the map tooltip and the event popup name the type). It always counts M6+ and M7+, whatever
   the magnitude control shows. The years follow the Years control.
@@ -91,6 +91,18 @@ Status on 2026-11-13 (branch with the browser suite, comparison, CSV, regional l
   default of the test fixture.
 - **Not tested.** Screen readers (VoiceOver, NVDA, TalkBack) on the search combobox and the bottom sheet; a swipe to
   resize the bottom sheet (it scrolls, it does not drag); real phones; right-to-left languages (none offered).
+
+## Globe and first load (v0.3.0)
+
+- **Starting longitude.** The globe turns to the longitude of the browser's time-zone offset, not the visitor's
+  position: a visitor in western China (UTC+8) sees eastern China, and a browser set to UTC shows Africa and Europe.
+- **Globe size.** The first zoom uses MapLibre 5.24's globe geometry (camera at 1.5 × the map height); a later MapLibre
+  that changes the field of view would change the size of the first globe, not its correctness.
+- **Phones.** The globe was checked in headless Chromium at 390 px (layers, size, no errors); frame rate on real phones
+  was not measured.
+- **`rating.json` follows `cells.geojson`.** It is rebuilt by `scripts/build_rating.py` (in `run_all.sh` after
+  `site_layers.py`); `tests/test_rating.py` fails when it is stale.
+- **Uzbek place names.** Still none (Natural Earth has none): "Toshkent" finds nothing, "Tashkent" works.
 
 ## Relief, 3D terrain and the Depth 3D view
 

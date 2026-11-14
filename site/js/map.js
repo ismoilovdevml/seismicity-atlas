@@ -51,8 +51,8 @@ export function defaultView(globe = !!(C && C.state.g)) {
   const c = 1.5 * h;
   const R = (rho * rho + rho * Math.sqrt(rho * rho + c * c)) / c;
   const z = Math.log2((2 * Math.PI * R * Math.cos((lat * Math.PI) / 180)) / 512);
-  let lon = Math.round(-new Date().getTimezoneOffset() / 4);
-  if (!Number.isFinite(lon) || Math.abs(lon) > 180) lon = 150;
+  let lon = Math.round(-new Date().getTimezoneOffset() / 4); // UTC+13 gives 195, i.e. -165
+  lon = Number.isFinite(lon) ? ((((lon + 180) % 360) + 360) % 360) - 180 : 150;
   return { z: Math.max(0, +z.toFixed(2)), lat, lon };
 }
 

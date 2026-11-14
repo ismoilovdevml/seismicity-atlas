@@ -151,7 +151,9 @@ world seismicity maps, EMSC's description of LastQuake and the papers on it, GEM
 - **Place search.** Natural Earth 1:10m Populated Places v5.1.2 (public domain), 7,342 places, shipped as
   `site/data/places.json` (585 KB, 242 KB gzip), loaded on the first focus of the search box or the first map click.
   Matching folds case and accents (`norm()` in `places.js`), also on the Russian and Spanish names and the
-  alternative names of Natural Earth; results are ranked exact, prefix, word prefix, substring, then by population.
+  alternative names of Natural Earth; results are ranked by match quality (a name starts with the query, a
+  later word starts with it, it contains it), then by population (POP_MAX), an exact name counting ten times (v0.3.0,
+  see below).
   Natural Earth has no Uzbek names, so none are shown or invented. Keyboard: arrows, Enter, Escape; IME composition
   is respected.
 - **Place card.** Counts of M6+ and M7+ events within 100 km or 300 km (a switch; 300 km is the atlas's sample
@@ -176,3 +178,76 @@ world seismicity maps, EMSC's description of LastQuake and the papers on it, GEM
   Enter rule; 44 px targets on phones; visible focus; no horizontal scroll at 360 px (tested).
 - The one bold element is the headline question over the map; everything else stays quiet (one card, one legend, the
   rest is map). No numbered eyebrows except the tour's "Tip 1 of 3", which is a real sequence.
+
+## v0.3.0 release pass (2026-11-14)
+
+### Globe by default
+
+- **Decision.** Both modes open on the globe (MapLibre 5.24 `projection: globe`). The globe button switches to the
+  flat map and back; the choice is stored as `gsa-proj` (`globe` or `flat`) when the visitor presses the button, and
+  every URL carries `g=1` or `g=0`, like `mode=` and `lang=`. Rule (`parseHash()` in `app.js`): the link's `g`; else
+  the stored choice; else the globe. So a link made before v0.3 (which had `g=1` only when someone chose the globe)
+  opens on the globe for a new visitor and in the visitor's own choice otherwise; `g=0` always gives the flat map. A
+  navigation link without `g` (`#v=about`) keeps the projection in use.
+- **First view.** The whole globe in sight, centred at 20° N on the visitor's longitude, taken from the browser's
+  time-zone offset (`-getTimezoneOffset() / 4` degrees; no location is asked for or sent): Tashkent sees the
+  Himalaya, Indonesia and Japan; Los Angeles the Americas and the Pacific; Europe the Mediterranean. No tilt (the 3D
+  terrain switch keeps its own pitch). The zoom solves the visible-disc radius from MapLibre's globe geometry
+  (`defaultView()` in `map.js`): 82 % of the shorter side of the map on desktop, 92 % on phones. The flat map keeps the
+  v0.2 first view (whole world, Pacific in the centre).
+- **Layers checked on the globe** (screenshots at 1440 and 390 px, light and dark, plus `tests/e2e/test_v03.py`):
+  dots and density heatmap, the place pin and radius, plate boundaries, coastline, land, relief tiles, lakes and
+  rivers, Scientist cells with hatching, cells across the antimeridian (Fiji and Tonga, both sides of 180°), polar
+  cells, regional layers and 3D terrain (existing tests in `test_features.py` and `test_terrain3d.py`). None needed a
+  globe-specific fix. One MapLibre detail: on the globe, `queryRenderedFeatures()` without a point or box returns
+  features from the wrong side of the globe; the app only queries at points (hover, click), which work.
+- **Phones.** At 390 px the globe renders in headless Chromium with the same layers and no errors, and the first
+  load is not slower than the flat map (below). Frame rate on real phones was not measured; no flat fallback was
+  added because nothing showed the globe broken.
+- **A flat-map camera detail.** The flat map leaves the style's projection unset, and the projection is only changed
+  when it differs: an explicit Mercator projection made MapLibre move the camera when the map was hidden and shown
+  again (a Learn page in between), which wrote a position into the URL.
+
+### First load of the Simple view
+
+The Simple view used `cells.geojson` (1.48 MB) only for the place card's recording rating. The card now reads
+`site/data/rating.json` (built by `scripts/build_rating.py` from `cells.geojson` and the manifest's global shallow Mc,
+238 KB, 87 KB gzip), and only when the first place card opens; `cells.geojson` loads when the Scientist view or Depth
+3D is opened (with the map's loading line and a "Try again" button on failure). The rating lookup keeps each cell's
+hexagon (the published coordinates have two decimals, stored as integers), so `cellAtPoint()` finds exactly the same
+cell as before: the browser test compares all 2,598 cells and 5,598 points (every cell centre and 3,000 random
+points), with no difference.
+
+Measured with Playwright and Chrome for Testing, cold cache (a new browser context per run), the default Simple view
+at 1440 × 900, served locally with gzip for text files (as GitHub Pages does) and throttled to 10 Mbit/s with 40 ms
+latency; "dots" is the time until the legend count is shown (M6 events drawn):
+
+| | Requests | Bytes (decoded) | Bytes (gzip) | Map ready | Dots drawn |
+|---|---|---|---|---|---|
+| Before (main 95b365c, flat map) | 79 | 5,221,415 | 1,533,914 | 1.90 s | 2.12 s |
+| After, flat map (`g=0`) | 78 | 3,752,564 | 1,341,391 | 1.40 s | 1.94 s |
+| After, globe (default) | 68 | 3,626,410 | 1,215,228 | 1.40 s | 1.84 s |
+
+Medians of three runs each (the runs differed by at most 0.03 s). Unthrottled on localhost the times are 0.32 s / 0.62 s
+before and 0.27 s / 0.56 s after. The globe needs fewer relief tiles at its first zoom.
+
+### Search ranking
+
+Match quality first (a name of the place starts with the query; a later word starts with it; it contains it), then
+population (`p`, Natural Earth POP_MAX, already in `places.json`), with an exact name counting ten times its
+population; an exact match that falls outside the eight results takes the last places. "San" before: San (Mali,
+41,386 people) first, then Santiago, St. Petersburg, San Francisco, San Diego, San Juan, St. Louis, Santo Domingo.
+After: Santiago, St. Petersburg, San Francisco, San Diego, San Juan, St. Louis, Santo Domingo, San (Mali). Paris,
+Kiev/Киев, zurich, Ташкент and accent-free queries return the same first result as before.
+
+### Interface changes in this pass
+
+- The coastline gets wider when zoomed in (0.8 px at zoom 3, 1.8 px at zoom 6, was 1.1 px): around a searched place
+  the dots and shading hid it.
+- The globe button has a tooltip ("Globe or flat map") and starts pressed; the last tip of the first-visit tour says
+  that dragging turns the globe and that the button switches to a flat map (four languages).
+- Visible loading and error states: the place list shows "Loading the list of places…" while the gazetteer loads on a
+  slow connection and its error message if it fails (before, both went to a screen-reader-only line); the place card
+  shows an error with "Try again" if `rating.json` fails; the Scientist switch shows the loading line while the cells
+  load and an error with "Try again" if they fail.
+- b-value legend ticks on phones 9.5 px → 10.5 px.

@@ -200,11 +200,13 @@ cd site && python3 -m http.server 8000   # then open http://localhost:8000/
   with their intervals). three.js 0.170.0 (MIT) is vendored and loads only in that view. Sources, licences and
   sizes: [docs/basemap.md](docs/basemap.md).
 
-![Simple view: earthquakes, density shading and place search](docs/img/site-v3-simple-light.png)
+![Simple view on the globe: earthquakes, density shading and place search](docs/img/site-v3-simple-light.png)
+
+![Simple view on a phone: the globe on first visit](docs/img/site-v3-phone-globe-light.png)
 
 ![Simple view on a phone, dark theme, with a place card](docs/img/site-v3-phone-dark-card.png)
 
-![Scientist view with a selected cell](docs/img/site-v3-expert.png)
+![Scientist view on the globe with a selected cell](docs/img/site-v3-expert.png)
 
 ![Depth 3D view, Japan with Slab2](docs/img/site-3d-light.png)
 
