@@ -13,6 +13,10 @@ An open, reproducible world map of earthquake-catalogue statistics, built only f
 
 The main message is **where the catalogue numbers can be trusted, and where they cannot.**
 
+The website opens in a **Simple view** for everyone: the recorded earthquakes on a map, a place search, and a card
+that says in plain words what was recorded around a place and how well. The **Scientist view** (one switch in the
+header) holds the cell statistics behind it. See [Website](#website).
+
 > **Not a forecast. Not a hazard map.** These are descriptive statistics of earthquake catalogues, for research
 > and education. They do not predict earthquakes and must not be used in place of an official seismic hazard
 > assessment.

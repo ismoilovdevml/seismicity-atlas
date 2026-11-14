@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from conftest import SITE, no_hscroll, rendered
+from conftest import SITE, no_hscroll, rendered, wait_map
 
 DATA = SITE / "data"
 EVENTS = json.loads((DATA / "events_m6.json").read_text())
@@ -143,8 +143,10 @@ def test_mode_persists_across_reloads_and_links(site):
     pg.wait_for_function("window.__map.queryRenderedFeatures({layers: ['cells-fill']}).length > 100")
     assert simple_layers_off(pg)
     # a bare URL opens the stored choice
+    # (each navigation waits for the map to finish loading: leaving a page mid-load aborts its fetches, which
+    # Firefox and WebKit report as console errors)
     pg.goto(site.base)
-    pg.wait_for_selector("#map-status", state="hidden")
+    wait_map(pg)
     assert pg.evaluate("document.documentElement.dataset.mode") == "pro"
     # a navigation link without a mode keeps the current one
     pg.evaluate("location.hash = 'v=about'")
@@ -152,7 +154,9 @@ def test_mode_persists_across_reloads_and_links(site):
     assert "mode=pro" in pg.evaluate("location.hash")
     # a shared Simple link opens Simple, without changing the stored choice
     pg.goto(site.base + "#v=map&mode=simple&lang=en")
+    wait_map(pg)
     pg.reload()
+    wait_map(pg)
     pg.wait_for_selector("#sx-top", state="visible")
     assert pg.evaluate("localStorage.getItem('gsa-mode')") == "pro"
     pg.click("#mode-seg [data-mode=simple]")
@@ -341,8 +345,7 @@ def test_tour_steps_and_dismissal(site):
     assert pg.evaluate("localStorage.getItem('gsa-tour')") == "1"
     assert pg.evaluate("document.activeElement.id") == "sx-q"
     pg.reload()
-    pg.wait_for_selector("#map-status", state="hidden")
-    pg.wait_for_timeout(500)
+    wait_map(pg)
     assert pg.is_hidden("#sx-tour")
 
 
@@ -405,3 +408,31 @@ def test_simple_view_in_four_languages(site, lang, simple, pro, title):
         assert pg.inner_text(f".{key}").strip()
     if lang != "en":
         assert "not a forecast" not in pg.inner_text(".sx-honest")
+
+
+def test_no_console_errors_through_the_simple_flows(site):
+    """The fixture fails any test with a console error; this one walks every Simple flow in one page to be explicit."""
+    pg = site.open("", mode=None, tour=True)
+    pg.wait_for_selector("#sx-tour:not([hidden])")
+    pg.click("#sx-tour-skip")
+    pg.click("#sx-q")
+    pg.fill("#sx-q", "lima")
+    pg.wait_for_selector("#sx-list:not([hidden]) [data-place]")
+    pg.keyboard.press("ArrowDown")
+    pg.keyboard.press("Enter")
+    wait_card(pg)
+    pg.click("#sx-card [data-pr='300']")
+    pg.click("#sx-yr [data-sr='50']")
+    pg.click("#sx-mag [data-sm='7']")
+    pg.select_option("#lang-select", "uz")
+    pg.wait_for_function("document.querySelector('#mode-seg [data-mode=simple]').textContent === 'Oddiy'")
+    pg.click(".sx-rating .info-btn")
+    pg.wait_for_selector(".lr-page[data-concept=recording-rating] .lr-diagram[data-ready='1']", timeout=20000)
+    pg.click(".lr-top [data-learn=back]")
+    pg.wait_for_selector("#sx-card:not([hidden])")
+    pg.click(".sx-pro-btn")
+    pg.wait_for_selector("#panel:not([hidden])")
+    pg.click("#mode-seg [data-mode=simple]")
+    pg.wait_for_selector("#sx-top", state="visible")
+    pg.wait_for_timeout(500)
+    assert not pg.errors, pg.errors

@@ -86,6 +86,9 @@ Status on 2026-11-13 (branch with the browser suite, comparison, CSV, regional l
 - **Density shading.** A MapLibre heatmap of the drawn events: its look depends on zoom (radius in pixels) and on the
   filter. It has no numeric scale on purpose (it is not a rate or hazard surface); the Scientist view has the M6+ rate
   per 100,000 km² per year.
+- **Tested.** `tests/e2e/test_simple.py` (26 tests) passes in Chromium, Firefox and WebKit, and the whole suite
+  (117 tests) in Chromium, on 2026-11-14. The older tests run in the Scientist view through the `mode="pro"`
+  default of the test fixture.
 - **Not tested.** Screen readers (VoiceOver, NVDA, TalkBack) on the search combobox and the bottom sheet; a swipe to
   resize the bottom sheet (it scrolls, it does not drag); real phones; right-to-left languages (none offered).
 
