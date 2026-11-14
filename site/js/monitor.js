@@ -95,6 +95,8 @@ function card(s, idx) {
   if (pr.ratio !== undefined && pr.ratio !== null && pr.class !== 'insufficient') {
     par(t('mon.prod'), t('mon.prodVal', { r: f.sig2(pr.ratio), lo: f.sig2(pr.ratio_lo), hi: f.sig2(pr.ratio_hi), pct: Math.round(pr.percentile) }));
   }
+  const zw = s.productivity_zw2020;
+  if (zw) par(t('mon.zw'), zwText(zw));
 
   const head = h('div', { class: 'seq-head' },
     h('h3', {}, h('a', { href: `#v=monitor&s=${s.id}`, text: s.place || s.id, title: t('mon.link') })),
@@ -104,6 +106,8 @@ function card(s, idx) {
   const li = h('li', { class: 'seq mon-seq', id: `mon-${s.id}` }, head, meta, h('div', { class: 'badges' }, badges), params);
 
   const notes = [];
+  const ctxNote = zwContext(pr, zw);
+  if (ctxNote) notes.push(ctxNote);
   for (const a of s.absorbed || []) notes.push(t('mon.absorbed', { m: f.mag(a.mag), date: f.isoDate(a.time), place: a.place }));
   for (const v of s.overlaps || []) notes.push(t('mon.overlap', { m: f.mag(v.mag), date: f.isoDate(v.time), km: f.int(v.dist_km) }));
   const mt = (s.magtypes || []).map(([k, sh]) => `${k} ${Math.round(sh * 100)} %`).join(', ');
@@ -114,6 +118,27 @@ function card(s, idx) {
   else li.append(h('p', { class: 'hint', text: t('mon.noFit', { n: f.int(c.n_fit) }) }));
   li.append(h('p', { class: 'mon-links' }, h('a', { href: s.url, target: '_blank', rel: 'noopener', text: t('mon.usgs') })));
   return li;
+}
+
+/**
+ * The second productivity reference (Zhang & Werner 2020, ETAS fits to 36 global subduction sequences): the ratio of
+ * our count to their expected direct aftershocks, with its 95 % interval, against the same ratio for their own
+ * sequences (docs/monitor.md section 9). Only for subduction-zone regimes.
+ */
+function zwText(zw) {
+  if (!zw.applicable) return t('mon.zwNA');
+  if (zw.class === 'insufficient' || zw.ratio === null || zw.ratio === undefined) return t('mon.zwInsuf');
+  const v = t('mon.zwVal', { r: f.sig2(zw.ratio), lo: f.sig2(zw.ratio_lo), hi: f.sig2(zw.ratio_hi), cls: t(`mon.zw.${zw.class}`),
+    med: f.sig2(zw.ref_ratio_median), min: f.sig2(zw.ref_ratio_min), max: f.sig2(zw.ref_ratio_max), n: f.int(zw.ref_n) });
+  return zw.in_calibration_range ? v : `${v} ${t('mon.zwOutside')}`;
+}
+
+/** Put a "more productive than typical" label from Page et al. (2016) in context when the ETAS reference says otherwise. */
+function zwContext(pr, zw) {
+  if (!pr || !zw || !zw.applicable || pr.class !== 'more') return null;
+  if (zw.class === 'within') return t('mon.zwCtxWithin');
+  if (zw.class === 'above') return t('mon.zwCtxAbove');
+  return null;
 }
 
 function cumChart(s) {

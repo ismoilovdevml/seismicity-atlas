@@ -180,11 +180,11 @@ Reading the comparison honestly:
 A push made with `GITHUB_TOKEN` does not start other workflows, so `pages.yml` lists "Update monitor" under
 `workflow_run` and redeploys the site after it.
 
-## 9. Productivity compared with Zhang & Werner (2020) (data fields only)
+## 9. Productivity compared with Zhang & Werner (2020)
 
 An optional second productivity reference for **subduction-zone regimes** (Garcia `SZ-*`), stored next to the
 Page et al. (2016) comparison as `productivity_zw2020` in each sequence file (and a short version in `index.json`).
-It is not shown in the view yet. Method version `monitor-1.1`.
+Shown on the Ongoing cards since v0.3.1 ("Productivity, ETAS reference"), with a note that puts a "more productive" label from Page et al. (2016) in context when the sequence is within the Zhang & Werner range. Method version `monitor-1.1`.
 
 **Source.** Zhang, L., Werner, M. J., Goda, K. (2020), "Variability of ETAS parameters in global subduction zones and
 applications to mainshock–aftershock hazard assessment", BSSA 110(1), 191–212, doi:10.1785/0120190121; read from

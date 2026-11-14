@@ -820,4 +820,15 @@ export default {
   "tour.search.title": "Look up a place",
   "tour.search.text": "Search a city, or click the map, to see the earthquakes recorded around it and how well they are recorded. Drag to turn the globe; the globe button on the right switches to a flat map.",
   "learn.c.recording-rating": "How well earthquakes are recorded",
+  // ---- v0.3.1: case studies, seismic deficit, ETAS productivity reference, Türkiye preset
+  "mon.zw": "Productivity, ETAS reference",
+  "mon.zwVal": "{r} [{lo}, {hi}]: {cls} (their sequences: median {med}, range {min}–{max}, n = {n}; Zhang & Werner 2020)",
+  "mon.zw.within": "within the range of global subduction sequences",
+  "mon.zw.above": "above the range of global subduction sequences",
+  "mon.zw.below": "below the range of global subduction sequences",
+  "mon.zwOutside": "Outside their calibration range (M 7.5–9.0, depth < 100 km): indicative only.",
+  "mon.zwNA": "not compared: not a subduction-zone regime",
+  "mon.zwInsuf": "too few events to compare",
+  "mon.zwCtxWithin": "“More productive” compares with the typical sequence of Page et al. (2016) for this region. Against ETAS fits to global subduction sequences, this sequence is within the range of global subduction sequences (Zhang & Werner 2020), so the label says more about the reference than about the sequence.",
+  "mon.zwCtxAbove": "“More productive” compares with the typical sequence of Page et al. (2016) for this region; it is also above the range of the global subduction sequences of Zhang & Werner (2020).",
 };

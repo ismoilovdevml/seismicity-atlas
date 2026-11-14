@@ -818,4 +818,15 @@ export default {
   "tour.search.title": "Joyni toping",
   "tour.search.text": "Shaharni qidiring yoki xaritani bosing: atrofida qayd etilgan zilzilalarni va ular qanchalik yaxshi qayd etilganini koʻrasiz. Globusni aylantirish uchun torting; oʻngdagi globus tugmasi tekis xaritaga oʻtkazadi.",
   "learn.c.recording-rating": "Zilzilalar qanchalik yaxshi qayd etiladi",
+  // ---- v0.3.1: case studies, seismic deficit, ETAS productivity reference, Türkiye preset
+  "mon.zw": "Mahsuldorlik, ETAS bo‘yicha taqqoslash",
+  "mon.zwVal": "{r} [{lo}, {hi}]: {cls} (ularning ketma-ketliklari: mediana {med}, oraliq {min}–{max}, n = {n}; Zhang & Werner 2020)",
+  "mon.zw.within": "global subduksiya ketma-ketliklari oralig‘ida",
+  "mon.zw.above": "global subduksiya ketma-ketliklari oralig‘idan yuqori",
+  "mon.zw.below": "global subduksiya ketma-ketliklari oralig‘idan past",
+  "mon.zwOutside": "Ularning kalibrlash oralig‘idan tashqarida (M 7.5–9.0, chuqurlik < 100 km): faqat taxminiy.",
+  "mon.zwNA": "taqqoslanmagan: subduksiya zonasi rejimi emas",
+  "mon.zwInsuf": "taqqoslash uchun hodisalar juda kam",
+  "mon.zwCtxWithin": "“Mahsuldorroq” Page va boshq. (2016) bo‘yicha shu mintaqaning odatiy ketma-ketligi bilan taqqoslaydi. Global subduksiya ketma-ketliklariga moslangan ETAS modellari bilan solishtirilganda bu ketma-ketlik global subduksiya ketma-ketliklari oralig‘ida (Zhang & Werner 2020), demak bu belgi ketma-ketlikdan ko‘ra ko‘proq taqqoslash asosi haqida gapiradi.",
+  "mon.zwCtxAbove": "“Mahsuldorroq” Page va boshq. (2016) bo‘yicha shu mintaqaning odatiy ketma-ketligi bilan taqqoslaydi; u Zhang & Werner (2020) global subduksiya ketma-ketliklari oralig‘idan ham yuqori.",
 };

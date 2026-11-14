@@ -817,4 +817,15 @@ export default {
   "tour.search.title": "Busca un lugar",
   "tour.search.text": "Busca una ciudad o haz clic en el mapa para ver los terremotos registrados alrededor y qué tan bien se registran. Arrastra para girar el globo; el botón del globo a la derecha cambia a un mapa plano.",
   "learn.c.recording-rating": "Qué tan bien se registran los terremotos",
+  // ---- v0.3.1: case studies, seismic deficit, ETAS productivity reference, Türkiye preset
+  "mon.zw": "Productividad, referencia ETAS",
+  "mon.zwVal": "{r} [{lo}, {hi}]: {cls} (sus secuencias: mediana {med}, rango {min}–{max}, n = {n}; Zhang & Werner 2020)",
+  "mon.zw.within": "dentro del rango de las secuencias de subducción globales",
+  "mon.zw.above": "por encima del rango de las secuencias de subducción globales",
+  "mon.zw.below": "por debajo del rango de las secuencias de subducción globales",
+  "mon.zwOutside": "Fuera de su rango de calibración (M 7.5–9.0, profundidad < 100 km): solo indicativo.",
+  "mon.zwNA": "no comparada: no es un régimen de zona de subducción",
+  "mon.zwInsuf": "muy pocos eventos para comparar",
+  "mon.zwCtxWithin": "«Más productiva» compara con la secuencia típica de Page et al. (2016) para esta región. Frente a ajustes ETAS de secuencias de subducción globales, esta secuencia está dentro del rango de las secuencias de subducción globales (Zhang & Werner 2020), así que la etiqueta dice más de la referencia que de la secuencia.",
+  "mon.zwCtxAbove": "«Más productiva» compara con la secuencia típica de Page et al. (2016) para esta región; también está por encima del rango de las secuencias de subducción globales de Zhang & Werner (2020).",
 };
