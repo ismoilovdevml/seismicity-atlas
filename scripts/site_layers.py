@@ -191,7 +191,8 @@ def main():
     srcf = PROC / "iscgem_source.json"
     isrc = json.loads(srcf.read_text()) if srcf.exists() else {"source": "comcat-mirror"}
     iscgem_access = ("official ISC-GEM CSV, sha256 " + isrc["sha256"] if isrc["source"] == "official"
-                     else "USGS ComCat mirror, catalog=iscgem")
+                     else "USGS ComCat copy, catalog=iscgem (version not stated by ComCat, events to "
+                          f"{str(prep['iscgem_span'][1])[:10]})")
     jdump(cells_layer(cells, detail_ids), SITE / "cells.geojson")
     ev = events_layers(g, c)
     jdump(plates_layer(), SITE / "plates.geojson")
@@ -218,17 +219,26 @@ def main():
         "coverage": {"iscgem": prep["iscgem_span"], "comcat": prep["comcat_span"]},
         "disclaimer": ("Catalogue statistics for research and education. Not an earthquake forecast and not an "
                        "official seismic hazard map."),
-        "licence": {"data": "CC BY-SA 4.0 (derived from ISC-GEM, CC BY-SA 3.0)", "code": "MIT"},
+        "licence": {"data": "CC BY-SA 4.0 (derived from ISC-GEM, CC BY-SA 3.0)", "code": "MIT",
+                    "exceptions": ["plates.geojson: PB2002 (Bird 2003) via fraxen/tectonicplates, ODC-BY 1.0",
+                                   "land.geojson, coastline.geojson, basemap/ and places.json: Natural Earth, public domain",
+                                   "slab2/: USGS Slab2 (Hayes et al. 2018), CC0 1.0"]},
         "sources": [
             {"name": "ISC-GEM Global Instrumental Earthquake Catalogue", "access": iscgem_access,
              "url": "https://www.isc.ac.uk/iscgem/", "licence": "CC BY-SA 3.0",
-             "citation": "Storchak et al. 2013 SRL 84(5); Di Giacomo et al. 2018 ESSD 10, 1877; doi:10.31905/D808B825"},
+             "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+             "attribution": "© International Seismological Centre and GEM Foundation",
+             "citation": ("International Seismological Centre (2026), ISC-GEM Earthquake Catalogue, doi:10.31905/D808B825; "
+                          "Storchak et al. 2013 SRL 84(5), 810-815; Storchak et al. 2015 PEPI 239, 48-63; "
+                          "Di Giacomo et al. 2018 ESSD 10, 1877")},
             {"name": "USGS ANSS ComprehensiveCatalog (ComCat)", "url": "https://earthquake.usgs.gov/fdsnws/event/1/",
              "licence": "public domain (U.S. Government work)", "query": "minmagnitude=4.5, 1973-01-01 to cut-off"},
             {"name": "PB2002 plate boundaries (Bird 2003)", "url": "https://github.com/fraxen/tectonicplates",
              "licence": "ODC-BY 1.0", "citation": "Bird 2003 G3 4(3) 1027; conversion by Hugo Ahlenius, Nordpil"},
-            {"name": "Natural Earth 1:110m land, 1:50m coastline", "url": "https://www.naturalearthdata.com/",
-             "licence": "public domain"}],
+            {"name": "Natural Earth (land, coastline, shaded relief, lakes and rivers, populated places)",
+             "url": "https://www.naturalearthdata.com/", "licence": "public domain"},
+            {"name": "USGS Slab2 subduction zone geometry (Depth 3D view)", "url": "https://doi.org/10.5066/F7PV6JNV",
+             "licence": "CC0 1.0", "citation": "Hayes et al. 2018 Science 362, 58-61, doi:10.1126/science.aat4723"}],
         "method": {"cells": "H3 resolution 2", "sample_radius_km": ag["sample_radius_km"],
                    "b_catalogue": "ISC-GEM Mw 1976-2021", "b_sample": ag.get("b_sample", "all events"),
                    "b_magerr_max": ag.get("b_magerr_max"), "floors": ag["floors"], "nboot": ag["nboot"],

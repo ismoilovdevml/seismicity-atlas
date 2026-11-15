@@ -18,7 +18,7 @@ General rules
 
 | File | Load | Content |
 |---|---|---|
-| `manifest.json` | first | version, data cut-off, sources, licences, file list with byte sizes, global numbers (version and cut-off come from `scripts/release.json`; see [release.md](release.md)) |
+| `manifest.json` | first | version, data cut-off, sources (`name`, `url`, `licence`, optional `licence_url`, `attribution`, `citation`, `access`, `query`), licences (`data`, `code`, `exceptions[]`: files under another licence), file list with byte sizes, global numbers (version and cut-off come from `scripts/release.json`; see [release.md](release.md)) |
 | `cells.geojson` | first | one Polygon feature per H3 resolution-2 cell that holds at least one event |
 | `events_m6.json` | first | deduplicated events M ≥ 6.0, columnar |
 | `events_m5.json` | lazy | deduplicated events M ≥ 5.0, columnar (superset of `events_m6.json`) |

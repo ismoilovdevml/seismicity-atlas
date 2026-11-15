@@ -22,3 +22,24 @@ def test_pages_render(site, viewport, scheme):
         if v == "about":
             assert "CC BY-SA 3.0" in txt and "CC BY-SA 4.0" in txt and "MIT" in txt
             assert pg.query_selector("a[href*='openquake']") is not None
+            # licence details (ISC-GEM co-owner, exceptions, three.js and the colour maps)
+            assert "International Seismological Centre and GEM Foundation" in txt
+            assert "ODC-BY 1.0" in txt and "CC0 1.0" in txt and "three.js 0.170.0" in txt and "Scientific colour maps 8.0.1" in txt
+            # "as is" data disclaimer, privacy note and accessibility contact
+            assert pg.is_visible("#about-asis") and "provided as is, without warranty" in pg.inner_text("#about-asis")
+            priv = pg.inner_text("#about-privacy")
+            assert "no cookies" in priv and "local storage" in priv and "GitHub Pages" in priv
+            assert pg.query_selector("#about-privacy a[href*='privacy-statement']") is not None
+            assert pg.query_selector("#about-a11y a[href$='/seismicity-atlas/issues']") is not None
+
+
+@pytest.mark.parametrize("lang,asis,privacy", [("uz", "kafolatsiz", "cookie"), ("ru", "«как есть»", "cookie"),
+                                               ("es", "tal cual", "cookies")])
+def test_about_notes_translated(site, lang, asis, privacy):
+    pg = site.open(ready=False)
+    pg.evaluate(f"location.hash = 'v=about&lang={lang}'")
+    pg.wait_for_function("document.querySelector('#about-privacy') && document.querySelector('#about-asis')", timeout=20000)
+    assert asis in pg.inner_text("#about-asis")
+    p = pg.inner_text("#about-privacy")
+    assert privacy in p and "local storage" not in p   # translated, not the English fallback
+    assert pg.inner_text("#about-a11y-h") != "Accessibility"

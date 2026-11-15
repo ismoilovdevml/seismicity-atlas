@@ -3,6 +3,27 @@
 Versions follow `scripts/release.json` (shown on the site from `site/data/manifest.json`). A patch is a data refresh
 with the same schema, a minor version a method, schema or website change; see [docs/release.md](docs/release.md).
 
+## Unreleased
+
+Licence and legal fixes; no atlas number changes.
+
+- Citation metadata declare both licences: `CITATION.cff` lists MIT and CC-BY-SA-4.0; `.zenodo.json` labels the deposit
+  CC BY-SA 4.0 and says in the notes that the code is MIT.
+- Full ISC-GEM attribution (© International Seismological Centre and GEM Foundation, CC BY-SA 3.0, the ComCat copy,
+  Storchak et al. 2015 added) in the README, `manifest.json` (from `scripts/site_layers.py`) and the About page.
+- Exceptions to the CC BY-SA data licence stated: PB2002 (ODC-BY 1.0), Natural Earth (public domain), Slab2 (CC0 1.0,
+  no longer labelled U.S. public domain), and `results/sci2_gem_hazard.json` (aggregates of CC BY-NC-SA GEM data).
+- About page: three.js and the Crameri colour maps listed with MapLibre; an "as is" data disclaimer, a privacy note
+  and an accessibility note with a contact route, in all four languages. The "as is" line is also in the README.
+- Regional layers: Southern California labelled "no licence stated" with the SCSN and SCEDC citations; `fetched_utc`
+  per region and the download date in the Icelandic Met Office attribution; the NZ source link points to the GeoNet
+  catalogue page.
+- Groningen: `rates.json` keeps only time, ML and KNMI id of the 16 events of ML ≥ 3.0 (no epicentres); the README
+  and docs describe this instead of "no single events".
+- Paper figures: Mc by period and plate-boundary b at 300 dpi for 180 mm; FMD title prints 176.2° W; validation
+  figure with readable labels, the universal-b band for subduction and open markers for mismatches; new figure
+  `consistency.png` (b against cutoff in three magnitude versions, median epicentre distance per cell).
+
 ## 0.3.1 (2026-11-15)
 
 Website and new science. The atlas statistics (method, data cut-off) are those of 0.3.0.

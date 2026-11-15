@@ -64,7 +64,8 @@ Full tables and the reasons for each verdict: [docs/validation.md](docs/validati
   summary first, then monthly gas production and earthquake rate (two charts on one time axis), phase rates with
   Poisson intervals, b by phase from three estimators, moving b-positive for the north and south, b maps by period and
   the comparison with published studies (15 rows). KNMI catalogue (doi:10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5)
-  and NLOG.NL production; no single events are offered for download. [docs/induced.md](docs/induced.md)
+  and NLOG.NL production; no event list is offered for download (`rates.json` keeps origin time, ML and KNMI id of
+  the 16 events of ML ≥ 3.0, without locations, for the plain-language summary). [docs/induced.md](docs/induced.md)
 - **Seismic-deficit layer, Tien Shan pilot** (Scientist view). Released seismic moment against the GNSS/InSAR moment
   rate at full coupling, per region or H3 cell. A ratio is never shown without its 95 % interval and p_full; zones with
   few events are greyed. Conclusion: **no detectable deficit beyond catalogue noise.** [docs/deficit.md](docs/deficit.md)
@@ -154,23 +155,38 @@ validation table (with the paper, the magnitude type and the completeness used).
 
 - **Code:** MIT (see `LICENSE`).
 - **Data and figures** (`site/data/`, `docs/img/`, `results/`): **CC BY-SA 4.0**. They are derived from the
-  ISC-GEM catalogue, which is CC BY-SA 3.0, and ShareAlike carries over.
+  ISC-GEM catalogue, which is CC BY-SA 3.0, and ShareAlike carries over. Exceptions:
+  - `site/data/plates.geojson`: PB2002 (Bird 2003) via github.com/fraxen/tectonicplates, **ODC-BY 1.0**;
+  - `site/data/land.geojson`, `coastline.geojson`, `basemap/` and `places.json`: Natural Earth, **public domain**;
+  - `site/data/slab2/`: USGS Slab2, **CC0 1.0**;
+  - `results/sci2_gem_hazard.json`: aggregate statistics (counts and medians) computed from the GEM Global Seismic
+    Hazard Map, which is **CC BY-NC-SA 4.0**. This file is not covered by the CC BY-SA statement above.
 - **Attribution required:**
-  - ISC-GEM: International Seismological Centre (2026), ISC-GEM Earthquake Catalogue,
-    doi:10.31905/D808B825; Storchak et al. 2013; Di Giacomo et al. 2018.
+  - ISC-GEM: © International Seismological Centre and GEM Foundation,
+    [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Used as served by USGS ComCat (`catalog=iscgem`,
+    version not stated by ComCat, events to 2021-12-31). Cite International Seismological Centre (2026), ISC-GEM
+    Earthquake Catalogue, doi:10.31905/D808B825; Storchak et al. (2013), SRL 84(5), 810–815; Storchak et al. (2015),
+    PEPI 239, 48–63; Di Giacomo et al. (2018), ESSD 10, 1877–1899.
   - U.S. Geological Survey ComCat (U.S. public domain).
   - Plate boundaries: Bird (2003), G3 4(3), 1027, via github.com/fraxen/tectonicplates (ODC-BY 1.0).
   - Natural Earth (public domain).
-  - Slab2: Hayes et al. (2018), Science 362, 58–61, doi:10.1126/science.aat4723; data doi:10.5066/F7PV6JNV (U.S. public
-    domain).
+  - Slab2: Hayes et al. (2018), Science 362, 58–61, doi:10.1126/science.aat4723; data doi:10.5066/F7PV6JNV (CC0 1.0).
   - Optional 3D terrain only: Terrain Tiles on AWS Open Data (Tilezen Joerd sources; the full credit list is shown on
     the map and in [docs/basemap.md](docs/basemap.md)).
   - Groningen case study: Royal Netherlands Meteorological Institute (KNMI), Netherlands Seismic and Acoustic Network,
-    doi:10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5 (CC BY 4.0; derived aggregates only); production and field
-    outline: Source: NLOG.NL.
+    doi:10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5 (CC BY 4.0; derived aggregates, plus origin time, ML and KNMI id
+    of the 16 events of ML ≥ 3.0, without locations); production and field outline: Source: NLOG.NL.
+  - Regional layers: INGV ISIDe (CC BY 4.0), GeoNet (CC BY 3.0 NZ), Icelandic Met Office (CC BY 4.0, with the download
+    date) and the Southern California Seismic Network via ComCat (no licence stated; cite doi:10.7914/SN/CI and SCEDC,
+    doi:10.7909/C3WD3xH1). Details in [docs/regional.md](docs/regional.md).
   - Seismic-deficit layer: strain rates of Ou et al. (2026), doi:10.5281/zenodo.20293601, and Chang (2025),
     doi:10.5281/zenodo.16547905 (both CC BY 4.0).
   - Colour maps: Crameri, F. (2023), Scientific colour maps 8.0.1, doi:10.5281/zenodo.8409685 (MIT licence).
+  - Software in `site/vendor/`: MapLibre GL JS 5.24.0 (BSD-3-Clause), three.js 0.170.0 (MIT), Inter and IBM Plex Mono
+    (SIL OFL 1.1); each with its licence file.
 - **Linked only:** the Lomax (2023) NLL-SSST-coherence relocations of the 2023 Türkiye sequence,
   doi:10.5281/zenodo.8089273 (CC BY 4.0; not redistributed here).
 - **Not redistributed:** the GEM Global Seismic Hazard Map (CC BY-NC-SA). The site may link to it only.
+- **No warranty.** The data are provided as is, without warranty of any kind. They are not a forecast, an early
+  warning or a hazard map, and must not be used for life-safety, engineering, insurance or emergency decisions. For
+  official information, consult your national seismological or emergency agency.

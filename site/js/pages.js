@@ -278,6 +278,7 @@ export function renderAbout(root, ctx) {
   const out = [];
   out.push(h('h1', { text: t('nav.about') }));
   out.push(h('p', { class: 'notice' }, h('strong', { text: `${t('about.notice')} ` }), man.disclaimer, ` ${t('about.hazard')} `, h('a', { href: 'https://maps.openquake.org/map/global-seismic-hazard-map/', target: '_blank', rel: 'noopener', text: 'GEM Global Seismic Hazard Map' }), ` ${t('about.linkOnly')}`, ' ', infoButton('not-a-forecast')));
+  out.push(h('p', { class: 'prose as-is', id: 'about-asis', text: t('about.asIs') }));
   out.push(h('p', { class: 'lede', text: t('about.lede') }));
 
   out.push(h('h2', { text: t('about.versionH') }));
@@ -294,12 +295,19 @@ export function renderAbout(root, ctx) {
   out.push(h('h2', {}, t('about.sourcesH'), infoButton('catalogue-consistency')));
   out.push(h('ul', { class: 'src-list prose' }, man.sources.map((s) => h('li', {},
     h('strong', { text: s.name }), h('br'),
-    `${t('about.licence')}: ${s.licence}. `, s.citation ? `${t('about.cite')}: ${s.citation}. ` : '', s.access ? `${t('about.access')}: ${s.access}. ` : '', s.query ? `${t('about.query')}: ${s.query}. ` : '',
+    s.attribution ? `${s.attribution}. ` : '',
+    `${t('about.licence')}: `, s.licence_url ? h('a', { href: s.licence_url, target: '_blank', rel: 'noopener', text: s.licence }) : s.licence, '. ',
+    s.citation ? `${t('about.cite')}: ${s.citation}. ` : '', s.access ? `${t('about.access')}: ${s.access}. ` : '', s.query ? `${t('about.query')}: ${s.query}. ` : '',
     h('a', { href: s.url, target: '_blank', rel: 'noopener', text: s.url })))));
   out.push(h('ul', { class: 'prose' },
-    h('li', {}, h('strong', { text: `${t('about.dataLic')}: ` }), `${man.licence.data}. ${t('about.shareAlike')}`),
+    h('li', {}, h('strong', { text: `${t('about.dataLic')}: ` }), `${man.licence.data}. ${t('about.shareAlike')}`,
+      (man.licence.exceptions || []).length ? h('span', {}, ` ${t('about.exceptions')}: `, man.licence.exceptions.join('; '), '.') : null),
     h('li', {}, h('strong', { text: `${t('about.code')}: ` }), man.licence.code),
-    h('li', {}, h('strong', { text: `${t('about.mapSw')}: ` }), `MapLibre GL JS 5.24.0, BSD 3-Clause (${t('about.vendored')}, `, h('a', { href: 'vendor/maplibre-gl-5.24.0/LICENSE.txt', text: t('about.licenceLink') }), ').'),
+    h('li', {}, h('strong', { text: `${t('about.software')}: ` }),
+      `MapLibre GL JS 5.24.0, BSD 3-Clause (${t('about.vendored')}, `, h('a', { href: 'vendor/maplibre-gl-5.24.0/LICENSE.txt', text: t('about.licenceLink') }), '); ',
+      `three.js 0.170.0, MIT (${t('about.vendored')}, `, h('a', { href: 'vendor/three-0.170.0/LICENSE', text: t('about.licenceLink') }), ').'),
+    h('li', {}, h('strong', { text: `${t('about.colours')}: ` }), 'Crameri, F. (2023), Scientific colour maps 8.0.1, MIT, ',
+      h('a', { href: 'https://doi.org/10.5281/zenodo.8409685', target: '_blank', rel: 'noopener', text: 'doi:10.5281/zenodo.8409685' }), `. ${t('about.coloursUse')}`),
     h('li', {}, h('strong', { text: `${t('about.terrainH')}: ` }), t('about.terrainTxt'), ' ', h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/blob/main/docs/basemap.md', text: 'docs/basemap.md' })),
     h('li', {}, h('strong', { text: `${t('about.fonts')}: ` }), `Inter, IBM Plex Mono, SIL Open Font License 1.1 (${t('about.vendored')}; `, h('a', { href: 'vendor/fonts/OFL-Inter.txt', text: 'Inter' }), ', ', h('a', { href: 'vendor/fonts/OFL-IBMPlexMono.txt', text: 'IBM Plex Mono' }), ').'),
     h('li', {}, h('strong', { text: `${t('about.notRedist')}: ` }), t('about.notRedistTxt'))));
@@ -318,5 +326,13 @@ export function renderAbout(root, ctx) {
   out.push(h('p', { class: 'prose' }, `${t('about.fields')}: `,
     h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/blob/main/docs/data-schema.md', target: '_blank', rel: 'noopener', text: 'docs/data-schema.md' }),
     ` ${t('about.inRepo')}`));
+
+  out.push(h('h2', { id: 'about-privacy-h', text: t('about.privacyH') }));
+  out.push(h('p', { class: 'prose', id: 'about-privacy' }, `${t('about.privacy')} ${t('about.privacyHost')} `,
+    h('a', { href: 'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement', target: '_blank', rel: 'noopener', text: t('about.privacyLink') }),
+    `. ${t('about.privacyTerrain')}`));
+  out.push(h('h2', { id: 'about-a11y-h', text: t('about.a11yH') }));
+  out.push(h('p', { class: 'prose', id: 'about-a11y' }, `${t('about.a11y')} ${t('about.a11yReport')} `,
+    h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/issues', target: '_blank', rel: 'noopener', text: 'github.com/ismoilovdevml/seismicity-atlas/issues' })));
   root.replaceChildren(...out);
 }
