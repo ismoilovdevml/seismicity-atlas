@@ -3,6 +3,14 @@
 Versions follow `scripts/release.json` (shown on the site from `site/data/manifest.json`). A patch is a data refresh
 with the same schema, a minor version a method, schema or website change; see [docs/release.md](docs/release.md).
 
+## Unreleased
+
+- Search engines: 88 static Learn pages (21 concepts × 4 languages + 4 indexes) with canonical, hreflang and JSON-LD,
+  generated from the same texts as the app (`scripts/seo_pages.mjs`); `sitemap.xml` and `robots.txt`; Dataset and
+  WebSite JSON-LD on the home page (Google Dataset Search); a descriptive title; a `<noscript>` summary with links.
+- New social card: dark globe of the western Pacific with only quality A/B cells and the live count of places with a
+  trustworthy b-value.
+
 ## 0.4.0 (2026-11-15)
 
 Licence and legal fixes and journal figures; no atlas number changes (data cut-off 2026-11-13, as in 0.3.1).

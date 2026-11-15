@@ -55,6 +55,7 @@ export default {
   'reg.eyebrow': 'Regional cell',
   // ---- shell
   'title.site': 'Global Seismicity Atlas',
+  'title.tagline': 'earthquake b-value and completeness map with uncertainty',
   'title.sequences': 'Aftershock sequences',
   'title.methods': 'Validation',
   'title.about': 'About and data',

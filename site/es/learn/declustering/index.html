@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Desagrupamiento — Aprender · Global Seismicity Atlas</title>
+<meta name="description" content="El desagrupamiento (declustering) elimina los eventos que parecen réplicas o premonitores de otro mayor, usando ventanas en el espacio y el tiempo; en este…">
+<link rel="canonical" href="https://seismicityatlas.org/es/learn/declustering/">
+<link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/declustering/">
+<link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/declustering/">
+<link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/declustering/">
+<link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/declustering/">
+<link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/declustering/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Global Seismicity Atlas">
+<meta property="og:title" content="Desagrupamiento — Aprender · Global Seismicity Atlas">
+<meta property="og:description" content="El desagrupamiento (declustering) elimina los eventos que parecen réplicas o premonitores de otro mayor, usando ventanas en el espacio y el tiempo; en este…">
+<meta property="og:url" content="https://seismicityatlas.org/es/learn/declustering/">
+<meta property="og:image" content="https://seismicityatlas.org/og-image.png">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#fbfaf7;--fg:#1d2126;--muted:#5b6470;--line:#e3e0d8;--accent:#0e6b73;--card:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#16191d;--fg:#e8eaed;--muted:#a3abb5;--line:#2c3138;--accent:#5cc3cb;--card:#1d2126}}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-latin.woff2) format("woff2");font-weight:400 700;font-display:swap}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--accent)}header,main,footer{max-width:760px;margin:0 auto;padding:0 16px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.brand{font-weight:700;text-decoration:none;color:var(--fg)}.langs a{margin-left:10px;font-size:14px}
+nav.crumbs{font-size:14px;color:var(--muted);margin:18px 0 4px}h1{font-size:30px;line-height:1.25;margin:6px 0 10px}
+.lead{font-size:19px;color:var(--fg);margin:0 0 22px}h2{font-size:19px;margin:30px 0 8px}
+.cta{display:inline-block;margin:6px 0 10px;padding:10px 16px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+blockquote{margin:0;padding:12px 16px;border-left:3px solid var(--accent);background:var(--card)}
+code.lr-formula{display:block;margin:8px 0;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow-x:auto;white-space:pre-wrap}
+ol.refs{padding-left:20px;font-size:14px}ul.idx{padding-left:20px}ul.idx li{margin:6px 0}.sum{color:var(--muted)}
+.pager{display:flex;justify-content:space-between;gap:12px;margin:34px 0 10px;font-size:15px}
+footer{margin-top:30px;padding-top:14px;padding-bottom:30px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}</style>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Desagrupamiento","headline":"Desagrupamiento","description":"El desagrupamiento (declustering) elimina los eventos que parecen réplicas o premonitores de otro mayor, usando ventanas en el espacio y el tiempo; en este catálogo global reduce b y depende mucho de la elección de las ventanas, por lo que el mapa muestra el catálogo completo.","inLanguage":"es","url":"https://seismicityatlas.org/es/learn/declustering/","learningResourceType":"explanation","educationalLevel":"beginner to expert","about":{"@type":"DefinedTerm","name":"Declustering","inDefinedTermSet":"https://seismicityatlas.org/learn/"},"author":{"@type":"Person","name":"Otabek Ismoilov","sameAs":"https://orcid.org/0009-0008-2785-3691"},"isPartOf":{"@type":"WebSite","name":"Global Seismicity Atlas","url":"https://seismicityatlas.org/"},"citation":["Gardner, J. K. & Knopoff, L. (1974). Is the sequence of earthquakes in Southern California, with aftershocks removed, Poissonian? BSSA, 64(5), 1363–1367.","Kagan, Y. Y. (2010). Earthquake size distribution: power-law with exponent β ≡ 1/2? Tectonophysics, 490(1–2), 103–114."]},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Seismicity Atlas","item":"https://seismicityatlas.org/"},{"@type":"ListItem","position":2,"name":"Aprender","item":"https://seismicityatlas.org/es/learn/"},{"@type":"ListItem","position":3,"name":"Desagrupamiento","item":"https://seismicityatlas.org/es/learn/declustering/"}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Global Seismicity Atlas</a><span class="langs"><a href="/learn/declustering/" hreflang="en" lang="en">English</a><a href="/uz/learn/declustering/" hreflang="uz" lang="uz">Oʻzbekcha</a><a href="/ru/learn/declustering/" hreflang="ru" lang="ru">Русский</a></span></header>
+<main>
+<nav class="crumbs" aria-label="Ruta de navegación"><a href="/">Global Seismicity Atlas</a> › <a href="/es/learn/">Aprender</a> › Desagrupamiento</nav>
+<h1>Desagrupamiento</h1>
+<p class="lead">El desagrupamiento (declustering) elimina los eventos que parecen réplicas o premonitores de otro mayor, usando ventanas en el espacio y el tiempo; en este catálogo global reduce b y depende mucho de la elección de las ventanas, por lo que el mapa muestra el catálogo completo.</p>
+<a class="cta" href="/#v=learn&t=declustering&lang=es">Diagrama interactivo · Ejemplo real del atlas →</a>
+<h2>Explicación sencilla</h2>
+<p>Los terremotos se agrupan: a uno grande le siguen muchos más pequeños en las cercanías. Algunos estudios quieren solo los sismos principales “independientes”, por ejemplo para comprobar si los eventos ocurren al azar en el tiempo.</p>
+<p>El método clásico de Gardner y Knopoff (1974) traza una caja alrededor de cada evento: una distancia y una duración que crecen con su magnitud. Los eventos menores dentro de la caja de uno mayor se marcan como dependientes y se eliminan.</p>
+<p>En un catálogo global de magnitud 5 o más, las cajas de los eventos mayores duran años y alcanzan cientos de kilómetros, por lo que eliminan mucho más que réplicas. Como los eventos eliminados son en su mayoría pequeños, el valor b de lo que queda baja.</p>
+<h2>Una imagen cotidiana</h2>
+<blockquote>Es como contar las personas que visitan una tienda, pero ignorando a quien llegó menos de una hora después de alguien conocido. Con una regla corta se eliminan grupos de amigos; con una regla de “menos de un año”, se elimina también a la mayoría de los clientes habituales, y el conteo restante dice más sobre la regla que sobre la tienda.</blockquote>
+<h2>Detalles técnicos</h2>
+<p>Ventanas de Gardner-Knopoff como en ZMAP y OpenQuake (scripts/seislib.py, gk_windows), con la distancia L en km y la duración T en días:<code class="lr-formula">L(M) = 10^(0.1238 M + 0.983),   T(M) = 10^(0.032 M + 2.7389) para M ≥ 6.5; si no, 10^(0.5409 M − 0.547)</code>Los eventos se procesan del mayor al menor; un evento dentro de la ventana de otro mayor es dependiente.</p>
+<p>Por qué el atlas no desagrupa el b principal: para M ≥ 6.5 la ventana temporal supera un año, por lo que en un catálogo global M ≥ 5 las ventanas eliminan una gran parte de todos los eventos, incluidos los independientes. El b desagrupado resultante refleja sobre todo la elección de las ventanas. Kagan (2010) desagrupa con otro método, y el valor de Gardner-Knopoff del atlas no reproduce su b global desagrupado; esto figura como discrepancia en docs/validation.md.</p>
+<p>Publicado de todos modos: el b desagrupado y su intervalo bootstrap están en los datos (<code>sh_bdecl</code>, <code>dp_bdecl</code>) y en el bloque de robustez del panel de la celda, de modo que el efecto es visible por celda.</p>
+<p>Las mismas ventanas reaparecen en las secuencias: la página Secuencias selecciona sismos principales independientes con una ventana relacionada (radio según Wells & Coppersmith 1994, un año).</p>
+<h2>Lecturas adicionales</h2>
+<ol class="refs"><li>Gardner, J. K. &amp; Knopoff, L. (1974). Is the sequence of earthquakes in Southern California, with aftershocks removed, Poissonian? BSSA, 64(5), 1363–1367. <a href="https://doi.org/10.1785/BSSA0640051363">doi.org/10.1785/BSSA0640051363</a></li><li>Kagan, Y. Y. (2010). Earthquake size distribution: power-law with exponent β ≡ 1/2? Tectonophysics, 490(1–2), 103–114. <a href="https://doi.org/10.1016/j.tecto.2010.04.034">doi.org/10.1016/j.tecto.2010.04.034</a></li></ol>
+<div class="pager"><a href="/es/learn/b-positive/">← b-positive</a><a href="/es/learn/omori-utsu/">Decaimiento de Omori-Utsu →</a></div>
+</main>
+<footer>Cada página toma sus ejemplos de los mismos archivos de datos que el mapa, por lo que las cifras siguen la actualización mensual. · <a href="/">Global Seismicity Atlas</a> · Not a forecast and not a hazard map. · <a href="https://doi.org/10.5281/zenodo.24228387">doi:10.5281/zenodo.24228387</a></footer>
+</body>
+</html>

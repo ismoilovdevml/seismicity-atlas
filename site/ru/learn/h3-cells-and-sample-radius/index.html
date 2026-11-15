@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ячейки H3 и круг выборки — Пояснения · Global Seismicity Atlas</title>
+<meta name="description" content="Карта построена на шестиугольниках H3, но статистика каждой ячейки использует все землетрясения внутри фиксированного круга вокруг центра ячейки, так что…">
+<link rel="canonical" href="https://seismicityatlas.org/ru/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Global Seismicity Atlas">
+<meta property="og:title" content="Ячейки H3 и круг выборки — Пояснения · Global Seismicity Atlas">
+<meta property="og:description" content="Карта построена на шестиугольниках H3, но статистика каждой ячейки использует все землетрясения внутри фиксированного круга вокруг центра ячейки, так что…">
+<meta property="og:url" content="https://seismicityatlas.org/ru/learn/h3-cells-and-sample-radius/">
+<meta property="og:image" content="https://seismicityatlas.org/og-image.png">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#fbfaf7;--fg:#1d2126;--muted:#5b6470;--line:#e3e0d8;--accent:#0e6b73;--card:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#16191d;--fg:#e8eaed;--muted:#a3abb5;--line:#2c3138;--accent:#5cc3cb;--card:#1d2126}}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-latin.woff2) format("woff2");font-weight:400 700;font-display:swap}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--accent)}header,main,footer{max-width:760px;margin:0 auto;padding:0 16px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.brand{font-weight:700;text-decoration:none;color:var(--fg)}.langs a{margin-left:10px;font-size:14px}
+nav.crumbs{font-size:14px;color:var(--muted);margin:18px 0 4px}h1{font-size:30px;line-height:1.25;margin:6px 0 10px}
+.lead{font-size:19px;color:var(--fg);margin:0 0 22px}h2{font-size:19px;margin:30px 0 8px}
+.cta{display:inline-block;margin:6px 0 10px;padding:10px 16px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+blockquote{margin:0;padding:12px 16px;border-left:3px solid var(--accent);background:var(--card)}
+code.lr-formula{display:block;margin:8px 0;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow-x:auto;white-space:pre-wrap}
+ol.refs{padding-left:20px;font-size:14px}ul.idx{padding-left:20px}ul.idx li{margin:6px 0}.sum{color:var(--muted)}
+.pager{display:flex;justify-content:space-between;gap:12px;margin:34px 0 10px;font-size:15px}
+footer{margin-top:30px;padding-top:14px;padding-bottom:30px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}</style>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Ячейки H3 и круг выборки","headline":"Ячейки H3 и круг выборки","description":"Карта построена на шестиугольниках H3, но статистика каждой ячейки использует все землетрясения внутри фиксированного круга вокруг центра ячейки, так что каждое место измеряется по одинаковой площади.","inLanguage":"ru","url":"https://seismicityatlas.org/ru/learn/h3-cells-and-sample-radius/","learningResourceType":"explanation","educationalLevel":"beginner to expert","about":{"@type":"DefinedTerm","name":"H3 cells and the sampling circle","inDefinedTermSet":"https://seismicityatlas.org/learn/"},"author":{"@type":"Person","name":"Otabek Ismoilov","sameAs":"https://orcid.org/0009-0008-2785-3691"},"isPartOf":{"@type":"WebSite","name":"Global Seismicity Atlas","url":"https://seismicityatlas.org/"},"citation":["Wiemer, S. & Wyss, M. (2002). Mapping spatial variability of the frequency-magnitude distribution of earthquakes. Advances in Geophysics, 45, 259–302.","H3: a hexagonal hierarchical geospatial indexing system (documentation)."]},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Seismicity Atlas","item":"https://seismicityatlas.org/"},{"@type":"ListItem","position":2,"name":"Пояснения","item":"https://seismicityatlas.org/ru/learn/"},{"@type":"ListItem","position":3,"name":"Ячейки H3 и круг выборки","item":"https://seismicityatlas.org/ru/learn/h3-cells-and-sample-radius/"}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Global Seismicity Atlas</a><span class="langs"><a href="/learn/h3-cells-and-sample-radius/" hreflang="en" lang="en">English</a><a href="/uz/learn/h3-cells-and-sample-radius/" hreflang="uz" lang="uz">Oʻzbekcha</a><a href="/es/learn/h3-cells-and-sample-radius/" hreflang="es" lang="es">Español</a></span></header>
+<main>
+<nav class="crumbs" aria-label="Навигационная цепочка"><a href="/">Global Seismicity Atlas</a> › <a href="/ru/learn/">Пояснения</a> › Ячейки H3 и круг выборки</nav>
+<h1>Ячейки H3 и круг выборки</h1>
+<p class="lead">Карта построена на шестиугольниках H3, но статистика каждой ячейки использует все землетрясения внутри фиксированного круга вокруг центра ячейки, так что каждое место измеряется по одинаковой площади.</p>
+<a class="cta" href="/#v=learn&t=h3-cells-and-sample-radius&lang=ru">Интерактивная диаграмма · Реальный пример из атласа →</a>
+<h2>Простое объяснение</h2>
+<p>H3 — глобальная сетка шестиугольников, созданная Uber и широко используемая для карт. Шестиугольники покрывают сферу почти равными по площади ячейками, и у каждой ячейки есть постоянный идентификатор, что упрощает ссылки и объединение данных.</p>
+<p>Шестиугольник глобальной сетки мал для статистики: в нём редко бывает достаточно сильных землетрясений. Поэтому атлас берёт <strong>круг</strong> вокруг центра каждой ячейки, больше шестиугольника, и рассчитывает Mc и b по всем событиям внутри него.</p>
+<p>Соседние круги перекрываются, поэтому у соседних ячеек есть общие землетрясения. Плавная картина на карте отчасти создаётся кругами, а не Землёй.</p>
+<h2>Пример из жизни</h2>
+<blockquote>Представьте, что качество воздуха измеряют на перекрёстках городской сетки, но каждый датчик усредняет воздух в пределах фиксированного расстояния пешком. Соседние перекрёстки дают похожие показания отчасти потому, что «дышат» одним и тем же воздухом.</blockquote>
+<h2>Технические подробности</h2>
+<p>Сетка: разрешение H3 {globalRes} для глобального слоя. Статистика по ячейке: все события с эпицентром в пределах {radius} км (по дуге большого круга) от центра ячейки, как в подходе ZMAP с постоянным радиусом (Wiemer & Wyss 2002). Частоты используют собственную площадь ячейки, а не площадь круга.</p>
+<p>Почему фиксированный радиус, а не N ближайших событий: пространственная опора везде одинакова, так что два места сравниваются по одинаковой площади, а места с редкими событиями честно остаются пустыми (b не показано), вместо того чтобы заимствовать события издалека. Цена — размер выборки, а значит и неопределённость, меняется; это указывается.</p>
+<p>Ячейки H3 не строго равновелики (в пределах одного разрешения площадь различается примерно вдвое), поэтому частоты делятся на собственную площадь каждой ячейки <code>area_km2</code>.</p>
+<p>Чувствительность к радиусу (docs/method.md §1): при 200 или 400 км вместо 300 км b меняется меньше чем на 0.04 (медиана) там, где оно показано; радиус в основном определяет, сколько ячеек набирают нужный размер выборки.</p>
+<h2>Дополнительная литература</h2>
+<ol class="refs"><li>Wiemer, S. &amp; Wyss, M. (2002). Mapping spatial variability of the frequency-magnitude distribution of earthquakes. Advances in Geophysics, 45, 259–302. <a href="https://doi.org/10.1016/S0065-2687(02)80007-3">doi.org/10.1016/S0065-2687(02)80007-3</a></li><li>H3: a hexagonal hierarchical geospatial indexing system (documentation). <a href="https://h3geo.org/docs/">h3geo.org/docs/</a></li></ol>
+<div class="pager"><a href="/ru/learn/aftershock-productivity-bath/">← Продуктивность афтершоков и закон Бота</a><a href="/ru/learn/plate-boundary-classes/">Классы границ плит →</a></div>
+</main>
+<footer>Каждая страница берёт свои примеры из тех же файлов данных, что и карта, поэтому числа следуют за ежемесячным обновлением. · <a href="/">Global Seismicity Atlas</a> · Not a forecast and not a hazard map. · <a href="https://doi.org/10.5281/zenodo.24228387">doi:10.5281/zenodo.24228387</a></footer>
+</body>
+</html>

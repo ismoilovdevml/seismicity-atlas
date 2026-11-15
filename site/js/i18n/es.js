@@ -53,6 +53,7 @@ export default {
   'reg.eyebrow': 'Celda regional',
   // ---- shell
   'title.site': 'Atlas global de sismicidad',
+  'title.tagline': 'mapa del valor b y la completitud de los terremotos con su incertidumbre',
   'title.sequences': 'Secuencias de réplicas',
   'title.methods': 'Validación',
   'title.about': 'Acerca de y datos',

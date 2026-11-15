@@ -194,7 +194,7 @@ function showView(v) {
   document.getElementById('nav').classList.remove('open');
   document.getElementById('menu-btn').setAttribute('aria-expanded', 'false');
   const site = t('title.site');
-  document.title = v === 'map' ? site : `${t(`title.${v}`)} | ${site}`;
+  document.title = v === 'map' ? `${site}: ${t('title.tagline')}` : `${t(`title.${v}`)} | ${site}`;
   if (v === 'learn') { showLearn(); return; }
   if (!ctx.manifest) return;
   if (v === 'map') { M.resize(); return; }

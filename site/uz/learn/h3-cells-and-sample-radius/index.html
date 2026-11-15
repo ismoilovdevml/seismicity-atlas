@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>H3 kataklari va tanlanma doirasi — Oʻrganish · Global Seismicity Atlas</title>
+<meta name="description" content="Xarita H3 oltiburchaklarida chiziladi, lekin har bir katak statistikasi katak markazi atrofidagi belgilangan doira ichidagi barcha zilzilalardan foydalanadi,…">
+<link rel="canonical" href="https://seismicityatlas.org/uz/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Global Seismicity Atlas">
+<meta property="og:title" content="H3 kataklari va tanlanma doirasi — Oʻrganish · Global Seismicity Atlas">
+<meta property="og:description" content="Xarita H3 oltiburchaklarida chiziladi, lekin har bir katak statistikasi katak markazi atrofidagi belgilangan doira ichidagi barcha zilzilalardan foydalanadi,…">
+<meta property="og:url" content="https://seismicityatlas.org/uz/learn/h3-cells-and-sample-radius/">
+<meta property="og:image" content="https://seismicityatlas.org/og-image.png">
+<meta property="og:locale" content="uz_UZ">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#fbfaf7;--fg:#1d2126;--muted:#5b6470;--line:#e3e0d8;--accent:#0e6b73;--card:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#16191d;--fg:#e8eaed;--muted:#a3abb5;--line:#2c3138;--accent:#5cc3cb;--card:#1d2126}}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-latin.woff2) format("woff2");font-weight:400 700;font-display:swap}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--accent)}header,main,footer{max-width:760px;margin:0 auto;padding:0 16px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.brand{font-weight:700;text-decoration:none;color:var(--fg)}.langs a{margin-left:10px;font-size:14px}
+nav.crumbs{font-size:14px;color:var(--muted);margin:18px 0 4px}h1{font-size:30px;line-height:1.25;margin:6px 0 10px}
+.lead{font-size:19px;color:var(--fg);margin:0 0 22px}h2{font-size:19px;margin:30px 0 8px}
+.cta{display:inline-block;margin:6px 0 10px;padding:10px 16px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+blockquote{margin:0;padding:12px 16px;border-left:3px solid var(--accent);background:var(--card)}
+code.lr-formula{display:block;margin:8px 0;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow-x:auto;white-space:pre-wrap}
+ol.refs{padding-left:20px;font-size:14px}ul.idx{padding-left:20px}ul.idx li{margin:6px 0}.sum{color:var(--muted)}
+.pager{display:flex;justify-content:space-between;gap:12px;margin:34px 0 10px;font-size:15px}
+footer{margin-top:30px;padding-top:14px;padding-bottom:30px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}</style>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"H3 kataklari va tanlanma doirasi","headline":"H3 kataklari va tanlanma doirasi","description":"Xarita H3 oltiburchaklarida chiziladi, lekin har bir katak statistikasi katak markazi atrofidagi belgilangan doira ichidagi barcha zilzilalardan foydalanadi, shuning uchun har bir joy bir xil maydon boʻyicha oʻlchanadi.","inLanguage":"uz","url":"https://seismicityatlas.org/uz/learn/h3-cells-and-sample-radius/","learningResourceType":"explanation","educationalLevel":"beginner to expert","about":{"@type":"DefinedTerm","name":"H3 cells and the sampling circle","inDefinedTermSet":"https://seismicityatlas.org/learn/"},"author":{"@type":"Person","name":"Otabek Ismoilov","sameAs":"https://orcid.org/0009-0008-2785-3691"},"isPartOf":{"@type":"WebSite","name":"Global Seismicity Atlas","url":"https://seismicityatlas.org/"},"citation":["Wiemer, S. & Wyss, M. (2002). Mapping spatial variability of the frequency-magnitude distribution of earthquakes. Advances in Geophysics, 45, 259–302.","H3: a hexagonal hierarchical geospatial indexing system (documentation)."]},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Seismicity Atlas","item":"https://seismicityatlas.org/"},{"@type":"ListItem","position":2,"name":"Oʻrganish","item":"https://seismicityatlas.org/uz/learn/"},{"@type":"ListItem","position":3,"name":"H3 kataklari va tanlanma doirasi","item":"https://seismicityatlas.org/uz/learn/h3-cells-and-sample-radius/"}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Global Seismicity Atlas</a><span class="langs"><a href="/learn/h3-cells-and-sample-radius/" hreflang="en" lang="en">English</a><a href="/ru/learn/h3-cells-and-sample-radius/" hreflang="ru" lang="ru">Русский</a><a href="/es/learn/h3-cells-and-sample-radius/" hreflang="es" lang="es">Español</a></span></header>
+<main>
+<nav class="crumbs" aria-label="Navigatsiya zanjiri"><a href="/">Global Seismicity Atlas</a> › <a href="/uz/learn/">Oʻrganish</a> › H3 kataklari va tanlanma doirasi</nav>
+<h1>H3 kataklari va tanlanma doirasi</h1>
+<p class="lead">Xarita H3 oltiburchaklarida chiziladi, lekin har bir katak statistikasi katak markazi atrofidagi belgilangan doira ichidagi barcha zilzilalardan foydalanadi, shuning uchun har bir joy bir xil maydon boʻyicha oʻlchanadi.</p>
+<a class="cta" href="/#v=learn&t=h3-cells-and-sample-radius&lang=uz">Interaktiv diagramma · Atlasdan haqiqiy misol →</a>
+<h2>Oddiy izoh</h2>
+<p>H3 Uber tomonidan yaratilgan va xaritalarda keng qoʻllaniladigan global oltiburchaklar toʻri. Oltiburchaklar sferani deyarli teng maydonlar bilan qoplaydi va har bir katak barqaror identifikatorga ega, bu havolalar va maʼlumotlarni birlashtirishni oddiy qiladi.</p>
+<p>Global toʻrning oltiburchagi statistika uchun kichik: unda kamdan-kam hollarda yetarlicha yirik zilzila boʻladi. Shuning uchun atlas har bir katak markazi atrofida oltiburchakdan kattaroq <strong>doira</strong> oladi va Mc hamda b ni uning ichidagi barcha hodisalardan hisoblaydi.</p>
+<p>Qoʻshni doiralar ustma-ust tushadi, shuning uchun qoʻshni kataklarning zilzilalari qisman umumiy. Shu sababli xaritadagi silliq koʻrinadigan manzara qisman Yerga emas, doiralarga bogʻliq.</p>
+<h2>Kundalik hayotdan misol</h2>
+<blockquote>Shahar toʻridagi koʻcha chorrahalarida havo sifatini oʻlchashni tasavvur qiling, lekin har bir sensor belgilangan piyoda masofasi ichidagi havoni oʻrtachalaydi. Yaqin chorrahalar qisman bir xil havodan “nafas olgani” uchun oʻxshash koʻrsatkichlar beradi.</blockquote>
+<h2>Texnik tafsilotlar</h2>
+<p>Toʻr: global qatlam uchun H3 aniqlik darajasi {globalRes}. Har bir katak statistikasi: episentri katak markazidan {radius} km ichida (katta doira boʻyicha masofa) boʻlgan barcha hodisalar, ZMAP ning oʻzgarmas radius yondashuvidagi kabi (Wiemer & Wyss 2002). Chastotalar doiraning emas, katakning oʻz maydonidan foydalanadi.</p>
+<p>Nega eng yaqin N ta hodisa emas, belgilangan radius: fazoviy qamrov hamma joyda bir xil, shuning uchun ikki joy bir xil maydon boʻyicha taqqoslanadi, siyrak joylar esa uzoqdan hodisa “qarzga olish” oʻrniga halol ravishda boʻsh qoladi (b koʻrsatilmaydi). Buning narxi shundaki, tanlanma hajmi va shu bilan birga noaniqlik ham oʻzgaradi; bu koʻrsatib beriladi.</p>
+<p>H3 kataklari aniq teng maydonli emas (bitta aniqlik darajasida taxminan ikki baravar farq), shuning uchun chastotalar har bir katakning oʻz <code>area_km2</code> qiymatiga boʻlinadi.</p>
+<p>Radiusga sezgirlik (docs/method.md §1): 300 km oʻrniga 200 yoki 400 km olinganda, b koʻrsatilgan joylarda u 0.04 dan kamroq (median) oʻzgaradi; radius asosan nechta katak kerakli tanlanma hajmiga yetishini belgilaydi.</p>
+<h2>Qoʻshimcha adabiyotlar</h2>
+<ol class="refs"><li>Wiemer, S. &amp; Wyss, M. (2002). Mapping spatial variability of the frequency-magnitude distribution of earthquakes. Advances in Geophysics, 45, 259–302. <a href="https://doi.org/10.1016/S0065-2687(02)80007-3">doi.org/10.1016/S0065-2687(02)80007-3</a></li><li>H3: a hexagonal hierarchical geospatial indexing system (documentation). <a href="https://h3geo.org/docs/">h3geo.org/docs/</a></li></ol>
+<div class="pager"><a href="/uz/learn/aftershock-productivity-bath/">← Aftershoklar mahsuldorligi va Båth qonuni</a><a href="/uz/learn/plate-boundary-classes/">Plita chegarasi sinflari →</a></div>
+</main>
+<footer>Har bir sahifa misollarini xarita bilan bir xil maʼlumot fayllaridan oladi, shuning uchun raqamlar oylik yangilanish bilan birga yangilanadi. · <a href="/">Global Seismicity Atlas</a> · Not a forecast and not a hazard map. · <a href="https://doi.org/10.5281/zenodo.24228387">doi:10.5281/zenodo.24228387</a></footer>
+</body>
+</html>

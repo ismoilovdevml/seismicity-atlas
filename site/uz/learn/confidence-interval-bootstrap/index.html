@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>95 % oraliq va bootstrap — Oʻrganish · Global Seismicity Atlas</title>
+<meta name="description" content="Har bir b qiymati bilan koʻrsatiladigan 95 % oraliq oʻlchov 100 marta takrorlansa, shundan 95 tasida haqiqiy b ni qamrab oladigan diapazon; atlas uni…">
+<link rel="canonical" href="https://seismicityatlas.org/uz/learn/confidence-interval-bootstrap/">
+<link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/confidence-interval-bootstrap/">
+<link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/confidence-interval-bootstrap/">
+<link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/confidence-interval-bootstrap/">
+<link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/confidence-interval-bootstrap/">
+<link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/confidence-interval-bootstrap/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Global Seismicity Atlas">
+<meta property="og:title" content="95 % oraliq va bootstrap — Oʻrganish · Global Seismicity Atlas">
+<meta property="og:description" content="Har bir b qiymati bilan koʻrsatiladigan 95 % oraliq oʻlchov 100 marta takrorlansa, shundan 95 tasida haqiqiy b ni qamrab oladigan diapazon; atlas uni…">
+<meta property="og:url" content="https://seismicityatlas.org/uz/learn/confidence-interval-bootstrap/">
+<meta property="og:image" content="https://seismicityatlas.org/og-image.png">
+<meta property="og:locale" content="uz_UZ">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#fbfaf7;--fg:#1d2126;--muted:#5b6470;--line:#e3e0d8;--accent:#0e6b73;--card:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#16191d;--fg:#e8eaed;--muted:#a3abb5;--line:#2c3138;--accent:#5cc3cb;--card:#1d2126}}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-latin.woff2) format("woff2");font-weight:400 700;font-display:swap}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--accent)}header,main,footer{max-width:760px;margin:0 auto;padding:0 16px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.brand{font-weight:700;text-decoration:none;color:var(--fg)}.langs a{margin-left:10px;font-size:14px}
+nav.crumbs{font-size:14px;color:var(--muted);margin:18px 0 4px}h1{font-size:30px;line-height:1.25;margin:6px 0 10px}
+.lead{font-size:19px;color:var(--fg);margin:0 0 22px}h2{font-size:19px;margin:30px 0 8px}
+.cta{display:inline-block;margin:6px 0 10px;padding:10px 16px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+blockquote{margin:0;padding:12px 16px;border-left:3px solid var(--accent);background:var(--card)}
+code.lr-formula{display:block;margin:8px 0;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow-x:auto;white-space:pre-wrap}
+ol.refs{padding-left:20px;font-size:14px}ul.idx{padding-left:20px}ul.idx li{margin:6px 0}.sum{color:var(--muted)}
+.pager{display:flex;justify-content:space-between;gap:12px;margin:34px 0 10px;font-size:15px}
+footer{margin-top:30px;padding-top:14px;padding-bottom:30px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}</style>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"95 % oraliq va bootstrap","headline":"95 % oraliq va bootstrap","description":"Har bir b qiymati bilan koʻrsatiladigan 95 % oraliq oʻlchov 100 marta takrorlansa, shundan 95 tasida haqiqiy b ni qamrab oladigan diapazon; atlas uni bootstrap bilan baholaydi: katalogni koʻp marta qayta tanlab, b ni qayta hisoblaydi.","inLanguage":"uz","url":"https://seismicityatlas.org/uz/learn/confidence-interval-bootstrap/","learningResourceType":"explanation","educationalLevel":"beginner to expert","about":{"@type":"DefinedTerm","name":"95 % interval and the bootstrap","inDefinedTermSet":"https://seismicityatlas.org/learn/"},"author":{"@type":"Person","name":"Otabek Ismoilov","sameAs":"https://orcid.org/0009-0008-2785-3691"},"isPartOf":{"@type":"WebSite","name":"Global Seismicity Atlas","url":"https://seismicityatlas.org/"},"citation":["Woessner, J. & Wiemer, S. (2005). Assessing the quality of earthquake catalogues: estimating the magnitude of completeness and its uncertainty. BSSA, 95(2), 684–698.","Marzocchi, W., Spassiani, I., Stallone, A. & Taroni, M. (2020). How to be fooled searching for significant variations of the b-value. Geophysical Journal International, 220, 1845–1856."]},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Seismicity Atlas","item":"https://seismicityatlas.org/"},{"@type":"ListItem","position":2,"name":"Oʻrganish","item":"https://seismicityatlas.org/uz/learn/"},{"@type":"ListItem","position":3,"name":"95 % oraliq va bootstrap","item":"https://seismicityatlas.org/uz/learn/confidence-interval-bootstrap/"}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Global Seismicity Atlas</a><span class="langs"><a href="/learn/confidence-interval-bootstrap/" hreflang="en" lang="en">English</a><a href="/ru/learn/confidence-interval-bootstrap/" hreflang="ru" lang="ru">Русский</a><a href="/es/learn/confidence-interval-bootstrap/" hreflang="es" lang="es">Español</a></span></header>
+<main>
+<nav class="crumbs" aria-label="Navigatsiya zanjiri"><a href="/">Global Seismicity Atlas</a> › <a href="/uz/learn/">Oʻrganish</a> › 95 % oraliq va bootstrap</nav>
+<h1>95 % oraliq va bootstrap</h1>
+<p class="lead">Har bir b qiymati bilan koʻrsatiladigan 95 % oraliq oʻlchov 100 marta takrorlansa, shundan 95 tasida haqiqiy b ni qamrab oladigan diapazon; atlas uni bootstrap bilan baholaydi: katalogni koʻp marta qayta tanlab, b ni qayta hisoblaydi.</p>
+<a class="cta" href="/#v=learn&t=confidence-interval-bootstrap&lang=uz">Interaktiv diagramma · Atlasdan haqiqiy misol →</a>
+<h2>Oddiy izoh</h2>
+<p>Bir necha yuz zilziladan olingan b qiymati noaniq: zilzilalarning biroz boshqacha toʻplami biroz boshqacha son bergan boʻlardi.</p>
+<p>Biz Yerni qaytadan “ishga tushira” olmaymiz, lekin tanlanmani qayta takrorlay olamiz. <strong>Bootstrap</strong> haqiqiy katalogdan tasodifiy ravishda va qaytarish bilan (baʼzi hodisalar ikki marta, baʼzilari umuman olinmaydi) xuddi shu hajmdagi yangi katalog tuzadi va b ni qayta hisoblaydi. Bunday koʻplab tanlashlardan keyin b qiymatlarining oʻrtadagi 95 % i oraliq boʻladi.</p>
+<p>Tor oraliq maʼlumotlar b ni yaxshi aniqlashini bildiradi. Keng oraliq esa aniqlamasligini bildiradi va bunda atlas b ni koʻrsatmaydi (“Sifat kodlari” ga qarang).</p>
+<h2>Kundalik hayotdan misol</h2>
+<blockquote>Soʻrovnoma natijasi qanchalik tebranishi mumkinligini bilish uchun xuddi shu hajmdagi yangi tasodifiy guruhdan koʻp marta soʻrash mumkin edi. Bootstrap buni allaqachon soʻralgan odamlar bilan qiladi, ularni yana tasodifiy tanlab.</blockquote>
+<h2>Texnik tafsilotlar</h2>
+<p>Har bir katak va chuqurlik sinfi uchun tartib: tanlanma doirasidagi n ta hodisadan qaytarish bilan n ta hodisa tanlanadi; katak Mc si (MAXC + 0.2) va har bir hodisa boʻsagʻalari qayta baholanadi; b Aki-Utsu baholovchisi bilan hisoblanadi; bu {nboot} marta takrorlanadi. Oraliq qayta tanlanmalarning 2.5- dan 97.5-protsentiligacha boʻlgan qism, shuning uchun u Mc noaniqligini ham oʻz ichiga oladi (Woessner & Wiemer 2005).</p>
+<p>Nega faqat formula emas: b ning klassik standart xatosi, σ ≈ b/√n (Aki) yoki Shi–Bolt shakli, maʼlum va belgilangan Mc ni nazarda tutadi. Bu yerda boʻsagʻaning oʻzi baholanadi va tanlanma oʻrtacha hajmda, shuning uchun protsentil bootstrap halolroq xulosa beradi. Katak tafsilotlaridagi kesim grafiklari tezlik uchun Shi–Bolt ±1.96 σ dan foydalanadi.</p>
+<p>Cheklovlar: bootstrap sistematik xatolarni (notoʻgʻri magnituda shkalasi, Mc dan yuqori oʻtkazib yuborilgan hodisalar, ikki populyatsiyaning aralashishi) emas, faqat tanlanma shovqinini takrorlaydi. Kesishadigan oraliqlar tenglikni isbotlamaydi; kesishmaydigan oraliqlar rasmiy test emas, balki farqning konservativ belgisi (Marzocchi et al. 2020).</p>
+<p>Saytda: katak panelidagi b shkalasida oraliq kesmasi, har bir b qiymatidan keyingi qavs, sifat kodini belgilaydigan oraliq kengligi va taqqoslash koʻrinishidagi ikki qatorli oraliq grafigi.</p>
+<h2>Qoʻshimcha adabiyotlar</h2>
+<ol class="refs"><li>Woessner, J. &amp; Wiemer, S. (2005). Assessing the quality of earthquake catalogues: estimating the magnitude of completeness and its uncertainty. BSSA, 95(2), 684–698. <a href="https://doi.org/10.1785/0120040007">doi.org/10.1785/0120040007</a></li><li>Marzocchi, W., Spassiani, I., Stallone, A. &amp; Taroni, M. (2020). How to be fooled searching for significant variations of the b-value. Geophysical Journal International, 220, 1845–1856. <a href="https://doi.org/10.1093/gji/ggz541">doi.org/10.1093/gji/ggz541</a></li></ol>
+<div class="pager"><a href="/uz/learn/gutenberg-richter-b-value/">← Gutenberg-Richter b qiymati</a><a href="/uz/learn/quality-codes/">A, B, C va “yetarli emas” sifat kodlari →</a></div>
+</main>
+<footer>Har bir sahifa misollarini xarita bilan bir xil maʼlumot fayllaridan oladi, shuning uchun raqamlar oylik yangilanish bilan birga yangilanadi. · <a href="/">Global Seismicity Atlas</a> · Not a forecast and not a hazard map. · <a href="https://doi.org/10.5281/zenodo.24228387">doi:10.5281/zenodo.24228387</a></footer>
+</body>
+</html>

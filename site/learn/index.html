@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Learn — Global Seismicity Atlas</title>
+<meta name="description" content="Short explanations of every number and label on the map: what it means in plain words, a real example from the current data, an interactive diagram, and the…">
+<link rel="canonical" href="https://seismicityatlas.org/learn/">
+<link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/">
+<link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/">
+<link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/">
+<link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/">
+<link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Global Seismicity Atlas">
+<meta property="og:title" content="Learn — Global Seismicity Atlas">
+<meta property="og:description" content="Short explanations of every number and label on the map: what it means in plain words, a real example from the current data, an interactive diagram, and the…">
+<meta property="og:url" content="https://seismicityatlas.org/learn/">
+<meta property="og:image" content="https://seismicityatlas.org/og-image.png">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#fbfaf7;--fg:#1d2126;--muted:#5b6470;--line:#e3e0d8;--accent:#0e6b73;--card:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#16191d;--fg:#e8eaed;--muted:#a3abb5;--line:#2c3138;--accent:#5cc3cb;--card:#1d2126}}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-latin.woff2) format("woff2");font-weight:400 700;font-display:swap}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--accent)}header,main,footer{max-width:760px;margin:0 auto;padding:0 16px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.brand{font-weight:700;text-decoration:none;color:var(--fg)}.langs a{margin-left:10px;font-size:14px}
+nav.crumbs{font-size:14px;color:var(--muted);margin:18px 0 4px}h1{font-size:30px;line-height:1.25;margin:6px 0 10px}
+.lead{font-size:19px;color:var(--fg);margin:0 0 22px}h2{font-size:19px;margin:30px 0 8px}
+.cta{display:inline-block;margin:6px 0 10px;padding:10px 16px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+blockquote{margin:0;padding:12px 16px;border-left:3px solid var(--accent);background:var(--card)}
+code.lr-formula{display:block;margin:8px 0;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow-x:auto;white-space:pre-wrap}
+ol.refs{padding-left:20px;font-size:14px}ul.idx{padding-left:20px}ul.idx li{margin:6px 0}.sum{color:var(--muted)}
+.pager{display:flex;justify-content:space-between;gap:12px;margin:34px 0 10px;font-size:15px}
+footer{margin-top:30px;padding-top:14px;padding-bottom:30px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Learn — Global Seismicity Atlas","inLanguage":"en","url":"https://seismicityatlas.org/learn/","isPartOf":{"@type":"WebSite","name":"Global Seismicity Atlas","url":"https://seismicityatlas.org/"},"hasPart":[{"@type":"LearningResource","name":"Magnitude types","url":"https://seismicityatlas.org/learn/magnitude-types/"},{"@type":"LearningResource","name":"Direct vs proxy Mw","url":"https://seismicityatlas.org/learn/direct-vs-proxy-mw/"},{"@type":"LearningResource","name":"Magnitude of completeness (Mc)","url":"https://seismicityatlas.org/learn/magnitude-of-completeness/"},{"@type":"LearningResource","name":"Frequency-magnitude distribution","url":"https://seismicityatlas.org/learn/frequency-magnitude-distribution/"},{"@type":"LearningResource","name":"Gutenberg-Richter b-value","url":"https://seismicityatlas.org/learn/gutenberg-richter-b-value/"},{"@type":"LearningResource","name":"95 % interval and the bootstrap","url":"https://seismicityatlas.org/learn/confidence-interval-bootstrap/"},{"@type":"LearningResource","name":"Quality codes A, B, C and insufficient","url":"https://seismicityatlas.org/learn/quality-codes/"},{"@type":"LearningResource","name":"b-positive","url":"https://seismicityatlas.org/learn/b-positive/"},{"@type":"LearningResource","name":"Declustering","url":"https://seismicityatlas.org/learn/declustering/"},{"@type":"LearningResource","name":"Omori-Utsu decay","url":"https://seismicityatlas.org/learn/omori-utsu/"},{"@type":"LearningResource","name":"Aftershock productivity and Båth's law","url":"https://seismicityatlas.org/learn/aftershock-productivity-bath/"},{"@type":"LearningResource","name":"H3 cells and the sampling circle","url":"https://seismicityatlas.org/learn/h3-cells-and-sample-radius/"},{"@type":"LearningResource","name":"Plate-boundary classes","url":"https://seismicityatlas.org/learn/plate-boundary-classes/"},{"@type":"LearningResource","name":"Depth and slabs","url":"https://seismicityatlas.org/learn/depth-and-slabs/"},{"@type":"LearningResource","name":"Mw ≥ 6 rate","url":"https://seismicityatlas.org/learn/rate-m6/"},{"@type":"LearningResource","name":"Catalogue consistency","url":"https://seismicityatlas.org/learn/catalogue-consistency/"},{"@type":"LearningResource","name":"Regional catalogues","url":"https://seismicityatlas.org/learn/regional-catalogues/"},{"@type":"LearningResource","name":"Not a forecast","url":"https://seismicityatlas.org/learn/not-a-forecast/"},{"@type":"LearningResource","name":"How well earthquakes are recorded","url":"https://seismicityatlas.org/learn/recording-rating/"},{"@type":"LearningResource","name":"Induced seismicity","url":"https://seismicityatlas.org/learn/induced-seismicity/"},{"@type":"LearningResource","name":"Seismic moment budget","url":"https://seismicityatlas.org/learn/seismic-moment-budget/"}]}</script>
+</head>
+<body>
+<header><a class="brand" href="/">Global Seismicity Atlas</a><span class="langs"><a href="/uz/learn/" hreflang="uz" lang="uz">Oʻzbekcha</a><a href="/ru/learn/" hreflang="ru" lang="ru">Русский</a><a href="/es/learn/" hreflang="es" lang="es">Español</a></span></header>
+<main>
+<nav class="crumbs"><a href="/">Global Seismicity Atlas</a> › Learn</nav>
+<h1>Learn</h1>
+<p class="lead">Short explanations of every number and label on the map: what it means in plain words, a real example from the current data, an interactive diagram, and the technical details.</p>
+<a class="cta" href="/#v=learn&lang=en">Interactive diagram →</a>
+<h2>Magnitudes</h2>
+<ul class="idx"><li><a href="/learn/magnitude-types/">Magnitude types</a> <span class="sum">— Mw, mb, Ms, ML and Md measure different waves, and some of them stop growing for large earthquakes.</span></li><li><a href="/learn/direct-vs-proxy-mw/">Direct vs proxy Mw</a> <span class="sum">— Why the atlas, since v0.2, computes b only from moment magnitudes that were measured, not converted.</span></li></ul>
+<h2>Completeness &amp; b-value</h2>
+<ul class="idx"><li><a href="/learn/magnitude-of-completeness/">Magnitude of completeness (Mc)</a> <span class="sum">— The size above which a catalogue misses almost nothing, and how it changes over time.</span></li><li><a href="/learn/frequency-magnitude-distribution/">Frequency-magnitude distribution</a> <span class="sum">— How many earthquakes of each size: the basic chart behind Mc and b.</span></li><li><a href="/learn/gutenberg-richter-b-value/">Gutenberg-Richter b-value</a> <span class="sum">— The slope that says how quickly large earthquakes become rarer than small ones.</span></li></ul>
+<h2>Uncertainty &amp; quality</h2>
+<ul class="idx"><li><a href="/learn/confidence-interval-bootstrap/">95 % interval and the bootstrap</a> <span class="sum">— How sure a b-value is, estimated by re-drawing the catalogue many times.</span></li><li><a href="/learn/quality-codes/">Quality codes A, B, C and insufficient</a> <span class="sum">— Why some cells show a b-value and most do not.</span></li><li><a href="/learn/b-positive/">b-positive</a> <span class="sum">— A b-value from magnitude differences that is not fooled by missing small aftershocks.</span></li></ul>
+<h2>Sequences</h2>
+<ul class="idx"><li><a href="/learn/declustering/">Declustering</a> <span class="sum">— Removing aftershocks with space-time windows, and why it lowers b here.</span></li><li><a href="/learn/omori-utsu/">Omori-Utsu decay</a> <span class="sum">— How aftershock rates fall with time: K, c and p.</span></li><li><a href="/learn/aftershock-productivity-bath/">Aftershock productivity and Båth's law</a> <span class="sum">— How large the largest aftershock tends to be, and how many aftershocks to expect.</span></li></ul>
+<h2>Space &amp; tectonics</h2>
+<ul class="idx"><li><a href="/learn/h3-cells-and-sample-radius/">H3 cells and the sampling circle</a> <span class="sum">— Hexagons for display, a fixed circle for the statistics.</span></li><li><a href="/learn/plate-boundary-classes/">Plate-boundary classes</a> <span class="sum">— Subduction, ridges, transforms and rifts in PB2002, and their b-values.</span></li><li><a href="/learn/depth-and-slabs/">Depth and slabs</a> <span class="sum">— Why shallow and deeper earthquakes are mapped separately.</span></li><li><a href="/learn/rate-m6/">Mw ≥ 6 rate</a> <span class="sum">— How often large earthquakes happened in a cell, per area and per year.</span></li></ul>
+<h2>Data &amp; caveats</h2>
+<ul class="idx"><li><a href="/learn/catalogue-consistency/">Catalogue consistency</a> <span class="sum">— Where ComCat and ISC-GEM agree or disagree on magnitude and location.</span></li><li><a href="/learn/regional-catalogues/">Regional catalogues</a> <span class="sum">— Dense national networks see much smaller earthquakes, on their own magnitude scale.</span></li><li><a href="/learn/not-a-forecast/">Not a forecast</a> <span class="sum">— Why catalogue statistics do not say when or where the next earthquake will be.</span></li><li><a href="/learn/recording-rating/">How well earthquakes are recorded</a> <span class="sum">— The four-word rating in the Simple view, and the exact rule behind it.</span></li></ul>
+<h2>Case studies and budgets</h2>
+<ul class="idx"><li><a href="/learn/induced-seismicity/">Induced seismicity</a> <span class="sum">— Earthquakes caused by people: gas production in Groningen, and what the record shows.</span></li><li><a href="/learn/seismic-moment-budget/">Seismic moment budget</a> <span class="sum">— Comparing the strain that GNSS measures with the earthquakes that released it, and why 120 years is short.</span></li></ul>
+</main>
+<footer>Each page reads its examples from the same data files as the map, so the numbers follow the monthly update. · <a href="/">Global Seismicity Atlas</a> · Not a forecast and not a hazard map. · <a href="https://doi.org/10.5281/zenodo.24228387">doi:10.5281/zenodo.24228387</a></footer>
+</body>
+</html>

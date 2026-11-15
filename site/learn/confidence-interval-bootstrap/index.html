@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>95 % interval and the bootstrap — Learn · Global Seismicity Atlas</title>
+<meta name="description" content="The 95 % interval shown with every b-value is the range that would cover the true b in 95 of 100 repeats of the measurement, and the atlas estimates it by…">
+<link rel="canonical" href="https://seismicityatlas.org/learn/confidence-interval-bootstrap/">
+<link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/confidence-interval-bootstrap/">
+<link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/confidence-interval-bootstrap/">
+<link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/confidence-interval-bootstrap/">
+<link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/confidence-interval-bootstrap/">
+<link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/confidence-interval-bootstrap/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Global Seismicity Atlas">
+<meta property="og:title" content="95 % interval and the bootstrap — Learn · Global Seismicity Atlas">
+<meta property="og:description" content="The 95 % interval shown with every b-value is the range that would cover the true b in 95 of 100 repeats of the measurement, and the atlas estimates it by…">
+<meta property="og:url" content="https://seismicityatlas.org/learn/confidence-interval-bootstrap/">
+<meta property="og:image" content="https://seismicityatlas.org/og-image.png">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#fbfaf7;--fg:#1d2126;--muted:#5b6470;--line:#e3e0d8;--accent:#0e6b73;--card:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#16191d;--fg:#e8eaed;--muted:#a3abb5;--line:#2c3138;--accent:#5cc3cb;--card:#1d2126}}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-latin.woff2) format("woff2");font-weight:400 700;font-display:swap}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--accent)}header,main,footer{max-width:760px;margin:0 auto;padding:0 16px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.brand{font-weight:700;text-decoration:none;color:var(--fg)}.langs a{margin-left:10px;font-size:14px}
+nav.crumbs{font-size:14px;color:var(--muted);margin:18px 0 4px}h1{font-size:30px;line-height:1.25;margin:6px 0 10px}
+.lead{font-size:19px;color:var(--fg);margin:0 0 22px}h2{font-size:19px;margin:30px 0 8px}
+.cta{display:inline-block;margin:6px 0 10px;padding:10px 16px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+blockquote{margin:0;padding:12px 16px;border-left:3px solid var(--accent);background:var(--card)}
+code.lr-formula{display:block;margin:8px 0;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow-x:auto;white-space:pre-wrap}
+ol.refs{padding-left:20px;font-size:14px}ul.idx{padding-left:20px}ul.idx li{margin:6px 0}.sum{color:var(--muted)}
+.pager{display:flex;justify-content:space-between;gap:12px;margin:34px 0 10px;font-size:15px}
+footer{margin-top:30px;padding-top:14px;padding-bottom:30px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}</style>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"95 % interval and the bootstrap","headline":"95 % interval and the bootstrap","description":"The 95 % interval shown with every b-value is the range that would cover the true b in 95 of 100 repeats of the measurement, and the atlas estimates it by the bootstrap: re-drawing the catalogue many times and re-computing b.","inLanguage":"en","url":"https://seismicityatlas.org/learn/confidence-interval-bootstrap/","learningResourceType":"explanation","educationalLevel":"beginner to expert","about":{"@type":"DefinedTerm","name":"95 % interval and the bootstrap","inDefinedTermSet":"https://seismicityatlas.org/learn/"},"author":{"@type":"Person","name":"Otabek Ismoilov","sameAs":"https://orcid.org/0009-0008-2785-3691"},"isPartOf":{"@type":"WebSite","name":"Global Seismicity Atlas","url":"https://seismicityatlas.org/"},"citation":["Woessner, J. & Wiemer, S. (2005). Assessing the quality of earthquake catalogues: estimating the magnitude of completeness and its uncertainty. BSSA, 95(2), 684–698.","Marzocchi, W., Spassiani, I., Stallone, A. & Taroni, M. (2020). How to be fooled searching for significant variations of the b-value. Geophysical Journal International, 220, 1845–1856."]},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Seismicity Atlas","item":"https://seismicityatlas.org/"},{"@type":"ListItem","position":2,"name":"Learn","item":"https://seismicityatlas.org/learn/"},{"@type":"ListItem","position":3,"name":"95 % interval and the bootstrap","item":"https://seismicityatlas.org/learn/confidence-interval-bootstrap/"}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Global Seismicity Atlas</a><span class="langs"><a href="/uz/learn/confidence-interval-bootstrap/" hreflang="uz" lang="uz">Oʻzbekcha</a><a href="/ru/learn/confidence-interval-bootstrap/" hreflang="ru" lang="ru">Русский</a><a href="/es/learn/confidence-interval-bootstrap/" hreflang="es" lang="es">Español</a></span></header>
+<main>
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Global Seismicity Atlas</a> › <a href="/learn/">Learn</a> › 95 % interval and the bootstrap</nav>
+<h1>95 % interval and the bootstrap</h1>
+<p class="lead">The 95 % interval shown with every b-value is the range that would cover the true b in 95 of 100 repeats of the measurement, and the atlas estimates it by the bootstrap: re-drawing the catalogue many times and re-computing b.</p>
+<a class="cta" href="/#v=learn&t=confidence-interval-bootstrap&lang=en">Interactive diagram · Real example from the atlas →</a>
+<h2>Simple explanation</h2>
+<p>A b-value from a few hundred earthquakes is uncertain: a slightly different set of earthquakes would have given a slightly different number.</p>
+<p>We cannot rerun the Earth, but we can rerun the sample. The <strong>bootstrap</strong> draws a new catalogue of the same size from the real one, at random and with replacement (some events twice, some not at all), and computes b again. After many such draws, the middle 95 % of the b-values is the interval.</p>
+<p>A narrow interval means the data pin b down well. A wide one means they do not, and the atlas then withholds b (see “Quality codes”).</p>
+<h2>An everyday picture</h2>
+<blockquote>To learn how much a poll result could wobble, you could ask a new random group of the same size, many times. The bootstrap does this with the people you already asked, drawing them again at random.</blockquote>
+<h2>Technical details</h2>
+<p>Procedure per cell and depth class: draw n events with replacement from the n events in the sampling circle; re-estimate the cell Mc (MAXC + 0.2) and the per-event thresholds; compute b with the Aki-Utsu estimator; repeat {nboot} times. The interval is the 2.5th to 97.5th percentile of the replicates, so it includes the Mc uncertainty (Woessner & Wiemer 2005).</p>
+<p>Why not only the formula: the classical standard error of b, σ ≈ b/√n (Aki) or the Shi–Bolt form, assumes a known, fixed Mc. Here the threshold itself is estimated and the sample is modest, so the percentile bootstrap is the more honest summary. The cutoff plots in the cell details use the Shi–Bolt ±1.96 σ for speed.</p>
+<p>Limits: the bootstrap reproduces sampling noise, not systematic errors (a wrong magnitude scale, missing events above Mc, mixing two populations). Overlapping intervals do not prove equality; non-overlapping intervals are a conservative sign of a difference, not a formal test (Marzocchi et al. 2020).</p>
+<p>On the site: the interval bar on the b scale in the cell panel, the bracket after every b value, the interval width that sets the quality code and the two-row interval chart of the comparison view.</p>
+<h2>Further reading</h2>
+<ol class="refs"><li>Woessner, J. &amp; Wiemer, S. (2005). Assessing the quality of earthquake catalogues: estimating the magnitude of completeness and its uncertainty. BSSA, 95(2), 684–698. <a href="https://doi.org/10.1785/0120040007">doi.org/10.1785/0120040007</a></li><li>Marzocchi, W., Spassiani, I., Stallone, A. &amp; Taroni, M. (2020). How to be fooled searching for significant variations of the b-value. Geophysical Journal International, 220, 1845–1856. <a href="https://doi.org/10.1093/gji/ggz541">doi.org/10.1093/gji/ggz541</a></li></ol>
+<div class="pager"><a href="/learn/gutenberg-richter-b-value/">← Gutenberg-Richter b-value</a><a href="/learn/quality-codes/">Quality codes A, B, C and insufficient →</a></div>
+</main>
+<footer>Each page reads its examples from the same data files as the map, so the numbers follow the monthly update. · <a href="/">Global Seismicity Atlas</a> · Not a forecast and not a hazard map. · <a href="https://doi.org/10.5281/zenodo.24228387">doi:10.5281/zenodo.24228387</a></footer>
+</body>
+</html>

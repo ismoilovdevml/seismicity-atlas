@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Прямая и прокси-Mw — Пояснения · Global Seismicity Atlas</title>
+<meta name="description" content="Начиная с версии 0.2 все b-значения в атласе рассчитываются только по моментным магнитудам ISC-GEM, измеренным непосредственно по сейсмическому моменту, а…">
+<link rel="canonical" href="https://seismicityatlas.org/ru/learn/direct-vs-proxy-mw/">
+<link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/direct-vs-proxy-mw/">
+<link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/direct-vs-proxy-mw/">
+<link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/direct-vs-proxy-mw/">
+<link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/direct-vs-proxy-mw/">
+<link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/direct-vs-proxy-mw/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Global Seismicity Atlas">
+<meta property="og:title" content="Прямая и прокси-Mw — Пояснения · Global Seismicity Atlas">
+<meta property="og:description" content="Начиная с версии 0.2 все b-значения в атласе рассчитываются только по моментным магнитудам ISC-GEM, измеренным непосредственно по сейсмическому моменту, а…">
+<meta property="og:url" content="https://seismicityatlas.org/ru/learn/direct-vs-proxy-mw/">
+<meta property="og:image" content="https://seismicityatlas.org/og-image.png">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#fbfaf7;--fg:#1d2126;--muted:#5b6470;--line:#e3e0d8;--accent:#0e6b73;--card:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#16191d;--fg:#e8eaed;--muted:#a3abb5;--line:#2c3138;--accent:#5cc3cb;--card:#1d2126}}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-latin.woff2) format("woff2");font-weight:400 700;font-display:swap}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--accent)}header,main,footer{max-width:760px;margin:0 auto;padding:0 16px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.brand{font-weight:700;text-decoration:none;color:var(--fg)}.langs a{margin-left:10px;font-size:14px}
+nav.crumbs{font-size:14px;color:var(--muted);margin:18px 0 4px}h1{font-size:30px;line-height:1.25;margin:6px 0 10px}
+.lead{font-size:19px;color:var(--fg);margin:0 0 22px}h2{font-size:19px;margin:30px 0 8px}
+.cta{display:inline-block;margin:6px 0 10px;padding:10px 16px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+blockquote{margin:0;padding:12px 16px;border-left:3px solid var(--accent);background:var(--card)}
+code.lr-formula{display:block;margin:8px 0;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow-x:auto;white-space:pre-wrap}
+ol.refs{padding-left:20px;font-size:14px}ul.idx{padding-left:20px}ul.idx li{margin:6px 0}.sum{color:var(--muted)}
+.pager{display:flex;justify-content:space-between;gap:12px;margin:34px 0 10px;font-size:15px}
+footer{margin-top:30px;padding-top:14px;padding-bottom:30px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}</style>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Прямая и прокси-Mw","headline":"Прямая и прокси-Mw","description":"Начиная с версии 0.2 все b-значения в атласе рассчитываются только по моментным магнитудам ISC-GEM, измеренным непосредственно по сейсмическому моменту, а «прокси»-значения Mw, пересчитанные из других шкал, исключаются.","inLanguage":"ru","url":"https://seismicityatlas.org/ru/learn/direct-vs-proxy-mw/","learningResourceType":"explanation","educationalLevel":"beginner to expert","about":{"@type":"DefinedTerm","name":"Direct vs proxy Mw","inDefinedTermSet":"https://seismicityatlas.org/learn/"},"author":{"@type":"Person","name":"Otabek Ismoilov","sameAs":"https://orcid.org/0009-0008-2785-3691"},"isPartOf":{"@type":"WebSite","name":"Global Seismicity Atlas","url":"https://seismicityatlas.org/"},"citation":["Di Giacomo, D., Engdahl, E. R. & Storchak, D. A. (2018). The ISC-GEM Earthquake Catalogue (1904–2014): status after the Extension Project. Earth System Science Data, 10, 1877–1899.","Castellaro, S., Mulargia, F. & Kagan, Y. Y. (2006). Regression problems for magnitudes. Geophysical Journal International, 165, 913–930.","Tinti, S. & Mulargia, F. (1985). Effects of magnitude uncertainties on estimating the parameters in the Gutenberg-Richter frequency-magnitude law. BSSA, 75(6), 1681–1697.","Kagan, Y. Y. & Jackson, D. D. (2013). Tohoku earthquake: a surprise? BSSA, 103(2B), 1181–1194."]},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Seismicity Atlas","item":"https://seismicityatlas.org/"},{"@type":"ListItem","position":2,"name":"Пояснения","item":"https://seismicityatlas.org/ru/learn/"},{"@type":"ListItem","position":3,"name":"Прямая и прокси-Mw","item":"https://seismicityatlas.org/ru/learn/direct-vs-proxy-mw/"}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Global Seismicity Atlas</a><span class="langs"><a href="/learn/direct-vs-proxy-mw/" hreflang="en" lang="en">English</a><a href="/uz/learn/direct-vs-proxy-mw/" hreflang="uz" lang="uz">Oʻzbekcha</a><a href="/es/learn/direct-vs-proxy-mw/" hreflang="es" lang="es">Español</a></span></header>
+<main>
+<nav class="crumbs" aria-label="Навигационная цепочка"><a href="/">Global Seismicity Atlas</a> › <a href="/ru/learn/">Пояснения</a> › Прямая и прокси-Mw</nav>
+<h1>Прямая и прокси-Mw</h1>
+<p class="lead">Начиная с версии 0.2 все b-значения в атласе рассчитываются только по моментным магнитудам ISC-GEM, измеренным непосредственно по сейсмическому моменту, а «прокси»-значения Mw, пересчитанные из других шкал, исключаются.</p>
+<a class="cta" href="/#v=learn&t=direct-vs-proxy-mw&lang=ru">Интерактивная диаграмма · Реальный пример из атласа →</a>
+<h2>Простое объяснение</h2>
+<p>ISC-GEM приводит для каждого землетрясения Mw. Для большинства событий с 1976 г. эта Mw измерена по волновым формам (проект Global CMT). Для остальных она <em>пересчитана</em> из mb или Ms по формуле — это прокси.</p>
+<p>Пересчёт — это обоснованная догадка с разбросом. Когда много таких угаданных магнитуд оказывается у нижней границы выборки, они меняют форму распределения по размерам, и b-значение сдвигается вместе с ней.</p>
+<p>Поэтому теперь атлас оставляет только измеренные. Признак, по которому он их отличает, — неопределённость, указанная при каждой магнитуде: у измеренных Mw она наименьшая, у прокси — больше.</p>
+<h2>Пример из жизни</h2>
+<blockquote>Представьте опрос о росте людей, где большинство измерили рулеткой, а рост некоторых оценили по размеру обуви. В среднем оценки могут быть неплохими, но они размывают «хвосты», и статистика о том, как быстро становятся редкими высокие люди, окажется неверной.</blockquote>
+<h2>Технические подробности</h2>
+<p>Правило: событие ISC-GEM 1976–2021 гг. входит в выборку для b, только если указанная для него неопределённость Mw не больше {magerr}, то есть это прямая моментная магнитуда. Частоты, числа событий, Mc(t), слои событий и сравнение с Michael (2014) используют все события. Минимальные пороги Mc по периодам пересчитаны по той же прямой выборке, так что пороги и выборка согласованы.</p>
+<p>Почему неопределённость указывает на прямую Mw: в копии ISC-GEM в USGS ComCat нет флага «прямая/прокси», но в 1976–2021 гг. ни у одного события нет неопределённости между 0.10 и 0.20, а почти все события, сопоставленные в ComCat с магнитудой Global CMT, имеют 0.10 (docs/method.md §2.1).</p>
+<p>Почему не исправлять, а исключать: гауссовы ошибки магнитуд постоянной величины не смещают b (Tinti & Mulargia 1985). Избыток b у прокси намного больше, чем можно объяснить шумом; он возникает из-за того, какие именно события получили прокси, и из-за регрессионного пересчёта, который смещает b (Castellaro et al. 2006).</p>
+<p>Цена и открытый вопрос: примерно одно событие из восьми за 1976–2021 гг. выпадает из выборки для b, минимальный порог для мелких событий в 1976–2003 гг. повышается на 0.1, и критерий качества проходит меньше ячеек. В ячейках, показанных в обеих версиях, b немного снизилось, тогда как b-positive почти не изменилось; часть этого снижения могут давать события чуть выше порога, пропущенные GCMT. Этот вопрос не решён.</p>
+<h2>Дополнительная литература</h2>
+<ol class="refs"><li>Di Giacomo, D., Engdahl, E. R. &amp; Storchak, D. A. (2018). The ISC-GEM Earthquake Catalogue (1904–2014): status after the Extension Project. Earth System Science Data, 10, 1877–1899. <a href="https://doi.org/10.5194/essd-10-1877-2018">doi.org/10.5194/essd-10-1877-2018</a></li><li>Castellaro, S., Mulargia, F. &amp; Kagan, Y. Y. (2006). Regression problems for magnitudes. Geophysical Journal International, 165, 913–930. <a href="https://doi.org/10.1111/j.1365-246X.2006.02955.x">doi.org/10.1111/j.1365-246X.2006.02955.x</a></li><li>Tinti, S. &amp; Mulargia, F. (1985). Effects of magnitude uncertainties on estimating the parameters in the Gutenberg-Richter frequency-magnitude law. BSSA, 75(6), 1681–1697. <a href="https://doi.org/10.1785/BSSA0750061681">doi.org/10.1785/BSSA0750061681</a></li><li>Kagan, Y. Y. &amp; Jackson, D. D. (2013). Tohoku earthquake: a surprise? BSSA, 103(2B), 1181–1194. <a href="https://doi.org/10.1785/0120120110">doi.org/10.1785/0120120110</a></li></ol>
+<div class="pager"><a href="/ru/learn/magnitude-types/">← Типы магнитуд</a><a href="/ru/learn/magnitude-of-completeness/">Магнитуда полноты (Mc) →</a></div>
+</main>
+<footer>Каждая страница берёт свои примеры из тех же файлов данных, что и карта, поэтому числа следуют за ежемесячным обновлением. · <a href="/">Global Seismicity Atlas</a> · Not a forecast and not a hazard map. · <a href="https://doi.org/10.5281/zenodo.24228387">doi:10.5281/zenodo.24228387</a></footer>
+</body>
+</html>

@@ -150,6 +150,9 @@ cd site && python3 -m http.server 8000   # preview the site at http://localhost:
 - README screenshots: `python tests/e2e/tools/readme_shots.py [--chromium PATH]` (Playwright and Pillow; fixed viewport,
   time zone, theme and data; refreshed on each release).
 - Paper figures: `.venv/bin/python -I scripts/paper_figures.py` (written at 400 dpi, `docs/img/paper/`).
+- Search-engine pages: `node scripts/seo_pages.mjs` writes one static page per Learn concept and language
+  (`site/learn/`, `site/{uz,ru,es}/learn/`), `site/sitemap.xml` and `site/robots.txt`; the social card is
+  `python tests/e2e/tools/og_image.py`.
 - Tests: `.venv/bin/python -I -m pytest -q tests --ignore=tests/e2e`; browser tests: `pip install playwright pytest &&
   python -m playwright install chromium && python -m pytest tests/e2e` (`E2E_BROWSERS=chromium,firefox,webkit` for all
   three engines). CI: `.github/workflows/test-site.yml`.

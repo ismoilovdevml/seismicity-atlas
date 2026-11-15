@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>H3 cells and the sampling circle — Learn · Global Seismicity Atlas</title>
+<meta name="description" content="The map is drawn on H3 hexagons, but each cell's statistics use every earthquake within a fixed circle around the cell centre, so every place is measured…">
+<link rel="canonical" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/h3-cells-and-sample-radius/">
+<link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Global Seismicity Atlas">
+<meta property="og:title" content="H3 cells and the sampling circle — Learn · Global Seismicity Atlas">
+<meta property="og:description" content="The map is drawn on H3 hexagons, but each cell's statistics use every earthquake within a fixed circle around the cell centre, so every place is measured…">
+<meta property="og:url" content="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/">
+<meta property="og:image" content="https://seismicityatlas.org/og-image.png">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#fbfaf7;--fg:#1d2126;--muted:#5b6470;--line:#e3e0d8;--accent:#0e6b73;--card:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#16191d;--fg:#e8eaed;--muted:#a3abb5;--line:#2c3138;--accent:#5cc3cb;--card:#1d2126}}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-latin.woff2) format("woff2");font-weight:400 700;font-display:swap}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--accent)}header,main,footer{max-width:760px;margin:0 auto;padding:0 16px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.brand{font-weight:700;text-decoration:none;color:var(--fg)}.langs a{margin-left:10px;font-size:14px}
+nav.crumbs{font-size:14px;color:var(--muted);margin:18px 0 4px}h1{font-size:30px;line-height:1.25;margin:6px 0 10px}
+.lead{font-size:19px;color:var(--fg);margin:0 0 22px}h2{font-size:19px;margin:30px 0 8px}
+.cta{display:inline-block;margin:6px 0 10px;padding:10px 16px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+blockquote{margin:0;padding:12px 16px;border-left:3px solid var(--accent);background:var(--card)}
+code.lr-formula{display:block;margin:8px 0;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow-x:auto;white-space:pre-wrap}
+ol.refs{padding-left:20px;font-size:14px}ul.idx{padding-left:20px}ul.idx li{margin:6px 0}.sum{color:var(--muted)}
+.pager{display:flex;justify-content:space-between;gap:12px;margin:34px 0 10px;font-size:15px}
+footer{margin-top:30px;padding-top:14px;padding-bottom:30px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}</style>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"H3 cells and the sampling circle","headline":"H3 cells and the sampling circle","description":"The map is drawn on H3 hexagons, but each cell's statistics use every earthquake within a fixed circle around the cell centre, so every place is measured over the same area.","inLanguage":"en","url":"https://seismicityatlas.org/learn/h3-cells-and-sample-radius/","learningResourceType":"explanation","educationalLevel":"beginner to expert","about":{"@type":"DefinedTerm","name":"H3 cells and the sampling circle","inDefinedTermSet":"https://seismicityatlas.org/learn/"},"author":{"@type":"Person","name":"Otabek Ismoilov","sameAs":"https://orcid.org/0009-0008-2785-3691"},"isPartOf":{"@type":"WebSite","name":"Global Seismicity Atlas","url":"https://seismicityatlas.org/"},"citation":["Wiemer, S. & Wyss, M. (2002). Mapping spatial variability of the frequency-magnitude distribution of earthquakes. Advances in Geophysics, 45, 259–302.","H3: a hexagonal hierarchical geospatial indexing system (documentation)."]},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Seismicity Atlas","item":"https://seismicityatlas.org/"},{"@type":"ListItem","position":2,"name":"Learn","item":"https://seismicityatlas.org/learn/"},{"@type":"ListItem","position":3,"name":"H3 cells and the sampling circle","item":"https://seismicityatlas.org/learn/h3-cells-and-sample-radius/"}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Global Seismicity Atlas</a><span class="langs"><a href="/uz/learn/h3-cells-and-sample-radius/" hreflang="uz" lang="uz">Oʻzbekcha</a><a href="/ru/learn/h3-cells-and-sample-radius/" hreflang="ru" lang="ru">Русский</a><a href="/es/learn/h3-cells-and-sample-radius/" hreflang="es" lang="es">Español</a></span></header>
+<main>
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Global Seismicity Atlas</a> › <a href="/learn/">Learn</a> › H3 cells and the sampling circle</nav>
+<h1>H3 cells and the sampling circle</h1>
+<p class="lead">The map is drawn on H3 hexagons, but each cell's statistics use every earthquake within a fixed circle around the cell centre, so every place is measured over the same area.</p>
+<a class="cta" href="/#v=learn&t=h3-cells-and-sample-radius&lang=en">Interactive diagram · Real example from the atlas →</a>
+<h2>Simple explanation</h2>
+<p>H3 is a global grid of hexagons made by Uber and used widely for maps. Hexagons tile the sphere with nearly equal areas, and every cell has a stable id, which keeps links and data joins simple.</p>
+<p>A hexagon of the global grid is small for statistics: it rarely holds enough large earthquakes. So the atlas takes a <strong>circle</strong> around each cell centre, bigger than the hexagon, and computes Mc and b from all events inside it.</p>
+<p>Neighbouring circles overlap, so neighbouring cells share earthquakes. A smooth-looking pattern on the map is therefore partly the circles, not the Earth.</p>
+<h2>An everyday picture</h2>
+<blockquote>Think of measuring air quality at street corners on a city grid, but each sensor averages the air within a fixed walking distance. Nearby corners give similar readings partly because they breathe the same air.</blockquote>
+<h2>Technical details</h2>
+<p>Grid: H3 resolution {globalRes} for the global layer. Statistics per cell: all events with an epicentre within {radius} km (great-circle distance) of the cell centre, as in the ZMAP constant-radius approach (Wiemer & Wyss 2002). Rates use the cell's own area, not the circle.</p>
+<p>Why a fixed radius rather than the nearest N events: the spatial support is the same everywhere, so two places are compared over the same footprint, and sparse places are honestly empty (b withheld) instead of borrowing events from far away. The cost is that the sample size, and so the uncertainty, varies; it is reported.</p>
+<p>H3 cells are not exactly equal-area (about a factor of two across one resolution), which is why rates divide by each cell's own <code>area_km2</code>.</p>
+<p>Radius sensitivity (docs/method.md §1): with 200 or 400 km instead of 300 km, b changes by less than 0.04 (median) where it is shown; the radius mainly decides how many cells reach the sample size.</p>
+<h2>Further reading</h2>
+<ol class="refs"><li>Wiemer, S. &amp; Wyss, M. (2002). Mapping spatial variability of the frequency-magnitude distribution of earthquakes. Advances in Geophysics, 45, 259–302. <a href="https://doi.org/10.1016/S0065-2687(02)80007-3">doi.org/10.1016/S0065-2687(02)80007-3</a></li><li>H3: a hexagonal hierarchical geospatial indexing system (documentation). <a href="https://h3geo.org/docs/">h3geo.org/docs/</a></li></ol>
+<div class="pager"><a href="/learn/aftershock-productivity-bath/">← Aftershock productivity and Båth's law</a><a href="/learn/plate-boundary-classes/">Plate-boundary classes →</a></div>
+</main>
+<footer>Each page reads its examples from the same data files as the map, so the numbers follow the monthly update. · <a href="/">Global Seismicity Atlas</a> · Not a forecast and not a hazard map. · <a href="https://doi.org/10.5281/zenodo.24228387">doi:10.5281/zenodo.24228387</a></footer>
+</body>
+</html>

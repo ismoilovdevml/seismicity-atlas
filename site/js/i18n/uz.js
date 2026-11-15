@@ -53,6 +53,7 @@ export default {
   'reg.eyebrow': 'Mintaqaviy katak',
   // ---- shell
   'title.site': 'Global seysmiklik atlasi',
+  'title.tagline': 'zilzilalar b-qiymati va toʻliqlik xaritasi, noaniqligi bilan',
   'title.sequences': 'Aftershok ketma-ketliklari',
   'title.methods': 'Validatsiya',
   'title.about': 'Atlas haqida va maʼlumotlar',

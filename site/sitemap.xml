@@ -1,0 +1,799 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://seismicityatlas.org/</loc>
+    <lastmod>2026-11-15</lastmod>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/magnitude-types/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/magnitude-types/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/direct-vs-proxy-mw/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/direct-vs-proxy-mw/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/magnitude-of-completeness/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/magnitude-of-completeness/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/frequency-magnitude-distribution/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/frequency-magnitude-distribution/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/gutenberg-richter-b-value/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/gutenberg-richter-b-value/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/confidence-interval-bootstrap/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/confidence-interval-bootstrap/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/quality-codes/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/quality-codes/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/b-positive/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/b-positive/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/declustering/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/declustering/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/omori-utsu/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/omori-utsu/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/aftershock-productivity-bath/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/aftershock-productivity-bath/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/h3-cells-and-sample-radius/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/plate-boundary-classes/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/plate-boundary-classes/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/depth-and-slabs/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/depth-and-slabs/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/rate-m6/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/rate-m6/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/catalogue-consistency/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/catalogue-consistency/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/regional-catalogues/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/regional-catalogues/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/not-a-forecast/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/not-a-forecast/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/recording-rating/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/recording-rating/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/induced-seismicity/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/induced-seismicity/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/learn/seismic-moment-budget/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/seismic-moment-budget/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/magnitude-types/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/magnitude-types/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/direct-vs-proxy-mw/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/direct-vs-proxy-mw/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/magnitude-of-completeness/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/magnitude-of-completeness/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/frequency-magnitude-distribution/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/frequency-magnitude-distribution/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/gutenberg-richter-b-value/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/gutenberg-richter-b-value/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/confidence-interval-bootstrap/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/confidence-interval-bootstrap/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/quality-codes/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/quality-codes/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/b-positive/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/b-positive/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/declustering/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/declustering/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/omori-utsu/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/omori-utsu/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/aftershock-productivity-bath/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/aftershock-productivity-bath/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/h3-cells-and-sample-radius/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/plate-boundary-classes/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/plate-boundary-classes/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/depth-and-slabs/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/depth-and-slabs/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/rate-m6/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/rate-m6/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/catalogue-consistency/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/catalogue-consistency/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/regional-catalogues/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/regional-catalogues/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/not-a-forecast/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/not-a-forecast/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/recording-rating/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/recording-rating/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/induced-seismicity/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/induced-seismicity/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/uz/learn/seismic-moment-budget/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/seismic-moment-budget/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/magnitude-types/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/magnitude-types/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/direct-vs-proxy-mw/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/direct-vs-proxy-mw/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/magnitude-of-completeness/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/magnitude-of-completeness/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/frequency-magnitude-distribution/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/frequency-magnitude-distribution/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/gutenberg-richter-b-value/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/gutenberg-richter-b-value/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/confidence-interval-bootstrap/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/confidence-interval-bootstrap/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/quality-codes/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/quality-codes/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/b-positive/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/b-positive/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/declustering/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/declustering/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/omori-utsu/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/omori-utsu/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/aftershock-productivity-bath/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/aftershock-productivity-bath/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/h3-cells-and-sample-radius/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/plate-boundary-classes/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/plate-boundary-classes/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/depth-and-slabs/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/depth-and-slabs/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/rate-m6/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/rate-m6/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/catalogue-consistency/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/catalogue-consistency/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/regional-catalogues/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/regional-catalogues/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/not-a-forecast/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/not-a-forecast/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/recording-rating/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/recording-rating/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/induced-seismicity/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/induced-seismicity/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/ru/learn/seismic-moment-budget/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/seismic-moment-budget/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/magnitude-types/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/magnitude-types/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/magnitude-types/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/direct-vs-proxy-mw/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/direct-vs-proxy-mw/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/direct-vs-proxy-mw/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/magnitude-of-completeness/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/magnitude-of-completeness/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/magnitude-of-completeness/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/frequency-magnitude-distribution/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/frequency-magnitude-distribution/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/frequency-magnitude-distribution/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/gutenberg-richter-b-value/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/gutenberg-richter-b-value/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/gutenberg-richter-b-value/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/confidence-interval-bootstrap/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/confidence-interval-bootstrap/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/confidence-interval-bootstrap/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/quality-codes/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/quality-codes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/quality-codes/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/b-positive/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/b-positive/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/b-positive/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/declustering/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/declustering/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/declustering/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/omori-utsu/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/omori-utsu/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/omori-utsu/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/aftershock-productivity-bath/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/aftershock-productivity-bath/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/aftershock-productivity-bath/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/h3-cells-and-sample-radius/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/h3-cells-and-sample-radius/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/h3-cells-and-sample-radius/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/plate-boundary-classes/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/plate-boundary-classes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/plate-boundary-classes/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/depth-and-slabs/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/depth-and-slabs/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/depth-and-slabs/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/rate-m6/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/rate-m6/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/rate-m6/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/catalogue-consistency/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/catalogue-consistency/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/catalogue-consistency/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/regional-catalogues/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/regional-catalogues/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/regional-catalogues/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/not-a-forecast/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/not-a-forecast/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/not-a-forecast/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/recording-rating/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/recording-rating/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/recording-rating/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/induced-seismicity/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/induced-seismicity/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/induced-seismicity/"/>
+  </url>
+  <url>
+    <loc>https://seismicityatlas.org/es/learn/seismic-moment-budget/</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/seismic-moment-budget/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/seismic-moment-budget/"/>
+  </url>
+</urlset>
