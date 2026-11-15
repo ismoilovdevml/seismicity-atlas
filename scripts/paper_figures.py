@@ -7,6 +7,10 @@ Reads only the published data in site/data/ (no pipeline run needed) and writes 
 Colour maps (doi:10.5281/zenodo.8409685, MIT licence, see scripts/crameri.py): b-values use the diverging vik map centred
 on b = 1 (the website's light-theme classes are steps of the same map); line colours are picked from vik and batlow.
 Text is in ink colours, never in a data colour. Every b-value and every ratio is drawn with its 95 % interval.
+
+Journal figures (fig1_b_maps, fmd_example, mc_time, validation_b, plate_boundary_b, consistency) carry no titles or
+footers: that information belongs in the captions. They are written at 400 dpi so that they stay above 300 dpi at the
+journal widths (86 mm single column, 180 mm full width); save() prints the effective dpi at the intended width.
 """
 from __future__ import annotations
 
@@ -31,7 +35,9 @@ from matplotlib.colors import BoundaryNorm, ListedColormap, Normalize  # noqa: E
 from matplotlib.patches import Patch  # noqa: E402
 
 OUT = Path(__file__).resolve().parents[1] / "docs" / "img" / "paper"
-DPI = 300
+DPI = 400
+WIDTH_MM = {"fig1_b_maps": 180, "fmd_example": 86, "mc_time": 180, "validation_b": 180, "plate_boundary_b": 180,
+            "consistency": 180}
 VIK = crameri.cmap("vik")
 C_LOW, C_HIGH = crameri.sample("vik", [0.18, 0.82])   # two series colours from vik (ours vs published, north vs south)
 C_SEQ = crameri.sample("batlow", [0.2, 0.55, 0.8])    # categorical-ish picks from batlow for line pairs
@@ -57,9 +63,16 @@ def load(rel):
 def save(fig, name):
     OUT.mkdir(parents=True, exist_ok=True)
     p = OUT / f"{name}.png"
-    fig.savefig(p, dpi=DPI, bbox_inches="tight")
+    fig.patch.set_facecolor("white")   # journals print on white; the site style uses an off-white page colour
+    for ax in fig.axes:
+        if ax.get_facecolor()[:3] != (1.0, 1.0, 1.0) and ax.axison:
+            ax.set_facecolor("white")
+    fig.savefig(p, dpi=DPI, bbox_inches="tight", facecolor="white")
     plt.close(fig)
-    print(f"wrote {p.relative_to(OUT.parents[2])} ({p.stat().st_size / 1e3:.0f} kB)")
+    from matplotlib.image import imread
+    h, w = imread(p).shape[:2]
+    at = f", {w / (WIDTH_MM[name] / 25.4):.0f} dpi at {WIDTH_MM[name]} mm" if name in WIDTH_MM else ""
+    print(f"wrote {p.relative_to(OUT.parents[2])} ({p.stat().st_size / 1e3:.0f} kB, {w} x {h} px{at})")
 
 
 # ----------------------------------------------------------------------------------------------- 1, 2: b maps
@@ -71,6 +84,19 @@ def b_map(d):
     fig, ax = F.map_axes(f"Gutenberg-Richter b-value, {lab}",
                          f"{period}, direct Mw only, {man['method']['sample_radius_km']:.0f} km circles on H3 "
                          f"resolution-2 cells. Coloured: 95 % interval ≤ 0.5 (B fainter). Hatched: b withheld. Grey: too few events.")
+    norm = draw_b(ax, d, feats)
+    cb = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=VIK), ax=ax, orientation="horizontal", fraction=0.04, pad=0.08,
+                      aspect=45, ticks=[0.6, 0.8, 1.0, 1.2, 1.4])
+    cb.set_label("b (Crameri vik, centred on b = 1)", color=INK2)
+    cb.outline.set_visible(False)
+    counts = {q: sum(1 for ft in feats if ft["properties"].get(f"{d}_q") == q) for q in ("A", "B", "C", "insufficient")}
+    F.footer(ax, f"Cells: quality A {counts['A']}, B {counts['B']}, C {counts['C']}, insufficient {counts['insufficient']}. {NOTE} "
+                 f"Plates: Bird (2003). Equal Earth, centred 150° E. Cut-off {man['data_cutoff_utc']}.")
+    save(fig, f"b_map_{'shallow' if d == 'sh' else 'deep'}")
+
+
+def draw_b(ax, d, feats, grey_cells=True):
+    """Cells of one depth layer: quality A solid, B lighter, C hatched (b withheld), insufficient grey (optional); PB2002 lines."""
     norm = Normalize(0.6, 1.4)
     shown = {"A": ([], []), "B": ([], [])}
     hatch, grey = [], []
@@ -87,21 +113,38 @@ def b_map(d):
             hatch.extend(polys)
         else:
             grey.extend(polys)
-    ax.add_collection(PolyCollection(grey, facecolors="#dddcd6", edgecolors="none", zorder=2))
+    if grey_cells:
+        ax.add_collection(PolyCollection(grey, facecolors="#dddcd6", edgecolors="none", zorder=2))
     pc = PolyCollection(hatch, facecolors="#f4f3ef", edgecolors=MUTED, linewidths=0.0, zorder=2.4)
     pc.set_hatch("//////")
     ax.add_collection(pc)
     ax.add_collection(PolyCollection(shown["A"][0], facecolors=shown["A"][1], edgecolors="none", zorder=2.6))
     ax.add_collection(PolyCollection(shown["B"][0], facecolors=shown["B"][1], edgecolors="none", alpha=0.55, zorder=2.5))
     F.add_plates(ax)
-    cb = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=VIK), ax=ax, orientation="horizontal", fraction=0.04, pad=0.08,
-                      aspect=45, ticks=[0.6, 0.8, 1.0, 1.2, 1.4])
-    cb.set_label("b (Crameri vik, centred on b = 1)", color=INK2)
+    return norm
+
+
+def b_maps():
+    """Figure 1: shallow (a) above deeper (b) b map, one shared colour bar, no titles (the caption carries them)."""
+    feats = load("cells.geojson")["features"]
+    fig = plt.figure(figsize=(7.2, 7.3))
+    gs = fig.add_gridspec(3, 1, height_ratios=[1, 1, 0.035], hspace=0.03)
+    for i, (d, letter) in enumerate((("sh", "a"), ("dp", "b"))):
+        ax = fig.add_subplot(gs[i])
+        world_into(ax)
+        norm = draw_b(ax, d, feats, grey_cells=False)   # grey cells read as land at print size; caption says so
+        ax.text(0.0, 0.98, letter, transform=ax.transAxes, fontsize=11, fontweight="bold", color=INK, va="top")
+        counts = {q: sum(1 for ft in feats if ft["properties"].get(f"{d}_q") == q) for q in ("A", "B", "C", "insufficient")}
+        print(f"fig1 {d}: {counts}")
+    cax = fig.add_subplot(gs[2])
+    cb = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=VIK), cax=cax, orientation="horizontal",
+                      ticks=[0.6, 0.8, 1.0, 1.2, 1.4])
+    cb.set_label("b", color=INK2, fontsize=8.5)
+    cb.ax.tick_params(labelsize=8)
     cb.outline.set_visible(False)
-    counts = {q: sum(1 for ft in feats if ft["properties"].get(f"{d}_q") == q) for q in ("A", "B", "C", "insufficient")}
-    F.footer(ax, f"Cells: quality A {counts['A']}, B {counts['B']}, C {counts['C']}, insufficient {counts['insufficient']}. {NOTE} "
-                 f"Plates: Bird (2003). Equal Earth, centred 150° E. Cut-off {man['data_cutoff_utc']}.")
-    save(fig, f"b_map_{'shallow' if d == 'sh' else 'deep'}")
+    pos = cax.get_position()
+    cax.set_position([pos.x0 + pos.width * 0.2, pos.y0, pos.width * 0.6, pos.height])
+    save(fig, "fig1_b_maps")
 
 
 # ----------------------------------------------------------------------------------------------- 3: validation
@@ -195,7 +238,8 @@ def plate_b():
     pb = load("global.json")["plate_boundary_types"]
     items = [(k, v) for k, v in pb.items() if v.get("b") is not None]
     items.sort(key=lambda kv: kv[1]["b"])
-    fig, ax = plt.subplots(figsize=(6.85, 3.2))
+    fig, ax = plt.subplots(figsize=(6.6, 3.0))
+    ax.axvspan(*UNIVERSAL_B, color=MUTED, alpha=0.3, lw=0, zorder=0)
     for y, (k, v) in enumerate(items):
         lo, hi = v["ci95"]
         c = C_LOW  # one colour: the value is read from the position (vik near b = 1 is almost white)
@@ -206,15 +250,16 @@ def plate_b():
     ax.axvline(1.0, color=GRID, lw=1, zorder=0)
     ax.set_xlim(0.75, 1.85)
     ax.set_xlabel("b, 95 % bootstrap interval")
-    ax.set_title("b by plate-boundary class (PB2002), shallow, ISC-GEM direct Mw", loc="left")
+    ax.legend(handles=[Patch(color=MUTED, alpha=0.3, label="universal b 0.95–1.0 (Kagan 1999)")], loc="lower right",
+              fontsize=7.5, frameon=False)
     save(fig, "plate_boundary_b")
 
 
 # ----------------------------------------------------------------------------------------------- 5: Mc over time
 def mc_time():
     per = load("global.json")["michael_periods"]
-    fig, axes = plt.subplots(1, 2, figsize=(7.95, 2.9), sharey=True)
-    for ax, depth, title in ((axes[0], "<60 km", "depth < 60 km"), (axes[1], ">=60 km", "depth ≥ 60 km")):
+    fig, axes = plt.subplots(1, 2, figsize=(7.0, 2.7), sharey=True)
+    for ax, depth, title in ((axes[0], "<60 km", "a  depth < 60 km"), (axes[1], ">=60 km", "b  depth ≥ 60 km")):
         ps = [p for p in per if p["depth"] == depth]
         x = np.arange(len(ps))
         mc = [p["maxc02"][0] for p in ps]
@@ -222,10 +267,9 @@ def mc_time():
         ax.errorbar(x - 0.08, mc, yerr=err, fmt="o", color=C_LOW, ms=5, lw=1.6, capsize=0, label="atlas MAXC + 0.2, 95 %")
         ax.plot(x + 0.08, [p["michael_mc"] for p in ps], "D", color=C_HIGH, ms=5, label="Michael (2014)")
         ax.set_xticks(x, [p["period"].replace("-", "–") for p in ps], rotation=35, ha="right", fontsize=7.5)
-        ax.set_title(title, loc="left")
+        ax.set_title(title, loc="left", fontsize=9.5)
     axes[0].set_ylabel("Mc (Mw)")
     axes[0].legend(fontsize=7.5, loc="upper right")
-    fig.suptitle("ISC-GEM completeness over time", x=0.02, y=1.06, ha="left", fontsize=10.5, fontweight="bold", color=INK)
     save(fig, "mc_time")
 
 
@@ -239,7 +283,7 @@ def fmd_example():
     n = np.array([x[1] for x in d["fmd_iscgem"]])
     cum = n[::-1].cumsum()[::-1]
     mc, b = p["sh_mc"], p["sh_b"]
-    fig, ax = plt.subplots(figsize=(5.0, 3.4))
+    fig, ax = plt.subplots(figsize=(3.3, 2.5))
     ax.bar(m, n, width=0.08, color=C_SEQ[1], alpha=0.55, label="per 0.1 bin")
     ax.plot(m, cum, "o", ms=3.8, color=C_LOW, label="cumulative")
     above = m >= mc - 1e-9
@@ -247,12 +291,15 @@ def fmd_example():
     xs = np.linspace(mc, m.max(), 20)
     ax.plot(xs, 10 ** (a - b * xs), color=C_HIGH, lw=1.8, label=f"b = {b:.2f} [{p['sh_b_lo']:.2f}, {p['sh_b_hi']:.2f}]")
     ax.axvline(mc, color=MUTED, ls="--", lw=1)
-    ax.text(mc + 0.03, cum.max(), f"Mc {mc:.1f}", color=INK2, fontsize=8, va="top")
+    ax.text(mc + 0.04, 1.6, f"Mc {mc:.1f}", color=INK2, fontsize=7, va="bottom")
     ax.set_yscale("log")
     ax.set_xlabel("Mw (ISC-GEM direct)")
     ax.set_ylabel("number of events")
-    ax.set_title(f"Frequency-magnitude distribution, cell at {fmt_lat(p['lat'])}, {fmt_lon(p['lon'])}", loc="left", fontsize=9.5)
-    ax.legend(fontsize=7.5)
+    print(f"fmd_example: cell at {fmt_lat(p['lat'])}, {fmt_lon(p['lon'])}, Mc {mc:.1f}, b {b:.2f}")
+    ax.tick_params(labelsize=7)
+    ax.xaxis.label.set_size(7.5)
+    ax.yaxis.label.set_size(7.5)
+    ax.legend(fontsize=6.5)
     save(fig, "fmd_example")
 
 
@@ -373,7 +420,7 @@ def consistency():
     save(fig, "consistency")
 
 
-FIGS = {"b_map_shallow": lambda: b_map("sh"), "b_map_deep": lambda: b_map("dp"), "validation_b": validation, "plate_boundary_b": plate_b,
+FIGS = {"fig1_b_maps": b_maps, "b_map_shallow": lambda: b_map("sh"), "b_map_deep": lambda: b_map("dp"), "validation_b": validation, "plate_boundary_b": plate_b,
         "mc_time": mc_time, "fmd_example": fmd_example, "groningen_rate": groningen, "deficit_ratios": deficit,
         "consistency": consistency}
 

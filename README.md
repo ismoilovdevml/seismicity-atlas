@@ -76,7 +76,7 @@ Full tables and the reasons for each verdict: [docs/validation.md](docs/validati
 - **Colour:** the light-theme b classes are steps of the Crameri Scientific colour map *vik*; it passed the dataviz
   validator where the old palette did not. Dark theme unchanged (no Crameri map passed there).
   [docs/ux-notes.md](docs/ux-notes.md)
-- **Paper figures** at 300 dpi with Crameri maps: `scripts/paper_figures.py` → `docs/img/paper/`.
+- **Paper figures** with Crameri maps, no titles, at least 300 dpi at journal widths: `scripts/paper_figures.py` → `docs/img/paper/`.
 
 **v0.3.0:** the two modes, the globe by default, Learn pages with (i) buttons, the Sequence Monitor, relief and 3D,
 and a lighter first load. Full list: [CHANGELOG.md](CHANGELOG.md).
@@ -133,7 +133,7 @@ cd site && python3 -m http.server 8000   # preview the site at http://localhost:
   `tests/test_readme.py`).
 - README screenshots: `python tests/e2e/tools/readme_shots.py [--chromium PATH]` (Playwright and Pillow; fixed viewport,
   time zone, theme and data; refreshed on each release).
-- Paper figures: `.venv/bin/python -I scripts/paper_figures.py` (300 dpi, `docs/img/paper/`).
+- Paper figures: `.venv/bin/python -I scripts/paper_figures.py` (written at 400 dpi, `docs/img/paper/`).
 - Tests: `.venv/bin/python -I -m pytest -q tests --ignore=tests/e2e`; browser tests: `pip install playwright pytest &&
   python -m playwright install chromium && python -m pytest tests/e2e` (`E2E_BROWSERS=chromium,firefox,webkit` for all
   three engines). CI: `.github/workflows/test-site.yml`.

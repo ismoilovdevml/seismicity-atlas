@@ -20,9 +20,13 @@ Licence and legal fixes; no atlas number changes.
   catalogue page.
 - Groningen: `rates.json` keeps only time, ML and KNMI id of the 16 events of ML ≥ 3.0 (no epicentres); the README
   and docs describe this instead of "no single events".
-- Paper figures: Mc by period and plate-boundary b at 300 dpi for 180 mm; FMD title prints 176.2° W; validation
+- Paper figures: Mc by period and plate-boundary b at 300 dpi for 180 mm; validation
   figure with readable labels, the universal-b band for subduction and open markers for mismatches; new figure
   `consistency.png` (b against cutoff in three magnitude versions, median epicentre distance per cell).
+- Journal figures without titles or footers (the captions carry that text), on white, written at 400 dpi with the
+  effective dpi at 86 or 180 mm printed: new `fig1_b_maps.png` (shallow above deeper b map, one colour bar, no grey
+  "too few events" cells, 194 mm tall at 180 mm); single-column FMD; universal b band on the plate-boundary figure;
+  panel letters on the Mc figure. All six checked under simulated protanopia, deuteranopia and tritanopia.
 - Literature values: all 16 re-read from the source PDFs (all match); pages, periods, estimators and the declustering
   method filled in (`checked_by_agent`; `needs_human_check` stays until the author's review). Bird & Kagan (2004)
   Table 5 is now read, and entry 15 uses the same z rule as the others, per class: mismatch → match (approximate).
