@@ -26,7 +26,8 @@ from common import GRID, INK, INK2, MUTED, SITE  # noqa: E402
 
 plt = F.plt
 from matplotlib.collections import PolyCollection  # noqa: E402
-from matplotlib.colors import Normalize  # noqa: E402
+from matplotlib.collections import LineCollection  # noqa: E402
+from matplotlib.colors import BoundaryNorm, ListedColormap, Normalize  # noqa: E402
 from matplotlib.patches import Patch  # noqa: E402
 
 OUT = Path(__file__).resolve().parents[1] / "docs" / "img" / "paper"
@@ -35,6 +36,18 @@ VIK = crameri.cmap("vik")
 C_LOW, C_HIGH = crameri.sample("vik", [0.18, 0.82])   # two series colours from vik (ours vs published, north vs south)
 C_SEQ = crameri.sample("batlow", [0.2, 0.55, 0.8])    # categorical-ish picks from batlow for line pairs
 NOTE = "Not a forecast and not a hazard map."
+
+
+def fmt_lat(lat):
+    return f"{abs(lat):.1f}° {'S' if lat < 0 else 'N'}"
+
+
+def fmt_lon(lon):
+    """Longitude wrapped to (-180, 180]: 183.8 prints as 176.2° W."""
+    w = ((lon + 180.0) % 360.0) - 180.0
+    if w == -180.0:
+        w = 180.0
+    return f"{abs(w):.1f}° {'W' if w < 0 else 'E'}"
 
 
 def load(rel):
@@ -93,10 +106,44 @@ def b_map(d):
 
 # ----------------------------------------------------------------------------------------------- 3: validation
 NUM = r"(\d+(?:\.\d+)?)"
+UNIVERSAL_B = (0.95, 1.0)   # universal b of shallow earthquakes (Kagan 1999; Bird & Kagan 2004), beta 0.63-0.67 x 1.5
+KJ2013 = {"fe01": "Alaska-Aleutians", "fe05": "Mexico-Guatemala", "fe06": "Central America", "fe08": "Andean South America",
+          "fe12": "Kermadec-Tonga-Samoa", "fe18": "Guam-Japan", "fe19": "Japan-Kamchatka", "fe24": "Sunda arc",
+          "fe46": "Andaman-Sumatra", "tohoku": "Tohoku box", "all": "All 18 subduction zones"}
+KAGAN2010 = {"global_mt56": "Global, m ≥ 5.6", "trenches_mt56": "Trenches (PB2002 SUB), m ≥ 5.6",
+             "global_declustered_mt56": "Global declustered, m ≥ 5.6"}
+
+
+def readable(test):
+    """Short, readable row label with the source in brackets (the full settings are in docs/validation.md)."""
+    m = re.match(r"^Literature b: kj2013_(fe\d+|tohoku|all)", test)
+    if m:
+        return f"{KJ2013[m.group(1)]} (Kagan & Jackson 2013)"
+    m = re.match(r"^Literature b: kagan2010_(\S+) ", test)
+    if m and m.group(1) in KAGAN2010:
+        return f"{KAGAN2010[m.group(1)]} (Kagan 2010)"
+    m = re.match(r"^Global b, shallow < 60 km, (\d{4})-(\d{4})", test)
+    if m:
+        return f"Global, < 60 km, {m.group(1)}–{m.group(2)} (Michael 2014)"
+    m = re.match(r"^Global b, depth >= 60 km, (\d{4})-(\d{4})", test)
+    if m:
+        return f"Global, ≥ 60 km, {m.group(1)}–{m.group(2)} (Michael 2014)"
+    m = re.match(r"^Regional b, (\w[\w ]*?), shallow", test)
+    if m:
+        return f"{m.group(1)}, shallow (b ≈ 1)"
+    if test.startswith("Plate-boundary b, SUB"):
+        return "Subduction boundaries (universal b)"
+    if test.startswith("Plate-boundary b, OSR"):
+        return "Oceanic spreading ridges (Kagan 2002, via Kagan 2010)"
+    return re.sub(r"^Literature b: ", "", test).split(" (")[0].replace("_", " ")
 
 
 def validation():
-    """Every b row of the validation table with an atlas interval and a published number (or range), quality A/B only."""
+    """Every b row of the validation table with an atlas interval and a published number (or range), quality A/B only.
+
+    The subduction row is compared with the universal range b 0.95-1.0 (a band), not with the second-hand 0.98 that the
+    table quotes; rows whose verdict is a mismatch (or outside the 95 % interval) get an open marker.
+    """
     rows = []
     for r in load("global.json")["validation_table"]:
         ours, pub, test = str(r["ours"]), str(r["published"]), r["test"]
@@ -108,27 +155,34 @@ def validation():
             continue
         lo_p = float(pb.group(1))
         hi_p = float(pb.group(2)) if pb.re.groups > 1 and pb.group(2) else lo_p
-        label = re.sub(r"^Literature b: ", "", test).split(" (")[0].replace("_", " ")
-        rows.append((label, *map(float, m.groups()), lo_p, hi_p, r["verdict"]))
-    fig, ax = plt.subplots(figsize=(7.2, 0.42 * len(rows) + 1.2))
-    for i, (test, b, lo, hi, plo, phi, verdict) in enumerate(rows):
+        kind = "range" if hi_p > lo_p else "value"
+        if test.startswith("Plate-boundary b, SUB"):
+            (lo_p, hi_p), kind = UNIVERSAL_B, "universal"
+        off = r["verdict"].startswith("mismatch") or "outside 95 % CI" in r["verdict"]
+        rows.append((readable(test), *map(float, m.groups()), lo_p, hi_p, kind, off))
+    fig, ax = plt.subplots(figsize=(7.2, 0.36 * len(rows) + 1.0))
+    for i, (label, b, lo, hi, plo, phi, kind, off) in enumerate(rows):
         y = len(rows) - 1 - i
-        if phi > plo:
+        if kind == "universal":
+            ax.add_patch(plt.Rectangle((plo, y - 0.3), phi - plo, 0.6, color=MUTED, alpha=0.35, lw=0))
+        elif kind == "range":
             ax.add_patch(plt.Rectangle((plo, y - 0.22), phi - plo, 0.44, color=C_HIGH, alpha=0.25, lw=0))
         else:
             ax.plot([plo], [y], marker="D", ms=5.5, color=C_HIGH, zorder=3)
         ax.plot([lo, hi], [y, y], color=C_LOW, lw=2.2, solid_capstyle="round")
-        ax.plot([b], [y], "o", ms=6, color=C_LOW, mec="white", mew=1.2, zorder=4)
-        label = re.sub(r"\s+", " ", test)
-        ax.text(-0.01, y, label[:58] + ("…" if len(label) > 58 else ""), transform=ax.get_yaxis_transform(), ha="right", va="center", fontsize=7.5, color=INK)
+        ax.plot([b], [y], "o", ms=6.5, color="white" if off else C_LOW, mec=C_LOW, mew=1.6, zorder=4)
+        ax.text(-0.012, y, label, transform=ax.get_yaxis_transform(), ha="right", va="center", fontsize=8.5, color=INK)
     ax.axvline(1.0, color=GRID, lw=1, zorder=0)
     ax.set_yticks([])
     ax.set_ylim(-0.7, len(rows) - 0.3)
     ax.set_xlabel("b")
-    ax.set_title("Atlas b-values against published values", loc="left")
     ax.legend(handles=[plt.Line2D([], [], color=C_LOW, marker="o", lw=2.2, label="atlas, 95 % interval"),
+                       plt.Line2D([], [], color=C_LOW, marker="o", mfc="white", mew=1.6, lw=2.2,
+                                  label="atlas, published value outside its interval"),
                        plt.Line2D([], [], color=C_HIGH, marker="D", lw=0, label="published value"),
-                       Patch(color=C_HIGH, alpha=0.25, label="published range")], loc="lower right", fontsize=7.5)
+                       Patch(color=C_HIGH, alpha=0.25, label="published range"),
+                       Patch(color=MUTED, alpha=0.35, label="universal b 0.95–1.0 (Kagan 1999; Bird & Kagan 2004)")],
+              loc="upper center", bbox_to_anchor=(0.32, -0.07), ncol=2, fontsize=7.5, frameon=False)
     save(fig, "validation_b")
 
 
@@ -141,7 +195,7 @@ def plate_b():
     pb = load("global.json")["plate_boundary_types"]
     items = [(k, v) for k, v in pb.items() if v.get("b") is not None]
     items.sort(key=lambda kv: kv[1]["b"])
-    fig, ax = plt.subplots(figsize=(6.4, 3.2))
+    fig, ax = plt.subplots(figsize=(6.85, 3.2))
     for y, (k, v) in enumerate(items):
         lo, hi = v["ci95"]
         c = C_LOW  # one colour: the value is read from the position (vik near b = 1 is almost white)
@@ -159,7 +213,7 @@ def plate_b():
 # ----------------------------------------------------------------------------------------------- 5: Mc over time
 def mc_time():
     per = load("global.json")["michael_periods"]
-    fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.9), sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=(7.95, 2.9), sharey=True)
     for ax, depth, title in ((axes[0], "<60 km", "depth < 60 km"), (axes[1], ">=60 km", "depth ≥ 60 km")):
         ps = [p for p in per if p["depth"] == depth]
         x = np.arange(len(ps))
@@ -197,7 +251,7 @@ def fmd_example():
     ax.set_yscale("log")
     ax.set_xlabel("Mw (ISC-GEM direct)")
     ax.set_ylabel("number of events")
-    ax.set_title(f"Frequency-magnitude distribution, cell at {abs(p['lat']):.1f}° S, {p['lon'] % 360:.1f}° E", loc="left", fontsize=9.5)
+    ax.set_title(f"Frequency-magnitude distribution, cell at {fmt_lat(p['lat'])}, {fmt_lon(p['lon'])}", loc="left", fontsize=9.5)
     ax.legend(fontsize=7.5)
     save(fig, "fmd_example")
 
@@ -263,8 +317,65 @@ def deficit():
     save(fig, "deficit_ratios")
 
 
+# ----------------------------------------------------------------------------------------------- 9: catalogue consistency
+def world_into(ax):
+    """The Equal Earth base map of figures.map_axes, drawn into an existing axes (for composite figures)."""
+    b = F.base_layers()
+    ax.set_aspect("equal")
+    ax.axis("off")
+    ax.fill(b["frame"][:, 0], b["frame"][:, 1], color="#f4f7fa", zorder=0)
+    ax.add_collection(PolyCollection(b["land"], facecolor="#ecebe6", edgecolor="none", zorder=1))
+    ax.add_collection(LineCollection(b["coast"], colors=MUTED, linewidths=0.3, zorder=3))
+    ax.plot(b["frame"][:, 0], b["frame"][:, 1], color=MUTED, lw=0.5, zorder=6)
+    ax.set_xlim(b["frame"][:, 0].min(), b["frame"][:, 0].max())
+    ax.set_ylim(b["frame"][:, 1].min(), b["frame"][:, 1].max())
+
+
+def consistency():
+    """(a) Global shallow b against the cutoff, 2004-2021, in three magnitude versions; (b) median epicentre difference
+    ComCat vs ISC-GEM per cell (cells with >= 10 matched events). Both from the published data files only."""
+    rows = load("global.json")["b_cutoff_2004_2021"]
+    feats = load("cells.geojson")["features"]
+    fig = plt.figure(figsize=(8.0, 7.6))
+    gs = fig.add_gridspec(2, 1, height_ratios=[1, 1.8], hspace=0.22)
+    a1, a2 = fig.add_subplot(gs[0]), fig.add_subplot(gs[1])
+    series = (("iscgem", "ISC-GEM Mw", C_LOW, "o", -0.02), ("comcat_native", "ComCat, preferred magnitude as served", C_SEQ[1], "s", 0.0),
+              ("comcat_proxy", "ComCat, mb/Ms converted to an Mw proxy", C_HIGH, "^", 0.02))
+    for key, lab, col, mk, off in series:
+        xs = np.array([r["cutoff"] for r in rows]) + off
+        b = np.array([r[key][0] for r in rows])
+        s = np.array([r[key][1] for r in rows])
+        a1.errorbar(xs, b, yerr=1.96 * s, fmt=f"{mk}-", color=col, ms=4.5, lw=1.3, capsize=0, label=lab)
+    a1.set_xlabel("magnitude cutoff")
+    a1.set_ylabel("b (± 1.96 σ)")
+    a1.legend(loc="upper right", fontsize=7.5)
+    a1.text(-0.1, 1.02, "a", transform=a1.transAxes, fontsize=11, fontweight="bold", color=INK, va="bottom")
+
+    world_into(a2)
+    bounds = [0, 5, 10, 15, 20, 30, 50, 100]
+    cmap = ListedColormap(crameri.sample("batlow", np.linspace(0.05, 0.95, len(bounds) - 1)))
+    norm = BoundaryNorm(bounds, cmap.N)
+    P, C = [], []
+    for ft in feats:
+        p = ft["properties"]
+        if (p.get("c_n") or 0) >= 10 and p.get("c_dloc") is not None:
+            ps = F.polys(shape(ft["geometry"]))
+            P.extend(ps)
+            C.extend([cmap(norm(p["c_dloc"]))] * len(ps))
+    a2.add_collection(PolyCollection(P, facecolors=C, edgecolors="none", zorder=2))
+    F.add_plates(a2)
+    cb = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), ax=a2, orientation="horizontal", fraction=0.05, pad=0.03,
+                      aspect=45)
+    cb.set_label("median epicentre distance ComCat vs ISC-GEM, matched events, km (Crameri batlow)", color=INK2)
+    cb.outline.set_visible(False)
+    a2.text(0.0, 1.0, "b", transform=a2.transAxes, fontsize=11, fontweight="bold", color=INK, va="bottom")
+    print(f"consistency: {sum(1 for ft in feats if (ft['properties'].get('c_n') or 0) >= 10)} cells with >= 10 matched events")
+    save(fig, "consistency")
+
+
 FIGS = {"b_map_shallow": lambda: b_map("sh"), "b_map_deep": lambda: b_map("dp"), "validation_b": validation, "plate_boundary_b": plate_b,
-        "mc_time": mc_time, "fmd_example": fmd_example, "groningen_rate": groningen, "deficit_ratios": deficit}
+        "mc_time": mc_time, "fmd_example": fmd_example, "groningen_rate": groningen, "deficit_ratios": deficit,
+        "consistency": consistency}
 
 
 def main():
