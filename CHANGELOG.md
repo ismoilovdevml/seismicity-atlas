@@ -23,6 +23,10 @@ Licence and legal fixes; no atlas number changes.
 - Paper figures: Mc by period and plate-boundary b at 300 dpi for 180 mm; FMD title prints 176.2° W; validation
   figure with readable labels, the universal-b band for subduction and open markers for mismatches; new figure
   `consistency.png` (b against cutoff in three magnitude versions, median epicentre distance per cell).
+- Literature values: all 16 re-read from the source PDFs (all match); pages, periods, estimators and the declustering
+  method filled in (`checked_by_agent`; `needs_human_check` stays until the author's review). Bird & Kagan (2004)
+  Table 5 is now read, and entry 15 uses the same z rule as the others, per class: mismatch → match (approximate).
+  Site validation table: 25 match, 1 mismatch (the declustered Kagan 2010 value).
 
 ## 0.3.1 (2026-11-15)
 

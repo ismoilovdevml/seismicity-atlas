@@ -144,7 +144,7 @@ Direct-Mw sample (v0.2). On every event (same floors) the values are 0.996–1.4
 |---|---|---|
 | SUB | b = 1.5 × 0.654 = 0.98 (GCMT subduction zones 1977–2010, as quoted from Kagan & Jackson) | match |
 | OSR | β 0.8–1.1 → b 1.2–1.65 for mid-ocean events (Kagan 2002, quoted in Kagan 2010) | match |
-| non-ridge classes | universal β 0.63–0.67 → b 0.95–1.0 (Kagan 1999; Bird & Kagan 2004) | SUB, CRB, OCB, CTF, CCB match within their intervals; the CCB point value (0.930) is below the range |
+| non-ridge classes | universal β 0.63–0.67 → b 0.95–1.0 (Kagan 1999, as cited; not re-checked); Bird & Kagan (2004) give a common β 0.61–0.66 → b 0.915–0.99 (abstract; p. 2397) | SUB, CRB, OCB, CTF, CCB match within their intervals; the CCB point value (0.930) is below the range |
 | Ranking | spreading highest; thrust and convergent lowest (Schorlemmer et al. 2005; TRACE 2026, see below) | match |
 | Subduction, young slabs (Mexico–Central America, Nankai–Ryukyu, south-central Chile, Cascadia) vs old (Japan Trench, Kuril–Kamchatka, Izu–Bonin–Mariana, Tonga–Kermadec) | b increases with slab age (Nishikawa & Ide 2014) | **match**: young 0.899 [0.832, 0.973], old 1.067 [1.018, 1.112]; the intervals do not overlap |
 
@@ -209,7 +209,9 @@ Global shallow events, 2004–2021, same years in both catalogues:
 
 The full table with exact quotes and table numbers is in [`literature-values.md`](literature-values.md). The data
 is in `scripts/val_literature.json`, and the code is `scripts/val_literature.py`. All 16 entries are flagged
-`needs_human_check`, because they were extracted with LLM assistance.
+`needs_human_check`, because they were extracted with LLM assistance. An independent re-read of the source PDFs on
+2026-11-15 found all 16 values correct (field `checked_by_agent`); the Kagan & Jackson (2013) values were checked
+against the arXiv v2 preprint, not the BSSA version of record. The flags stay until the author's review.
 
 - **Ten regional values match** (in v0.1 and v0.2), nine of them on approximate boxes. They come from Kagan & Jackson 2013,
   Table 1: GCMT 1977–2010, m ≥ 5.8, tapered G-R β. Only the Tohoku box (35–40° N, 140–146° E) is defined
@@ -226,8 +228,11 @@ is in `scripts/val_literature.json`, and the code is `scripts/val_literature.py`
 - **Declustered global b mismatches**, and more so in v0.2 (0.903 against 0.972, z = −5.13; v0.1 0.934,
   z = −2.50). Gardner-Knopoff is not Kagan's declustering.
 - **Mc matches.** The global MAXC+0.2 for 1980–2016 at 0–50 km is 5.4, against GCMT Mc 5.4–5.5 (Petruccelli 2018).
-- **The β range over classes mismatches at the top end.** Our OSR β is 0.98 (v0.1: 1.02), against a published maximum of 0.92
-  (Bird & Kagan 2004, abstract). The per-class table was not read.
+- **β by plate-boundary class matches (approximate).** Bird & Kagan (2004) Table 5 gives β per class with 95 % ranges.
+  With the same z rule as the other entries, every class has |z| ≤ 1.96: our OSR 0.98 [0.84, 1.12] against OSR
+  normal faulting 0.92 [0.60, 0.99] (z +0.71). Until 2026-11-15 this row compared only point values with the
+  abstract range 0.53–0.92 and was a mismatch at the top end. They split OSR by mechanism and OTF by spreading rate;
+  our OTF matches only their fast-spreading OTF (z +0.94; medium +2.18, slow +2.91).
 
 ## 9. Retrospective b before and after the 40 sequences
 
@@ -328,7 +333,7 @@ the committed v0.1 outputs exactly (every number in `results/*.json` and every c
 | 12 | `kagan2010_global_mt56` | 1.016 | TGR 1.087 [1.063, 1.110] (z +5.93) | TGR 1.035 [1.012, 1.062] (z +1.53) | **mismatch → match** |
 | 13 | `kagan2010_trenches_mt56` | 0.969 | TGR 1.053 [1.013, 1.094] (z +4.07) | TGR 0.992 [0.955, 1.029] (z +1.20) | **mismatch → match** (approximate region) |
 | 14 | `kagan2010_global_declustered_mt56` | 0.972 | TGR 0.934 [0.902, 0.962] (z -2.50) | TGR 0.903 [0.874, 0.926] (z -5.13) | mismatch (approximate region) |
-| 15 | `birdkagan2004_pb2002_class_range` | β 0.53–0.92 | β 0.65–1.02 | β 0.63–0.98 | mismatch (approximate) |
+| 15 | `birdkagan2004_pb2002_class_range` | β per class, 0.53–0.92 (Table 5) | β 0.65–1.02 | β 0.63–0.98; per class \|z\| ≤ 1.24 | mismatch (approximate); **match** per class since 2026-11-15 (Table 5 read, same z rule) |
 | 16 | `petruccelli2018_gcmt_mc_map` | Mc 5.4–5.5 | MAXC+0.2 5.4, MBS 5.6 | MAXC+0.2 5.4, MBS 5.8 | match |
 
 
@@ -352,10 +357,10 @@ No change to floors or estimators; the global b, A/B cells and validation verdic
 - The USGS public-domain statement: usgs.gov pages returned bot-protection pages and timeouts on 2026-11-13.
 - Exact coefficients of Scordilis (2006). Only the slopes were confirmed through a secondary source; the
   intercepts are our own.
-- Bird & Kagan (2004) per-class β values. Their tables were not retrievable, so the class comparison uses Kagan's
-  universal β and the ridge range instead.
+- Kagan (1999), the source cited for the universal β 0.63–0.67: no open copy was found, so that range is cited as
+  given, not re-checked.
 - TRACE's global plate-boundary b numbers (see §4).
-- Every literature entry in §8 (`needs_human_check: true`); Flinn-Engdahl regions approximated by boxes.
+- Every literature entry in §8 (`needs_human_check: true`; values re-read from the sources on 2026-11-15, author review pending); Flinn-Engdahl regions approximated by boxes.
 - That ISC-GEM magnitude uncertainty 0.10 marks direct Mw. It is checked against GCMT magnitudes in ComCat
   (99.97 % of GCMT-sourced matches carry 0.10), not against ISC-GEM's own direct/proxy column, which the ComCat
   copy lacks (`method.md` §2.1).

@@ -13,7 +13,8 @@ the published values were made from). For comparison the same two numbers are al
 (`*_all_events`, the v0.1 behaviour) and on the magnitude-uncertainty-0.10 events (`*_magerr010`).
 
 Verdict: z = (ours - published) / sqrt(se_ours^2 + se_pub^2), se_ours = CI width / 3.92, se_pub from the printed
-uncertainty (0 if none). |z| <= 1.96 -> match, else mismatch. Entries whose region is only approximated (an
+uncertainty (0 if none). |z| <= 1.96 -> match, else mismatch. The PB2002 class entry (Bird & Kagan 2004) applies the
+same rule per class against their Table 5. Entries whose region is only approximated (an
 envelope box for a Flinn-Engdahl polygon, PB2002 class for 'trenches') are marked 'approximate region'.
 All entries keep needs_human_check = true: the quotes were extracted with LLM assistance and must be checked.
 
@@ -151,21 +152,45 @@ def main():
                          "verdict": out["verdict"] + f"; all events: {out['verdict_all_events'].split(' (')[0]}"
                                     " [needs human check]"})
         elif c["kind"] == "class_range":
+            # Same rule as the other entries: z = (ours - published) / sqrt(se_ours^2 + se_pub^2), |z| <= 1.96 -> match,
+            # per PB2002 class against Bird & Kagan (2004) Table 5. se_pub comes from the published 95 % range on the side
+            # facing our value (the OSR ranges are asymmetric). Where they split a class (OSR by mechanism, OTF by
+            # spreading rate) and we do not, the class agrees when it matches at least one of their subcatalogs.
+            pubc = e["per_class_published"]
             per = {}
             for k in CLASSES:
                 sel = s & (g.pb_class == k)
-                beta, mc = tgr_beta(g[sel].mag.to_numpy(), c["threshold"])
-                per[k] = {"beta": beta, "n": int((sel & (g.mag >= c["threshold"] - 1e-9)).sum())}
+                r = b_tgr(g[sel].mag.to_numpy(), c["threshold"])
+                beta = r.get("beta")
+                lo, hi = (r["ci95"][0] / 1.5, r["ci95"][1] / 1.5) if beta is not None else (None, None)
+                rows_k = []
+                for q in pubc.get(k, []):
+                    if beta is None:
+                        rows_k.append({"label": q["label"], "z": None})
+                        continue
+                    se_o = (hi - lo) / 3.92
+                    se_p = ((q["hi95"] - q["beta"]) if beta > q["beta"] else (q["beta"] - q["lo95"])) / 1.96
+                    rows_k.append({"label": q["label"], "z": float((beta - q["beta"]) / np.sqrt(se_o ** 2 + se_p ** 2))})
+                ok_k = any(x["z"] is not None and abs(x["z"]) <= 1.96 for x in rows_k)
+                per[k] = {"beta": beta, "ci95": [lo, hi], "n": r["n"], "vs_table5": rows_k, "match": ok_k}
             out["per_class_beta"] = per
             lo_o, hi_o = min(v["beta"] for v in per.values()), max(v["beta"] for v in per.values())
             out["ours_range"] = [lo_o, hi_o]
-            ok = 0.53 - 0.03 <= lo_o and hi_o <= 0.92 + 0.03
+            # the v0.2 rule (our range of point values inside the abstract range 0.53-0.92, +-0.03), kept for reference
+            out["range_rule_v02"] = "match" if (0.53 - 0.03 <= lo_o and hi_o <= 0.92 + 0.03) else "mismatch"
+            ok = all(v["match"] for v in per.values())
             out["verdict"] = ("match" if ok else "mismatch") + " (approximate)"
-            rows.append({"test": f"Literature beta range over PB2002 classes ({c['years'][0]}-{c['years'][1]}, "
+
+            def best(v):
+                zs = [x["z"] for x in v["vs_table5"] if x["z"] is not None]
+                return min(zs, key=abs) if zs else float("nan")
+            rows.append({"test": f"Literature beta by PB2002 class ({c['years'][0]}-{c['years'][1]}, "
                                  f"<= 70 km, m >= {c['threshold']}, TGR)",
-                         "ours": f"beta {lo_o:.2f}-{hi_o:.2f} over {len(per)} classes",
-                         "published": "best-fitting beta 0.53-0.92 (Bird & Kagan 2004, abstract)",
-                         "verdict": out["verdict"] + " [needs human check]"})
+                         "ours": "beta " + ", ".join(f"{k} {v['beta']:.2f} (z {best(v):+.2f})" for k, v in per.items()),
+                         "published": "Table 5 per-class beta with 95 % ranges, 0.53 (OCB) to 0.92 (OSR normal faulting) "
+                                      "(Bird & Kagan 2004)",
+                         "verdict": out["verdict"] + "; OSR and OTF against the closest of their subcatalogs"
+                                    " [needs human check]"})
         elif c["kind"] == "mc_global":
             m = sl.bin_mag(g[s].mag.to_numpy())
             out["maxc02"] = float(sl.mc_maxc(m, correction=0.2))

@@ -234,10 +234,10 @@
   "verdict": "mismatch (approximate region); all events: mismatch [needs human check]"
  },
  {
-  "test": "Literature beta range over PB2002 classes (1977-2002, <= 70 km, m >= 5.8, TGR)",
-  "ours": "beta 0.63-0.98 over 7 classes",
-  "published": "best-fitting beta 0.53-0.92 (Bird & Kagan 2004, abstract)",
-  "verdict": "mismatch (approximate) [needs human check]"
+  "test": "Literature beta by PB2002 class (1977-2002, <= 70 km, m >= 5.8, TGR)",
+  "ours": "beta SUB 0.66 (z +0.81), CCB 0.64 (z +0.35), OCB 0.63 (z +1.24), CTF 0.69 (z +0.54), OTF 0.79 (z +0.94), CRB 0.69 (z +0.56), OSR 0.98 (z +0.71)",
+  "published": "Table 5 per-class beta with 95 % ranges, 0.53 (OCB) to 0.92 (OSR normal faulting) (Bird & Kagan 2004)",
+  "verdict": "match (approximate); OSR and OTF against the closest of their subcatalogs [needs human check]"
  },
  {
   "test": "Literature Mc: GCMT 1980-2016, 0-50 km (Petruccelli 2018 thesis)",

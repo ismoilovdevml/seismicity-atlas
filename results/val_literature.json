@@ -1341,38 +1341,128 @@
    "per_class_beta": {
     "SUB": {
      "beta": 0.6609535343999386,
-     "n": 1763
+     "ci95": [
+      0.6285443356657511,
+      0.6917851089338704
+     ],
+     "n": 1763,
+     "vs_table5": [
+      {
+       "label": "SUB",
+       "z": 0.8054513445690662
+      }
+     ],
+     "match": true
     },
     "CCB": {
      "beta": 0.643528205907201,
-     "n": 251
+     "ci95": [
+      0.5598078974718224,
+      0.728413706160663
+     ],
+     "n": 251,
+     "vs_table5": [
+      {
+       "label": "CCB",
+       "z": 0.35258043872198275
+      }
+     ],
+     "match": true
     },
     "OCB": {
      "beta": 0.6349650508325253,
-     "n": 151
+     "ci95": [
+      0.5364309620252747,
+      0.7441467197498922
+     ],
+     "n": 151,
+     "vs_table5": [
+      {
+       "label": "OCB",
+       "z": 1.236423026344571
+      }
+     ],
+     "match": true
     },
     "CTF": {
      "beta": 0.6903398656265101,
-     "n": 257
+     "ci95": [
+      0.6147686860404884,
+      0.784372970058176
+     ],
+     "n": 257,
+     "vs_table5": [
+      {
+       "label": "CTF",
+       "z": 0.5380840067938886
+      }
+     ],
+     "match": true
     },
     "OTF": {
      "beta": 0.7906210050251236,
-     "n": 578
+     "ci95": [
+      0.7346324115983253,
+      0.8598836563873192
+     ],
+     "n": 578,
+     "vs_table5": [
+      {
+       "label": "OTF slow",
+       "z": 2.9057640480699085
+      },
+      {
+       "label": "OTF medium",
+       "z": 2.177450700812117
+      },
+      {
+       "label": "OTF fast",
+       "z": 0.9386879993661477
+      }
+     ],
+     "match": true
     },
     "CRB": {
      "beta": 0.6945355706955796,
-     "n": 194
+     "ci95": [
+      0.5598393951996649,
+      0.7798604962162838
+     ],
+     "n": 194,
+     "vs_table5": [
+      {
+       "label": "CRB",
+       "z": 0.5610926540606825
+      }
+     ],
+     "match": true
     },
     "OSR": {
      "beta": 0.9760776737646056,
-     "n": 221
+     "ci95": [
+      0.8401991924032312,
+      1.116208439387067
+     ],
+     "n": 221,
+     "vs_table5": [
+      {
+       "label": "OSR normal faulting",
+       "z": 0.7102907133634531
+      },
+      {
+       "label": "OSR other",
+       "z": 1.3970885808072395
+      }
+     ],
+     "match": true
     }
    },
    "ours_range": [
     0.6349650508325253,
     0.9760776737646056
    ],
-   "verdict": "mismatch (approximate)"
+   "range_rule_v02": "mismatch",
+   "verdict": "match (approximate)"
   },
   {
    "id": "petruccelli2018_gcmt_mc_map",
@@ -1481,10 +1571,10 @@
    "verdict": "mismatch (approximate region); all events: mismatch [needs human check]"
   },
   {
-   "test": "Literature beta range over PB2002 classes (1977-2002, <= 70 km, m >= 5.8, TGR)",
-   "ours": "beta 0.63-0.98 over 7 classes",
-   "published": "best-fitting beta 0.53-0.92 (Bird & Kagan 2004, abstract)",
-   "verdict": "mismatch (approximate) [needs human check]"
+   "test": "Literature beta by PB2002 class (1977-2002, <= 70 km, m >= 5.8, TGR)",
+   "ours": "beta SUB 0.66 (z +0.81), CCB 0.64 (z +0.35), OCB 0.63 (z +1.24), CTF 0.69 (z +0.54), OTF 0.79 (z +0.94), CRB 0.69 (z +0.56), OSR 0.98 (z +0.71)",
+   "published": "Table 5 per-class beta with 95 % ranges, 0.53 (OCB) to 0.92 (OSR normal faulting) (Bird & Kagan 2004)",
+   "verdict": "match (approximate); OSR and OTF against the closest of their subcatalogs [needs human check]"
   },
   {
    "test": "Literature Mc: GCMT 1980-2016, 0-50 km (Petruccelli 2018 thesis)",
