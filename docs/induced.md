@@ -65,7 +65,7 @@ effect of the caps.
 
 | Input | Access | Licence (quoted) | Redistributed here |
 |---|---|---|---|
-| **KNMI earthquake catalogue**: origin time, epicentre, local magnitude, event type | FDSN event service `https://rdsa.knmi.nl/fdsnws/event/1/query`, `format=text`, yearly requests, box 52.90–53.70 N, 6.20–7.40 E, 1986-01-01 to 2026-11-01 | rdsa.knmi.nl: "Creative Commons Attribution 4.0 International (CC BY 4.0)" is the default, with the request of "citing the Royal Netherlands Meteorological Institute (KNMI) and including the DOI of the network(s)". Network DOI 10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5 ("Netherlands Seismic and Acoustic Network", DataCite rights: CC BY 4.0). The portal also says the data "cannot be reused in unaltered form for commercial use". | Derived aggregates only: monthly counts, b-values and maps. Single events are listed only for ML ≥ 3.0 (16 events), with their KNMI ids. The event table itself is **not** published; scripts download it again. |
+| **KNMI earthquake catalogue**: origin time, epicentre, local magnitude, event type | FDSN event service `https://rdsa.knmi.nl/fdsnws/event/1/query`, `format=text`, yearly requests, box 52.90–53.70 N, 6.20–7.40 E, 1986-01-01 to 2026-11-01 | rdsa.knmi.nl: "Creative Commons Attribution 4.0 International (CC BY 4.0)" is the default, with the request of "citing the Royal Netherlands Meteorological Institute (KNMI) and including the DOI of the network(s)". Network DOI 10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5 ("Netherlands Seismic and Acoustic Network", DataCite rights: CC BY 4.0). The portal also says the data "cannot be reused in unaltered form for commercial use". | Derived aggregates only: monthly counts, b-values and maps. For the 16 events of ML ≥ 3.0, `rates.json` keeps origin time, ML and the KNMI id (no locations), used by the plain-language summary; because the portal restricts unaltered commercial reuse of event rows, epicentres are not published. The event table itself is **not** published; scripts download it again. |
 | **NLOG production figures**: Groningen field, gas, "Produced", monthly, 2003–2024 | `POST https://www.nlog.nl/nlog-mapviewer-api/rest/prodfigures/field`, the JSON service behind the NLOG datacenter ("Production and injection data are made available on the datacenter page") | NLOG disclaimer: "Users are permitted to copy, to download and to disclose in any way, to distribute or to simplify the information provided on this website […] Users are also permitted to copy, duplicate, process or edit the information and/or layout, provided NLOG.NL is quoted as the source." | Monthly and annual totals, attributed "Source: NLOG.NL" |
 | **NLOG field outline**: `FIELD_CODE = 'GRO'` | ArcGIS REST `https://www.nlog.nl/standalone/rest/services/nlog_gdn/gdw_ng_field_utm_v1/MapServer/0`, `outSR=4326`, GeoJSON | same NLOG terms | The outline, rounded to 1e-4° |
 
@@ -352,7 +352,7 @@ version bump.
 | `phases[]` | `label`, `start`, `end` (end is exclusive), `years`, `n_ge15`, `rate_per_yr`, `rate_lo`, `rate_hi` (Poisson 95 %), `prod_bcm_per_yr`. |
 | `correlation` | `spearman_rho`, `p`, `lag1_rho`, `lag1_p`, `years`, `n_years`. |
 | `milestones[]` | `date`, `label`, `short`, `kind` (`event` or `policy`). |
-| `events_ge3` | Columnar: `time`, `lat`, `lon`, `ml`, `id` (the KNMI event id). |
+| `events_ge3` | Columnar: `time`, `ml`, `id` (the KNMI event id), for the 16 events of ML ≥ 3.0. No locations (see the licence row above). |
 | `mc` | 1.5 |
 
 ### `btime.json` fields
@@ -381,7 +381,9 @@ version bump.
 
 - Show the KNMI attribution with the network DOI.
 - Show "Source: NLOG.NL" next to any production curve or the outline.
-- Do not offer a download of single KNMI events, apart from the ML ≥ 3.0 list.
+- Do not offer a download of single KNMI events. `rates.json` keeps only time, ML and id of the 16 events of
+  ML ≥ 3.0, without locations; the portal's "cannot be reused in unaltered form for commercial use" clause applies
+  to these rows.
 
 ## Reproduce
 

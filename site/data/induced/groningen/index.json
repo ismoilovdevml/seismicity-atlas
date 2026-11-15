@@ -10,7 +10,7 @@
  "files": {
   "bmap.json": 62240,
   "btime.json": 19584,
-  "rates.json": 10938,
+  "rates.json": 10717,
   "validation.json": 6893
  },
  "sources": [
@@ -18,7 +18,7 @@
    "name": "KNMI earthquake catalogue (FDSN event service rdsa.knmi.nl)",
    "licence": "CC BY 4.0",
    "attribution": "Royal Netherlands Meteorological Institute (KNMI); Netherlands Seismic and Acoustic Network, doi:10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5",
-   "redistributed": "derived aggregates and the list of ML >= 3.0 events only"
+   "redistributed": "derived aggregates, and origin time, ML and KNMI id of the ML >= 3.0 events (no locations)"
   },
   {
    "name": "NLOG production figures, Groningen field, monthly gas produced",

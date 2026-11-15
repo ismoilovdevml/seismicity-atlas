@@ -421,9 +421,10 @@ def write_json(ev, pr, gj, monthly, ann, ph, corr, big, phases, moving, maps, ro
         "phases": [{k: (r3(v) if isinstance(v, float) else v) for k, v in p.items()} for p in ph],
         "correlation": {k: (float(f"{v:.3g}") if isinstance(v, float) else v) for k, v in corr.items()},
         "milestones": MILESTONES,
-        "events_ge3": {"time": [t.strftime("%Y-%m-%dT%H:%M:%SZ") for t in big.time], "lat": [r3(v) for v in big.lat],
-                       "lon": [r3(v) for v in big.lon], "ml": [round(float(v), 2) for v in big.mag],
-                       "id": big.id.tolist()},
+        # time and magnitude only (no locations): the site needs no more, and KNMI's portal terms ask that event
+        # rows are not reused unaltered for commercial use
+        "events_ge3": {"time": [t.strftime("%Y-%m-%dT%H:%M:%SZ") for t in big.time],
+                       "ml": [round(float(v), 2) for v in big.mag], "id": big.id.tolist()},
         "mc": MC_RATE,
     }, OUT / "rates.json")
 
@@ -473,7 +474,7 @@ def write_json(ev, pr, gj, monthly, ann, ph, corr, big, phases, moving, maps, ro
             {"name": "KNMI earthquake catalogue (FDSN event service rdsa.knmi.nl)", "licence": "CC BY 4.0",
              "attribution": "Royal Netherlands Meteorological Institute (KNMI); Netherlands Seismic and Acoustic "
                             "Network, doi:10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5",
-             "redistributed": "derived aggregates and the list of ML >= 3.0 events only"},
+             "redistributed": "derived aggregates, and origin time, ML and KNMI id of the ML >= 3.0 events (no locations)"},
             {"name": "NLOG production figures, Groningen field, monthly gas produced", "licence":
                 "NLOG terms of use: reuse permitted provided NLOG.NL is quoted as the source",
              "attribution": "Source: NLOG.NL (TNO - Geological Survey of the Netherlands)",

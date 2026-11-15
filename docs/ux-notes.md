@@ -308,7 +308,7 @@ Before and after (Scientist view, b layer, light theme, the same view; the "afte
 
 The Groningen case study is a separate view (`#v=cases&cs=groningen`, "Case studies" in both menus), not a Learn page.
 A Learn page has a fixed shape (one idea, one example, one diagram) and explains a concept used everywhere; the case
-study is a data product with its own licence duties (the KNMI DOI, "Source: NLOG.NL", no single events), five charts, a
+study is a data product with its own licence duties (the KNMI DOI, "Source: NLOG.NL", no event list or epicentres), five charts, a
 map and a validation table, and it is the place where later case studies go. Learn links to it from the new concept
 `induced-seismicity` (its example button opens the case study), and the case study's (i) buttons open Learn.
 
