@@ -31,7 +31,7 @@ REGIONS = {
         "attribution": ("GeoNet Aotearoa New Zealand Earthquake Catalogue, doi:10.21420/0S8P-TZ38. We acknowledge the "
                         "New Zealand GeoNet programme and its sponsors NHC, Earth Sciences NZ, LINZ, NEMA and MBIE for "
                         "providing data used in this study."),
-        "source_url": "https://www.geonet.org.nz/data/access/FDSN",
+        "source_url": "https://www.geonet.org.nz/data/types/eq_catalogue",
         "periods": [[2013, 2016], [2017, 2020], [2021, 2025]],
         "depth_split": True, "h3_res": 4, "radius_km": 30.0,
     },
@@ -44,9 +44,12 @@ REGIONS = {
         "altmag_url": "https://service.scedc.caltech.edu/fdsnws/event/1/query", "altmag_id_prefix": "ci", "altmag_minmag": 2.0,
         "altmag_params": {"includeallmagnitudes": "true"},
         "catalogue": "Southern California Seismic Network (SCSN) via USGS ComCat, catalog=ci",
-        "licence": "Public domain (U.S. Government work)",
-        "attribution": ("USGS ComCat; Southern California Seismic Network, Caltech (1926), doi:10.7914/SN/CI; "
-                        "SCEDC (2013), doi:10.7909/C3WD3xH1"),
+        # a joint Caltech and USGS product; neither SCSN nor SCEDC publishes a licence, only a citation request
+        "licence": "No licence stated (SCSN, operated by Caltech and the USGS; citation requested)",
+        "attribution": ("Southern California Seismic Network (Caltech and USGS) via USGS ComCat, catalog=ci, and SCEDC "
+                        "magnitudes. Cite California Institute of Technology (Caltech) (1926), Southern California "
+                        "Seismic Network, doi:10.7914/SN/CI; SCEDC (2013), Southern California Earthquake Data Center, "
+                        "Caltech, doi:10.7909/C3WD3xH1"),
         "source_url": "https://earthquake.usgs.gov/fdsnws/event/1/",
         "periods": [[2006, 2009], [2010, 2013], [2014, 2017], [2018, 2021], [2022, 2025]],
         "depth_split": False, "h3_res": 4, "radius_km": 30.0,
@@ -60,6 +63,7 @@ REGIONS = {
                           "SIL magnitude, so the two are never mixed"),
         "catalogue": "Icelandic Met Office (IMO) Quakes API, SeisComP system, reviewed events",
         "licence": "CC BY 4.0", "attribution": "Icelandic Met Office (Vedurstofa Islands), Quakes API",
+        "attribution_with_date": True,   # IMO terms: "reference must be made to … the date of data downloading"
         "source_url": "https://api.vedur.is/quakes/",
         "periods": [[2020, 2021], [2022, 2023], [2024, 2026]],
         "depth_split": False, "h3_res": 5, "radius_km": 15.0,

@@ -195,13 +195,17 @@ What these tests can and cannot show:
 
 ```json
 {"regions": [{"id": "italy", "name": "Italy", "bbox": [w, s, e, n], "catalogue": "...", "licence": "CC BY 4.0",
-              "attribution": "...", "source_url": "...", "period": ["2010-01-01", "2025-12-31"],
+              "attribution": "...", "source_url": "...", "fetched_utc": "2026-11-13T10:22:20Z",
+              "period": ["2010-01-01", "2025-12-31"],
               "mc_typical": 1.5, "magtype": "...", "mc_periods": [[2010, 2013], ...], "h3_res": 4,
               "radius_km": 30, "n_events": 0, "n_cells": 0, "quality_counts": {...}, "depth_classes": ["sh", "dp"],
               "cells": "regional/italy/cells.geojson", "cell_detail_dir": "regional/italy/cells/",
               "summary": "regional/italy/summary.json", "bytes": 0}]}
 ```
 
+- `fetched_utc`: time of the latest download of the region's catalogue, read from
+  `data/raw/regional/<id>/manifest.jsonl` (the IMO terms ask for the date of data downloading, so the Iceland
+  attribution repeats the date).
 - `mc_typical`: median Mc of the latest period over cells whose circle holds ≥ 50 events in that period.
 - `period`: inclusive first and last day of the analysed window.
 
@@ -251,11 +255,13 @@ cell quality counts, Mc distribution and the validation checkpoints.
 |---|---|---|
 | Italy | CC BY 4.0 (stated on terremoti.ingv.it) | ISIDe Working Group (2007), Italian Seismological Instrumental and Parametric Database, INGV, doi:10.13127/ISIDE |
 | New Zealand | CC BY 3.0 NZ (stated on geonet.org.nz/policy) | GeoNet Aotearoa New Zealand Earthquake Catalogue, doi:10.21420/0S8P-TZ38; "We acknowledge the New Zealand GeoNet programme and its sponsors NHC, Earth Sciences NZ, LINZ, NEMA and MBIE for providing data used in this study." |
-| Southern California | public domain (USGS ComCat) | U.S. Geological Survey; Caltech (1926) Southern California Seismic Network, doi:10.7914/SN/CI; SCEDC (2013), doi:10.7909/C3WD3xH1 |
-| Iceland | CC BY 4.0 (stated in the Quakes API OpenAPI document) | Icelandic Met Office (Veðurstofa Íslands), Quakes API, with the download date |
+| Southern California | no licence stated: the SCSN catalogue is a joint Caltech and USGS product, and neither the SCEDC citation page nor the DataCite records of the two DOIs give a licence (only a citation request) | Southern California Seismic Network (Caltech and USGS) via USGS ComCat, `catalog=ci`, and SCEDC magnitudes; California Institute of Technology (Caltech) (1926), Southern California Seismic Network, doi:10.7914/SN/CI; SCEDC (2013), Southern California Earthquake Data Center, Caltech, doi:10.7909/C3WD3xH1 |
+| Iceland | CC BY 4.0 (stated in the Quakes API OpenAPI document); IMO terms of use ask for the date of data downloading | Icelandic Met Office (Veðurstofa Íslands), Quakes API, with the download date (`fetched_utc`; 2026-11-13 for the current files) |
 
-All four allow redistribution of derived data with attribution, so the regional files are published under the
-repository's data licence (CC BY-SA 4.0) with the attributions above.
+Italy, New Zealand and Iceland allow redistribution of derived data with attribution, so those regional files are
+published under the repository's data licence (CC BY-SA 4.0) with the attributions above. For Southern California the
+regional files hold only our derived cell statistics, published under the same statement with the citations the
+operators request; the operators state no licence for the catalogue itself, so it is not labelled public domain.
 
 ## Reproduce
 

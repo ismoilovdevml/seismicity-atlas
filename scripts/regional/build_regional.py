@@ -26,7 +26,7 @@ import atlaslib as al  # noqa: E402
 import regionlib as rl  # noqa: E402
 import seislib as sl  # noqa: E402
 from common import jdump  # noqa: E402
-from fetch_regional import WORK, fetch, fetch_altmag  # noqa: E402
+from fetch_regional import RAW, WORK, fetch, fetch_altmag  # noqa: E402
 from regions import REGIONS  # noqa: E402
 
 ROOT = HERE.parents[1]
@@ -292,11 +292,29 @@ def checkpoints(rid, cfg, feats, details):
     return out
 
 
+def fetched_utc(rid):
+    """Time of the latest download of this region's catalogue (from the raw cache's manifest.jsonl), or None."""
+    m = RAW / rid / "manifest.jsonl"
+    if not m.exists():
+        return None
+    ts = [json.loads(line)["fetched_utc"] for line in m.read_text().splitlines() if line.strip()]
+    return max(pd.Timestamp(t) for t in ts).strftime("%Y-%m-%dT%H:%M:%SZ") if ts else None
+
+
+def attribution(cfg, fetched):
+    """The configured attribution; regions whose terms ask for it (IMO) get the date of data downloading."""
+    if cfg.get("attribution_with_date") and fetched:
+        return f"{cfg['attribution']}, data downloaded {fetched[:10]}"
+    return cfg["attribution"]
+
+
 def index_entry(rid, s):
     cfg = REGIONS[rid]
     mc = s["mc_cells_latest_period"]
+    fetched = fetched_utc(rid)
     return {"id": rid, "name": cfg["name"], "bbox": cfg["bbox"], "catalogue": cfg["catalogue"],
-            "licence": cfg["licence"], "attribution": cfg["attribution"], "source_url": cfg["source_url"], "caveat": cfg.get("caveat"),
+            "licence": cfg["licence"], "attribution": attribution(cfg, fetched), "source_url": cfg["source_url"],
+            "fetched_utc": fetched, "caveat": cfg.get("caveat"),
             "period": [f"{cfg['periods'][0][0]}-01-01", (pd.Timestamp(cfg["end"]) - pd.Timedelta(days=1)).strftime("%Y-%m-%d")],
             "mc_periods": cfg["periods"], "mc_typical": mc["median"], "magtype": cfg["magtype_label"],
             "h3_res": cfg["h3_res"], "radius_km": cfg["radius_km"], "n_events": s["counts"]["used"],
