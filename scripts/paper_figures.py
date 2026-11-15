@@ -106,7 +106,7 @@ def b_map(d):
 
 # ----------------------------------------------------------------------------------------------- 3: validation
 NUM = r"(\d+(?:\.\d+)?)"
-UNIVERSAL_B = (0.95, 1.0)   # universal b of shallow earthquakes (Kagan 1999; Bird & Kagan 2004), beta 0.63-0.67 x 1.5
+UNIVERSAL_B = (0.95, 1.0)   # universal b of shallow earthquakes, beta 0.63-0.67 x 1.5 (Kagan 1999, as cited; Bird & Kagan 2004 give 0.61-0.66)
 KJ2013 = {"fe01": "Alaska-Aleutians", "fe05": "Mexico-Guatemala", "fe06": "Central America", "fe08": "Andean South America",
           "fe12": "Kermadec-Tonga-Samoa", "fe18": "Guam-Japan", "fe19": "Japan-Kamchatka", "fe24": "Sunda arc",
           "fe46": "Andaman-Sumatra", "tohoku": "Tohoku box", "all": "All 18 subduction zones"}
@@ -181,7 +181,7 @@ def validation():
                                   label="atlas, published value outside its interval"),
                        plt.Line2D([], [], color=C_HIGH, marker="D", lw=0, label="published value"),
                        Patch(color=C_HIGH, alpha=0.25, label="published range"),
-                       Patch(color=MUTED, alpha=0.35, label="universal b 0.95–1.0 (Kagan 1999; Bird & Kagan 2004)")],
+                       Patch(color=MUTED, alpha=0.35, label="universal b 0.95–1.0 (Kagan 1999)")],
               loc="upper center", bbox_to_anchor=(0.32, -0.07), ncol=2, fontsize=7.5, frameon=False)
     save(fig, "validation_b")
 
