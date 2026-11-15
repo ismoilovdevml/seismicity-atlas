@@ -5,7 +5,9 @@ abstract: "An open, reproducible world map of earthquake-catalogue statistics: c
 type: software
 version: "0.3.1"
 date-released: "2026-11-15"
-license: MIT
+license:
+  - MIT
+  - CC-BY-SA-4.0
 doi: "10.5281/zenodo.24228387"
 identifiers:
   - type: doi

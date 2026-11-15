@@ -7,7 +7,7 @@
       "name": "Ismoilov, Otabek"
     }
   ],
-  "license": "MIT",
+  "license": "cc-by-sa-4.0",
   "access_right": "open",
   "keywords": [
     "seismology",
@@ -40,5 +40,5 @@
       "scheme": "url"
     }
   ],
-  "notes": "Code: MIT. Data and figures (site/data, docs/img, results): CC BY-SA 4.0, derived from the ISC-GEM catalogue (CC BY-SA 3.0). Please also cite ISC-GEM (doi:10.31905/D808B825; Storchak et al. 2013; Di Giacomo et al. 2018) and USGS ComCat."
+  "notes": "Licences: the code (scripts, site code, tests) is MIT; the data and figures (site/data, docs/img, results) are CC BY-SA 4.0. The deposit as a whole is labelled CC BY-SA 4.0, the stricter of the two. The data are derived from the ISC-GEM Global Instrumental Earthquake Catalogue, (c) International Seismological Centre and GEM Foundation, CC BY-SA 3.0, as served by USGS ComCat (catalog=iscgem). Exceptions: plates.geojson is PB2002 (Bird 2003) under ODC-BY 1.0; Natural Earth layers are public domain; slab2/ is USGS Slab2 under CC0 1.0; results/sci2_gem_hazard.json holds aggregate statistics computed from the GEM Global Seismic Hazard Map (CC BY-NC-SA 4.0) and is not covered by the CC BY-SA statement. Please also cite ISC (2026), ISC-GEM Earthquake Catalogue, doi:10.31905/D808B825; Storchak et al. 2013, 2015; Di Giacomo et al. 2018; and USGS ComCat."
 }
