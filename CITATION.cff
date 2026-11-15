@@ -14,8 +14,8 @@ identifiers:
     value: "10.5281/zenodo.24228387"
     description: "Concept DOI (all versions)"
   - type: doi
-    value: "10.5281/zenodo.24228388"
-    description: "Version 0.3.1"
+    value: "10.5281/zenodo.24254373"
+    description: "Version 0.4.0"
 repository-code: "https://github.com/ismoilovdevml/seismicity-atlas"
 url: "https://seismicityatlas.org/"
 authors:

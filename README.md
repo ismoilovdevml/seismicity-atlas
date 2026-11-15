@@ -157,8 +157,8 @@ cd site && python3 -m http.server 8000   # preview the site at http://localhost:
 ## How to cite
 
 Cite the archived release on Zenodo: **doi:[10.5281/zenodo.24228387](https://doi.org/10.5281/zenodo.24228387)**
-(this concept DOI always resolves to the latest version; v0.3.1 is
-[10.5281/zenodo.24228388](https://doi.org/10.5281/zenodo.24228388)). The full metadata is in [CITATION.cff](CITATION.cff)
+(this concept DOI always resolves to the latest version; v0.4.0 is
+[10.5281/zenodo.24254373](https://doi.org/10.5281/zenodo.24254373)). The full metadata is in [CITATION.cff](CITATION.cff)
 (GitHub shows a "Cite this repository" button). Also cite the underlying catalogues listed below, and quote the data
 cut-off date shown on the site.
 
