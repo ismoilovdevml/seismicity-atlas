@@ -3,9 +3,11 @@
 Versions follow `scripts/release.json` (shown on the site from `site/data/manifest.json`). A patch is a data refresh
 with the same schema, a minor version a method, schema or website change; see [docs/release.md](docs/release.md).
 
-## Unreleased
+## 0.4.0 (2026-11-15)
 
-Licence and legal fixes; no atlas number changes.
+Licence and legal fixes and journal figures; no atlas number changes (data cut-off 2026-11-13, as in 0.3.1).
+The data version is a minor step because `site/data/` changed shape (`fetched_utc` added to the regional layers,
+epicentres removed from the Groningen `rates.json`).
 
 - Citation metadata declare both licences: `CITATION.cff` lists MIT and CC-BY-SA-4.0; `.zenodo.json` labels the deposit
   CC BY-SA 4.0 and says in the notes that the code is MIT.
@@ -31,6 +33,7 @@ Licence and legal fixes; no atlas number changes.
   method filled in (`checked_by_agent`; `needs_human_check` stays until the author's review). Bird & Kagan (2004)
   Table 5 is now read, and entry 15 uses the same z rule as the others, per class: mismatch → match (approximate).
   Site validation table: 25 match, 1 mismatch (the declustered Kagan 2010 value).
+- Author ORCID iD (0009-0008-2785-3691) in `CITATION.cff` and `.zenodo.json`.
 
 ## 0.3.1 (2026-11-15)
 

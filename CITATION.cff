@@ -3,7 +3,7 @@ message: "If you use this atlas, please cite it as below, together with the ISC-
 title: "Global Seismicity Atlas"
 abstract: "An open, reproducible world map of earthquake-catalogue statistics: completeness (Mc), Gutenberg-Richter b-value with 95 % intervals and quality codes, ISC-GEM vs ComCat consistency, and Omori-Utsu parameters for major sequences. Not a forecast and not a hazard map."
 type: software
-version: "0.3.1"
+version: "0.4.0"
 date-released: "2026-11-15"
 license:
   - MIT

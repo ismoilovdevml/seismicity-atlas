@@ -56,6 +56,22 @@ Generated from the data files by `scripts/readme_numbers.py`; do not edit by han
 Full tables and the reasons for each verdict: [docs/validation.md](docs/validation.md). Since v0.2, b uses direct
 (measured) Mw only; converted Ms and mb are left out of every b ([method §2.1](docs/method.md)).
 
+## What changed in v0.4.0
+
+Licences, attribution and journal figures; **the atlas numbers are those of v0.3.1** (same data cut-off,
+2026-11-13). The data version moves to 0.4.0 because `site/data/` changed shape: regional layers gained `fetched_utc`,
+and the Groningen `rates.json` no longer carries epicentres.
+
+- Both licences declared in the citation metadata (code MIT, data CC BY-SA 4.0); full ISC-GEM attribution
+  (© ISC and GEM Foundation, CC BY-SA 3.0) on the site, in the README and in `manifest.json`; the exceptions
+  (PB2002 ODC-BY 1.0, Natural Earth public domain, Slab2 CC0, GEM aggregates) stated.
+- About page: an "as is" disclaimer and privacy and accessibility notes in four languages; three.js and the Crameri
+  colour maps credited.
+- Literature values re-read from the source PDFs, with page references (`docs/literature-values.md`).
+- Journal figures in `docs/img/paper/` without titles, at least 300 dpi at 86 or 180 mm, checked for colour-vision
+  deficiency.
+- Author ORCID iD in `CITATION.cff` and `.zenodo.json`.
+
 ## What changed in v0.3.x
 
 **v0.3.1** (website and new science; the atlas statistics are those of v0.3.0):
