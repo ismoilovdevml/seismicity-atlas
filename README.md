@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24228387.svg)](https://doi.org/10.5281/zenodo.24228387)
 
-**Live site: https://ismoilovdevml.github.io/seismicity-atlas/**
+**Live site: https://seismicityatlas.org/**
 
 An open, reproducible world map of earthquake-catalogue statistics, built from free global catalogues (ISC-GEM and
 USGS ComCat). For each place it gives the amount of seismicity, the magnitude of completeness (Mc) and how it changed,

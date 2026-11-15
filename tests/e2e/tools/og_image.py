@@ -49,7 +49,7 @@ CARD_JS = """() => {
     <div><div class="og-bar">${colors.map((c) => `<div style="background:${c}"></div>`).join('')}</div>
     <div class="og-ticks"><span></span><span>0.8</span><span>0.9</span><span>1.0</span><span>1.1</span><span>1.2</span></div></div>
     <span class="warn">Not a forecast. Not a hazard map.</span>
-    <span class="og-url">ismoilovdevml.github.io/seismicity-atlas</span>`;
+    <span class="og-url">seismicityatlas.org</span>`;
   document.getElementById('map-area').append(card);
 }"""
 

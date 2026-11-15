@@ -1,6 +1,6 @@
 {
   "title": "Global Seismicity Atlas",
-  "description": "An open, reproducible world map of earthquake-catalogue statistics built from free global catalogues (ISC-GEM and USGS ComCat): magnitude of completeness (Mc) and its change over time, Gutenberg-Richter b-value with 95 % intervals and quality codes, ISC-GEM vs ComCat consistency, and Omori-Utsu parameters for major aftershock sequences since 1990. Includes the analysis code, the website data files and the validation against published values. Descriptive catalogue statistics for research and education: not an earthquake forecast and not a seismic hazard map. Live site: https://ismoilovdevml.github.io/seismicity-atlas/",
+  "description": "An open, reproducible world map of earthquake-catalogue statistics built from free global catalogues (ISC-GEM and USGS ComCat): magnitude of completeness (Mc) and its change over time, Gutenberg-Richter b-value with 95 % intervals and quality codes, ISC-GEM vs ComCat consistency, and Omori-Utsu parameters for major aftershock sequences since 1990. Includes the analysis code, the website data files and the validation against published values. Descriptive catalogue statistics for research and education: not an earthquake forecast and not a seismic hazard map. Live site: https://seismicityatlas.org/",
   "upload_type": "software",
   "creators": [
     {
@@ -34,7 +34,7 @@
       "scheme": "url"
     },
     {
-      "identifier": "https://ismoilovdevml.github.io/seismicity-atlas/",
+      "identifier": "https://seismicityatlas.org/",
       "relation": "isDocumentedBy",
       "resource_type": "other",
       "scheme": "url"

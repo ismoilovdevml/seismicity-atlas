@@ -3,7 +3,7 @@ import struct
 
 from conftest import SITE
 
-CANON = "https://ismoilovdevml.github.io/seismicity-atlas/"
+CANON = "https://seismicityatlas.org/"
 
 
 def test_share_meta(site):
