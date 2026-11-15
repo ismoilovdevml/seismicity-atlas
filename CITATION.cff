@@ -17,7 +17,9 @@ identifiers:
 repository-code: "https://github.com/ismoilovdevml/seismicity-atlas"
 url: "https://ismoilovdevml.github.io/seismicity-atlas/"
 authors:
-  - alias: "ismoilovdevml"
+  - family-names: "Ismoilov"
+    given-names: "Otabek"
+    alias: "ismoilovdevml"
 keywords:
   - seismology
   - earthquake catalogue
