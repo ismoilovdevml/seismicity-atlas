@@ -544,6 +544,7 @@ export default {
   "mon.lede": "Lo ocurrido hasta ahora después de cada sismo principal de M {m} o mayor en los últimos {d} días, en todo el mundo: número de réplicas, decaimiento de Omori-Utsu, valor b y la productividad de cada secuencia comparada con las secuencias típicas de la misma región tectónica. Se actualiza a diario con USGS ComCat.",
   "mon.cutoff": "Corte de los datos",
   "mon.updated": "Última actualización",
+  "mon.stale": "Estas cifras se actualizaron hace {h} horas. La actualización diaria puede retrasarse; consulte la fecha de corte arriba.",
   "mon.selection": "Selección",
   "mon.selectionVal": "ComCat M ≥ {m} en los {d} días anteriores al corte: {n} secuencias independientes",
   "mon.fallback": " (menos de 5 con M ≥ {m0}, por lo que se bajó el umbral)",

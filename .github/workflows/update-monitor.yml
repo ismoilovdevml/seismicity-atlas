@@ -7,7 +7,9 @@ name: Update monitor
 
 on:
   schedule:
-    - cron: "41 5 * * *" # 05:41 UTC every day
+    # GitHub delays scheduled runs under load (hours) and may drop some, so try every 3 hours; the freshness gate
+    # below turns all but the first due run of the day into a no-op. Off the top of the hour on purpose.
+    - cron: "41 */3 * * *"
   workflow_dispatch:
 
 permissions:
@@ -27,36 +29,67 @@ jobs:
         with:
           ref: main
 
+      # Scheduled runs only rebuild when the committed data is at least MIN_AGE_H hours old; manual runs always do.
+      - name: Freshness gate
+        id: gate
+        env:
+          MIN_AGE_H: "20"
+          EVENT: ${{ github.event_name }}
+        run: |
+          python -I - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          run = True
+          if os.environ["EVENT"] == "schedule":
+              try:
+                  gen = json.load(open("site/data/monitor/index.json"))["generated_utc"]
+                  age_h = (datetime.now(timezone.utc) - datetime.fromisoformat(gen.replace("Z", "+00:00"))).total_seconds() / 3600
+                  run = age_h >= float(os.environ["MIN_AGE_H"])
+                  print(f"monitor data generated {gen}, {age_h:.1f} h ago -> {'rebuild' if run else 'skip'}")
+              except Exception as exc:  # unreadable index: rebuild rather than stall
+                  print(f"freshness check failed ({exc}); rebuilding")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+              fh.write(f"run={'true' if run else 'false'}\n")
+          PY
+
       - uses: actions/setup-python@v5
+        if: steps.gate.outputs.run == 'true'
         with:
           python-version: "3.12"
           cache: pip
 
       - name: Install requirements
+        if: steps.gate.outputs.run == 'true'
         run: python -m pip install -r requirements.txt
 
       - name: Restore the tectonic-regime grid cache
+        if: steps.gate.outputs.run == 'true'
         uses: actions/cache@v4
         with:
           path: data/raw/opensha
           key: monitor-opensha-20431f4
 
       - name: Fetch ComCat and build the monitor
+        if: steps.gate.outputs.run == 'true'
         run: python -I scripts/monitor/build_monitor.py
 
       - name: Check the monitor data
+        if: steps.gate.outputs.run == 'true'
         run: python -I scripts/monitor/check_monitor.py
 
       - name: Unit tests
+        if: steps.gate.outputs.run == 'true'
         run: python -I -m pytest -q -p no:cacheprovider tests/test_monitor.py
 
       - name: Browser tests of the Ongoing view (Chromium)
+        if: steps.gate.outputs.run == 'true'
         run: |
           python -m pip install playwright==1.65.1 pytest==9.2.0
           python -m playwright install --with-deps chromium
           python -m pytest -q -p no:cacheprovider tests/e2e/test_monitor.py
 
       - name: Commit and push
+        if: steps.gate.outputs.run == 'true'
         run: |
           git config user.name "ismoilovdevml"
           git config user.email "107093598+ismoilovdevml@users.noreply.github.com"

@@ -544,6 +544,7 @@ export default {
   "mon.lede": "Butun dunyo bo‘yicha so‘nggi {d} kunda bo‘lgan M {m} va undan katta har bir asosiy zarbadan keyin hozirgacha nima bo‘lgani: aftershoklar soni, Omori-Utsu so‘nishi, b-qiymat va har bir ketma-ketlik shu tektonik mintaqadagi odatiy ketma-ketliklarga nisbatan qanchalik sermahsul bo‘lgani. USGS ComCat asosida har kuni yangilanadi.",
   "mon.cutoff": "Maʼlumotlar kesimi",
   "mon.updated": "Oxirgi yangilanish",
+  "mon.stale": "Bu raqamlar {h} soat oldin yangilangan. Kunlik yangilanish kechikishi mumkin; yuqoridagi maʼlumot sanasiga qarang.",
   "mon.selection": "Tanlov",
   "mon.selectionVal": "Kesimdan oldingi {d} kundagi ComCat M ≥ {m}: {n} ta mustaqil ketma-ketlik",
   "mon.fallback": " (M ≥ {m0} da 5 tadan kam bo‘lgani uchun chegara pasaytirildi)",

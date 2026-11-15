@@ -546,6 +546,7 @@ export default {
   "mon.lede": "What has happened so far after every mainshock of M {m} or larger in the last {d} days, worldwide: aftershock counts, the Omori-Utsu decay, the b-value, and how productive each sequence has been compared with typical sequences in the same tectonic region. Updated daily from USGS ComCat.",
   "mon.cutoff": "Data cut-off",
   "mon.updated": "Last update",
+  "mon.stale": "These figures were last updated {h} hours ago. The daily refresh can be delayed; check the data cut-off above.",
   "mon.selection": "Selection",
   "mon.selectionVal": "ComCat M ≥ {m} in the {d} days before the cut-off: {n} independent sequences",
   "mon.fallback": " (fewer than 5 at M ≥ {m0}, so the threshold was lowered)",

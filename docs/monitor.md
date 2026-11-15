@@ -168,7 +168,14 @@ Reading the comparison honestly:
 
 ## 8. Automation
 
-`.github/workflows/update-monitor.yml` runs every day at 05:41 UTC and on demand:
+`.github/workflows/update-monitor.yml` is scheduled every 3 hours (minute 41) and also runs on demand. GitHub delays
+scheduled runs under load, sometimes by many hours, and may drop some; on 2026-11-14 the 05:41 run started at 12:28,
+and on 2026-11-15 none had started by 08:00. So a **freshness gate** runs first: a scheduled run continues only when the
+committed `site/data/monitor/index.json` is at least 20 hours old, and otherwise ends after a few seconds without
+building or committing. A manual run always rebuilds. The result is about one refresh a day whose time drifts, not a
+fixed hour. The Ongoing view shows a notice when the data is more than 36 hours old.
+
+Steps when the gate lets a run through:
 
 1. set up Python and the requirements;
 2. fetch and build (`build_monitor.py`: one ComCat request per sequence, 1 s apart; the regime grid is cached);

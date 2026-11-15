@@ -49,6 +49,9 @@ function draw(root, idx, full, ctx) {
   fact(t('mon.selection'), t('mon.selectionVal', { m: f.mag(sel.min_mag), d: sel.window_days, n: idx.sequences.length }) + (sel.fallback_used ? t('mon.fallback', { m0: f.mag(sel.default_min_mag) }) : ''));
   fact(t('mon.version'), idx.method_version);
   out.push(facts);
+  // The refresh is scheduled daily, but GitHub can delay or drop scheduled runs: say so when the data is old.
+  const ageH = idx.generated_utc ? (Date.now() - Date.parse(idx.generated_utc)) / 3.6e6 : NaN;
+  if (ageH > 36) out.push(h('p', { class: 'notice mon-stale', role: 'status', text: t('mon.stale', { h: Math.floor(ageH) }) }));
   out.push(infoKey([['omori-utsu', 'p, c, K'], ['gutenberg-richter-b-value', 'b'], ['quality-codes', t('col.quality')], ['b-positive', t('mon.bpos')],
     ['aftershock-productivity-bath', `${t('mon.prod')}, ${t('mon.largest')}`], ['magnitude-of-completeness', t('mon.nMcat')]]));
   out.push(h('details', { class: 'method card' }, h('summary', { text: t('mon.method') }), h('pre', { text: idx.method })));

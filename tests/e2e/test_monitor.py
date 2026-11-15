@@ -114,3 +114,28 @@ def test_committed_monitor_data_loads(site, base_url):
     n = json.loads((Path(__file__).resolve().parents[2] / "site" / "data" / "monitor" / "index.json").read_text())
     assert pg.evaluate("document.querySelectorAll('.mon-seq').length") == len(n["sequences"])
     assert "could not be loaded" not in pg.inner_text("#monitor-root")
+
+
+def _serve_monitor_aged(hours):
+    """Serve the fixture, but with generated_utc set `hours` before now."""
+    from datetime import datetime, timedelta, timezone
+    stamp = (datetime.now(timezone.utc) - timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    def handler(route):
+        rel = route.request.url.split("/data/monitor/", 1)[1].split("?")[0]
+        if rel == "index.json":
+            idx = json.loads((FIX / "index.json").read_text())
+            idx["generated_utc"] = stamp
+            route.fulfill(status=200, body=json.dumps(idx), content_type="application/json")
+        else:
+            _serve_monitor(route)
+    return handler
+
+
+@pytest.mark.parametrize("hours,shown", [(2, False), (40, True)])
+def test_stale_notice_only_when_old(site, hours, shown):
+    pg = site.open("#v=monitor", ready=False, routes=(("**/data/monitor/**", _serve_monitor_aged(hours)),))
+    pg.wait_for_selector(".mon-seq", timeout=20000)
+    assert pg.locator(".mon-stale").count() == (1 if shown else 0)
+    if shown:
+        assert "40 hours" in pg.inner_text(".mon-stale")
