@@ -3,7 +3,7 @@
     .venv/bin/python -I scripts/basemap/build_slab2.py
 
 Source: Hayes, G.P., et al. (2018), Slab2, a comprehensive subduction zone geometry model, Science 362, 58-61,
-doi:10.1126/science.aat4723; data release Hayes, G. (2018), doi:10.5066/F7PV6JNV (U.S. public domain).
+doi:10.1126/science.aat4723; data release Hayes, G. (2018), doi:10.5066/F7PV6JNV (CC0 1.0 per its DataCite record).
 
 The official ScienceBase download sits behind an interactive browser check that scripts cannot pass. The contour
 files are therefore read, unchanged, from a public mirror of the release (repository ndb38/arc-metals, pinned
@@ -111,7 +111,7 @@ def main():
                               "contours": [{"d": d, "lines": by_depth[d]} for d in sorted(by_depth)]})
         doc = {"preset": preset, "bbox": list(bb),
                "source": "USGS Slab2 (Hayes et al. 2018, doi:10.1126/science.aat4723; data doi:10.5066/F7PV6JNV), "
-                         "U.S. public domain. Depth contours every 20 km.",
+                         "CC0 1.0. Depth contours every 20 km.",
                "slabs": slabs}
         p = OUT / f"{preset}.json"
         p.write_text(json.dumps(doc, separators=(",", ":")))

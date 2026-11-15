@@ -62,7 +62,8 @@ version with a hard black/white colour switch and point sampling was 18 MB at 51
 
 **Attribution shown on the map while 3D terrain is on.** A short line, "3D terrain: Terrain Tiles (AWS Open Data,
 Tilezen Joerd): ETOPO1, SRTM, GMTED2010, 3DEP and others.", and a "Full credits" button that opens the required
-attribution block of the Joerd document, quoted verbatim:
+attribution block of the Joerd document, quoted verbatim (`tests/e2e/test_terrain3d.py` turns terrain on, opens
+"Full credits" and checks the first and last entries of the block):
 
 ```
 * ArcticDEM terrain data DEM(s) were created from DigitalGlobe, Inc., imagery and
@@ -158,7 +159,7 @@ towards a photographic look, which this atlas avoids.
 |---|---|
 | Model | USGS Slab2: Hayes, G.P., Moore, G.L., Portner, D.E., Hearne, M., Flamme, H., Furtney, M., Smoczyk, G.M. (2018), Slab2, a comprehensive subduction zone geometry model, *Science* 362, 58–61, doi:10.1126/science.aat4723 |
 | Data release | Hayes, G. (2018), Slab2 – A Comprehensive Subduction Zone Geometry Model, U.S. Geological Survey data release, doi:10.5066/F7PV6JNV |
-| Licence | U.S. Government work, public domain (USGS data releases carry no copyright; credit requested) |
+| Licence | CC0 1.0 (rights list of the DataCite record of doi:10.5066/F7PV6JNV: "Creative Commons Zero v1.0 Universal"); credit requested |
 | Files used | depth contours (`*_slab2_dep_*_contours.in`): `kur` Kuril–Japan, `izu` Izu–Bonin, `ryu` Ryukyu (Japan); `sam` South America (Chile); `ker` Kermadec–Tonga (Tonga); `hin` Hindu Kush and `pam` Pamir (Hindu Kush–Pamir); `cal` Calabria (Italy). Iceland has no subducting slab. |
 | Output | `site/data/slab2/<preset>.json`, 51 kB in total (Japan 16 kB, Chile 17 kB, Tonga 11 kB, Hindu Kush–Pamir 4 kB, Italy 4 kB): contours cut to the preset box plus 1°, simplified (0.02°), rounded to 0.01°, longitudes continuous around the box centre |
 | Script | `scripts/basemap/build_slab2.py`; SHA-256 of each source file in `scripts/basemap/slab2_sha256.json` |
@@ -171,7 +172,9 @@ from it. The contour files are read unchanged from a public mirror of the releas
 Checks: the file names are those of the release; the git blob hashes of `izu` and `ryu` are identical in the
 independent mirror `Oboue/4dssmtzimaging`, and those of `hin` and `pam` in `chelle0425/IntPyGMT`; the script
 verifies the SHA-256 of each file. Anyone with browser access to ScienceBase can replace the mirror URL and compare
-the hashes.
+the hashes. **Not yet verified:** the SHA-256 values in `scripts/basemap/slab2_sha256.json` have not been compared with
+the files of the USGS ScienceBase release itself (it needs an interactive browser session), so the identity of the
+mirror files with the release is assumed, not checked.
 
 ### Library: three.js 0.170.0
 

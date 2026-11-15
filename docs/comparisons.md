@@ -11,7 +11,7 @@ and `docs/img/sci2-*.png`. Every number below comes from those outputs (runs of 
 | # | Reference | Licence | Used as | Verdict |
 |---|---|---|---|---|
 | 1 | Taroni, Zhuang & Marzocchi (2021) HD b map of Italy; comment by Gulia, Gasperini & Wiemer (2022) | paper: author accepted manuscript, CC0 1.0 (INGV Earth-prints); input catalogue: subset of HORUS (CC BY 4.0) released in a GitHub repository without a licence | comparison only; files kept in the local cache, not redistributed | our Italy layer agrees in ranks (Spearman 0.62) with no bias (median −0.013); differences are concentrated in the Po Plain and eastern Sicily |
-| 2 | pybvalue v0.0.1 | MIT | method re-implemented (the archive holds no b-value code) | agrees with our layer when the same +0.2 completeness correction is used (Spearman 0.87, median +0.003) |
+| 2 | pybvalue v0.0.1 | Zenodo metadata: CC BY 4.0; archive LICENSE file: MIT | method re-implemented (the archive holds no b-value code) | agrees with our layer when the same +0.2 completeness correction is used (Spearman 0.87, median +0.003) |
 | 3 | GEM Global Seismic Hazard Map v2026.1 | CC BY-NC-SA 4.0 | not redistributed, link only; internal analysis with aggregate statistics only | 369 of 555 cells with mean PGA ≥ 0.2 g have no shallow b; the cause is few events, not a high Mc |
 | 4 | Zhang, Werner & Goda (2020) ETAS parameters | journal article; parameters quoted as facts | optional data fields of the monitor | the shallow subduction sequences lie inside the range of the published sequences (ratios 2.3–6.0 vs 1.2–10.4) |
 | 5 | Savran et al. (2020); pyCSEP | pyCSEP BSD-3-Clause | the Poisson N-test re-implemented (same definition) for a retrospective check | the Omori fit extrapolated past its data fails 9 of 12 tests (6 with parameter uncertainty); the monitor stays descriptive |
@@ -148,8 +148,10 @@ What this shows:
 
 ## 2. pybvalue cross-check
 
-- **Package and licence.** pybvalue v0.0.1, N. Thapa (2024), doi:10.5281/zenodo.11508511, **MIT** (LICENSE file in
-  the Zenodo archive). The linked GitHub repository returned 404 on 2026-11-14.
+- **Package and licence.** pybvalue v0.0.1, N. Thapa (2024), doi:10.5281/zenodo.11508511. The licence is
+  stated twice and differently: the Zenodo and DataCite metadata say **CC BY 4.0**, the LICENSE file in the archive
+  says **MIT**. No code was copied (only the documented method was re-implemented), so either way the only duty is
+  the citation. The linked GitHub repository returned 404 on 2026-11-14.
 - **What it contains.** The archive holds a README, the licence, a project description (PDF), one notebook and two
   catalogue files. The notebook only downloads and reads catalogues; **there is no b-value or Mc function** to run.
 - **Method as documented** (README and ProjectDescription.pdf): Mc by maximum curvature; the Aki (1965) maximum
