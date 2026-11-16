@@ -18,7 +18,10 @@ def test_pages_render(site, viewport, scheme):
             assert pg.evaluate("document.querySelectorAll('.seq').length") == 40
         if v == "methods":
             assert pg.evaluate("document.querySelectorAll('.vtable tbody tr').length") >= 20
-            assert "Mismatch" in txt and "Not testable" in txt
+            assert "Differs" in txt and "Not testable" in txt and "Consistent, uninformative" in txt
+            # verdicts are grouped by whether the published value comes from the same data or independent data
+            assert pg.evaluate("document.querySelectorAll('.data-groups li').length") >= 3
+            assert "Independent data" in txt and "Same data (GCMT-based)" in txt
         if v == "about":
             assert "CC BY-SA 3.0" in txt and "CC BY-SA 4.0" in txt and "MIT" in txt
             assert pg.query_selector("a[href*='openquake']") is not None

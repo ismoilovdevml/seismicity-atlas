@@ -37,7 +37,7 @@ Numbers below are from the build with data cut-off **2026-11-13 00:00 UTC**.
 | Mc(t) | max(Mcat, Mm − 4.5 − 0.75 log₁₀ t), t in days (Helmstetter et al. 2006; the F, G, H of Page et al. 2016 and the USGS) |
 | Omori-Utsu K, c, p | MLE on events above Mc(t), with the expected rate K (t + c)^−p 10^(−b (Mc(t) − Mcat)) (`seislib.omori_fit_mct`, the same fit as the Sequences page); b = sequence b-positive if ≥ 50 differences, else 1.0; 95 % intervals from the observed information (c on a log scale) |
 | Omori quality | as on the Sequences page: A = n ≥ 100, σp ≤ 0.10, 0.5 ≤ p ≤ 2, not contaminated; B = n ≥ 50, σp ≤ 0.20, 0.5 ≤ p ≤ 2.5; C otherwise; insufficient below 20 events above Mc(t) |
-| b | Aki-Utsu with each event's own threshold Mc(t) (`seislib.b_varmc`); 200 bootstrap resamples of the sequence with Mcat re-estimated in each; shown only for A (95 % interval ≤ 0.30) or B (≤ 0.50) with ≥ 50 events, as on the map |
+| b | Aki-Utsu with each event's own threshold Mc(t) (`seislib.b_varmc`); 1000 bootstrap resamples of the sequence with Mcat re-estimated in each (200 before 0.5.0); shown only for A (95 % interval width / b ≤ 0.30) or B (≤ 0.50) with ≥ 50 events, as on the map |
 | b-positive | van der Elst (2021), differences ≥ 0.2, ± 1.96 σ, shown with ≥ 50 differences |
 | Largest aftershock | its magnitude and day, and ΔM = Mm − Mmax; Båth's law gives about 1.2 |
 | Productivity | see §3 |

@@ -42,6 +42,33 @@ MICHAEL_SHALLOW = [(1900, 1917, 7.7), (1918, 1939, 7.0), (1940, 1954, 6.8), (195
                    (1964, 1975, 6.0), (1976, 2003, 5.8), (2004, 2009, 5.7)]
 MICHAEL_DEEP = [(1900, 1963, 7.1), (1964, 2009, 5.7)]
 
+# Validation verdicts (since 0.5.0, docs/validation.md "How a comparison is judged"). Every comparison with a published
+# number gets z = (ours - published) / sqrt(se_ours^2 + se_pub^2), se_ours = 95 % interval width / 3.92. With a
+# published uncertainty: |z| <= 1.96 -> "match", else "differs". Without one, z is not computed: our interval
+# containing the published value is only "consistent, uninformative", because a wide interval accepts almost anything.
+V_MATCH, V_DIFFERS = "match", "differs"
+V_UNINF = "consistent, uninformative (no published uncertainty)"
+# Which data the published number was made from, relative to ours (ISC-GEM direct Mw, mostly GCMT moments since 1976)
+D_GCMT = "same data (GCMT-based)"          # GCMT moment tensors: the source of most ISC-GEM direct Mw after 1976
+D_ISCGEM = "same data (ISC-GEM itself)"    # a study of the ISC-GEM catalogue (an earlier release)
+D_INDEP = "independent data"               # other catalogues, other magnitudes, or synthetic data with a known answer
+D_NONE = "no published value"              # internal checks and reference rows: not a comparison
+
+
+def z_verdict(ours, lo, hi, pub, se_pub=None):
+    """Verdict and z of `ours` [lo, hi] (95 %) against a published value; se_pub None = no published uncertainty.
+
+    Returns (verdict, z): z is None without a published uncertainty. `pub` may be a (low, high) range without an
+    uncertainty: then the verdict is "consistent, uninformative" when our interval overlaps the range."""
+    if ours is None or lo is None or hi is None or not np.isfinite([ours, lo, hi]).all():
+        return "not testable", None
+    if se_pub is None:
+        a, b = (pub, pub) if np.isscalar(pub) else pub
+        return (V_UNINF if lo <= b and hi >= a else V_DIFFERS), None
+    z = (ours - pub) / np.hypot((hi - lo) / 3.92, se_pub)
+    return (V_MATCH if abs(z) <= 1.96 else V_DIFFERS), float(z)
+
+
 # validated reference palette (dataviz skill): categorical slots in fixed order, text inks, surfaces
 C1, C2, C3, C4, C5, C6, C7, C8 = ("#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6",
                                   "#e34948")

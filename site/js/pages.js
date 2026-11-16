@@ -112,8 +112,12 @@ function omoriChart(s) {
 // ---------------------------------------------------------------- methods
 
 // Verdict codes are read from the (English) data text; only the pill label is translated.
+// Since 0.5.0: "match" / "differs" by a z-score with both uncertainties; "consistent, uninformative" when the
+// publication gives no uncertainty (docs/validation.md). The older codes stay for older data files.
 const VERDICTS = [
   [/^match/i, 'ok', 'match'],
+  [/^differs/i, 'bad', 'differs'],
+  [/^consistent, uninformative/i, '', 'uninf'],
   [/^close/i, 'close', 'close'],
   [/^mismatch/i, 'bad', 'mismatch'],
   [/^not testable/i, 'na', 'na'],
@@ -122,6 +126,15 @@ const VERDICTS = [
   [/^description only/i, '', 'desc'],
   [/^robust/i, 'ok', 'robust'],
 ];
+
+// Which data the published number comes from (row.data, since 0.5.0).
+const DATA_GROUPS = [
+  ['same data (GCMT-based)', 'gcmt'],
+  ['same data (ISC-GEM itself)', 'iscgem'],
+  ['independent data', 'indep'],
+  ['no published value', 'none'],
+];
+const dataKey = (d) => (DATA_GROUPS.find(([k]) => k === d) || [null, 'none'])[1];
 
 function verdictEl(text) {
   const v = VERDICTS.find(([re]) => re.test(text)) || [null, '', 'other'];
@@ -150,11 +163,20 @@ function drawMethods(root, g, sq, man) {
   out.push(h('section', { 'aria-label': t('val.summary') }, h('div', { class: 'summary-cards' },
     h('div', {}, h('span', { class: 'n', text: String(vt.length) }), h('span', { class: 'pill', text: t('val.total') })),
     [...tally.entries()].map(([k, v]) => h('div', {}, h('span', { class: 'n', text: String(v.n) }), h('span', { class: `pill ${v.cls}`, text: k }))))));
+  if (vt.some((r) => r.data)) {
+    // verdict counts per data group: agreement on the same data checks the code, not the result
+    const groups = new Map(DATA_GROUPS.map(([, k]) => [k, new Map()]));
+    for (const r of vt) { const g = groups.get(dataKey(r.data)); const l = verdictEl(r.verdict).label; g.set(l, (g.get(l) || 0) + 1); }
+    out.push(h('section', { 'aria-label': t('val.byData') }, h('h2', { text: t('val.byData') }),
+      h('ul', { class: 'data-groups' }, [...groups.entries()].filter(([, g]) => g.size).map(([k, g]) => h('li', { 'data-group': k },
+        h('strong', { text: `${t(`val.data.${k}`)}: ` }), [...g.entries()].map(([l, n]) => `${n} ${l}`).join(', ')))),
+      h('p', { class: 'hint', text: t('val.dataNote') })));
+  }
   out.push(h('section', {}, h('div', { class: 'sec-head' }, h('h2', {}, t('val.plateH'), infoButton('plate-boundary-classes')), h('span', { class: 'sub', text: t('val.plateSub') })), h('div', { class: 'card' }, plateChart(g, gs))));
   const tb = h('tbody');
   for (const r of vt) {
     const v = verdictEl(r.verdict);
-    tb.append(h('tr', {}, h('td', { 'data-h': t('val.colTest'), text: r.test }), h('td', { class: String(r.ours).length > 32 ? 'num long' : 'num', 'data-h': t('val.colOurs'), text: r.ours }), h('td', { 'data-h': t('val.colPub'), text: r.published }), h('td', { 'data-h': t('val.colVerdict') }, v.el, h('div', { class: 'detail', text: r.verdict }))));
+    tb.append(h('tr', {}, h('td', { 'data-h': t('val.colTest'), text: r.test }), h('td', { class: String(r.ours).length > 32 ? 'num long' : 'num', 'data-h': t('val.colOurs'), text: r.ours }), h('td', { 'data-h': t('val.colPub'), text: r.published }), h('td', { 'data-h': t('val.colVerdict') }, v.el, h('div', { class: 'detail', text: r.verdict }), r.data ? h('div', { class: 'detail data-tag', 'data-group': dataKey(r.data), text: t(`val.data.${dataKey(r.data)}`) }) : null)));
   }
   out.push(h('section', {}, h('h2', { text: t('val.all') }),
     h('div', { class: 'table-card' }, h('table', { class: 'vtable' }, h('caption', { class: 'sr-only', text: t('val.caption') }), h('thead', {}, h('tr', {}, [t('val.colTest'), t('val.colOurs'), t('val.colPub'), t('val.colVerdict')].map((c) => h('th', { scope: 'col', text: c })))), tb)),

@@ -189,9 +189,9 @@ that the b-value is computed from.
 |---|---|---|---|---|
 | 1991–2002 | 1.3 | 1.00 (0.77–1.49), n 70, quality C | 1.07 (0.86–1.40), n 46, insufficient | 1.11 (0.86–1.36), n 54 |
 | 2003–2013 | 1.4 | 0.93 (0.79–1.04), n 218, A | 0.97 (0.84–1.12), n 182 | 0.99 (0.86–1.12), n 229 |
-| 2014–2018 | 0.7 | 0.76 (0.71–0.97), n 351, A | 0.97 (0.81–1.18), n 86 | 0.92 (0.79–1.04), n 184 |
-| 2019–Sep 2023 | 0.8 | 0.74 (0.63–0.86), n 188, A | 0.79 (0.64–0.97), n 58 | 0.84 (0.69–0.99), n 112 |
-| after shut-in | 0.6 | 0.63 (0.53–1.02), n 64, B | 0.88 (0.60–1.45), n 18, insufficient | not enough differences (31) |
+| 2014–2018 | 0.7 | 0.76 (0.71–0.97), n 351, B | 0.97 (0.81–1.18), n 86 | 0.92 (0.79–1.04), n 184 |
+| 2019–Sep 2023 | 0.8 | 0.74 (0.63–0.86), n 188, B | 0.79 (0.64–0.97), n 58 | 0.84 (0.69–0.99), n 112 |
+| after shut-in | 0.6 | 0.63 (0.53–1.02), n 64, C | 0.88 (0.60–1.45), n 18, insufficient | not enough differences (31) |
 
 All three estimators fall from about 1.0 before 2014 to about 0.75–0.85 in 2019–2023. After 2014 the atlas
 estimator (Mc 0.7–0.8) gives lower values than the estimator with a fixed ML 1.5. This Mc dependence is listed
@@ -220,20 +220,20 @@ semicolon, n, the number of events (or magnitude differences) used.
 | Source | Quantity | Published | Ours | Verdict |
 |---|---|---|---|---|
 | Kraaijpoel et al. 2022 | events with unrounded ML ≥ 1.45, 1995–2021, field outline | 336 | 332 | **matches** (−1.2 %; the NLOG outline is used here, the paper used the NAM 2021 outline) |
-| Kraaijpoel et al. 2022 | field b, same sample ("MLE for the constant b-value is 0.96") | 0.96 | 0.949 (0.861–1.059); unbinned MLE 0.956 | **consistent** |
-| Dost et al. 2017 | b 2003–2017 | 0.93 ± 0.03 | 0.919 (0.808–1.013), Mc 1.4; n 281 | **consistent** |
-| Dost et al. 2017 | b 2004–2010 | 0.91 ± 0.06 | 0.917 (0.756–1.128), Mc 1.4; n 89 | **consistent** |
-| Dost et al. 2017 | b 2010–2013 | 1.06 ± 0.07 | 0.915 (0.800–1.308), Mc 1.1; n 127 | **consistent** |
-| Dost et al. 2017 | b 2013–2015 | 0.88 ± 0.06 | 0.879 (0.684–1.060), Mc 1.1; n 121 | **consistent** |
-| Dost et al. 2017 | b 2015–2017 | 0.93 ± 0.06 | 0.815 (0.686–0.985), Mc 0.8; n 115 | **consistent** |
+| Kraaijpoel et al. 2022 | field b, same sample ("MLE for the constant b-value is 0.96") | 0.96 | 0.949 (0.857–1.054); unbinned MLE 0.956 | **consistent** |
+| Dost et al. 2017 | b 2003–2017 | 0.93 ± 0.03 | 0.919 (0.804–1.007), Mc 1.4; n 281 | **consistent** |
+| Dost et al. 2017 | b 2004–2010 | 0.91 ± 0.06 | 0.917 (0.743–1.099), Mc 1.4; n 89 | **consistent** |
+| Dost et al. 2017 | b 2010–2013 | 1.06 ± 0.07 | 0.915 (0.792–1.351), Mc 1.1; n 127 | **consistent** |
+| Dost et al. 2017 | b 2013–2015 | 0.88 ± 0.06 | 0.879 (0.692–1.054), Mc 1.1; n 121 | **consistent** |
+| Dost et al. 2017 | b 2015–2017 | 0.93 ± 0.06 | 0.815 (0.691–0.974), Mc 0.8; n 115 | **consistent** |
 | Dost et al. 2017 | b 1996–2003 | 1.06 ± 0.07 | 1.16, Mc 1.8; n 13 | **not testable** (fewer than 50 events above the atlas Mc) |
 | Gulia & Wiemer 2026 | south sub-field, 2012 to mid-2015 ("ranging between 1.0 and 1.3") | 1.0–1.3 | 1.21 (0.94–1.48); n 91 | **consistent** |
 | Gulia & Wiemer 2026 | north sub-field, 2012 to mid-2015 ("minor b-value fluctuations around 0.8") | ≈ 0.8 | pooled: 39 differences, below 50; moving windows 0.71–0.92 | **not testable** (KNMI data alone are too sparse) |
 | Gulia & Wiemer 2026 | north around 2022 ("converge towards comparable values (0.9 around 2022)") | ≈ 0.9 | 0.746 (0.616–0.903), window 2015.8–2022.5 | **consistent** (interval only; see note) |
 | Gulia & Wiemer 2026 | south around 2022 | ≈ 0.9 | 1.051 (0.859–1.295), window 2017.4–2022.3 | **consistent** (interval only; see note) |
 | Gulia & Wiemer 2026 | b-positive map 2014–2022 ("values typically in the range 0.8–1.0") | 0.8–1.0 | median 0.681, inter-quartile range 0.625–0.749, over 75 mapped nodes | **differs** |
-| Gulia 2023, as quoted by Gulia & Wiemer 2026 | field after 2014 ("around ~0.7–0.8") | 0.7–0.8 | 0.785 (0.705–0.909), Mc 0.8; n 482 | **consistent** |
-| Sirorattanakul et al. 2024, as quoted by Gulia & Wiemer 2026 | field 2015–2022 ("b ≈ 0.86") | 0.86 | 0.799 (0.714–0.893), Mc 0.8; b-positive 0.878 (0.774–0.982) | **consistent** (different catalogue: context only) |
+| Gulia 2023, as quoted by Gulia & Wiemer 2026 | field after 2014 ("around ~0.7–0.8") | 0.7–0.8 | 0.785 (0.712–0.912), Mc 0.8; n 482 | **consistent** |
+| Sirorattanakul et al. 2024, as quoted by Gulia & Wiemer 2026 | field 2015–2022 ("b ≈ 0.86") | 0.86 | 0.799 (0.718–0.890), Mc 0.8; b-positive 0.878 (0.774–0.982) | **consistent** (different catalogue: context only) |
 
 ![Validation](img/induced-groningen-validation.png)
 

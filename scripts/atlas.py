@@ -29,7 +29,7 @@ from common import (B_MAGERR_MAX, CUTOFF_YEAR, H3_RES, RES, SAMPLE_R_KM, SITE, W
 
 PERIODS = [(1976, 2003), (2004, 2021)]
 Y0, Y1 = 1976, 2021
-NBOOT = 200
+NBOOT = al.NBOOT  # 1000 since v0.5 (200 before)
 RNG = 20261113
 
 
@@ -163,7 +163,7 @@ def main(radius=SAMPLE_R_KM):
             r = al.cell_b(mg, fg, nboot=NBOOT, rng=rng) if ig.size else {"n_sample": 0, "quality": "insufficient"}
             if r.get("n_b", 0) >= al.NMIN_B:
                 ms = gg.mainshock.to_numpy()[ig]
-                rd = al.cell_b(mg[ms], fg[ms], nboot=100, rng=rng)
+                rd = al.cell_b(mg[ms], fg[ms], nboot=NBOOT, rng=rng)
                 rp = al.cell_bpos(mg, fg)  # ig is time-sorted because gg is time-sorted
             else:
                 rd, rp = {}, {}
@@ -178,6 +178,7 @@ def main(radius=SAMPLE_R_KM):
                         pre + "b_hi": r.get("b_hi", np.nan), pre + "b_q": r.get("quality", "insufficient"),
                         pre + "b_raw": r.get("b_raw", np.nan), pre + "b_ci_w": (r.get("b_hi_raw", np.nan) -
                                                                                 r.get("b_lo_raw", np.nan)),
+                        pre + "b_ci_rel": r.get("b_relw", np.nan),
                         pre + "b_unstable": r.get("cutoff_unstable", False),
                         pre + "b_decl": rd.get("b_raw", np.nan), pre + "b_decl_lo": rd.get("b_lo_raw", np.nan),
                         pre + "b_decl_hi": rd.get("b_hi_raw", np.nan), pre + "n_decl": rd.get("n_b", 0),

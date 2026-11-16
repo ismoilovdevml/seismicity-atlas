@@ -6,9 +6,9 @@ import pytest
 
 from conftest import SITE, cell_point, jump, no_hscroll, rendered
 
-A = "820ccffffffffff"        # b 0.67 [0.55, 0.82]
-B_OVER = "820cdffffffffff"   # b interval [0.68, 1.04]: overlaps A
-B_SEP = "829b2ffffffffff"    # b interval [1.28, 1.75]: does not overlap A
+A = "829eaffffffffff"        # Vanuatu, b 0.86 [0.77, 0.94], quality A (0.5.0; 820cc... before)
+B_OVER = "829e87fffffffff"   # 280 km away, b 0.95 [0.83, 1.18], quality B: overlaps A and shares events
+B_SEP = "829b2ffffffffff"    # b 1.52 [1.26, 1.78]: does not overlap A
 NO_B = "82000ffffffffff"     # insufficient
 
 

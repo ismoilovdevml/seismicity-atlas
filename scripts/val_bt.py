@@ -35,13 +35,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import atlaslib as al  # noqa: E402
 import seislib as sl  # noqa: E402
 from atlas import floor_of  # noqa: E402
-from common import RES, SITE, b_sample_mask, jdump, load_work  # noqa: E402
+from common import D_INDEP, D_NONE, RES, SITE, b_sample_mask, jdump, load_work  # noqa: E402
 from validate import box  # noqa: E402
 
 WINDOWS = {"pre_5y": (-5 * 365.25, 0.0), "pre_1y": (-365.25, 0.0), "post_0_30d": (0.0, 30.0),
            "post_30_365d": (30.0, 365.0)}
 COVER = (pd.Timestamp("1976-01-01", tz="UTC"), pd.Timestamp("2022-01-01", tz="UTC"))
-NBOOT = 500
+NBOOT = al.NBOOT  # 1000 since 0.5.0 (500 before)
 
 
 def mc_after(t_days, mag_main, floor):
@@ -66,7 +66,7 @@ def b_window(m, thr, nboot=NBOOT, rng=5, time_order=None):
     bs = np.array(bs)
     bs = bs[np.isfinite(bs)]
     lo, hi = (np.percentile(bs, [2.5, 97.5]) if bs.size > 0.8 * nboot else (np.nan, np.nan))
-    q = al.quality(n, lo, hi)
+    q = al.quality(n, lo, hi, b)
     out.update(mc_window=mc, n_b=int(n), b_raw=float(b), b_lo_raw=float(lo), b_hi_raw=float(hi), q=q)
     if q in ("A", "B"):
         out.update(b=float(b), b_lo=float(lo), b_hi=float(hi))
@@ -168,12 +168,13 @@ def main():
               "verdict": (f"not testable: {k_bad} window has q={v[k_bad]['q']} (n={v[k_bad]['n_b']})" if k_bad else
                           ("same direction" if same_dir else "opposite direction") +
                           ("" if sig else ", intervals overlap") + " (mb vs Mw: direction only)") +
-                         " [needs human check]"},
+                         " [needs human check]", "data": D_INDEP, "z": None},
              {"test": "b(t) retrospective: 40 sequences, pre 5 yr vs 30-365 d after (ISC-GEM Mw)",
               "ours": f"shown (A/B) per window {shown}; {len(pairs)} pair(s) with both shown; median post - pre "
                       f"{summary['median_post_minus_pre']:+.3f}; {summary['pairs_non_overlapping_ci']} with "
                       f"separated intervals" if pairs else "no pairs",
-              "published": "no published Mw >= 5 before/after comparison found", "verdict": "description only"}]
+              "published": "no published Mw >= 5 before/after comparison found", "verdict": "description only",
+              "data": D_NONE, "z": None}]
     jdump({"summary": summary, "validation_sumatra": valid, "table_rows": table, "per_sequence": rows},
           RES / "val_bt.json", indent=1)
     pd.set_option("display.width", 250)

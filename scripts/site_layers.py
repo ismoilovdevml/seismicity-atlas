@@ -14,7 +14,8 @@ from shapely.geometry import MultiLineString, mapping, shape
 from shapely.ops import linemerge
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import AUX, CUTOFF, PROC, RES, SITE, VERSION, jdump, load_work  # noqa: E402
+from common import (AUX, CUTOFF, D_GCMT, D_INDEP, D_ISCGEM, D_NONE, PROC, RES, SITE, V_DIFFERS, V_MATCH,  # noqa: E402
+                    V_UNINF, VERSION, jdump, load_work, z_verdict)
 
 R = lambda x, n: None if x is None or not np.isfinite(x) else round(float(x), n)  # noqa: E731
 
@@ -40,7 +41,8 @@ def cells_layer(cells, detail_ids):
             p.update({f"{d}_n": int(g("n_sample")), f"{d}_nb": int(g("n_b")), f"{d}_mc": R(g("mc"), 1),
                       f"{d}_mc_lo": R(g("mc_lo"), 1), f"{d}_mc_hi": R(g("mc_hi"), 1),
                       f"{d}_b": R(g("b"), 3), f"{d}_b_lo": R(g("b_lo"), 3), f"{d}_b_hi": R(g("b_hi"), 3),
-                      f"{d}_q": g("b_q"), f"{d}_ciw": R(g("b_ci_w"), 3), f"{d}_unstable": bool(g("b_unstable")),
+                      f"{d}_q": g("b_q"), f"{d}_ciw": R(g("b_ci_w"), 3), f"{d}_ciwr": R(g("b_ci_rel"), 3),
+                      f"{d}_unstable": bool(g("b_unstable")),
                       f"{d}_bpos": R(g("bpos"), 3) if show else None,
                       f"{d}_bpos_lo": R(g("bpos_lo"), 3) if show else None,
                       f"{d}_bpos_hi": R(g("bpos_hi"), 3) if show else None,
@@ -127,57 +129,99 @@ def simplify_layer(src, tol, nd=2):
     return {"type": "FeatureCollection", "features": feats}
 
 
+def _zs(z):
+    return f" (z {z:+.2f})" if z is not None else ""
+
+
 def validation_table(v, seq):
+    """Rows of the site validation table. Every row: test, ours, published, verdict, data, z (docs/validation.md).
+
+    verdict starts with one of: match / differs (|z| <= 1.96 or not, published uncertainty known), "consistent,
+    uninformative" (no published uncertainty; our interval contains the published value), not testable, reference
+    only, robust (internal check), description only. data says whether the published number comes from the same data
+    as ours (GCMT-based, or ISC-GEM itself) or from independent data (common.D_*)."""
     t = []
+
+    def row(test, ours, published, verdict, data, z=None):
+        t.append({"test": test, "ours": ours, "published": published, "verdict": verdict, "data": data, "z": z})
+
     mp = v["michael_pooled"]
     for k, lab in (("shallow_1918_2009", "Global b, shallow < 60 km, 1918-2009, Michael's Mc(t)"),
                    ("deep_1964_2009", "Global b, depth >= 60 km, 1964-2009, Mc 5.7")):
         r = mp[k]
-        t.append({"test": lab, "ours": f"{r['b']:.3f} [{r['ci95'][0]:.3f}, {r['ci95'][1]:.3f}]",
-                  "published": f"{r['published_b']:.2f} (Michael 2014)",
-                  "verdict": "match" if r["ci95"][0] <= r["published_b"] <= r["ci95"][1] else "close, outside 95 % CI"})
+        vd, z = z_verdict(r["b"], r["ci95"][0], r["ci95"][1], r["published_b"])
+        row(lab, f"{r['b']:.3f} [{r['ci95'][0]:.3f}, {r['ci95'][1]:.3f}]", f"{r['published_b']:.2f} (Michael 2014)",
+            vd + ("" if vd != V_DIFFERS else ": published value outside our 95 % interval"), D_ISCGEM, z)
     for r in v["michael_periods"]:
-        mx = r["maxc02"][0]
+        mx, mlo, mhi = r["maxc02"]
         d = mx - r["michael_mc"]
-        t.append({"test": f"Mc, {r['depth']}, {r['period']} (MAXC+0.2 / MBS)",
-                  "ours": f"{mx:.1f} / {r['mbs'][0]:.1f}", "published": f"{r['michael_mc']:.1f} (Michael 2014)",
-                  "verdict": "match" if abs(d) <= 0.1 else ("lower" if d < 0 else "higher") + f" by {abs(d):.1f}" +
-                  (" (catalogue version differs)" if d < 0 else "")})
+        vd, z = z_verdict(mx, mlo, mhi, r["michael_mc"])
+        row(f"Mc, {r['depth']}, {r['period']} (MAXC+0.2 [95 %] / MBS)",
+            f"{mx:.1f} [{mlo:.1f}, {mhi:.1f}] / {r['mbs'][0]:.1f}", f"{r['michael_mc']:.1f} (Michael 2014)",
+            vd + ("" if vd != V_DIFFERS else f": {'lower' if d < 0 else 'higher'} by {abs(d):.1f}"
+                  + (" (newer catalogue release; Mc here reflects the ISC-GEM inclusion thresholds)" if d < 0 else "")),
+            D_ISCGEM, z)
     for name, r in v["regions"].items():
         pub = r["published_b"]
         lo, hi = r["ci95"]
-        ok = pub is not None and lo is not None and lo <= pub <= hi
-        t.append({"test": f"Regional b, {name}, shallow, ISC-GEM 1976-2021",
-                  "ours": f"{r['b']:.3f} [{lo:.3f}, {hi:.3f}] n={r['n_b']} q={r['quality']}",
-                  "published": f"{pub:.2f}" if pub is not None else r["source"],
-                  "verdict": ("not testable (n<50)" if r["quality"] == "insufficient" else
-                              ("match" if ok else "mismatch") if pub is not None else "reference only")})
+        if r["quality"] == "insufficient":
+            vd, z = "not testable (n<50)", None
+        elif pub is None:
+            vd, z = "reference only", None
+        else:
+            vd, z = z_verdict(r["b"], lo, hi, pub)
+        data = D_NONE if (pub is None and name in ("Japan", "Chile")) else D_INDEP
+        row(f"Regional b, {name}, shallow, ISC-GEM 1976-2021",
+            f"{r['b']:.3f} [{lo:.3f}, {hi:.3f}] n={r['n_b']} q={r['quality']}",
+            f"{pub:.2f}" if pub is not None else r["source"], vd, data, z)
     pb = v["plate_boundary_types"]
-    t.append({"test": "Plate-boundary b, SUB", "ours": f"{pb['SUB']['b']:.3f} [{pb['SUB']['ci95'][0]:.3f}, "
-              f"{pb['SUB']['ci95'][1]:.3f}]", "published": "0.98 (beta 0.654 x 1.5, GCMT subduction, Kagan & Jackson)",
-              "verdict": "match" if pb["SUB"]["ci95"][0] <= 0.981 <= pb["SUB"]["ci95"][1] else "mismatch"})
-    t.append({"test": "Plate-boundary b, OSR (spreading ridges)", "ours": f"{pb['OSR']['b']:.3f} [{pb['OSR']['ci95'][0]:.3f}, "
-              f"{pb['OSR']['ci95'][1]:.3f}]", "published": "1.2-1.65 (beta 0.8-1.1, Kagan 2002 via Kagan 2010)",
-              "verdict": "match" if 1.2 <= pb["OSR"]["b"] <= 1.65 else "mismatch"})
+    sub = pb["SUB"]
+    vd, z = z_verdict(sub["b"], sub["ci95"][0], sub["ci95"][1], 0.981)
+    row("Plate-boundary b, SUB", f"{sub['b']:.3f} [{sub['ci95'][0]:.3f}, {sub['ci95'][1]:.3f}]",
+        "0.98 (beta 0.654 x 1.5, GCMT subduction, Kagan & Jackson)", vd, D_GCMT, z)
+    osr = pb["OSR"]
+    vd, z = z_verdict(osr["b"], osr["ci95"][0], osr["ci95"][1], (1.2, 1.65))
+    row("Plate-boundary b, OSR (spreading ridges)", f"{osr['b']:.3f} [{osr['ci95'][0]:.3f}, {osr['ci95'][1]:.3f}]",
+        "1.2-1.65 (beta 0.8-1.1, Kagan 2002 via Kagan 2010)", vd, D_GCMT, z)
     order = sorted(pb, key=lambda k: -pb[k]["b"])
-    t.append({"test": "Ranking of b by boundary class", "ours": " > ".join(order),
-              "published": "spreading highest (TRACE 2026, Kagan); thrust/convergent lowest (Schorlemmer 2005)",
-              "verdict": "match" if order[0] == "OSR" else "mismatch"})
+    row("Ranking of b by boundary class", " > ".join(order),
+        "spreading highest (TRACE 2026, Kagan); thrust/convergent lowest (Schorlemmer 2005)",
+        (V_UNINF + ": qualitative ranking") if order[0] == "OSR" else V_DIFFERS, D_GCMT)
     sa = v["slab_age_groups"]
-    t.append({"test": "Subduction b, young vs old slabs",
-              "ours": f"young {sa['young']['b']:.3f} [{sa['young']['ci95'][0]:.3f}, {sa['young']['ci95'][1]:.3f}], "
-                      f"old {sa['old']['b']:.3f} [{sa['old']['ci95'][0]:.3f}, {sa['old']['ci95'][1]:.3f}]",
-              "published": "b increases with slab age (Nishikawa & Ide 2014)",
-              "verdict": "match" if sa["young"]["ci95"][1] < sa["old"]["ci95"][0] else
-              ("same direction, overlapping CI" if sa["young"]["b"] < sa["old"]["b"] else "mismatch")})
+    y, o = sa["young"], sa["old"]
+    sep = y["ci95"][1] < o["ci95"][0]
+    row("Subduction b, young vs old slabs",
+        f"young {y['b']:.3f} [{y['ci95'][0]:.3f}, {y['ci95'][1]:.3f}], old {o['b']:.3f} [{o['ci95'][0]:.3f}, "
+        f"{o['ci95'][1]:.3f}]", "b increases with slab age (Nishikawa & Ide 2014, ANSS catalogue)",
+        (V_UNINF + (": direction only; our two intervals do not overlap" if sep else
+                    ": direction only; our two intervals overlap")) if y["b"] < o["b"] else V_DIFFERS, D_INDEP)
     s = seq["synthetic_check"]
-    t.append({"test": "Omori p recovery, synthetic teleseismic sequence (20 runs)",
-              "ours": f"p {s['p_mean']:.3f} (sd {s['p_sd_between']:.3f}, mean sigma {s['sp_mean']:.3f})",
-              "published": f"true p {s['p_true']}", "verdict": "match" if abs(s["p_mean"] - s["p_true"]) < 2 * s["p_sd_between"] else "biased"})
+    se = s["p_sd_between"] / np.sqrt(s["n_runs"])
+    z = (s["p_mean"] - s["p_true"]) / se   # the true p is known exactly
+    row(f"Omori p recovery, synthetic teleseismic sequence ({s['n_runs']} runs)",
+        f"p {s['p_mean']:.3f} (sd {s['p_sd_between']:.3f}, se of the mean {se:.3f}, mean sigma {s['sp_mean']:.3f})",
+        f"true p {s['p_true']}", (V_MATCH if abs(z) <= 1.96 else V_DIFFERS) + _zs(z) + " (bias of the mean)",
+        D_INDEP, float(z))
+    for r in v.get("synthetic_bias", []):
+        row(f"b recovery, synthetic cells, {r['case'].replace('_', ' ')}, {r['n_cells']} cells with "
+            f"{r['n_min']}-{r['n_max']} events above Mc",
+            f"mean error {r['mean_err']:+.3f} (se {r['se']:.3f}); CI coverage {r['coverage']:.3f}",
+            "true b (0.7-1.4)", (V_MATCH if abs(r["z"]) <= 1.96 else V_DIFFERS) + _zs(r["z"]) + " (bias of the mean)",
+            D_INDEP, r["z"])
     for f in ("val_chile.json", "val_literature.json", "val_bt.json"):  # rows from scripts/val_*.py, if those have been run
         if (RES / f).exists():
             t += json.loads((RES / f).read_text()).get("table_rows", [])
     return t
+
+
+def validation_counts(t):
+    """Verdict counts per data group (same data vs independent) for the table and the docs."""
+    out = {}
+    for r in t:
+        g = out.setdefault(r.get("data", D_NONE), {})
+        k = r["verdict"].split(" (")[0].split(":")[0].split(";")[0]
+        g[k] = g.get(k, 0) + 1
+    return out
 
 
 def main():
@@ -202,7 +246,7 @@ def main():
     jdump({"michael_periods": v["michael_periods"], "michael_pooled": v["michael_pooled"],
            "b_cutoff_2004_2021": v["comcat_proxy_vs_iscgem_b_2004_2021"],
            "plate_boundary_types": v["plate_boundary_types"], "slab_age_groups": v["slab_age_groups"],
-           "floors": ag["floors"], "validation_table": vt}, SITE / "global.json")
+           "floors": ag["floors"], "validation_table": vt, "validation_counts": validation_counts(vt)}, SITE / "global.json")
     jdump(vt, RES / "validation_table.json", indent=1)
 
     files = {}
@@ -242,8 +286,9 @@ def main():
         "method": {"cells": "H3 resolution 2", "sample_radius_km": ag["sample_radius_km"],
                    "b_catalogue": "ISC-GEM Mw 1976-2021", "b_sample": ag.get("b_sample", "all events"),
                    "b_magerr_max": ag.get("b_magerr_max"), "floors": ag["floors"], "nboot": ag["nboot"],
-                   "quality": {"A": "95 % CI width <= 0.30", "B": "<= 0.50", "C": "wider: b masked",
-                               "insufficient": "< 50 events above threshold"}},
+                   "quality": {"A": "95 % CI width / b <= 0.30", "B": "<= 0.50", "C": "wider: b masked",
+                               "insufficient": "< 50 events above threshold"},
+                   "quality_width": "relative: (hi - lo) / b, b = the point estimate of the cell (since 0.5.0)"},
         "global": {"b_shallow_1976_2021": v["global_atlas_method"]["shallow"],
                    "b_deep_1976_2021": v["global_atlas_method"]["deep"]},
         "files": files, "cell_detail_files": {"count": len(det), "bytes": sum(p.stat().st_size for p in det)},

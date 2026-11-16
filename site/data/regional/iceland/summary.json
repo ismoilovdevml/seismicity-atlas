@@ -173,15 +173,15 @@
    "excluded_types_above": 0
   }
  },
- "generated_utc": "2026-11-13T11:12:08Z",
+ "generated_utc": "2026-11-15T20:56:03Z",
  "n_cells": 326,
  "n_detail": 230,
  "quality_counts": {
   "sh": {
    "insufficient": 143,
-   "A": 113,
-   "C": 41,
-   "B": 29
+   "A": 107,
+   "B": 41,
+   "C": 35
   }
  },
  "mc_cells_latest_period": {
@@ -198,10 +198,10 @@
    "sh_mc_lo": -0.3,
    "sh_mc_hi": -0.3,
    "sh_b": 0.808,
-   "sh_b_lo": 0.784,
+   "sh_b_lo": 0.782,
    "sh_b_hi": 0.813,
    "sh_q": "A",
-   "sh_ciw": 0.029,
+   "sh_ciw": 0.031,
    "mc_periods": [
     [
      2020,
@@ -231,10 +231,10 @@
    "sh_mc_lo": 0.1,
    "sh_mc_hi": 0.3,
    "sh_b": 0.823,
-   "sh_b_lo": 0.802,
-   "sh_b_hi": 0.846,
+   "sh_b_lo": 0.795,
+   "sh_b_hi": 0.849,
    "sh_q": "A",
-   "sh_ciw": 0.044,
+   "sh_ciw": 0.054,
    "mc_periods": [
     [
      2020,
@@ -261,13 +261,13 @@
    "id": "85074333fffffff",
    "sh_n": 2203,
    "sh_mc": 0.5,
-   "sh_mc_lo": 0.4,
+   "sh_mc_lo": 0.3,
    "sh_mc_hi": 0.6,
    "sh_b": 1.007,
-   "sh_b_lo": 0.91,
-   "sh_b_hi": 1.064,
+   "sh_b_lo": 0.918,
+   "sh_b_hi": 1.074,
    "sh_q": "A",
-   "sh_ciw": 0.154,
+   "sh_ciw": 0.157,
    "mc_periods": [
     [
      2020,
@@ -297,10 +297,10 @@
    "sh_mc_lo": 1.2,
    "sh_mc_hi": 1.4,
    "sh_b": 1.056,
-   "sh_b_lo": 0.96,
-   "sh_b_hi": 1.12,
+   "sh_b_lo": 0.958,
+   "sh_b_hi": 1.129,
    "sh_q": "A",
-   "sh_ciw": 0.159,
+   "sh_ciw": 0.172,
    "mc_periods": [
     [
      2020,

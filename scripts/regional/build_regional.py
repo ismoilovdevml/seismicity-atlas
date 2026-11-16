@@ -32,7 +32,7 @@ from regions import REGIONS  # noqa: E402
 ROOT = HERE.parents[1]
 OUT = ROOT / "site" / "data" / "regional"
 DEPTH_SPLIT = 70.0
-NBOOT = 200
+NBOOT = al.NBOOT     # 1000 since 0.5.0 (200 before), as for the global cells
 RNG = 20261113
 MIN_CELL_EVENTS = 3        # a cell is drawn when it holds at least this many events (all depths)
 KEEP_ETYPES = {"earthquake", "unknown", "", "nan", "induced or triggered event"}
@@ -206,7 +206,7 @@ def build_region(rid):
             rd, rp = {}, {}
             if r.get("n_b", 0) >= al.NMIN_B:
                 ms = dd.ms.to_numpy()[ii]
-                rd = rl.cell_b_tv(m[ms], per[ms], fl, nboot=100, rng=rng, window=MC_WINDOW)
+                rd = rl.cell_b_tv(m[ms], per[ms], fl, nboot=NBOOT, rng=rng, window=MC_WINDOW)
                 rp = rl.bpos_above_thr(m, rl.thresholds_time_order(r))
             show = r.get("quality") in ("A", "B")
             # Mc is published only when the latest period was measured (>= NMIN_P events), not a fallback value
@@ -219,6 +219,8 @@ def build_region(rid):
                           pre + "b": R(r.get("b", np.nan), 3), pre + "b_lo": R(r.get("b_lo", np.nan), 3),
                           pre + "b_hi": R(r.get("b_hi", np.nan), 3), pre + "q": r.get("quality", "insufficient"),
                           pre + "ciw": R(r.get("b_hi_raw", np.nan) - r.get("b_lo_raw", np.nan), 3),
+                          pre + "ciwr": R(al.rel_width(r.get("b_raw", np.nan), r.get("b_lo_raw", np.nan),
+                                                       r.get("b_hi_raw", np.nan)), 3),
                           pre + "unstable": bool(r.get("cutoff_unstable", False))})
             if show:
                 props.update({pre + "bpos": R(rp.get("bpos", np.nan), 3),

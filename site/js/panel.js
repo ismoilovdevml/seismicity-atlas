@@ -61,7 +61,7 @@ export function renderPanel(p, ctx) {
     const nb = p[`${d}_nb`] || 0;
     const mcTxt = p[`${d}_mc`] !== undefined ? ` ${f.mag(p[`${d}_mc`])}` : '';
     const why = q === 'C'
-      ? t('panel.whyC', { n: f.int(nb), mc: mcTxt, w: f.b2(p[`${d}_ciw`]), max: qB.toFixed(2) })
+      ? t('panel.whyC', { n: f.int(nb), mc: mcTxt, w: f.b2(p[`${d}_ciw`]), r: f.b2(p[`${d}_ciwr`]), max: qB.toFixed(2) })
       : t('panel.whyFew', { n: f.int(nb), mc: mcTxt, depth: t(`panel.depthPhrase.${d}`), min: nMin }) + (p[`${d}_ciw`] !== undefined ? ` ${t('panel.wouldBe', { w: f.b2(p[`${d}_ciw`]) })}` : '') + ` ${t('panel.withheld')}`;
     top.append(h('div', { class: 'withheld' }, h('strong', {}, t(`panel.noB.${d}`), infoButton('quality-codes')), h('p', { text: why }), qPill(q)));
   }

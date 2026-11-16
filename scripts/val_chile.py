@@ -31,7 +31,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import seislib as sl  # noqa: E402
-from common import RES, b_sample_label, b_sample_mask, jdump, load_work  # noqa: E402
+from common import (D_GCMT, D_INDEP, D_NONE, RES, b_sample_label, b_sample_mask, jdump, load_work,  # noqa: E402
+                    z_verdict)
 from validate import b_region, box  # noqa: E402
 
 CHILE = (-45, -18, -76, -66)        # atlas validation box, S N W E
@@ -67,29 +68,30 @@ def _f(r):
 
 
 def table_rows(out):
-    """Rows for the site validation table (site_layers.validation_table appends them)."""
+    """Rows for the site validation table (site_layers.validation_table appends them); verdicts as common.z_verdict."""
     var = [r for grp in ("box", "depth", "period") for r in out[grp].values() if r.get("quality") in ("A", "B")]
     var += [r for k, r in out["sequences"].items() if k.startswith("without_") and r.get("quality") in ("A", "B")]
     var += [r for r in out["fixed_threshold"] if r["b"] is not None]
     lo, hi = min(r["b"] for r in var), max(r["b"] for r in var)
     kj = out["kj2013_settings"]
     c = kj["chile_box_m58"]
-    se = (c["ci95"][1] - c["ci95"][0]) / 3.92
-    z = (c["b"] - kj["published"]["b_equiv"]) / np.hypot(se, kj["published"]["b_equiv_sigma"])
+    vkj, z = z_verdict(c["b"], c["ci95"][0], c["ci95"][1], kj["published"]["b_equiv"], kj["published"]["b_equiv_sigma"])
     w = out["sequences"]["without_all_five"]
+    vw, _ = z_verdict(w["b"], w["ci95"][0], w["ci95"][1], 1.0)
     return [
         {"test": "Chile b: spread over box, depth, period, sequence-removal and fixed-threshold variants",
          "ours": f"baseline {_f(out['baseline'])}; {len(var)} variants {lo:.3f}-{hi:.3f}",
          "published": "b ~1 (2018 national-catalogue study, weak source)",
          "verdict": f"robust: {lo:.2f}-{hi:.2f}" + ("; the highest b is without all five large-sequence windows"
                                                     if w.get("quality") in ("A", "B") and abs(w["b"] - hi) < 1e-9
-                                                    else "")},
+                                                    else "") + " (internal sensitivity, not a comparison)",
+         "data": D_NONE, "z": None},
         {"test": "Chile b without the five Mw >= 7.9 sequence windows (1985, 1995, 2010, 2014, 2015)",
-         "ours": _f(w), "published": "b ~1 (weak source)",
-         "verdict": "match" if w["ci95"][0] <= 1.0 <= w["ci95"][1] else "mismatch"},
+         "ours": _f(w), "published": "b ~1 (2018 national-catalogue study, weak source)",
+         "verdict": vw, "data": D_INDEP, "z": None},
         {"test": "Chile box at Kagan & Jackson (2013) settings: 1977-2010, <= 70 km, m >= 5.8",
          "ours": _f(c), "published": "Andean S. America (FE region 8) beta 0.57 +-0.04 -> b 0.855 +-0.06, GCMT",
-         "verdict": ("match" if abs(z) <= 1.96 else "mismatch") + " (FE region 8 is larger than the Chile box)"},
+         "verdict": vkj + f" (z {z:+.2f}; FE region 8 is larger than the Chile box)", "data": D_GCMT, "z": z},
     ]
 
 

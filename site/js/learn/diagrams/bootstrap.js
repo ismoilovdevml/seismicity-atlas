@@ -48,14 +48,16 @@ export default function mount(el, { dg, ex }) {
     const s = reps.slice(0, shown).sort((a, b) => a - b);
     fig.say(tpl(shown >= N ? dg.done : dg.running, { k: f.int(shown), n: f.int(N), b: f.b2(reps[shown - 1]), lo: f.b2(quantile(s, 0.025)), hi: f.b2(quantile(s, 0.975)), alo: f.b2(ex.lo), ahi: f.b2(ex.hi) }));
   };
+  // at most 200 frames of 30 ms: with the atlas's 1000 replicates (since 0.5.0) each frame adds five
+  const FR = Math.min(N, 200);
   const anim = animator({
-    frames: N, interval: 30,
-    step: (i) => { shown = i; say(); fig.redraw(); },
+    frames: FR, interval: 30,
+    step: (i) => { shown = Math.round((i * N) / FR); say(); fig.redraw(); },
     onState: (s) => { fig.fig.dataset.anim = s; },
   });
   fig.controls.append(anim.btn,
     button(dg.again, () => { seed += 1; resample(); anim.jump(0); anim.play(); }, 'again'),
-    button(dg.skip, () => anim.jump(N), 'skip'));
+    button(dg.skip, () => anim.jump(FR), 'skip'));
   fig.setDraw(draw);
   anim.start();
   return () => { anim.stop(); fig.destroy(); };

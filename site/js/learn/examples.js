@@ -205,13 +205,13 @@ export const EXAMPLES = {
     const qr = man.method.quality;
     const num = (s) => { const m = String(s).match(/\d+(?:\.\d+)?/g); return m ? +m[m.length - 1] : null; };
     const wA = num(qr.A), wB = num(qr.B), nMin = num(qr.insufficient);
-    const ex = (p) => (p ? { loc: f.latlon(p.lat, p.lon), ciw: f.b2(p.sh_ciw), nb: f.int(p.sh_nb), b: f.b2(p.sh_b) } : {});
+    const ex = (p) => (p ? { loc: f.latlon(p.lat, p.lon), ciw: f.b2(p.sh_ciw), ciwr: f.b2(p.sh_ciwr), nb: f.int(p.sh_nb), b: f.b2(p.sh_b) } : {});
     return {
       vars: { nA: f.int(cnt.A), nB: f.int(cnt.B), nC: f.int(cnt.C), nI: f.int(cnt.insufficient), nAll: f.int(cells.length),
         wA: f.b2(wA), wB: f.b2(wB), nMin: f.int(nMin),
-        aLoc: ex(A).loc, aCiw: ex(A).ciw, aNb: ex(A).nb, aB: ex(A).b,
-        bLoc: ex(B).loc, bCiw: ex(B).ciw, bNb: ex(B).nb, bB: ex(B).b,
-        cLoc: ex(C).loc, cCiw: ex(C).ciw, cNb: ex(C).nb,
+        aLoc: ex(A).loc, aCiw: ex(A).ciw, aCiwr: ex(A).ciwr, aNb: ex(A).nb, aB: ex(A).b,
+        bLoc: ex(B).loc, bCiw: ex(B).ciw, bCiwr: ex(B).ciwr, bNb: ex(B).nb, bB: ex(B).b,
+        cLoc: ex(C).loc, cCiw: ex(C).ciw, cCiwr: ex(C).ciwr, cNb: ex(C).nb,
         iLoc: ex(I).loc, iNb: ex(I).nb },
       map: C ? cellMap(C, 'q') : mapHash({ l: 'q' }),
       data: { wA, wB, nMin, b: A ? A.sh_b : 1, examples: { A, B, C, I } },

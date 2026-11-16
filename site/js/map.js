@@ -219,7 +219,7 @@ export function bSentence(p, d, manifest) {
   const q = p[`${d}_q`];
   const nMin = ruleNumber(manifest.method.quality.insufficient);
   if (q === 'A' || q === 'B') return { strong: `b ${f.interval(p[`${d}_b`], p[`${d}_b_lo`], p[`${d}_b_hi`])}`, rest: t('tt.bRest', { q }) };
-  if (q === 'C') return { strong: t('tt.withheld'), rest: t('tt.withheldC', { w: f.b2(p[`${d}_ciw`]) }) };
+  if (q === 'C') return { strong: t('tt.withheld'), rest: t('tt.withheldC', { w: f.b2(p[`${d}_ciw`]), r: f.b2(p[`${d}_ciwr`]) }) };
   return { strong: t('tt.withheld'), rest: t('tt.withheldFew', { n: f.int(p[`${d}_nb`] || 0), min: nMin }) };
 }
 
@@ -229,7 +229,7 @@ function layerSentence(p, st) {
   switch (st.l) {
     case 'q': {
       const q = p[`${d}_q`];
-      return { strong: q === 'insufficient' ? t('q.insufficient') : t('q.quality', { q }), rest: q === 'insufficient' ? t('cmp.nAbove', { n: f.int(p[`${d}_nb`] || 0) }) : t('tt.ciw', { w: f.b2(p[`${d}_ciw`]) }) };
+      return { strong: q === 'insufficient' ? t('q.insufficient') : t('q.quality', { q }), rest: q === 'insufficient' ? t('cmp.nAbove', { n: f.int(p[`${d}_nb`] || 0) }) : t('tt.ciw', { w: f.b2(p[`${d}_ciw`]), r: f.b2(p[`${d}_ciwr`]) }) };
     }
     case 'mc': {
       if ((sub || 'ig') === 'ig') return p[`${d}_mc`] !== undefined ? { strong: `Mc ${f.mag(p[`${d}_mc`])} [${f.mag(p[`${d}_mc_lo`])}, ${f.mag(p[`${d}_mc_hi`])}]`, rest: t('tt.mcIg') } : { strong: t('tt.noMc'), rest: t('tt.noMcIg') };

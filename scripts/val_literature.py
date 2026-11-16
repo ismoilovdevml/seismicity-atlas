@@ -12,9 +12,13 @@ Both are computed on the atlas b sample (common.b_sample_mask: direct Mw only by
 the published values were made from). For comparison the same two numbers are also given on every event
 (`*_all_events`, the v0.1 behaviour) and on the magnitude-uncertainty-0.10 events (`*_magerr010`).
 
-Verdict: z = (ours - published) / sqrt(se_ours^2 + se_pub^2), se_ours = CI width / 3.92, se_pub from the printed
-uncertainty (0 if none). |z| <= 1.96 -> match, else mismatch. The PB2002 class entry (Bird & Kagan 2004) applies the
-same rule per class against their Table 5. Entries whose region is only approximated (an
+Verdict (common.z_verdict, since 0.5.0): z = (ours - published) / sqrt(se_ours^2 + se_pub^2), se_ours = CI width /
+3.92, se_pub from the printed uncertainty. |z| <= 1.96 -> match, else differs. Without a printed uncertainty no z is
+computed: "consistent, uninformative (no published uncertainty)" when our interval contains the published value, else
+differs (until 0.4.0 se_pub was set to 0 and a z was computed anyway). The PB2002 class entry (Bird & Kagan 2004)
+applies the z rule per class against their Table 5. Every entry here is tagged "same data (GCMT-based)": the published
+values are fits to GCMT moments, and ISC-GEM direct Mw after 1976 are mostly GCMT moments too, so agreement shows that
+the code reproduces the published estimator, not an independent confirmation. Entries whose region is only approximated (an
 envelope box for a Flinn-Engdahl polygon, PB2002 class for 'trenches') are marked 'approximate region'.
 All entries keep needs_human_check = true: the quotes were extracted with LLM assistance and must be checked.
 
@@ -31,7 +35,7 @@ from scipy.optimize import minimize
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import seislib as sl  # noqa: E402
-from common import RES, b_sample_label, b_sample_mask, jdump, load_work  # noqa: E402
+from common import D_GCMT, RES, V_DIFFERS, V_MATCH, b_sample_label, b_sample_mask, jdump, load_work, z_verdict  # noqa: E402
 from val_chile import b_fixed  # noqa: E402
 from validate import box  # noqa: E402
 
@@ -61,7 +65,7 @@ def tgr_beta(m, mt):
     return float(beta), float(mcorner)
 
 
-def b_tgr(m, mt, nboot=300, rng=41):
+def b_tgr(m, mt, nboot=1000, rng=41):
     m = np.asarray(m, float)
     m = m[m >= mt - 1e-9]
     beta, mc = tgr_beta(m, mt)
@@ -89,18 +93,15 @@ def select(g, c):
 def verdict(ours, pub, pub_se, approx):
     if ours.get("b") is None:
         return "not testable", None
-    lo, hi = ours["ci95"]
-    se = (hi - lo) / 3.92
-    z = (ours["b"] - pub) / np.sqrt(se ** 2 + pub_se ** 2)
-    v = "match" if abs(z) <= 1.96 else "mismatch"
-    return v + (" (approximate region)" if approx else ""), float(z)
+    v, z = z_verdict(ours["b"], ours["ci95"][0], ours["ci95"][1], pub, pub_se)
+    return v + (" (approximate region)" if approx else ""), z
 
 
 def pub_b(e):
-    """Published value in b units and its standard error (b = 1.5 beta)."""
+    """Published value in b units and its standard error (b = 1.5 beta); None when no uncertainty is printed."""
     k = 1.5 if e["quantity"] == "beta" else 1.0
     u = e.get("uncertainty")
-    se = 0.0
+    se = None
     if isinstance(u, str) and u.strip().startswith("±"):
         se = k * float(u.strip()[1:])
     return k * float(e["value"]), se
@@ -149,8 +150,10 @@ def main():
                                  f"all events: TGR {fmt(out['b_tgr_all_events'])}",
                          "published": f"{e['quantity']} {e['value']}{' ' + e['uncertainty'] if e.get('uncertainty') else ''}"
                                       f" (b {pb:.3f}; {short}, {e['location_in_source'].split(':')[0]})",
-                         "verdict": out["verdict"] + f"; all events: {out['verdict_all_events'].split(' (')[0]}"
-                                    " [needs human check]"})
+                         "verdict": out["verdict"] + (f" (z {out['z']:+.2f})" if out["z"] is not None else "")
+                                    + f"; all events: {out['verdict_all_events'].split(' (')[0]}"
+                                    " [needs human check]",
+                         "data": D_GCMT, "z": out["z"]})
         elif c["kind"] == "class_range":
             # Same rule as the other entries: z = (ours - published) / sqrt(se_ours^2 + se_pub^2), |z| <= 1.96 -> match,
             # per PB2002 class against Bird & Kagan (2004) Table 5. se_pub comes from the published 95 % range on the side
@@ -179,7 +182,7 @@ def main():
             # the v0.2 rule (our range of point values inside the abstract range 0.53-0.92, +-0.03), kept for reference
             out["range_rule_v02"] = "match" if (0.53 - 0.03 <= lo_o and hi_o <= 0.92 + 0.03) else "mismatch"
             ok = all(v["match"] for v in per.values())
-            out["verdict"] = ("match" if ok else "mismatch") + " (approximate)"
+            out["verdict"] = (V_MATCH if ok else V_DIFFERS) + " (approximate)"
 
             def best(v):
                 zs = [x["z"] for x in v["vs_table5"] if x["z"] is not None]
@@ -190,19 +193,25 @@ def main():
                          "published": "Table 5 per-class beta with 95 % ranges, 0.53 (OCB) to 0.92 (OSR normal faulting) "
                                       "(Bird & Kagan 2004)",
                          "verdict": out["verdict"] + "; OSR and OTF against the closest of their subcatalogs"
-                                    " [needs human check]"})
+                                    " [needs human check]",
+                         "data": D_GCMT, "z": None})
         elif c["kind"] == "mc_global":
             m = sl.bin_mag(g[s].mag.to_numpy())
             out["maxc02"] = float(sl.mc_maxc(m, correction=0.2))
             out["mbs"] = float(sl.mc_mbs(m))
             out["gft"] = float(sl.mc_gft(m)[0])
             out["n"] = int(m.size)
-            ok = 5.3 <= out["maxc02"] <= 5.6
-            out["verdict"] = "match" if ok else "mismatch"
+            r = np.random.default_rng(43)
+            bs = [sl.mc_maxc(r.choice(m, m.size), correction=0.2) for _ in range(1000)]
+            out["maxc02_ci95"] = [float(np.percentile(bs, 2.5)), float(np.percentile(bs, 97.5))]
+            # no published uncertainty: the range 5.4-5.5 against our bootstrap interval (until 0.4.0: 5.3 <= MAXC <= 5.6)
+            out["verdict"], _ = z_verdict(out["maxc02"], *out["maxc02_ci95"], (5.4, 5.5))
             rows.append({"test": "Literature Mc: GCMT 1980-2016, 0-50 km (Petruccelli 2018 thesis)",
-                         "ours": f"global MAXC+0.2 {out['maxc02']:.1f}, MBS {out['mbs']:.1f}, GFT {out['gft']:.1f}",
+                         "ours": f"global MAXC+0.2 {out['maxc02']:.1f} [{out['maxc02_ci95'][0]:.1f}, "
+                                 f"{out['maxc02_ci95'][1]:.1f}], MBS {out['mbs']:.1f}, GFT {out['gft']:.1f}",
                          "published": "most local Mc 5.4-5.5; 5.1-5.3 on ridges and Himalaya",
-                         "verdict": out["verdict"] + " (global vs local map) [needs human check]"})
+                         "verdict": out["verdict"] + " (global vs local map) [needs human check]",
+                         "data": D_GCMT, "z": None})
         res.append(out)
     # diagnostic: share and b of the non-0.10-uncertainty magnitudes, global shallow 1982-2008, m >= 5.6
     g = g_all

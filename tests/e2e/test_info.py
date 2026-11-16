@@ -4,8 +4,8 @@ import pytest
 
 from conftest import no_hscroll
 
-A = "820ccffffffffff"        # quality A shallow cell (also used by test_features)
-B_OVER = "820cdffffffffff"   # its comparison partner with an overlapping interval
+A = "829eaffffffffff"        # shown (A/B) shallow cell (also used by test_features)
+B_OVER = "829e87fffffffff"   # its comparison partner with an overlapping interval (as in test_features)
 
 # The placement table of docs/learn.md, per view: the set of concepts with a visible button.
 VIEWS = {

@@ -1,6 +1,7 @@
-// How the number of events sets the width of the 95 % interval, and how the width sets the quality code.
-// The slider uses the textbook approximation width ≈ 2 × 1.96 × b / √n (Aki 1965); the atlas itself uses the
-// bootstrap, so the real cells (dots, from cells.geojson) are placed by their measured width.
+// How the number of events sets the relative width of the 95 % interval, and how that width sets the quality code.
+// Since 0.5.0 the code uses the width divided by b. The slider uses the textbook approximation
+// width / b ≈ 2 × 1.96 / √n (Aki 1965), which does not depend on b; the atlas itself uses the bootstrap, so the real
+// cells (dots, from cells.geojson) are placed by their measured relative width `sh_ciwr`.
 
 import { figure, frame, slider, svgEl, label, tpl } from '../kit.js';
 import * as f from '../../fmt.js';
@@ -10,7 +11,7 @@ export default function mount(el, { dg, ex }) {
   const st = { n: 200 };
   const fig = figure(el, { title: dg.title, caption: dg.caption, alt: dg.alt });
   const code = (n, w) => (n < nMin ? 'insufficient' : w <= wA ? 'A' : w <= wB ? 'B' : 'C');
-  const width = (n) => (2 * 1.96 * b) / Math.sqrt(n);
+  const rel = (n) => (2 * 1.96) / Math.sqrt(n);
   const draw = (W) => {
     const H = 210;
     const xmax = Math.max(1.0, wB * 2);
@@ -24,23 +25,24 @@ export default function mount(el, { dg, ex }) {
       svgEl('line', { x1: F.xs(w), x2: F.xs(w), y1: F.m.t, y2: H - F.m.b, class: 'rule' }, F.top);
     }
     // real example cells
-    const exs = [['A', ex.examples.A], ['B', ex.examples.B], ['C', ex.examples.C], ['insufficient', ex.examples.I]].filter(([, p]) => p && p.sh_ciw != null);
+    const exs = [['A', ex.examples.A], ['B', ex.examples.B], ['C', ex.examples.C], ['insufficient', ex.examples.I]].filter(([, p]) => p && p.sh_ciwr != null);
     exs.forEach(([q, p], i) => {
       const y = F.ys(3.2 - i * 0.62);
-      const x = F.xs(Math.min(p.sh_ciw, xmax));
+      const x = F.xs(Math.min(p.sh_ciwr, xmax));
       svgEl('circle', { cx: x, cy: y, r: 5, class: q === 'insufficient' ? 'dot hollow' : 'dot', style: '--c:var(--ink-2)' }, F.top);
       label(F.top, x + 9, y + 4, tpl(dg.cellLabel, { q: q === 'insufficient' ? dg.insufficient : q, nb: f.int(p.sh_nb) }), 'lbl');
     });
-    const w = width(st.n);
+    const w = rel(st.n);
     const xw = F.xs(Math.min(w, xmax));
     svgEl('line', { x1: xw, x2: xw, y1: F.m.t, y2: H - F.m.b, class: 'accent-line' }, F.top);
     svgEl('path', { d: `M${xw - 6},${H - F.m.b + 2}L${xw + 6},${H - F.m.b + 2}L${xw},${H - F.m.b - 8}Z`, style: 'fill:var(--accent)' }, F.top);
     return F.svg;
   };
   const update = () => {
-    const w = width(st.n);
-    const q = code(st.n, w);
-    fig.say(tpl(dg.readout, { n: f.int(st.n), w: f.b2(w), lo: f.b2(b - w / 2), hi: f.b2(b + w / 2), b: f.b2(b), q: q === 'insufficient' ? dg.insufficient : q }));
+    const wr = rel(st.n);
+    const w = wr * b;
+    const q = code(st.n, wr);
+    fig.say(tpl(dg.readout, { n: f.int(st.n), w: f.b2(w), wr: f.b2(wr), lo: f.b2(b - w / 2), hi: f.b2(b + w / 2), b: f.b2(b), q: q === 'insufficient' ? dg.insufficient : q }));
     fig.fig.dataset.q = q;
     fig.redraw();
   };

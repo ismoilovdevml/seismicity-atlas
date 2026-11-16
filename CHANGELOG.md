@@ -3,7 +3,35 @@
 Versions follow `scripts/release.json` (shown on the site from `site/data/manifest.json`). A patch is a data refresh
 with the same schema, a minor version a method, schema or website change; see [docs/release.md](docs/release.md).
 
-## Unreleased
+## 0.5.0 (prepared 2026-11-16, not yet released)
+
+Method release after a review; same data cut-off (2026-11-13). Every old → new number with its reason is in
+[docs/changes-0.5.md](docs/changes-0.5.md).
+
+- **Quality gate on the relative interval width** (hi − lo) / b, with b the cell's point estimate: A ≤ 0.30,
+  B ≤ 0.50, C wider, insufficient below 50 events (`atlaslib.quality`). The absolute limits used until 0.4.0
+  favoured low b, because the width grows with b. Shallow cells A/B/C 58/112/54 → 55/117/52 (shown 170 → 172),
+  deeper 24/49/14 → 12/59/16 (shown 73 → 71). Global b unchanged: 1.035 [1.018, 1.052] shallow, 0.936
+  [0.911, 0.961] deeper. The same gate now applies to the regional layers, the retrospective b(t), the Groningen
+  case study and the Sequence Monitor (monitor data are rebuilt by its daily job, not in this commit).
+- **1000 bootstrap replicates** (200 before) for the cell intervals, the declustered b, the validation intervals
+  (500 and 300 before), the regional layers, b(t) and the Monitor. Seeds unchanged.
+- New cell property `d_ciwr` (relative width, also for C cells; global and regional cells); `manifest.json`
+  `method.quality` reads "95 % CI width / b <= 0.30" and gains `quality_width`; `sequences.json` `synthetic_check`
+  gains `n_runs`; `global.json` validation rows gain `data` and `z`, and the file gains `validation_counts`.
+- **Validation verdicts by z-score**: z = (ours − published) / √(σ_ours² + σ_pub²), |z| ≤ 1.96 match, else differs;
+  without a published uncertainty, "consistent, uninformative" when our interval contains the value (until 0.4.0
+  the Kagan 2010 rows used σ_pub = 0 and the regional and plate-class rows only "inside our interval"). Every row is
+  tagged same data (GCMT-based), same data (ISC-GEM itself), independent data or no published value. New rows: a
+  pooled bias test of the synthetic b recovery and a z-test of the Omori p recovery (both "differs" for one case,
+  see docs/validation.md).
+- Docs: the relative mask, the 1000 replicates and the Mc caveat (ISC-GEM inclusion thresholds) in `method.md`;
+  `validation.md` re-classified; Learn pages `quality-codes` and `confidence-interval-bootstrap` updated in four
+  languages (native review of uz/ru/es pending, `docs/learn.md`).
+- `run_all.sh` runs the unit tests without `tests/e2e` (collecting both `test_monitor.py` files stopped pytest).
+- The cell layer fixtures of the browser tests moved to cells that keep their code under the new gate.
+
+### Also in 0.5.0 (committed before the review, listed under Unreleased until now)
 
 - Search engines: 88 static Learn pages (21 concepts × 4 languages + 4 indexes) with canonical, hreflang and JSON-LD,
   generated from the same texts as the app (`scripts/seo_pages.mjs`); `sitemap.xml` and `robots.txt`; Dataset and

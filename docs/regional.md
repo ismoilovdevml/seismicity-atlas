@@ -147,10 +147,11 @@ more from place to place, so here **Mc is estimated per cell and per period** (`
   the same circles, not stored in the outputs.
 - Each event's threshold is the Mc of its window, and b is the Aki-Utsu estimate with per-event thresholds
   (`seislib.b_varmc`, unchanged).
-- **Uncertainty:** 200 bootstrap replicates, resampling events within each window (stratified). Every window Mc is
+- **Uncertainty:** 1000 bootstrap replicates since 0.5.0 (200 before), resampling events within each window (stratified). Every window Mc is
   re-estimated in every replicate, so the 95 % interval includes the Mc uncertainty.
-- **Quality gate:** the global one, unchanged (`atlaslib.quality`): `A` interval ≤ 0.30, `B` ≤ 0.50, `C` wider (b
-  withheld), `insufficient` fewer than 50 events above threshold.
+- **Quality gate:** the global one (`atlaslib.quality`): since 0.5.0 on the relative width (hi − lo) / b, `A` ≤ 0.30,
+  `B` ≤ 0.50, `C` wider (b withheld), `insufficient` fewer than 50 events above threshold. Until 0.4.0 the limits
+  applied to the absolute width (`method.md` §4).
 - **Reported Mc** (`*_mc`) is MAXC + 0.2 of the **latest calendar period**, with its bootstrap interval. It is
   published only when that period holds ≥ 50 events in the circle (otherwise it would be a fallback, not a
   measurement). The Mc of each period is in the detail file (`mc_periods`).
@@ -220,7 +221,7 @@ What these tests can and cannot show:
 | `d_n`, `d_nb` | events in the sampling circle; events above their threshold (`d` = `sh` or `dp`) |
 | `d_mc`, `d_mc_lo`, `d_mc_hi` | Mc of the latest period and its bootstrap 95 % interval |
 | `d_b`, `d_b_lo`, `d_b_hi` | b and its bootstrap 95 % interval; only when `d_q` is `A` or `B` |
-| `d_q`, `d_ciw`, `d_unstable` | quality code, interval width (also for `C`), cutoff-stability flag: same meaning as global |
+| `d_q`, `d_ciw`, `d_ciwr`, `d_unstable` | quality code, absolute and relative interval width (also for `C`; `d_ciwr` since 0.5.0), cutoff-stability flag: same meaning as global |
 | `d_bpos`, `d_bpos_lo`, `d_bpos_hi` | b-positive ± 1.96 σ; only when `d_q` is `A` or `B` |
 | `d_bdecl`, `d_bdecl_lo`, `d_bdecl_hi` | b after Gardner-Knopoff declustering, bootstrap 95 %; only when `d_q` is `A` or `B` |
 

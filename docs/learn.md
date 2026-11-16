@@ -106,6 +106,13 @@ Interface strings are in the `// learn` block of `site/js/i18n/<lang>.js`; conce
 Scientific symbols (b, Mc, Mw, mb, MAXC) and catalogue names stay untranslated; place names inside examples come from
 the data in English.
 
+**Release 0.5.0 text changes.** `quality-codes` (relative interval width (hi − lo) / b, a new technical paragraph on
+why, the diagram on a width / b axis) and `confidence-interval-bootstrap` (a paragraph on why 1000 replicates) were
+changed in English first and then in Uzbek, Russian and Spanish with the same keys and placeholders, as were the
+interface strings of the quality legend, the C-cell tooltip and panel text, and the validation verdicts and data
+groups. The three translations were written by the maintainer's assistant, not by a native-speaker reviewer:
+**native review pending** for these strings (uz most of all).
+
 ## Tests
 
 ```

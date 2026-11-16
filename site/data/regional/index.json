@@ -1,6 +1,6 @@
 {
  "note": "Regional layers use each network's own local magnitude and are never merged with the global cells. Not a forecast and not a hazard map.",
- "generated_utc": "2026-11-13T11:12:11Z",
+ "generated_utc": "2026-11-15T20:56:22Z",
  "regions": [
   {
    "id": "italy",
@@ -49,14 +49,14 @@
     "sh": {
      "insufficient": 255,
      "A": 88,
-     "B": 56,
-     "C": 9
+     "B": 54,
+     "C": 11
     },
     "dp": {
      "insufficient": 400,
-     "C": 3,
+     "B": 3,
      "A": 3,
-     "B": 2
+     "C": 2
     }
    },
    "depth_classes": [
@@ -66,7 +66,7 @@
    "cells": "regional/italy/cells.geojson",
    "cell_detail_dir": "regional/italy/cells/",
    "summary": "regional/italy/summary.json",
-   "bytes": 654443
+   "bytes": 658269
   },
   {
    "id": "nz",
@@ -110,15 +110,15 @@
    "quality_counts": {
     "sh": {
      "insufficient": 227,
-     "A": 110,
-     "B": 34,
+     "A": 106,
+     "B": 38,
      "C": 16
     },
     "dp": {
      "insufficient": 316,
-     "A": 29,
-     "B": 22,
-     "C": 20
+     "A": 34,
+     "B": 20,
+     "C": 17
     }
    },
    "depth_classes": [
@@ -128,7 +128,7 @@
    "cells": "regional/nz/cells.geojson",
    "cell_detail_dir": "regional/nz/cells/",
    "summary": "regional/nz/summary.json",
-   "bytes": 805428
+   "bytes": 811044
   },
   {
    "id": "socal",
@@ -179,10 +179,10 @@
    "n_cells": 132,
    "quality_counts": {
     "sh": {
-     "A": 58,
+     "A": 55,
      "insufficient": 49,
-     "B": 14,
-     "C": 11
+     "B": 16,
+     "C": 12
     }
    },
    "depth_classes": [
@@ -191,7 +191,7 @@
    "cells": "regional/socal/cells.geojson",
    "cell_detail_dir": "regional/socal/cells/",
    "summary": "regional/socal/summary.json",
-   "bytes": 310976
+   "bytes": 312582
   },
   {
    "id": "iceland",
@@ -235,9 +235,9 @@
    "quality_counts": {
     "sh": {
      "insufficient": 143,
-     "A": 113,
-     "C": 41,
-     "B": 29
+     "A": 107,
+     "B": 41,
+     "C": 35
     }
    },
    "depth_classes": [
@@ -246,13 +246,13 @@
    "cells": "regional/iceland/cells.geojson",
    "cell_detail_dir": "regional/iceland/cells/",
    "summary": "regional/iceland/summary.json",
-   "bytes": 606302
+   "bytes": 610755
   }
  ],
  "sha256": {
-  "italy": "99ce79298998b5b2b8e30c3cf068d6f8eb1369d1affffbdf3b887f3dbcedba62",
-  "nz": "b163aafe470a29cc85bfc610a058141f96dab0585ea770d3a25af779fb906ec8",
-  "socal": "03952973da136a5b76ab104711e99111d1d6fc4cc2b2a6efccd144cc56bd5b0c",
-  "iceland": "793ec538de3b6446269642bcad0b589cd9f22ccd3b1a4e28120543a981f1020a"
+  "italy": "bad9d870f6c4881c2519535b249447d12f070049fd8d64e419485a6740b50b2a",
+  "nz": "d0925ffee749a37ad8a132e963566b3b85bf0d95553a5585ff6ed5a15eebb4d7",
+  "socal": "f15361e1caea9324283d0e67c36706d596011a19f22145098e321b83fe40d634",
+  "iceland": "e304eb2a19b8623c4f9754f71d5de4582f1f6703d1a5e61b08d1b4ede33941a0"
  }
 }

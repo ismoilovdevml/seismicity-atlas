@@ -54,6 +54,6 @@
  "b_sample_excluded_1976_2021": 7049,
  "sample_radius_km": 300.0,
  "h3_res": 2,
- "nboot": 200,
+ "nboot": 1000,
  "rng_seed": 20261113
 }

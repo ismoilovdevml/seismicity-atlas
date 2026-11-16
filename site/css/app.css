@@ -423,6 +423,8 @@ table.data th { color: var(--ink-3); font-weight: 600; }
 .vtable td:first-child { color: var(--ink); }
 .vtable td.num { font-family: var(--mono); font-size: 13px; white-space: nowrap; color: var(--ink); }
 .vtable .detail { font-size: 12px; color: var(--ink-3); margin-top: 4px; }
+.vtable .data-tag { font-style: italic; }
+.data-groups { margin: 0 0 8px; padding-left: 20px; display: grid; gap: 4px; }
 .toolbar { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
 .toolbar .lbl { font-size: 13px; color: var(--ink-3); margin-right: 8px; }
 .toolbar .seg { display: inline-flex; }

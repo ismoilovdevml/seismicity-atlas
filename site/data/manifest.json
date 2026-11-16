@@ -1,7 +1,7 @@
 {
  "name": "Global Seismicity Atlas",
- "version": "0.4.0",
- "generated_utc": "2026-11-13T18:42:15Z",
+ "version": "0.5.0",
+ "generated_utc": "2026-11-15T20:55:27Z",
  "data_cutoff_utc": "2026-11-13",
  "coverage": {
   "iscgem": [
@@ -97,13 +97,14 @@
     }
    }
   },
-  "nboot": 200,
+  "nboot": 1000,
   "quality": {
-   "A": "95 % CI width <= 0.30",
+   "A": "95 % CI width / b <= 0.30",
    "B": "<= 0.50",
    "C": "wider: b masked",
    "insufficient": "< 50 events above threshold"
-  }
+  },
+  "quality_width": "relative: (hi - lo) / b, b = the point estimate of the cell (since 0.5.0)"
  },
  "global": {
   "b_shallow_1976_2021": {
@@ -112,8 +113,8 @@
    "mc": 5.2,
    "b": 1.0350923766327362,
    "ci95": [
-    1.018282302869513,
-    1.051983093872792
+    1.0182243660354124,
+    1.0518698346544189
    ],
    "quality": "A"
   },
@@ -123,8 +124,8 @@
    "mc": 5.4,
    "b": 0.9360865208137327,
    "ci95": [
-    0.9109181824528273,
-    0.9607696031181667
+    0.9113719113997677,
+    0.9611951272754674
    ],
    "quality": "A"
   }
@@ -139,16 +140,24 @@
    "sha256": "10bb8bfe413eacbaf76c030ac175ade10fe1f853f296bdb443f868437418d7fc"
   },
   "global.json": {
-   "bytes": 17372,
-   "sha256": "af48de3479d06bebdd6c9b49c809005d557ef447a69d291f87016ff016e5b2a8"
+   "bytes": 21684,
+   "sha256": "556560dce86ec0f1a570ed57c2e306a169b3478e86ddb9631e2eb44fe48c1899"
+  },
+  "places.json": {
+   "bytes": 584959,
+   "sha256": "72f8837ffc8e9aee391cd663744ddb8341a90f4f3dc5ed595ecfdb3d20126a01"
+  },
+  "rating.json": {
+   "bytes": 238130,
+   "sha256": "9590e0eac6a878d11f73c7c67d5fef10de96759145dc6d79bc4fe84df854713e"
   },
   "sequences.json": {
-   "bytes": 55272,
-   "sha256": "ac633e3b23b7e6ca87cc6f4c75cbe9fd2cf29b819ffe68232df7ec76fcbd9059"
+   "bytes": 55329,
+   "sha256": "a12aeaebc907f0d8d7680598dee575e9fd24c8e4d5b52a594f5faa2cda8d84f6"
   },
   "cells.geojson": {
-   "bytes": 1477697,
-   "sha256": "d5431d3ca72846dd17c873dd7b06b83ab937b5077b90c81f1fbfac9b81412f3f"
+   "bytes": 1495296,
+   "sha256": "91a3d0fb186f7cebd995015e5c1f5c18177156acadb2e36e821d0c6103a15276"
   },
   "coastline.geojson": {
    "bytes": 384300,
@@ -165,7 +174,7 @@
  },
  "cell_detail_files": {
   "count": 1289,
-  "bytes": 2558469
+  "bytes": 2588948
  },
  "events": {
   "events_m6.json": {

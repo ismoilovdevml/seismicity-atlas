@@ -51,7 +51,7 @@ def table() -> str:
         ("Duplicates", f"{n(m['matched'])} of {n(m['iscgem_in_overlap'])} ISC-GEM events in {c0}–{y1} matched in ComCat "
                        f"({100 * m['matched'] / m['iscgem_in_overlap']:.1f} %); median offset {m['dt_s_median']:.1f} s, {m['dist_km_median']:.1f} km"),
         (f"Global b, ISC-GEM direct Mw {years}", f"shallow ≤ 70 km: {b(gs)}; deeper: {b(gd)}"),
-        ("Cells with a trusted b (95 % interval ≤ 0.5)", f"{n(trusted['sh'])} shallow and {n(trusted['dp'])} deeper, out of {n(glob['n_cells'])} cells that hold events"),
+        ("Cells with a trusted b (95 % interval ≤ 0.5 × b)", f"{n(trusted['sh'])} shallow and {n(trusted['dp'])} deeper, out of {n(glob['n_cells'])} cells that hold events"),
         ("Global completeness (ISC-GEM direct Mw, shallow)", f"Mw {f1['floor']:.1f} for {p1.replace('-', '–')}, {f2['floor']:.1f} for {p2.replace('-', '–')}"),
         ("USGS M4.5+ feed, as served", f"median Mc {statistics.median(mc_cc):.1f} (mostly mb) over {n(len(mc_cc))} shallow cells, 2010 to the cut-off"),
         ("Omori fits", f"{seq['n']} sequences since 1990: {q['A']} quality A, {q['B']} B, {q['C']} C, {q['insufficient']} insufficient"),

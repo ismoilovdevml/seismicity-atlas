@@ -21,7 +21,7 @@ import seislib as sl  # noqa: E402
 DM = 0.1
 F_MC, G_MC, H_MC = 1.0, 4.5, 0.75   # Mc(t) = max(Mcat, F Mm - G - H log10 t), Helmstetter et al. 2006; Page et al. 2016
 MCAT_DEFAULT = 4.5                  # used when a sequence has too few events to estimate its completeness
-NBOOT = 200
+NBOOT = 1000                        # bootstrap replicates for b (200 before 0.5.0)
 LN10 = math.log(10)
 
 # Page et al. (2016, BSSA 106(5), 2290-2301, doi:10.1785/0120160073), generic Reasenberg-Jones parameters per
@@ -313,10 +313,11 @@ def zw2020_productivity(t, m, T2, mag_main, mcat, regime, depth_km):
 
 
 # ----------------------------------------------------------------------------------------------- b-values
-def b_quality(n, lo, hi):
-    if n < 50 or lo is None or hi is None:
+def b_quality(n, lo, hi, b):
+    """As for the map cells (atlaslib.quality, since 0.5.0): relative width (hi - lo) / b <= 0.30 A, <= 0.50 B."""
+    if n < 50 or lo is None or hi is None or b is None or not np.isfinite(b) or b <= 0:
         return "insufficient"
-    w = hi - lo
+    w = (hi - lo) / b
     return "A" if w <= 0.30 else "B" if w <= 0.50 else "C"
 
 
@@ -337,7 +338,7 @@ def b_bootstrap_seq(t, m, age_days, mag_main, floor, nboot=NBOOT, rng=0):
         if nn >= 2 and np.isfinite(bb):
             bs.append(bb)
     lo, hi = (float(np.percentile(bs, 2.5)), float(np.percentile(bs, 97.5))) if len(bs) >= nboot // 2 else (None, None)
-    q = b_quality(n, lo, hi)
+    q = b_quality(n, lo, hi, b)
     return {"b": float(b) if q in ("A", "B") else None, "b_raw": float(b), "lo": lo, "hi": hi, "n": int(n), "q": q}
 
 

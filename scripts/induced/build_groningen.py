@@ -145,7 +145,7 @@ def b_maps(ev, geom, rng):
         s = reg[(reg.yr >= y0) & (reg.yr < y1)]
         floor_mc = float(sl.mc_maxc(s.mb.values, 0.1, 0.2))      # field-wide MAXC + 0.2 of the period
         df = il.b_map(nx, ny, s.x.values, s.y.values, s.mag.values, np.full(len(s), floor_mc), BPOS_FLOOR,
-                      MAP_RADIUS_M, nboot=200, rng=rng)
+                      MAP_RADIUS_M, nboot=NBOOT, rng=rng)
         df["lon"], df["lat"] = il.from_rd(df.x.values, df.y.values)
         out[lab] = {"floor_mc": floor_mc, "n_events": int(len(s)), "nodes": df}
     return out
@@ -438,7 +438,7 @@ def write_json(ev, pr, gj, monthly, ann, ph, corr, big, phases, moving, maps, ro
                 "atlas": {"b": r3(a["b_raw"]), "lo": r3(a["b_lo_raw"]), "hi": r3(a["b_hi_raw"]), "mc": r3(a["mc"]),
                           "n": a["n_b"], "q": a["quality"]},
                 "mc15": {"b": r3(f["b"]), "lo": r3(f["lo"]), "hi": r3(f["hi"]), "n": f["n"],
-                         "q": al.quality(f["n"], f["lo"], f["hi"])},
+                         "q": al.quality(f["n"], f["lo"], f["hi"], f["b"])},
                 "bpos": {"b": r3(q["bpos"]), "lo": r3(q["bpos_lo"]), "hi": r3(q["bpos_hi"]), "n": q["n_bpos"]}}
     common.jdump({"phases": [ph_b(p) for p in phases], "moving": {k: mv(v) for k, v in moving.items()},
                   "window": MOVING_WINDOW, "bpos_floor": BPOS_FLOOR, "ns_split_rd_y": NS_SPLIT_RD_Y},

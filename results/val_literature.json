@@ -37,8 +37,8 @@
     "beta": 0.6102917328890767,
     "b": 0.915437599333615,
     "ci95": [
-     0.8083437771655715,
-     1.0441958451513256
+     0.8087416828504623,
+     1.0419221811000616
     ],
     "corner_mag": 7.945442652941365,
     "n": 259,
@@ -58,8 +58,8 @@
     "beta": 0.659683417480004,
     "b": 0.989525126220006,
     "ci95": [
-     0.8650679658200956,
-     1.1327360677128593
+     0.8734626540387999,
+     1.1197315299082828
     ],
     "corner_mag": 7.989422586343334,
     "n": 291,
@@ -79,8 +79,8 @@
     "beta": 0.6102917328890767,
     "b": 0.915437599333615,
     "ci95": [
-     0.8083437771655715,
-     1.0441958451513256
+     0.8087416828504623,
+     1.0419221811000616
     ],
     "corner_mag": 7.945442652941365,
     "n": 259,
@@ -90,11 +90,11 @@
    "published_b_se": 0.06,
    "published_n": 280,
    "verdict": "match (approximate region)",
-   "z": -0.700977257097291,
+   "z": -0.7049696452923638,
    "verdict_all_events": "match (approximate region)",
-   "z_all_events": 0.15979513066617373,
+   "z_all_events": 0.16720067381399034,
    "verdict_magerr010": "match (approximate region)",
-   "z_magerr010": -0.700977257097291
+   "z_magerr010": -0.7049696452923638
   },
   {
    "id": "kj2013_fe05_mexico_guatemala",
@@ -133,8 +133,8 @@
     "beta": 0.5296823789263924,
     "b": 0.7945235683895886,
     "ci95": [
-     0.6391760806529047,
-     0.9456212798459236
+     0.6490757702250031,
+     0.9631997399727987
     ],
     "corner_mag": 7.905628331207475,
     "n": 121,
@@ -154,8 +154,8 @@
     "beta": 0.5457804697737907,
     "b": 0.818670704660686,
     "ci95": [
-     0.6601566522731241,
-     1.0211327690903098
+     0.6630599470100811,
+     0.9788186089009694
     ],
     "corner_mag": 7.920860924303919,
     "n": 125,
@@ -175,8 +175,8 @@
     "beta": 0.5296823789263924,
     "b": 0.7945235683895886,
     "ci95": [
-     0.6391760806529047,
-     0.9456212798459236
+     0.6490757702250031,
+     0.9631997399727987
     ],
     "corner_mag": 7.905628331207475,
     "n": 121,
@@ -186,11 +186,11 @@
    "published_b_se": 0.09,
    "published_n": 164,
    "verdict": "match (approximate region)",
-   "z": -0.8847866170625663,
+   "z": -0.875288291072691,
    "verdict_all_events": "match (approximate region)",
-   "z_all_events": -0.6316224702884566,
+   "z_all_events": -0.673353312630491,
    "verdict_magerr010": "match (approximate region)",
-   "z_magerr010": -0.8847866170625663
+   "z_magerr010": -0.875288291072691
   },
   {
    "id": "kj2013_fe06_central_america",
@@ -229,8 +229,8 @@
     "beta": 0.6836665480843693,
     "b": 1.0254998221265539,
     "ci95": [
-     0.8677005508342572,
-     1.2441141551782113
+     0.8552099537716691,
+     1.2405570105496726
     ],
     "corner_mag": 7.781423171040811,
     "n": 121,
@@ -250,8 +250,8 @@
     "beta": 0.6921399414893148,
     "b": 1.038209912233972,
     "ci95": [
-     0.8802748474112947,
-     1.2833776034216362
+     0.8624490082432122,
+     1.2559652302171087
     ],
     "corner_mag": 7.789272486971846,
     "n": 123,
@@ -271,8 +271,8 @@
     "beta": 0.6836665480843693,
     "b": 1.0254998221265539,
     "ci95": [
-     0.8677005508342572,
-     1.2441141551782113
+     0.8552099537716691,
+     1.2405570105496726
     ],
     "corner_mag": 7.781423171040811,
     "n": 121,
@@ -282,11 +282,11 @@
    "published_b_se": 0.09,
    "published_n": 161,
    "verdict": "match (approximate region)",
-   "z": 0.04178951803761446,
+   "z": 0.04126530426925778,
    "verdict_all_events": "match (approximate region)",
-   "z_all_events": 0.13325499155582735,
+   "z_all_events": 0.13506433416149508,
    "verdict_magerr010": "match (approximate region)",
-   "z_magerr010": 0.04178951803761446
+   "z_magerr010": 0.04126530426925778
   },
   {
    "id": "kj2013_fe08_andean_south_america",
@@ -325,8 +325,8 @@
     "beta": 0.6019691938655469,
     "b": 0.9029537907983204,
     "ci95": [
-     0.8035105375518545,
-     1.0138397809099648
+     0.8012213310025242,
+     1.010440675138565
     ],
     "corner_mag": 8.814995963034205,
     "n": 307,
@@ -346,8 +346,8 @@
     "beta": 0.6463792186755413,
     "b": 0.9695688280133119,
     "ci95": [
-     0.8657937169561444,
-     1.072698018338905
+     0.8658829898035755,
+     1.080156834348793
     ],
     "corner_mag": 8.8621704168717,
     "n": 357,
@@ -367,8 +367,8 @@
     "beta": 0.6019691938655469,
     "b": 0.9029537907983204,
     "ci95": [
-     0.8035105375518545,
-     1.0138397809099648
+     0.8012213310025242,
+     1.010440675138565
     ],
     "corner_mag": 8.814995963034205,
     "n": 307,
@@ -378,11 +378,11 @@
    "published_b_se": 0.06,
    "published_n": 286,
    "verdict": "match (approximate region)",
-   "z": 0.5957611394202154,
+   "z": 0.5971593129162748,
    "verdict_all_events": "match (approximate region)",
-   "z_all_events": 1.4336895259378564,
+   "z_all_events": 1.4115391937133104,
    "verdict_magerr010": "match (approximate region)",
-   "z_magerr010": 0.5957611394202154
+   "z_magerr010": 0.5971593129162748
   },
   {
    "id": "kj2013_fe12_kermadec_tonga_samoa",
@@ -421,8 +421,8 @@
     "beta": 0.8077785402663588,
     "b": 1.2116678103995382,
     "ci95": [
-     1.1076214268788265,
-     1.3143692272257232
+     1.0963983498648766,
+     1.3266278175152892
     ],
     "corner_mag": 8.261353566801432,
     "n": 464,
@@ -442,8 +442,8 @@
     "beta": 0.8392644621608241,
     "b": 1.258896693241236,
     "ci95": [
-     1.1561077255511811,
-     1.3892855401938065
+     1.1487093375516981,
+     1.3803210468781006
     ],
     "corner_mag": 8.305324314998602,
     "n": 500,
@@ -463,8 +463,8 @@
     "beta": 0.8077785402663588,
     "b": 1.2116678103995382,
     "ci95": [
-     1.1076214268788265,
-     1.3143692272257232
+     1.0963983498648766,
+     1.3266278175152892
     ],
     "corner_mag": 8.261353566801432,
     "n": 464,
@@ -474,11 +474,11 @@
    "published_b_se": 0.06,
    "published_n": 439,
    "verdict": "match (approximate region)",
-   "z": 0.14605664088686227,
+   "z": 0.1389670337208669,
    "verdict_all_events": "match (approximate region)",
-   "z_all_events": 0.6970944310849644,
+   "z_all_events": 0.6994189670363371,
    "verdict_magerr010": "match (approximate region)",
-   "z_magerr010": 0.14605664088686227
+   "z_magerr010": 0.1389670337208669
   },
   {
    "id": "kj2013_fe18_guam_japan",
@@ -517,8 +517,8 @@
     "beta": 0.8395908212268463,
     "b": 1.2593862318402693,
     "ci95": [
-     0.9984010933987628,
-     1.6312390487397117
+     0.973482275779783,
+     1.5959765469261697
     ],
     "corner_mag": 7.99183599969026,
     "n": 88,
@@ -538,8 +538,8 @@
     "beta": 0.8568367048398619,
     "b": 1.2852550572597927,
     "ci95": [
-     0.9929855899115032,
-     1.6508739176587959
+     0.9993115554199651,
+     1.6576133744953079
     ],
     "corner_mag": 8.010931678805061,
     "n": 94,
@@ -559,8 +559,8 @@
     "beta": 0.8395908212268463,
     "b": 1.2593862318402693,
     "ci95": [
-     0.9984010933987628,
-     1.6312390487397117
+     0.973482275779783,
+     1.5959765469261697
     ],
     "corner_mag": 7.99183599969026,
     "n": 88,
@@ -570,11 +570,11 @@
    "published_b_se": 0.15000000000000002,
    "published_n": 88,
    "verdict": "match (approximate region)",
-   "z": -0.13892075061570774,
+   "z": -0.14014540350210952,
    "verdict_all_events": "match (approximate region)",
-   "z_all_events": -0.02108000482621636,
+   "z_all_events": -0.021072640967229554,
    "verdict_magerr010": "match (approximate region)",
-   "z_magerr010": -0.13892075061570774
+   "z_magerr010": -0.14014540350210952
   },
   {
    "id": "kj2013_fe19_japan_kamchatka",
@@ -613,8 +613,8 @@
     "beta": 0.6617120046387089,
     "b": 0.9925680069580634,
     "ci95": [
-     0.898167426264557,
-     1.1155305859159912
+     0.8882747694892112,
+     1.1112836670150852
     ],
     "corner_mag": 8.397025898473856,
     "n": 362,
@@ -634,8 +634,8 @@
     "beta": 0.7148422613158809,
     "b": 1.0722633919738214,
     "ci95": [
-     0.9689850032584628,
-     1.201092543465925
+     0.9623602416827444,
+     1.1939984568794797
     ],
     "corner_mag": 8.44226829007485,
     "n": 435,
@@ -655,8 +655,8 @@
     "beta": 0.6617120046387089,
     "b": 0.9925680069580634,
     "ci95": [
-     0.898167426264557,
-     1.1155305859159912
+     0.8882747694892112,
+     1.1112836670150852
     ],
     "corner_mag": 8.397025898473856,
     "n": 362,
@@ -666,11 +666,11 @@
    "published_b_se": 0.06,
    "published_n": 425,
    "verdict": "match (approximate region)",
-   "z": 0.7658383988385671,
+   "z": 0.7567217353121846,
    "verdict_all_events": "match (approximate region)",
-   "z_all_events": 1.6876482224086633,
+   "z_all_events": 1.6893326828249537,
    "verdict_magerr010": "match (approximate region)",
-   "z_magerr010": 0.7658383988385671
+   "z_magerr010": 0.7567217353121846
   },
   {
    "id": "kj2013_tohoku_box",
@@ -709,8 +709,8 @@
     "beta": 0.6818693894121549,
     "b": 1.0228040841182324,
     "ci95": [
-     0.7993394322142161,
-     1.2600593743501927
+     0.7861883307581389,
+     1.2636512253083454
     ],
     "corner_mag": 7.52101294068378,
     "n": 93,
@@ -730,8 +730,8 @@
     "beta": 0.7210154112993851,
     "b": 1.0815231169490775,
     "ci95": [
-     0.8598195723159474,
-     1.3330896443903129
+     0.8534234304723043,
+     1.3293731205428236
     ],
     "corner_mag": 7.550380020064741,
     "n": 105,
@@ -751,8 +751,8 @@
     "beta": 0.6818693894121549,
     "b": 1.0228040841182324,
     "ci95": [
-     0.7993394322142161,
-     1.2600593743501927
+     0.7861883307581389,
+     1.2636512253083454
     ],
     "corner_mag": 7.52101294068378,
     "n": 93,
@@ -762,11 +762,11 @@
    "published_b_se": 0.10500000000000001,
    "published_n": 109,
    "verdict": "match",
-   "z": 0.3984976060971301,
+   "z": 0.39054224047969327,
    "verdict_all_events": "match",
-   "z_all_events": 0.759500868070296,
+   "z_all_events": 0.7570574105250777,
    "verdict_magerr010": "match",
-   "z_magerr010": 0.3984976060971301
+   "z_magerr010": 0.39054224047969327
   },
   {
    "id": "kj2013_fe24_sunda_arc",
@@ -805,8 +805,8 @@
     "beta": 0.678948646934601,
     "b": 1.0184229704019014,
     "ci95": [
-     0.8623526166603287,
-     1.2109987074613158
+     0.8508263510129486,
+     1.2193131371385348
     ],
     "corner_mag": 8.434703810593,
     "n": 124,
@@ -826,8 +826,8 @@
     "beta": 0.7183122547971178,
     "b": 1.0774683821956768,
     "ci95": [
-     0.9007186274449497,
-     1.2531757588938996
+     0.8987619137733551,
+     1.2577617066690434
     ],
     "corner_mag": 8.47577382163129,
     "n": 141,
@@ -847,8 +847,8 @@
     "beta": 0.678948646934601,
     "b": 1.0184229704019014,
     "ci95": [
-     0.8623526166603287,
-     1.2109987074613158
+     0.8508263510129486,
+     1.2193131371385348
     ],
     "corner_mag": 8.434703810593,
     "n": 124,
@@ -858,11 +858,11 @@
    "published_b_se": 0.06,
    "published_n": 278,
    "verdict": "match (approximate region)",
-   "z": 0.40473862954387535,
+   "z": 0.3893798639658386,
    "verdict_all_events": "match (approximate region)",
-   "z_all_events": 0.9479582373802122,
+   "z_all_events": 0.9359039100963786,
    "verdict_magerr010": "match (approximate region)",
-   "z_magerr010": 0.40473862954387535
+   "z_magerr010": 0.3893798639658386
   },
   {
    "id": "kj2013_fe46_andaman_sumatra",
@@ -901,8 +901,8 @@
     "beta": 0.6138247096546728,
     "b": 0.9207370644820092,
     "ci95": [
-     0.7984125471546226,
-     1.0799567826308012
+     0.7885502552145592,
+     1.0785781795381961
     ],
     "corner_mag": 9.510724714903779,
     "n": 195,
@@ -922,8 +922,8 @@
     "beta": 0.6731141938431915,
     "b": 1.0096712907647873,
     "ci95": [
-     0.8676018128320311,
-     1.1513633207078697
+     0.8696049675189241,
+     1.1623071182239006
     ],
     "corner_mag": 9.565026420060779,
     "n": 240,
@@ -943,8 +943,8 @@
     "beta": 0.6138247096546728,
     "b": 0.9207370644820092,
     "ci95": [
-     0.7984125471546226,
-     1.0799567826308012
+     0.7885502552145592,
+     1.0785781795381961
     ],
     "corner_mag": 9.510724714903779,
     "n": 195,
@@ -954,11 +954,11 @@
    "published_b_se": 0.10500000000000001,
    "published_n": 143,
    "verdict": "match (approximate region)",
-   "z": -1.1340152736129514,
+   "z": -1.123118305202943,
    "verdict_all_events": "match (approximate region)",
-   "z_all_events": -0.4338333493301704,
+   "z_all_events": -0.42942828566669755,
    "verdict_magerr010": "match (approximate region)",
-   "z_magerr010": -1.1340152736129514
+   "z_magerr010": -1.123118305202943
   },
   {
    "id": "kj2013_all_18_subduction_zones",
@@ -992,8 +992,8 @@
     "beta": 0.6513572186080717,
     "b": 0.9770358279121076,
     "ci95": [
-     0.9377378268301408,
-     1.0127541739984587
+     0.9380131622107255,
+     1.020172235980336
     ],
     "corner_mag": 8.469757018952905,
     "n": 2460,
@@ -1013,8 +1013,8 @@
     "beta": 0.6891639560845709,
     "b": 1.0337459341268564,
     "ci95": [
-     0.9959570075563586,
-     1.0734121623755024
+     0.9920719114603708,
+     1.070702473156396
     ],
     "corner_mag": 8.517421046497965,
     "n": 2783,
@@ -1034,8 +1034,8 @@
     "beta": 0.6513572186080717,
     "b": 0.9770358279121076,
     "ci95": [
-     0.9377378268301408,
-     1.0127541739984587
+     0.9380131622107255,
+     1.020172235980336
     ],
     "corner_mag": 8.469757018952905,
     "n": 2460,
@@ -1045,11 +1045,11 @@
    "published_b_se": 0.015,
    "published_n": 4217,
    "verdict": "match (approximate region)",
-   "z": 0.08372732937198038,
-   "verdict_all_events": "mismatch (approximate region)",
-   "z_all_events": 2.368062352327434,
+   "z": 0.07898894278427349,
+   "verdict_all_events": "differs (approximate region)",
+   "z_all_events": 2.345420631403004,
    "verdict_magerr010": "match (approximate region)",
-   "z_magerr010": 0.08372732937198038
+   "z_magerr010": 0.07898894278427349
   },
   {
    "id": "kagan2010_global_mt56",
@@ -1082,8 +1082,8 @@
     "beta": 0.6901347976258984,
     "b": 1.0352021964388476,
     "ci95": [
-     1.0123819594411794,
-     1.0615720292349182
+     1.010098611227406,
+     1.058406470256439
     ],
     "corner_mag": 9.322696726643779,
     "n": 6522,
@@ -1103,8 +1103,8 @@
     "beta": 0.7248041220297468,
     "b": 1.08720618304462,
     "ci95": [
-     1.0633144893775088,
-     1.1104191623682764
+     1.0618736630922951,
+     1.111750422541724
     ],
     "corner_mag": 9.374608643750587,
     "n": 7358,
@@ -1124,22 +1124,22 @@
     "beta": 0.6901347976258984,
     "b": 1.0352021964388476,
     "ci95": [
-     1.0123819594411794,
-     1.0615720292349182
+     1.010098611227406,
+     1.058406470256439
     ],
     "corner_mag": 9.322696726643779,
     "n": 6522,
     "thr": 5.6
    },
    "published_b": 1.0159500000000001,
-   "published_b_se": 0.0,
+   "published_b_se": null,
    "published_n": 7369,
-   "verdict": "match",
-   "z": 1.534224496056479,
-   "verdict_all_events": "mismatch",
-   "z_all_events": 5.929862576259831,
-   "verdict_magerr010": "match",
-   "z_magerr010": 1.534224496056479
+   "verdict": "consistent, uninformative (no published uncertainty)",
+   "z": null,
+   "verdict_all_events": "differs",
+   "z_all_events": null,
+   "verdict_magerr010": "consistent, uninformative (no published uncertainty)",
+   "z_magerr010": null
   },
   {
    "id": "kagan2010_trenches_mt56",
@@ -1173,8 +1173,8 @@
     "beta": 0.6614588723889975,
     "b": 0.9921883085834962,
     "ci95": [
-     0.9547506224595154,
-     1.0290184862193255
+     0.9578884934589141,
+     1.027520708011168
     ],
     "corner_mag": 8.301752164354026,
     "n": 3029,
@@ -1194,8 +1194,8 @@
     "beta": 0.702278510699385,
     "b": 1.0534177660490776,
     "ci95": [
-     1.0130041173853719,
-     1.093806760350649
+     1.0173800767678558,
+     1.092446532180482
     ],
     "corner_mag": 8.346165762506551,
     "n": 3513,
@@ -1215,22 +1215,22 @@
     "beta": 0.6614588723889975,
     "b": 0.9921883085834962,
     "ci95": [
-     0.9547506224595154,
-     1.0290184862193255
+     0.9578884934589141,
+     1.027520708011168
     ],
     "corner_mag": 8.301752164354026,
     "n": 3029,
     "thr": 5.6
    },
    "published_b": 0.9694499999999999,
-   "published_b_se": 0.0,
+   "published_b_se": null,
    "published_n": 4805,
-   "verdict": "match (approximate region)",
-   "z": 1.2001714487920954,
-   "verdict_all_events": "mismatch (approximate region)",
-   "z_all_events": 4.073550453712634,
-   "verdict_magerr010": "match (approximate region)",
-   "z_magerr010": 1.2001714487920954
+   "verdict": "consistent, uninformative (no published uncertainty) (approximate region)",
+   "z": null,
+   "verdict_all_events": "differs (approximate region)",
+   "z_all_events": null,
+   "verdict_magerr010": "consistent, uninformative (no published uncertainty) (approximate region)",
+   "z_magerr010": null
   },
   {
    "id": "kagan2010_global_declustered_mt56",
@@ -1263,8 +1263,8 @@
     "beta": 0.6020682383678435,
     "b": 0.9031023575517653,
     "ci95": [
-     0.8736720405628009,
-     0.9262790545144675
+     0.8715948489726157,
+     0.9288312706095241
     ],
     "corner_mag": 9.208176290186504,
     "n": 3700,
@@ -1284,8 +1284,8 @@
     "beta": 0.6223525355877927,
     "b": 0.9335288033816891,
     "ci95": [
-     0.901561360491679,
-     0.9619715022648254
+     0.9008814839971294,
+     0.9606687544206074
     ],
     "corner_mag": 9.239980369880056,
     "n": 3933,
@@ -1305,22 +1305,22 @@
     "beta": 0.6020682383678435,
     "b": 0.9031023575517653,
     "ci95": [
-     0.8736720405628009,
-     0.9262790545144675
+     0.8715948489726157,
+     0.9288312706095241
     ],
     "corner_mag": 9.208176290186504,
     "n": 3700,
     "thr": 5.6
    },
    "published_b": 0.972,
-   "published_b_se": 0.0,
+   "published_b_se": null,
    "published_n": 5841,
-   "verdict": "mismatch (approximate region)",
-   "z": -5.133892576476946,
-   "verdict_all_events": "mismatch (approximate region)",
-   "z_all_events": -2.4963869694279652,
-   "verdict_magerr010": "mismatch (approximate region)",
-   "z_magerr010": -5.133892576476946
+   "verdict": "differs (approximate region)",
+   "z": null,
+   "verdict_all_events": "differs (approximate region)",
+   "z_all_events": null,
+   "verdict_magerr010": "differs (approximate region)",
+   "z_magerr010": null
   },
   {
    "id": "birdkagan2004_pb2002_class_range",
@@ -1342,14 +1342,14 @@
     "SUB": {
      "beta": 0.6609535343999386,
      "ci95": [
-      0.6285443356657511,
-      0.6917851089338704
+      0.6284831773855223,
+      0.6970387777808084
      ],
      "n": 1763,
      "vs_table5": [
       {
        "label": "SUB",
-       "z": 0.8054513445690662
+       "z": 0.7796225700624211
       }
      ],
      "match": true
@@ -1357,14 +1357,14 @@
     "CCB": {
      "beta": 0.643528205907201,
      "ci95": [
-      0.5598078974718224,
-      0.728413706160663
+      0.5585979673963567,
+      0.7224396008830009
      ],
      "n": 251,
      "vs_table5": [
       {
        "label": "CCB",
-       "z": 0.35258043872198275
+       "z": 0.35673309462203445
       }
      ],
      "match": true
@@ -1372,14 +1372,14 @@
     "OCB": {
      "beta": 0.6349650508325253,
      "ci95": [
-      0.5364309620252747,
-      0.7441467197498922
+      0.537789581247175,
+      0.7572627222438452
      ],
      "n": 151,
      "vs_table5": [
       {
        "label": "OCB",
-       "z": 1.236423026344571
+       "z": 1.2093044753118045
       }
      ],
      "match": true
@@ -1387,14 +1387,14 @@
     "CTF": {
      "beta": 0.6903398656265101,
      "ci95": [
-      0.6147686860404884,
-      0.784372970058176
+      0.6099894446917609,
+      0.7847660924832615
      ],
      "n": 257,
      "vs_table5": [
       {
        "label": "CTF",
-       "z": 0.5380840067938886
+       "z": 0.5326194847924
       }
      ],
      "match": true
@@ -1402,22 +1402,22 @@
     "OTF": {
      "beta": 0.7906210050251236,
      "ci95": [
-      0.7346324115983253,
-      0.8598836563873192
+      0.731723202356758,
+      0.8574991612627393
      ],
      "n": 578,
      "vs_table5": [
       {
        "label": "OTF slow",
-       "z": 2.9057640480699085
+       "z": 2.901140091380996
       },
       {
        "label": "OTF medium",
-       "z": 2.177450700812117
+       "z": 2.1752165257874028
       },
       {
        "label": "OTF fast",
-       "z": 0.9386879993661477
+       "z": 0.9377248577972476
       }
      ],
      "match": true
@@ -1425,14 +1425,14 @@
     "CRB": {
      "beta": 0.6945355706955796,
      "ci95": [
-      0.5598393951996649,
-      0.7798604962162838
+      0.5732104485524351,
+      0.7802964024615786
      ],
      "n": 194,
      "vs_table5": [
       {
        "label": "CRB",
-       "z": 0.5610926540606825
+       "z": 0.5778223667281921
       }
      ],
      "match": true
@@ -1440,18 +1440,18 @@
     "OSR": {
      "beta": 0.9760776737646056,
      "ci95": [
-      0.8401991924032312,
-      1.116208439387067
+      0.8379635532633064,
+      1.1188524795106354
      ],
      "n": 221,
      "vs_table5": [
       {
        "label": "OSR normal faulting",
-       "z": 0.7102907133634531
+       "z": 0.7004240542877228
       },
       {
        "label": "OSR other",
-       "z": 1.3970885808072395
+       "z": 1.3872943680014873
       }
      ],
      "match": true
@@ -1482,105 +1482,141 @@
    "mbs": 5.8,
    "gft": 5.2,
    "n": 29683,
-   "verdict": "match"
+   "maxc02_ci95": [
+    5.4,
+    5.4
+   ],
+   "verdict": "consistent, uninformative (no published uncertainty)"
   }
  ],
  "table_rows": [
   {
    "test": "Literature b: kj2013_fe01_alaska_aleutian (box [50, 65, 163, -140], 1977-2010, <= 70 km, m >= 5.8)",
-   "ours": "TGR 0.915 [0.808, 1.044] n=259; Aki 0.937 [0.842, 1.048] n=290 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.990 [0.865, 1.133] n=291",
+   "ours": "TGR 0.915 [0.809, 1.042] n=259; Aki 0.937 [0.842, 1.048] n=290 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.990 [0.873, 1.120] n=291",
    "published": "beta 0.65 \u00b10.04 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-   "verdict": "match (approximate region); all events: match [needs human check]"
+   "verdict": "match (approximate region) (z -0.70); all events: match [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": -0.7049696452923638
   },
   {
    "test": "Literature b: kj2013_fe05_mexico_guatemala (box [13, 22, -106, -90], 1977-2010, <= 70 km, m >= 5.8)",
-   "ours": "TGR 0.795 [0.639, 0.946] n=121; Aki 0.857 [0.737, 1.018] n=138 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.819 [0.660, 1.021] n=125",
+   "ours": "TGR 0.795 [0.649, 0.963] n=121; Aki 0.857 [0.737, 1.018] n=138 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.819 [0.663, 0.979] n=125",
    "published": "beta 0.6 \u00b10.06 (b 0.900; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-   "verdict": "match (approximate region); all events: match [needs human check]"
+   "verdict": "match (approximate region) (z -0.88); all events: match [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": -0.875288291072691
   },
   {
    "test": "Literature b: kj2013_fe06_central_america (box [7, 15, -92, -82], 1977-2010, <= 70 km, m >= 5.8)",
-   "ours": "TGR 1.025 [0.868, 1.244] n=121; Aki 1.064 [0.913, 1.246] n=139 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.038 [0.880, 1.283] n=123",
+   "ours": "TGR 1.025 [0.855, 1.241] n=121; Aki 1.064 [0.913, 1.246] n=139 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.038 [0.862, 1.256] n=123",
    "published": "beta 0.68 \u00b10.06 (b 1.020; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-   "verdict": "match (approximate region); all events: match [needs human check]"
+   "verdict": "match (approximate region) (z +0.04); all events: match [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": 0.04126530426925778
   },
   {
    "test": "Literature b: kj2013_fe08_andean_south_america (box [-56, 13, -82, -63], 1977-2010, <= 70 km, m >= 5.8)",
-   "ours": "TGR 0.903 [0.804, 1.014] n=307; Aki 0.903 [0.816, 1.014] n=339 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.970 [0.866, 1.073] n=357",
+   "ours": "TGR 0.903 [0.801, 1.010] n=307; Aki 0.903 [0.816, 1.014] n=339 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.970 [0.866, 1.080] n=357",
    "published": "beta 0.57 \u00b10.04 (b 0.855; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-   "verdict": "match (approximate region); all events: match [needs human check]"
+   "verdict": "match (approximate region) (z +0.60); all events: match [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": 0.5971593129162748
   },
   {
    "test": "Literature b: kj2013_fe12_kermadec_tonga_samoa (box [-38, -13, 175, -170], 1977-2010, <= 70 km, m >= 5.8)",
-   "ours": "TGR 1.212 [1.108, 1.314] n=464; Aki 1.184 [1.088, 1.291] n=521 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.259 [1.156, 1.389] n=500",
+   "ours": "TGR 1.212 [1.096, 1.327] n=464; Aki 1.184 [1.088, 1.291] n=521 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.259 [1.149, 1.380] n=500",
    "published": "beta 0.8 \u00b10.04 (b 1.200; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-   "verdict": "match (approximate region); all events: match [needs human check]"
+   "verdict": "match (approximate region) (z +0.14); all events: match [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": 0.1389670337208669
   },
   {
    "test": "Literature b: kj2013_fe18_guam_japan (box [12, 34, 138, 148], 1977-2010, <= 70 km, m >= 5.8)",
-   "ours": "TGR 1.259 [0.998, 1.631] n=88; Aki 1.290 [1.055, 1.631] n=104 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.285 [0.993, 1.651] n=94",
+   "ours": "TGR 1.259 [0.973, 1.596] n=88; Aki 1.290 [1.055, 1.631] n=104 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.285 [0.999, 1.658] n=94",
    "published": "beta 0.86 \u00b10.10 (b 1.290; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-   "verdict": "match (approximate region); all events: match [needs human check]"
+   "verdict": "match (approximate region) (z -0.14); all events: match [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": -0.14014540350210952
   },
   {
    "test": "Literature b: kj2013_fe19_japan_kamchatka (box [35, 60, 140, 165], 1977-2010, <= 70 km, m >= 5.8)",
-   "ours": "TGR 0.993 [0.898, 1.116] n=362; Aki 0.983 [0.894, 1.084] n=399 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.072 [0.969, 1.201] n=435",
+   "ours": "TGR 0.993 [0.888, 1.111] n=362; Aki 0.983 [0.894, 1.084] n=399 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.072 [0.962, 1.194] n=435",
    "published": "beta 0.62 \u00b10.04 (b 0.930; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-   "verdict": "match (approximate region); all events: match [needs human check]"
+   "verdict": "match (approximate region) (z +0.76); all events: match [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": 0.7567217353121846
   },
   {
    "test": "Literature b: kj2013_tohoku_box (box [35, 40, 140, 146], 1977-2010, <= 70 km, m >= 5.8)",
-   "ours": "TGR 1.023 [0.799, 1.260] n=93; Aki 1.055 [0.889, 1.287] n=104 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.082 [0.860, 1.333] n=105",
+   "ours": "TGR 1.023 [0.786, 1.264] n=93; Aki 1.055 [0.889, 1.287] n=104 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.082 [0.853, 1.329] n=105",
    "published": "beta 0.64 \u00b10.07 (b 0.960; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-   "verdict": "match; all events: match [needs human check]"
+   "verdict": "match (z +0.39); all events: match [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": 0.39054224047969327
   },
   {
    "test": "Literature b: kj2013_fe24_sunda_arc (box [-12, -5, 100, 125], 1977-2010, <= 70 km, m >= 5.8)",
-   "ours": "TGR 1.018 [0.862, 1.211] n=124; Aki 1.078 [0.917, 1.285] n=149 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.077 [0.901, 1.253] n=141",
+   "ours": "TGR 1.018 [0.851, 1.219] n=124; Aki 1.078 [0.917, 1.285] n=149 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.077 [0.899, 1.258] n=141",
    "published": "beta 0.65 \u00b10.04 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-   "verdict": "match (approximate region); all events: match [needs human check]"
+   "verdict": "match (approximate region) (z +0.39); all events: match [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": 0.3893798639658386
   },
   {
    "test": "Literature b: kj2013_fe46_andaman_sumatra (box [-6, 15, 90, 102], 1977-2010, <= 70 km, m >= 5.8)",
-   "ours": "TGR 0.921 [0.798, 1.080] n=195; Aki 0.918 [0.802, 1.073] n=215 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.010 [0.868, 1.151] n=240",
+   "ours": "TGR 0.921 [0.789, 1.079] n=195; Aki 0.918 [0.802, 1.073] n=215 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.010 [0.870, 1.162] n=240",
    "published": "beta 0.71 \u00b10.07 (b 1.065; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-   "verdict": "match (approximate region); all events: match [needs human check]"
+   "verdict": "match (approximate region) (z -1.12); all events: match [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": -1.123118305202943
   },
   {
    "test": "Literature b: kj2013_all_18_subduction_zones (PB2002 SUB, 1977-2010, <= 70 km, m >= 5.8)",
-   "ours": "TGR 0.977 [0.938, 1.013] n=2460; Aki 0.978 [0.941, 1.016] n=2747 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.034 [0.996, 1.073] n=2783",
+   "ours": "TGR 0.977 [0.938, 1.020] n=2460; Aki 0.978 [0.941, 1.016] n=2747 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.034 [0.992, 1.071] n=2783",
    "published": "beta 0.65 \u00b10.01 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
-   "verdict": "match (approximate region); all events: mismatch [needs human check]"
+   "verdict": "match (approximate region) (z +0.08); all events: differs [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": 0.07898894278427349
   },
   {
    "test": "Literature b: kagan2010_global_mt56 (global, 1982-2008, <= 70 km, m >= 5.6)",
-   "ours": "TGR 1.035 [1.012, 1.062] n=6522; Aki 1.006 [0.983, 1.028] n=7138 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.087 [1.063, 1.110] n=7358",
+   "ours": "TGR 1.035 [1.010, 1.058] n=6522; Aki 1.006 [0.983, 1.028] n=7138 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.087 [1.062, 1.112] n=7358",
    "published": "beta 0.6773 (b 1.016; Kagan, Y. Y. 2010, Table 2)",
-   "verdict": "match; all events: mismatch [needs human check]"
+   "verdict": "consistent, uninformative (no published uncertainty); all events: differs [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": null
   },
   {
    "test": "Literature b: kagan2010_trenches_mt56 (PB2002 SUB, 1982-2008, <= 70 km, m >= 5.6)",
-   "ours": "TGR 0.992 [0.955, 1.029] n=3029; Aki 0.975 [0.943, 1.007] n=3321 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.053 [1.013, 1.094] n=3513",
+   "ours": "TGR 0.992 [0.958, 1.028] n=3029; Aki 0.975 [0.943, 1.007] n=3321 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.053 [1.017, 1.092] n=3513",
    "published": "beta 0.6463 (b 0.969; Kagan, Y. Y. 2010, Table 2)",
-   "verdict": "match (approximate region); all events: mismatch [needs human check]"
+   "verdict": "consistent, uninformative (no published uncertainty) (approximate region); all events: differs [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": null
   },
   {
    "test": "Literature b: kagan2010_global_declustered_mt56 (global, 1982-2008, <= 70 km, m >= 5.6, declustered)",
-   "ours": "TGR 0.903 [0.874, 0.926] n=3700; Aki 0.879 [0.854, 0.906] n=3992 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.934 [0.902, 0.962] n=3933",
+   "ours": "TGR 0.903 [0.872, 0.929] n=3700; Aki 0.879 [0.854, 0.906] n=3992 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.934 [0.901, 0.961] n=3933",
    "published": "beta 0.648 (b 0.972; Kagan, Y. Y. 2010, Table 2)",
-   "verdict": "mismatch (approximate region); all events: mismatch [needs human check]"
+   "verdict": "differs (approximate region); all events: differs [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": null
   },
   {
    "test": "Literature beta by PB2002 class (1977-2002, <= 70 km, m >= 5.8, TGR)",
-   "ours": "beta SUB 0.66 (z +0.81), CCB 0.64 (z +0.35), OCB 0.63 (z +1.24), CTF 0.69 (z +0.54), OTF 0.79 (z +0.94), CRB 0.69 (z +0.56), OSR 0.98 (z +0.71)",
+   "ours": "beta SUB 0.66 (z +0.78), CCB 0.64 (z +0.36), OCB 0.63 (z +1.21), CTF 0.69 (z +0.53), OTF 0.79 (z +0.94), CRB 0.69 (z +0.58), OSR 0.98 (z +0.70)",
    "published": "Table 5 per-class beta with 95 % ranges, 0.53 (OCB) to 0.92 (OSR normal faulting) (Bird & Kagan 2004)",
-   "verdict": "match (approximate); OSR and OTF against the closest of their subcatalogs [needs human check]"
+   "verdict": "match (approximate); OSR and OTF against the closest of their subcatalogs [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": null
   },
   {
    "test": "Literature Mc: GCMT 1980-2016, 0-50 km (Petruccelli 2018 thesis)",
-   "ours": "global MAXC+0.2 5.4, MBS 5.8, GFT 5.2",
+   "ours": "global MAXC+0.2 5.4 [5.4, 5.4], MBS 5.8, GFT 5.2",
    "published": "most local Mc 5.4-5.5; 5.1-5.3 on ridges and Himalaya",
-   "verdict": "match (global vs local map) [needs human check]"
+   "verdict": "consistent, uninformative (no published uncertainty) (global vs local map) [needs human check]",
+   "data": "same data (GCMT-based)",
+   "z": null
   }
  ],
  "magerr_diagnostic_global_1982_2008": {

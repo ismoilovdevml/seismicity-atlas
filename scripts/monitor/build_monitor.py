@@ -13,8 +13,8 @@ Mcat      : MAXC + 0.2 of the events after min(10 days, half the sequence age); 
 Mc(t)     : max(Mcat, Mm - 4.5 - 0.75 log10 t) (Helmstetter et al. 2006; Page et al. 2016).
 Omori     : Omori-Utsu MLE above Mc(t) (seislib.omori_fit_mct), b = sequence b-positive if >= 50 differences, else 1.
             95 % intervals from the observed information; quality A/B/C as in the atlas sequence fits.
-b         : Aki-Utsu with the per-event threshold Mc(t); 200 bootstrap resamples with Mcat re-estimated; shown only
-            for quality A (95 % interval <= 0.30) or B (<= 0.50) with >= 50 events. b-positive (van der Elst 2021).
+b         : Aki-Utsu with the per-event threshold Mc(t); 1000 bootstrap resamples with Mcat re-estimated; shown only
+            for quality A (95 % interval width / b <= 0.30) or B (<= 0.50) with >= 50 events. b-positive (van der Elst 2021).
 ZW2020    : optional, subduction-zone regimes only: count above Mc(t) divided by the direct-aftershock count of
             the Zhang & Werner (2020) Table 6 ETAS parameters over the same span, next to the same ratio for their
             own Case 3 sequences (descriptive; nothing is extrapolated past the cut-off).

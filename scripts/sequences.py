@@ -41,7 +41,8 @@ def synthetic_check(rng=3):
         rows.append((f["p"], f["sp"], f["c"], f["n"]))
     a = np.array(rows)
     return {"p_true": 1.05, "c_true": 0.05, "p_mean": float(a[:, 0].mean()), "p_sd_between": float(a[:, 0].std(ddof=1)),
-            "sp_mean": float(a[:, 1].mean()), "c_median": float(np.median(a[:, 2])), "n_mean": float(a[:, 3].mean())}
+            "sp_mean": float(a[:, 1].mean()), "c_median": float(np.median(a[:, 2])), "n_mean": float(a[:, 3].mean()),
+            "n_runs": int(len(a))}
 
 
 def main():

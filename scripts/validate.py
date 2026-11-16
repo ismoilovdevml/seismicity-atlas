@@ -22,6 +22,7 @@ from common import (B_MAGERR_MAX, MICHAEL_DEEP, MICHAEL_SHALLOW, RES, b_sample_l
                     jdump, load_work)
 
 RNG = 7
+NBOOT = al.NBOOT  # 1000 since v0.5 for every published interval (200 / 500 / 100 before)
 
 
 def synth_cell(n_above, b, mc, rng, width=0.1):
@@ -49,13 +50,15 @@ def synthetic_recovery():
                     m2 = synth_cell(n // 2, b, mc, rng)
                     m = np.r_[m1, m2]
                     floor = np.r_[np.full(m1.size, 5.7), np.full(m2.size, 4.0)]
-                r = al.cell_b(m, floor, nboot=200, rng=rng)
+                r = al.cell_b(m, floor, nboot=NBOOT, rng=rng)
                 rows.append({"case": case, "n": n, "b_true": b, "mc_true": mc, **{k: r.get(k, np.nan) for k in
                              ("b_raw", "b_lo_raw", "b_hi_raw", "mc", "quality", "n_b")}})
     df = pd.DataFrame(rows)
     df["err"] = df.b_raw - df.b_true
     df["covered"] = (df.b_lo_raw <= df.b_true) & (df.b_true <= df.b_hi_raw)
     df["shown"] = df.quality.isin(["A", "B"])
+    # the rule until 0.4.0 on the same intervals, for comparison: absolute width <= 0.50 and >= 50 events
+    df["shown_abs_rule"] = (df.n_b >= al.NMIN_B) & np.isfinite(df.b_lo_raw) & (df.b_hi_raw - df.b_lo_raw <= al.Q_B)
     out = []
     for (case, n), s in df.groupby(["case", "n"]):
         v = s[np.isfinite(s.b_raw)]
@@ -66,11 +69,32 @@ def synthetic_recovery():
                     "ci95_coverage": float(v.covered.mean()) if len(v) else None,
                     "shown_fraction": float(v.shown.mean()) if len(v) else 0.0,
                     "shown_max_abs_err": float(sh.err.abs().max()) if len(sh) else None,
-                    "mc_median_err": float((v.mc - v.mc_true).median()) if len(v) else None})
-    return out
+                    "mc_median_err": float((v.mc - v.mc_true).median()) if len(v) else None,
+                    # the quality mask against true b (v0.5): share shown and mean error of the shown cells, b < 1.05
+                    # and b >= 1.05 (true b is drawn from 0.7-1.4)
+                    "shown_fraction_b_lt_1.05": float(v[v.b_true < 1.05].shown.mean()) if (v.b_true < 1.05).any() else None,
+                    "shown_fraction_b_ge_1.05": float(v[v.b_true >= 1.05].shown.mean()) if (v.b_true >= 1.05).any() else None,
+                    "shown_mean_err": float(sh.err.mean()) if len(sh) else None,
+                    "median_n_b_b_lt_1.05": float(v[v.b_true < 1.05].n_b.median()) if (v.b_true < 1.05).any() else None,
+                    "median_n_b_b_ge_1.05": float(v[v.b_true >= 1.05].n_b.median()) if (v.b_true >= 1.05).any() else None,
+                    "abs_rule_shown_fraction_b_lt_1.05": float(v[v.b_true < 1.05].shown_abs_rule.mean())
+                    if (v.b_true < 1.05).any() else None,
+                    "abs_rule_shown_fraction_b_ge_1.05": float(v[v.b_true >= 1.05].shown_abs_rule.mean())
+                    if (v.b_true >= 1.05).any() else None,
+                    "abs_rule_shown_mean_err": float(v[v.shown_abs_rule].err.mean()) if v.shown_abs_rule.any() else None})
+    # pooled bias test per case on the cells with >= 100 events above Mc: z = mean error / (sd / sqrt(k))
+    bias = []
+    for case, s in df[df.n >= 100].groupby("case"):
+        v = s[np.isfinite(s.b_raw)]
+        se = float(v.err.std(ddof=1) / np.sqrt(len(v)))
+        bias.append({"case": case, "n_min": int(v.n.min()), "n_max": int(v.n.max()), "n_cells": len(v),
+                     "mean_err": float(v.err.mean()), "se": se, "z": float(v.err.mean() / se),
+                     "coverage": float(v.covered.mean())})
+    return out, bias
 
 
-def boot_mc(m, fn, nboot=200, rng=None):
+def boot_mc(m, fn, nboot=None, rng=None):
+    nboot = NBOOT if nboot is None else nboot
     rng = np.random.default_rng(rng)
     vals = [fn(rng.choice(m, m.size)) for _ in range(nboot)]
     vals = np.array([v for v in vals if np.isfinite(v)])
@@ -85,8 +109,8 @@ def global_vs_michael(g):
             m = sl.bin_mag(g[sel].mag.to_numpy())
             r = {"depth": ">=60 km" if deep else "<60 km", "period": f"{a}-{b}", "n": int(m.size), "michael_mc": mm}
             r["maxc02"] = boot_mc(m, lambda x: sl.mc_maxc(x, correction=0.2), rng=1)
-            r["gft"] = boot_mc(m, lambda x: sl.mc_gft(x)[0], nboot=100, rng=2)
-            r["mbs"] = boot_mc(m, sl.mc_mbs, nboot=100, rng=3)
+            r["gft"] = boot_mc(m, lambda x: sl.mc_gft(x)[0], rng=2)
+            r["mbs"] = boot_mc(m, sl.mc_mbs, rng=3)
             bb = sl.b_aki(m, mm)
             r["b_at_michael_mc"] = [float(bb[0]), float(bb[1]), int(bb[2])]
             rows.append(r)
@@ -102,7 +126,7 @@ def global_vs_michael(g):
         bv, sig, n = sl.b_varmc(s.mag.to_numpy(), thr)
         rng = np.random.default_rng(4)
         m_, t_ = sl.bin_mag(s.mag.to_numpy()), sl.bin_mag(thr)
-        bs = [sl.b_varmc(m_[i], t_[i])[0] for i in (rng.integers(0, len(s), len(s)) for _ in range(500))]
+        bs = [sl.b_varmc(m_[i], t_[i])[0] for i in (rng.integers(0, len(s), len(s)) for _ in range(NBOOT))]
         pooled[name] = {"b": float(bv), "sigma": float(sig), "ci95": [float(np.percentile(bs, 2.5)),
                         float(np.percentile(bs, 97.5))], "n": int(n), "published_b": pub}
     return rows, pooled
@@ -110,7 +134,7 @@ def global_vs_michael(g):
 
 def b_region(g, sel, fl_key="sh", fl=None, rng=None):
     s = g[sel]
-    r = al.cell_b(s.mag.to_numpy(), floor_of(s.year.to_numpy(), fl[fl_key]), nboot=500, rng=rng)
+    r = al.cell_b(s.mag.to_numpy(), floor_of(s.year.to_numpy(), fl[fl_key]), nboot=NBOOT, rng=rng)
     return {"n_sample": r["n_sample"], "n_b": r.get("n_b", 0), "mc": r.get("mc"), "b": r.get("b_raw"),
             "ci95": [r.get("b_lo_raw"), r.get("b_hi_raw")], "quality": r.get("quality")}
 
@@ -128,7 +152,7 @@ def main():
     fl = json.loads((RES / "atlas_globals.json").read_text())["floors"]
     out = {}
     print("synthetic ...", flush=True)
-    out["synthetic"] = synthetic_recovery()
+    out["synthetic"], out["synthetic_bias"] = synthetic_recovery()
     print("global ...", flush=True)
     out["michael_periods"], out["michael_pooled"] = global_vs_michael(g)
 

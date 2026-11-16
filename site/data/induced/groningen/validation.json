@@ -15,12 +15,12 @@
    "quantity": "field b, ML>=1.45, 1995-2021",
    "published": 0.96,
    "ours": 0.949,
-   "ours_lo": 0.861,
-   "ours_hi": 1.059,
+   "ours_lo": 0.857,
+   "ours_hi": 1.054,
    "n": 332,
    "ours_unbinned": 0.956,
    "verdict": "consistent",
-   "z": 0.213,
+   "z": 0.214,
    "note": "binned Aki-Utsu (atlas) and unbinned MLE (paper's choice) both shown"
   },
   {
@@ -32,8 +32,8 @@
    "published_n_all": 99,
    "ours_n_all": 89,
    "ours": 1.164,
-   "ours_lo": 0.751,
-   "ours_hi": 1.803,
+   "ours_lo": 0.78,
+   "ours_hi": 1.835,
    "ours_mc": 1.8,
    "n": 13,
    "b_at_fixed_mc": {
@@ -42,7 +42,7 @@
     "1.5": 1.186
    },
    "verdict": "not testable",
-   "z": 0.375,
+   "z": 0.374,
    "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
   },
   {
@@ -54,8 +54,8 @@
    "published_n_all": 887,
    "ours_n_all": 883,
    "ours": 0.919,
-   "ours_lo": 0.808,
-   "ours_hi": 1.013,
+   "ours_lo": 0.804,
+   "ours_hi": 1.007,
    "ours_mc": 1.4,
    "n": 281,
    "b_at_fixed_mc": {
@@ -64,7 +64,7 @@
     "1.5": 0.953
    },
    "verdict": "consistent",
-   "z": 0.189,
+   "z": 0.19,
    "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
   },
   {
@@ -76,8 +76,8 @@
    "published_n_all": 204,
    "ours_n_all": 200,
    "ours": 0.917,
-   "ours_lo": 0.756,
-   "ours_hi": 1.128,
+   "ours_lo": 0.743,
+   "ours_hi": 1.099,
    "ours_mc": 1.4,
    "n": 89,
    "b_at_fixed_mc": {
@@ -86,7 +86,7 @@
     "1.5": 0.959
    },
    "verdict": "consistent",
-   "z": 0.063,
+   "z": 0.064,
    "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
   },
   {
@@ -98,8 +98,8 @@
    "published_n_all": 210,
    "ours_n_all": 211,
    "ours": 0.915,
-   "ours_lo": 0.8,
-   "ours_hi": 1.308,
+   "ours_lo": 0.792,
+   "ours_hi": 1.351,
    "ours_mc": 1.1,
    "n": 127,
    "b_at_fixed_mc": {
@@ -108,7 +108,7 @@
     "1.5": 1.197
    },
    "verdict": "consistent",
-   "z": 0.981,
+   "z": 0.91,
    "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
   },
   {
@@ -120,8 +120,8 @@
    "published_n_all": 199,
    "ours_n_all": 200,
    "ours": 0.879,
-   "ours_lo": 0.684,
-   "ours_hi": 1.06,
+   "ours_lo": 0.692,
+   "ours_hi": 1.054,
    "ours_mc": 1.1,
    "n": 121,
    "b_at_fixed_mc": {
@@ -130,7 +130,7 @@
     "1.5": 0.778
    },
    "verdict": "consistent",
-   "z": 0.004,
+   "z": 0.005,
    "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
   },
   {
@@ -142,8 +142,8 @@
    "published_n_all": 227,
    "ours_n_all": 228,
    "ours": 0.815,
-   "ours_lo": 0.686,
-   "ours_hi": 0.985,
+   "ours_lo": 0.691,
+   "ours_hi": 0.974,
    "ours_mc": 0.8,
    "n": 115,
    "b_at_fixed_mc": {
@@ -152,7 +152,7 @@
     "1.5": 1.018
    },
    "verdict": "consistent",
-   "z": 1.18,
+   "z": 1.221,
    "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
   },
   {
@@ -254,8 +254,8 @@
    "quantity": "field b 2015-2022",
    "published": 0.86,
    "ours": 0.799,
-   "ours_lo": 0.714,
-   "ours_hi": 0.893,
+   "ours_lo": 0.718,
+   "ours_hi": 0.89,
    "ours_mc": 0.8,
    "n": 409,
    "ours_bpos": 0.878,
@@ -275,8 +275,8 @@
     0.8
    ],
    "ours": 0.785,
-   "ours_lo": 0.705,
-   "ours_hi": 0.909,
+   "ours_lo": 0.712,
+   "ours_hi": 0.912,
    "ours_mc": 0.8,
    "n": 482,
    "verdict": "consistent",

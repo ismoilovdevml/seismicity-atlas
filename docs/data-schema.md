@@ -40,6 +40,9 @@ General rules
 | `b_catalogue` | string | catalogue and years of every b, `"ISC-GEM Mw 1976-2021"` (unchanged; the site parses the two years) |
 | `b_sample` | string | which events enter b: `"Mw uncertainty <= 0.10 (direct Mw)"`, or `"all events"` when built with `ATLAS_B_MAGERR_MAX=all` |
 | `b_magerr_max` | number or `null` | the uncertainty limit (0.1), `null` = every event (v0.1 behaviour) |
+| `nboot` | number | bootstrap replicates per b interval: 1000 since 0.5.0 (200 before) |
+| `quality` | object | the gate as text; the site reads the last number of each rule. Since 0.5.0 `A` reads `"95 % CI width / b <= 0.30"` (before: `"95 % CI width <= 0.30"`) |
+| `quality_width` | string | since 0.5.0: `"relative: (hi - lo) / b, b = the point estimate of the cell (since 0.5.0)"` |
 
 The site does not show `b_sample` yet. Suggested later UI (not done, site code unchanged): add it to the b layer's
 unit line and to the method step on the about page, e.g. "ISC-GEM Mw 1976–2021, direct Mw only".
@@ -67,8 +70,9 @@ Statistics per depth class `d` ∈ {`sh`, `dp`}, from ISC-GEM 1976–2021 events
 | `d_nb` | count | events above their completeness threshold (used for b) |
 | `d_mc`, `d_mc_lo`, `d_mc_hi` | Mw | cell Mc (MAXC + 0.2) and its bootstrap 95 % interval; the threshold actually used per event is max(`d_mc`, global floor of its period) |
 | `d_b`, `d_b_lo`, `d_b_hi` | – | Gutenberg-Richter b and bootstrap 95 % interval (Mc re-estimated in every replicate); `null` unless `d_q` is `A` or `B` |
-| `d_q` | code | `A` interval width ≤ 0.30, `B` ≤ 0.50, `C` wider (b masked), `insufficient` fewer than 50 events above threshold |
-| `d_ciw` | – | interval width, also for `C` cells (explains the mask) |
+| `d_q` | code | since 0.5.0 on the **relative** width (`d_b_hi` − `d_b_lo`) / b, with b the cell's point estimate: `A` ≤ 0.30, `B` ≤ 0.50, `C` wider (b masked), `insufficient` fewer than 50 events above threshold. Until 0.4.0 the limits applied to the absolute width (`d_ciw`), which favoured low b ([method.md §4](method.md#4-b-value-uncertainty-and-the-mask)) |
+| `d_ciw` | – | absolute interval width hi − lo, also for `C` cells (unchanged meaning) |
+| `d_ciwr` | – | relative interval width (hi − lo) / b, the number the quality code is set by; also for `C` cells (since 0.5.0) |
 | `d_unstable` | bool | b at threshold +0.2 and +0.4 both fall outside the interval on the same side |
 | `d_bpos`, `d_bpos_lo`, `d_bpos_hi` | – | b-positive (van der Elst 2021), ±1.96 σ; `null` unless `d_q` is A/B |
 | `d_bdecl`, `d_bdecl_lo`, `d_bdecl_hi` | – | b after Gardner-Knopoff declustering, bootstrap 95 %; `null` unless `d_q` is A/B |
@@ -139,15 +143,22 @@ Columnar JSON, one array per field, same length:
 `lat`, `lon`, `depth` (km), `mag`, `magtype`, `place`, `radius_km`, `mcat`, `n_window`, `n_fit`, `K`
 (events/day ≥ Mcat), `c` (days), `p`, `sK`, `sc`, `sp` (standard errors), `b_seq`, `b_seq_source`, `contaminated`,
 `c_resolved`, `quality` (`A`/`B`/`C`/`insufficient`), `rate_bins_days`, `rate_counts` (counts ≥ Mcat in log-spaced
-day bins, for the decay chart).
+day bins, for the decay chart). `synthetic_check` gained `n_runs` (20) in 0.5.0.
 
 ## `global.json`
 
 Chart-ready global series: `michael_periods`, `michael_pooled`, `b_cutoff_2004_2021`, `plate_boundary_types`,
-`slab_age_groups`, `validation_table`, `floors`. Field names follow `results/validation.json`. Since v0.2
+`slab_age_groups`, `validation_table`, `validation_counts`, `floors`. Field names follow `results/validation.json`. Since v0.2
 `plate_boundary_types`, `slab_age_groups` and `floors` use the direct-Mw b sample; `michael_*` and
 `b_cutoff_2004_2021` (a catalogue comparison) use every ISC-GEM event. The all-events class values are in
 `results/validation.json` (`plate_boundary_types_all_events`), not in `global.json`.
+
+Validation table rows (since 0.5.0): `test`, `ours`, `published` (text), `verdict` (text that starts with `match`,
+`differs`, `consistent, uninformative`, `not testable`, `reference only`, `robust` or `description only`; the site
+reads the pill from that first word), `data` (`same data (GCMT-based)`, `same data (ISC-GEM itself)`,
+`independent data` or `no published value`) and `z` (number, or `null` when no published uncertainty exists or the
+row is not a single comparison). `validation_counts` holds the verdict counts per `data` group. The rule is in
+[validation.md](validation.md#how-a-comparison-is-judged-since-050).
 
 ### `sequences.json`: retrospective b before and after (`bt`, added by `scripts/val_bt.py`)
 

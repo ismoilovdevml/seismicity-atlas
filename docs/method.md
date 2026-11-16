@@ -29,11 +29,12 @@ does not depend on cell shape.
 
 | Radius | Shallow cells with b shown | Common cells with the 300 km run | Median \|Δb\| vs 300 km |
 |---|---|---|---|
-| 200 km | 83 | 83 | 0.035 |
-| 300 km | 204 | – | – |
-| 400 km | 345 | 202 | 0.039 |
+| 200 km | 78 | 77 | 0.044 |
+| 300 km | 172 | – | – |
+| 400 km | 329 | 172 | 0.040 |
 
-Where b is shown, it changes by less than 0.04 (median) between radii. The radius mainly decides how many cells
+Release 0.5.0 (relative-width mask, 1000 replicates). Where b is shown, it changes by about 0.04 (median) between
+radii. The radius mainly decides how many cells
 reach the sample size.
 
 ## 2. Catalogue and magnitude for b: ISC-GEM Mw, 1976–2021
@@ -128,7 +129,8 @@ uncertainty, (c) a Tinti–Mulargia correction for magnitude error.
 - (b) has no standard estimator to point to and would need its own validation; it was not adopted.
 
 **Cost.** 7,049 of 56,585 events of 1976–2021 (12.5 %) leave the b sample. The direct sample is less complete at
-small magnitudes in 1976–2003, so the shallow floors rise by 0.1 (§3). Shown shallow cells fall from 204 to 170.
+small magnitudes in 1976–2003, so the shallow floors rise by 0.1 (§3). Shown shallow cells fell from 204 to 170 in
+v0.2 (with the absolute-width mask of that release; 172 since the relative mask of 0.5.0, §4).
 
 **b-positive after the change (resolved, `bpositive.md`).** In the 77 shallow cells with b and b-positive in
 both versions, b fell by a median 0.022 while b-positive moved by +0.002. b-positive now lies inside the b
@@ -173,20 +175,56 @@ exact selector. The reader does not use it yet, because the current header could
   - Each window needs ≥ 50 events.
 - **Map layers.** `sh_mc_cc` (ComCat 2010–cut-off) and `sh_mc_cc0` (1973–1989) show how far the USGS M4.5+ feed
   is complete at each place, in its own (mostly mb) magnitude.
+- **What an ISC-GEM Mc means.** ISC-GEM is a *selected* catalogue: events enter it above period-dependent
+  inclusion thresholds (7.5 before 1918, 6.25 for 1918–1959 and 5.5 from 1960 in the first release; Di Giacomo,
+  Engdahl & Storchak 2018, who warn that these thresholds are not completeness levels), and later releases added
+  smaller events unevenly. A MAXC Mc of ISC-GEM therefore reflects the inclusion rule of the catalogue as much as,
+  or more than, the sensitivity of the seismic networks. Read the ISC-GEM Mc of a cell, the period floors and the
+  Mc comparison with Michael (2014) as "where this catalogue is complete", not as the detection capability of the
+  networks at that place. The ComCat layers above are the closer measure of network completeness (in mb).
 
 ## 4. b-value, uncertainty and the mask
 
 - **Estimator.** Aki-Utsu maximum likelihood with the ΔM/2 binning correction, on magnitudes binned to 0.1.
-- **Uncertainty.** 200 bootstrap resamples of the events in the circle. Each replicate re-estimates the cell Mc,
-  so the 95 % percentile interval includes the Mc uncertainty (Woessner & Wiemer 2005).
+- **Uncertainty.** 1000 bootstrap resamples of the events in the circle (`atlaslib.NBOOT`; 200 until 0.4.0). Each
+  replicate re-estimates the cell Mc, so the 95 % percentile interval includes the Mc uncertainty (Woessner &
+  Wiemer 2005). Seeds are fixed (`atlas.py`: `RNG`). Why 1000: the bounds of a percentile interval are themselves
+  random. In a test cell with 150 events (88 above threshold), the standard deviation of the lower and upper bound
+  between 40 seeds was 0.012 and 0.024 at 200 replicates and 0.005 and 0.009 at 1000 (`tests/test_atlaslib.py`),
+  small against the A/B/C limits. The declustered b, the validation intervals and the regional layers use 1000 too.
 - **Mask (quality codes).** A b-value is published only when:
   - at least 50 events are above threshold, and
-  - the 95 % interval is ≤ 0.30 wide (`A`) or ≤ 0.50 wide (`B`).
+  - the **relative** width of the 95 % interval, (hi − lo) / b, is ≤ 0.30 (`A`) or ≤ 0.50 (`B`). The denominator
+    is the point estimate b of the same sample (`atlaslib.quality`, `rel_width`; published as `*_ciwr`).
 
   A wider interval gives `C`: b is withheld and only the width is shown. Fewer than 50 events gives
   `insufficient`. This is the hard rule of the atlas: **no b-value without its interval and quality code.**
+- **Why relative (since 0.5.0).** Until 0.4.0 the limits applied to the absolute width hi − lo. That width grows
+  with b itself (about 2 × 1.96 × b / √n), so at the same number of events a high-b cell was masked more often
+  than a low-b one, and the shown b-values were biased low. Synthetic cells with 70 events above a known
+  threshold (`tests/test_atlaslib.py`, 200 cells per b, 1000 replicates):
+
+  | True b | Shown, absolute rule | Mean shown b, absolute rule | Shown, relative rule | Mean shown b, relative rule |
+  |---|---|---|---|---|
+  | 0.8 | 97.5 % | 0.810 | 77.0 % | 0.817 |
+  | 1.0 | 64.5 % | 0.972 | 73.0 % | 1.013 |
+  | 1.25 | 14.5 % | 1.109 | 73.5 % | 1.261 |
+  | 1.5 | 2.0 % | 1.242 | 74.0 % | 1.493 |
+
+  The relative width is about 3.92 / √n whatever b is, so at a fixed number of events above the threshold the
+  share shown no longer depends on b, and the shown means are unbiased within the Aki-Utsu small-sample bias
+  (about b / n). **Remaining dependence:** at a fixed number of events above the *true* completeness, a high-b
+  cell still passes less often, because the MAXC + 0.2 threshold removes a larger share of its events. In the
+  validation synthetic cells with 100 events above the true Mc, the median number above the threshold was 70.5
+  for b < 1.05 and 41.5 for b ≥ 1.05 (one period; 75 and 41 with two periods), so 47 % and 4 % of them were shown
+  (`results/validation.json`, `synthetic`; `validation.md` §1). This is a property of the Mc rule, not of the mask,
+  and it is not corrected.
+- **Effect on the map** (`docs/changes-0.5.md`): shallow A/B/C 58/112/54 → 55/117/52 (shown 170 → 172); deeper
+  24/49/14 → 12/59/16 (shown 73 → 71). The 1000 replicates alone moved shallow A/B to 53/117 and left the deeper
+  counts unchanged; the rest is the relative mask. Deeper cells have b below 1, so for them the relative rule is
+  stricter than the old absolute one.
 - **Cutoff stability flag.** `*_unstable` is true when b at threshold + 0.2 and at + 0.4 both fall outside the
-  interval, on the same side. It is true for 4.7 % of shown shallow cells.
+  interval, on the same side. It is true for 2.9 % of shown shallow cells (4.7 % in 0.4.0).
 - **Finite-sample bias.** Marzocchi et al. (2020) show that b from small samples is biased and correlates with
   the largest event in the sample, so apparent spatial b contrasts need significance checks. Adjacent cells
   overlap and are not independent. The site should compare two places only through their intervals.
@@ -197,7 +235,7 @@ b-positive (van der Elst 2021) is computed on successive positive magnitude diff
 above the period floor in time order. It is insensitive to the short-term incompleteness after large events.
 
 - Shown cells: the median of b⁺ − b is +0.046 (v0.1, all events: +0.029).
-- b⁺ falls inside the bootstrap interval of b in 64.9 % of cells (v0.1: 87.8 %; `results/validation.json`,
+- b⁺ falls inside the bootstrap interval of b in 67.5 % of cells (0.4.0: 64.9 %; v0.1: 87.8 %; `results/validation.json`,
   `cells_summary`). For iid Gutenberg-Richter data with the same cell sizes and floors, the share would be about
   96 % and the median b⁺ − b +0.005 to +0.008. The excess has two parts, both in `bpositive.md`:
   - Time order (v0.2 only). The direct-Mw sample misses early aftershocks, and b⁺ partly corrects for that.
@@ -214,8 +252,8 @@ above the period floor in time order. It is insensitive to the short-term incomp
 - **Declustering is not applied to the main b.** Gardner-Knopoff windows (as in ZMAP and OpenQuake) mark 51 % of
   ISC-GEM events as dependent. At M ≥ 6.5 the windows last years, so for a global M ≥ 5 catalogue they remove
   much more than aftershocks.
-  - Global shallow b falls from 1.035 to 0.887 [0.868, 0.906].
-  - Across shown cells, the median declustered-minus-full difference is −0.202.
+  - Global shallow b falls from 1.035 to 0.887 [0.867, 0.907].
+  - Across shown cells, the median declustered-minus-full difference is −0.205.
 
   A declustered b therefore mostly reflects the window choice. The declustered b is still published per cell
   (`*_bdecl`, with its interval) so the effect can be seen, but the map shows the full catalogue.
@@ -267,7 +305,7 @@ kept.
    ComCat covers those years and its magnitudes are mixed (§2).
 2. **Large footprint.** b and Mc are teleseismic-scale quantities (Mw ≥ 5.2–5.7) averaged over 300 km. They are
    not comparable to b-values from local networks at M 1–3, and they cannot resolve asperity-scale structure.
-3. **Few trusted cells.** Only 170 shallow and 73 deeper cells pass the quality gate. Most of the world shows
+3. **Few trusted cells.** Only 172 shallow and 71 deeper cells pass the quality gate (0.5.0). Most of the world shows
    "insufficient". This is the honest result for a global M ≥ 5 catalogue, not missing work.
 4. **Overlapping circles.** Neighbouring cells share events, so a smooth-looking pattern is partly
    autocorrelation.

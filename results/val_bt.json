@@ -6,7 +6,7 @@
    "pre_5y": 2,
    "pre_1y": 0,
    "post_0_30d": 1,
-   "post_30_365d": 1
+   "post_30_365d": 2
   },
   "n_pairs_pre5y_post30_365": 1,
   "median_post_minus_pre": 0.014796994266501384,
@@ -29,20 +29,20 @@
     "n_b": 12,
     "q": "insufficient",
     "mc_window": 5.5,
-    "b_lo_raw": 0.683151046481973,
-    "b_hi_raw": 2.061676748290506
+    "b_lo_raw": 0.6566805692752341,
+    "b_hi_raw": 2.112783966015823
    },
    "2005_2009": {
     "n": 578,
     "b": 1.0261810542861647,
     "b_raw": 1.0261810542861647,
-    "b_lo": 0.8713432287156135,
-    "b_hi": 1.1752983638342531,
+    "b_lo": 0.8727404971558502,
+    "b_hi": 1.16200479031481,
     "n_b": 280,
-    "q": "B",
+    "q": "A",
     "mc_window": 5.2,
-    "b_lo_raw": 0.8713432287156135,
-    "b_hi_raw": 1.1752983638342531,
+    "b_lo_raw": 0.8727404971558502,
+    "b_hi_raw": 1.16200479031481,
     "bpos": 1.0109984184481207,
     "bpos_lo": 0.7874950267466079,
     "bpos_hi": 1.2345018101496334,
@@ -55,15 +55,19 @@
  "table_rows": [
   {
    "test": "b(t) retrospective: Sumatra band 92-100 E, 2000-2004 vs 2005-2009, ISC-GEM Mw",
-   "ours": "before 1.184 [0.683, 2.062] n=12 q=insufficient; after 1.026 [0.871, 1.175] n=280 q=B",
+   "ours": "before 1.184 [0.657, 2.113] n=12 q=insufficient; after 1.026 [0.873, 1.162] n=280 q=A",
    "published": "before 1.04, after 1.14 (ISC mb; Srivastava et al. 2021 preprint)",
-   "verdict": "not testable: 2000_2004 window has q=insufficient (n=12) [needs human check]"
+   "verdict": "not testable: 2000_2004 window has q=insufficient (n=12) [needs human check]",
+   "data": "independent data",
+   "z": null
   },
   {
    "test": "b(t) retrospective: 40 sequences, pre 5 yr vs 30-365 d after (ISC-GEM Mw)",
-   "ours": "shown (A/B) per window {'pre_5y': 2, 'pre_1y': 0, 'post_0_30d': 1, 'post_30_365d': 1}; 1 pair(s) with both shown; median post - pre +0.015; 0 with separated intervals",
+   "ours": "shown (A/B) per window {'pre_5y': 2, 'pre_1y': 0, 'post_0_30d': 1, 'post_30_365d': 2}; 1 pair(s) with both shown; median post - pre +0.015; 0 with separated intervals",
    "published": "no published Mw >= 5 before/after comparison found",
-   "verdict": "description only"
+   "verdict": "description only",
+   "data": "no published value",
+   "z": null
   }
  ],
  "per_sequence": [
@@ -74,11 +78,11 @@
    "pre_5y_b": null,
    "pre_1y_b": null,
    "post_0_30d_b": null,
-   "post_30_365d_b": null,
+   "post_30_365d_b": 1.2685438820243822,
    "pre_5y_q": "insufficient",
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "insufficient",
-   "post_30_365d_q": "C",
+   "post_30_365d_q": "B",
    "pre_5y_n": 12,
    "pre_1y_n": 0,
    "post_0_30d_n": 49,
@@ -95,7 +99,7 @@
    "pre_5y_q": "B",
    "pre_1y_q": "insufficient",
    "post_0_30d_q": "B",
-   "post_30_365d_q": "A",
+   "post_30_365d_q": "B",
    "pre_5y_n": 114,
    "pre_1y_n": 25,
    "post_0_30d_n": 84,

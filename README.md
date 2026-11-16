@@ -30,7 +30,7 @@ Generated from the data files by `scripts/readme_numbers.py`; do not edit by han
 | Events analysed | ISC-GEM 74,153 (1904–2021); ComCat M ≥ 4.5: 294,223 (1973–2026-11-12) |
 | Duplicates | 58,666 of 58,982 ISC-GEM events in 1973–2021 matched in ComCat (99.5 %); median offset 1.1 s, 9.6 km |
 | Global b, ISC-GEM direct Mw 1976–2021 | shallow ≤ 70 km: **1.035 [1.018, 1.052]**; deeper: **0.936 [0.911, 0.961]** |
-| Cells with a trusted b (95 % interval ≤ 0.5) | 170 shallow and 73 deeper, out of 2,598 cells that hold events |
+| Cells with a trusted b (95 % interval ≤ 0.5 × b) | 172 shallow and 71 deeper, out of 2,598 cells that hold events |
 | Global completeness (ISC-GEM direct Mw, shallow) | Mw 5.8 for 1976–2003, 5.3 for 2004–2021 |
 | USGS M4.5+ feed, as served | median Mc 4.7 (mostly mb) over 956 shallow cells, 2010 to the cut-off |
 | Omori fits | 40 sequences since 1990: 17 quality A, 10 B, 8 C, 5 insufficient |
@@ -38,24 +38,51 @@ Generated from the data files by `scripts/readme_numbers.py`; do not edit by han
 
 ## Validation (ours vs published)
 
-| Test | Ours | Published | Verdict |
-|---|---|---|---|
-| Global b, deep, 1964–2009 | 0.997 [0.962, 1.033] | 0.99 (Michael 2014) | match |
-| Global b, shallow, 1918–2009 | 1.078 [1.056, 1.102] | 1.05 (Michael 2014) | close; just outside our interval |
-| Mc, deep, 1964–2009 | 5.7 | 5.7 (Michael 2014) | match |
-| Mc, shallow, modern periods | 5.2–5.7 | 5.7–6.0 (Michael 2014, catalogue v1) | ours 0.1–0.5 lower (newer catalogue release) |
-| b, subduction boundaries | 0.971 [0.948, 0.994] | 0.98 (β 0.654, Kagan & Jackson) | match |
-| b, global 1982–2008, m ≥ 5.6 (TGR) | 1.035 [1.012, 1.062] | 1.016 (Kagan 2010, GCMT) | match (mismatch in v0.1) |
-| b, oceanic spreading ridges | 1.480 [1.413, 1.565] | 1.2–1.65 (β 0.8–1.1, Kagan 2002) | match |
-| b, young vs old subducting slabs | 0.899 vs 1.067 (intervals do not overlap) | b increases with slab age (Nishikawa & Ide 2014) | match |
-| b, California | 0.921 [0.741, 1.128] | ≈ 1.0 (Hutton et al. 2010) | match (wide) |
-| b, Chile | 0.852 [0.780, 0.931] | 0.855 ± 0.06 (Andean S. America, GCMT; Kagan & Jackson 2013) | match at their settings (0.871 [0.761, 1.015]); the earlier "≈ 1" reference was weak |
-| b, Italy | 29 events above Mc | ≈ 1.0 | not testable |
-| Synthetic cells, 100–1000 events | median bias ≤ 0.021, CI coverage 0.88–0.98 | true b | match |
-| Omori p, synthetic | 1.063 ± 0.025 | 1.05 | match |
+Since v0.5.0 a comparison is a **match** only when z = (ours − published) / √(σ_ours² + σ_pub²) has |z| ≤ 1.96, with
+the published uncertainty. Without a published uncertainty, a published value inside our interval is only
+**consistent, uninformative**. Each row also says whether the published number comes from the **same data**
+(GCMT moments, the source of most ISC-GEM direct Mw after 1976, or ISC-GEM itself) or from **independent data**.
+Agreement on the same data shows that the code reproduces the published estimator, not that the result is
+independently confirmed.
 
-Full tables and the reasons for each verdict: [docs/validation.md](docs/validation.md). Since v0.2, b uses direct
-(measured) Mw only; converted Ms and mb are left out of every b ([method §2.1](docs/method.md)).
+| Test | Ours | Published | Data | Verdict |
+|---|---|---|---|---|
+| Global b, deep, 1964–2009 | 0.997 [0.962, 1.033] | 0.99 (Michael 2014, no uncertainty given) | same (ISC-GEM) | consistent, uninformative |
+| Global b, shallow, 1918–2009 | 1.078 [1.056, 1.101] | 1.05 (Michael 2014) | same (ISC-GEM) | differs: 1.05 is outside our interval |
+| Mc, deep, 1964–2009 | 5.7 [5.4, 5.7] | 5.7 (Michael 2014) | same (ISC-GEM) | consistent, uninformative |
+| Mc, shallow, 1964–2009 (three periods) | 5.2–5.7 | 5.7–6.0 (Michael 2014, catalogue v1) | same (ISC-GEM) | differs: ours 0.3–0.5 lower (newer release; ISC-GEM Mc reflects its inclusion thresholds) |
+| b, subduction boundaries | 0.971 [0.949, 0.994] | 0.98 (β 0.654, Kagan & Jackson) | same (GCMT) | consistent, uninformative |
+| b, global 1982–2008, m ≥ 5.6 (TGR) | 1.035 [1.010, 1.058] | 1.016 (Kagan 2010, no uncertainty given) | same (GCMT) | consistent, uninformative (v0.4 "match" assumed a zero published uncertainty) |
+| b, oceanic spreading ridges | 1.480 [1.409, 1.562] | 1.2–1.65 (β 0.8–1.1, Kagan 2002) | same (GCMT) | consistent, uninformative |
+| b, Chile box at Kagan & Jackson settings | 0.871 [0.761, 1.015] | 0.855 ± 0.06 (Andean S. America, GCMT) | same (GCMT) | match (z +0.18) |
+| b, 10 subduction regions and the 18-zone total (Kagan & Jackson 2013, Table 1) | TGR, mostly on approximate boxes | β ± σ per entry | same (GCMT) | 11 of 11 match (\|z\| ≤ 1.12) |
+| b, young vs old subducting slabs | 0.899 vs 1.067 (intervals do not overlap) | b increases with slab age (Nishikawa & Ide 2014, ANSS catalogue) | independent | consistent, uninformative (direction only) |
+| b, California | 0.921 [0.746, 1.156] | ≈ 1.0 (Hutton et al. 2010, SCSN) | independent | consistent, uninformative (wide interval) |
+| b, Italy | 29 events above Mc | ≈ 1.0 | independent | not testable |
+| Synthetic cells, 100–1000 events, one period / two periods | mean error −0.010 / −0.020 (se 0.007) | true b | independent (synthetic) | match (z −1.48) / differs (z −2.78) |
+| Omori p, 20 synthetic sequences | 1.063 (se of the mean 0.006) | 1.05 | independent (synthetic) | differs (z +2.31): a bias of +0.013, half the σp of one fit |
+
+Verdict counts over the 45 rows of the site table: same data, GCMT-based 13 match, 6 consistent-uninformative,
+1 differs; same data, ISC-GEM itself 2 consistent-uninformative, 9 differs; independent data 1 match,
+3 consistent-uninformative, 2 differs, 3 not testable, 1 reference only; no published value 4. **No published
+value from independent data is confirmed with a z-test**: the independent rows are either synthetic, without a
+published uncertainty, or not testable. Full tables and the reasons for each verdict:
+[docs/validation.md](docs/validation.md). Since v0.2, b uses direct (measured) Mw only; converted Ms and mb are left
+out of every b ([method §2.1](docs/method.md)).
+
+## What changed in v0.5.0
+
+A method release after a review; same data cut-off (2026-11-13). Old → new numbers with reasons:
+[docs/changes-0.5.md](docs/changes-0.5.md).
+
+- **Quality gate on the relative width** (hi − lo) / b: A ≤ 0.30, B ≤ 0.50. The old absolute limits favoured
+  low b, because the width grows with b: the 24 cells newly shown have median b 1.265 (shallow) and 1.252 (deeper),
+  the 24 newly hidden had 0.833 and 0.825. Shallow cells shown 170 → 172, deeper 73 → 71; the global b is unchanged.
+- **1000 bootstrap replicates** (200 before) for every published interval.
+- **Validation verdicts by z-score** with both uncertainties, "consistent, uninformative" where the publication
+  gives none, and a same-data / independent-data tag on every row.
+- **Mc caveat:** ISC-GEM is a selected catalogue with period-dependent inclusion thresholds, so its MAXC Mc
+  reflects the inclusion rule rather than network sensitivity ([method §3](docs/method.md)).
 
 ## What changed in v0.4.0
 

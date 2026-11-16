@@ -113,7 +113,7 @@ def cell_b_tv(m, per, fallback, nboot=200, rng=None, dm=0.1, nmin_p=NMIN_P, wind
     bb, nb = al.b_rows(mm, tb, dm)
     ok = np.isfinite(bb) & (nb >= 2)
     lo, hi = (np.percentile(bb[ok], [2.5, 97.5]) if ok.sum() > 0.8 * nboot else (np.nan, np.nan))
-    q = al.quality(n, lo, hi)
+    q = al.quality(n, lo, hi, b)
     b2 = sl.b_varmc(m, thr + 0.2, dm)[0]
     b4 = sl.b_varmc(m, thr + 0.4, dm)[0]
     unstable = bool(np.isfinite(b2) and np.isfinite(b4) and np.isfinite(lo) and
