@@ -177,7 +177,7 @@ def test_keyboard_and_theme(site):
     seen = []
     # WebKit (as Safari) moves focus to buttons and form controls with Alt+Tab; plain Tab reaches text fields only
     key = "Alt+Tab" if pg.context.browser.browser_type.name == "webkit" else "Tab"
-    for _ in range(18):  # v0.3: the header gained the Simple | Scientist switch (one tab stop)
+    for _ in range(19):  # v0.3: Simple | Scientist switch; v0.5: 'Your catalogue' nav link (one tab stop each)
         pg.keyboard.press(key)
         seen.append(pg.evaluate("""(() => { const e = document.activeElement;
           return (e.id || e.name || e.tagName) + ':' + (e.getAttribute('aria-label') || e.textContent || '').trim().slice(0, 30); })()"""))

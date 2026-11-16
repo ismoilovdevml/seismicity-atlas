@@ -477,6 +477,10 @@ details.method pre { white-space: pre-wrap; font-family: var(--mono); font-size:
   .brand-tag, .version { display: none; }
   :root { --panel-w: 360px; --rail-w: 250px; }
 }
+/* nine nav links since v0.5 ('Your catalogue'): tighter padding keeps the uz/ru header inside 1440 px */
+@media (max-width: 1500px) {
+  .nav a { padding: 8px 8px; }
+}
 @media (max-width: 860px) {
   .nav a { padding: 8px 8px; }
 }
