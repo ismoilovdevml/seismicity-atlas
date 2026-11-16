@@ -16,6 +16,9 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.24254373"
     description: "Version 0.4.0"
+  - type: doi
+    value: "10.31223/X5X23M"
+    description: "Paper describing the atlas (EarthArXiv preprint, not peer reviewed)"
 repository-code: "https://github.com/ismoilovdevml/seismicity-atlas"
 url: "https://seismicityatlas.org/"
 authors:
@@ -42,3 +45,17 @@ references:
     authors:
       - name: "U.S. Geological Survey"
     url: "https://earthquake.usgs.gov/data/comcat/"
+preferred-citation:
+  type: article
+  title: "A reproducible global atlas of earthquake-catalogue completeness and b-value with uncertainty"
+  authors:
+    - family-names: "Ismoilov"
+      given-names: "Otabek"
+      orcid: "https://orcid.org/0009-0008-2785-3691"
+  year: 2026
+  date-published: "2026-11-16"
+  publisher:
+    name: "EarthArXiv"
+  doi: "10.31223/X5X23M"
+  url: "https://doi.org/10.31223/X5X23M"
+  notes: "Preprint, not peer reviewed; submitted to Seismica."

@@ -314,6 +314,8 @@ export function renderAbout(root, ctx) {
 
   out.push(h('h2', { text: t('about.citeH') }));
   out.push(h('p', { class: 'cite', text: `Global Seismicity Atlas, version ${man.version}, data cut-off ${man.data_cutoff_utc}. Data licensed CC BY-SA 4.0. Derived from the ISC-GEM Global Instrumental Earthquake Catalogue (${(man.sources[0] || {}).citation || ''}) and USGS ComCat.` }));
+  out.push(h('p', { class: 'cite' }, 'Ismoilov, O. (2026). A reproducible global atlas of earthquake-catalogue completeness and b-value with uncertainty. EarthArXiv preprint (not peer reviewed). ',
+    h('a', { href: 'https://doi.org/10.31223/X5X23M', target: '_blank', rel: 'noopener', text: 'doi:10.31223/X5X23M' })));
   out.push(h('p', { class: 'prose', text: t('about.citeAlso') }));
 
   out.push(h('h2', { text: t('about.downloadH') }));

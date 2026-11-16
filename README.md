@@ -1,6 +1,7 @@
 # Global Seismicity Atlas
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24228387.svg)](https://doi.org/10.5281/zenodo.24228387)
+[![Paper](https://img.shields.io/badge/EarthArXiv-10.31223%2FX5X23M-blue)](https://doi.org/10.31223/X5X23M)
 
 **Live site: https://seismicityatlas.org/**
 
@@ -159,7 +160,11 @@ cd site && python3 -m http.server 8000   # preview the site at http://localhost:
 
 ## How to cite
 
-Cite the archived release on Zenodo: **doi:[10.5281/zenodo.24228387](https://doi.org/10.5281/zenodo.24228387)**
+The method and results are described in a paper (preprint, not peer reviewed; submitted to Seismica):
+
+> Ismoilov, O. (2026). A reproducible global atlas of earthquake-catalogue completeness and b-value with uncertainty. EarthArXiv. https://doi.org/10.31223/X5X23M
+
+For the data and code, cite the archived release on Zenodo: **doi:[10.5281/zenodo.24228387](https://doi.org/10.5281/zenodo.24228387)**
 (this concept DOI always resolves to the latest version; v0.4.0 is
 [10.5281/zenodo.24254373](https://doi.org/10.5281/zenodo.24254373)). The full metadata is in [CITATION.cff](CITATION.cff)
 (GitHub shows a "Cite this repository" button). Also cite the underlying catalogues listed below, and quote the data
