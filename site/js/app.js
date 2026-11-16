@@ -18,7 +18,7 @@ import { placeRailInfo } from './info-rail.js';
 import * as D from './depth3d.js';
 import { initSimple, syncSimple, relabelSimple, startTour, openPlace, loadM5 as simpleLoadM5 } from './simple.js';
 
-const VIEWS = ['map', 'sequences', 'monitor', 'cases', 'methods', 'about', 'depth', 'learn'];
+const VIEWS = ['map', 'sequences', 'monitor', 'cases', 'methods', 'about', 'depth', 'learn', 'analyze'];
 const LAYERS = ['b', 'q', 'mc', 'cc', 'rate', 'none'];
 const MODES = ['simple', 'pro'];
 // A link that sets any of these and does not name a mode is a Scientist-view link (all links made before v0.3).
@@ -196,6 +196,7 @@ function showView(v) {
   const site = t('title.site');
   document.title = v === 'map' ? `${site}: ${t('title.tagline')}` : `${t(`title.${v}`)} | ${site}`;
   if (v === 'learn') { showLearn(); return; }
+  if (v === 'analyze') { showAnalyze(); return; }
   if (!ctx.manifest) return;
   if (v === 'map') { M.resize(); return; }
   if (v === 'depth') {
@@ -211,6 +212,13 @@ function showView(v) {
   if (v === 'cases') renderCases(document.getElementById('cases-root'), pageCtx);
   if (v === 'methods') renderMethods(document.getElementById('methods-root'), pageCtx);
   if (v === 'about') renderAbout(document.getElementById('about-root'), pageCtx);
+}
+
+/** "Your catalogue" loads on demand; the file stays in the browser (js/analyze/view.js). */
+function showAnalyze() {
+  import('./analyze/view.js')
+    .then((m) => m.renderAnalyze($('analyze-root')))
+    .catch((e) => { console.error(e); });
 }
 
 let learnBack = null;

@@ -1,0 +1,36 @@
+/* "Your catalogue" page (js/analyze). Uses the theme tokens of app.css. */
+.an-root { max-width: 880px; }
+.an-root .lede { font-size: 17px; color: var(--ink-2); margin: 0; }
+.an-privacy { margin: 0; padding: 10px 14px; border: 1px solid var(--v-ok-bd); background: var(--v-ok-bg); color: var(--v-ok-fg); border-radius: 8px; font-size: 14px; }
+.an-form { display: flex; flex-direction: column; gap: 14px; }
+.an-filebox input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.an-drop { display: flex; flex-direction: column; gap: 4px; padding: 22px; border: 2px dashed var(--rule-strong); border-radius: 10px; background: var(--surface); cursor: pointer; text-align: center; color: var(--ink-3); }
+.an-drop strong { color: var(--accent); font-size: 16px; }
+.an-drop.over, .an-drop:hover, .an-filebox input:focus-visible + .an-drop { border-color: var(--accent); background: var(--accent-bg); }
+.an-opts summary, .an-help summary, .an-result details summary { cursor: pointer; color: var(--ink-2); font-weight: 500; }
+.an-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px 14px; margin-top: 12px; }
+.an-field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--ink-3); }
+.an-field input, .an-field select { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-strong); border-radius: 6px; padding: 7px 8px; min-height: 36px; }
+.an-form > .btn { align-self: flex-start; cursor: pointer; font: inherit; font-size: 15px; padding: 9px 22px; }
+.an-status { margin: 0; color: var(--ink-3); font-size: 14px; min-height: 1.4em; }
+.an-result { display: flex; flex-direction: column; gap: 14px; }
+.an-result h2 { margin: 8px 0 0; }
+.an-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+.an-table th, .an-table td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.an-table th[scope=row] { color: var(--ink-3); font-weight: 500; width: 36%; }
+.an-result figure { margin: 0; }
+.an-result figcaption, .an-note { color: var(--ink-3); font-size: 13px; margin: 4px 0 0; }
+.an-fmd { width: 100%; max-width: 620px; height: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; }
+.an-grid line, .an-fmd .an-grid { stroke: var(--rule); }
+.an-fmd .an-tick { fill: var(--ink-3); font-size: 11px; }
+.an-fmd .an-bar { fill: var(--accent-border); }
+.an-fmd .an-dot { fill: var(--ink); }
+.an-fmd .an-mc { stroke: var(--v-bad-fg); stroke-dasharray: 4 3; }
+.an-fmd .an-mc-t { fill: var(--v-bad-fg); font-size: 11px; }
+.an-fmd .an-fit { stroke: var(--v-bad-fg); stroke-width: 1.5; }
+.an-result ul { margin: 0; padding-left: 20px; }
+.an-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.an-actions .btn { cursor: pointer; font: inherit; font-size: 14px; }
+.an-help p { color: var(--ink-2); font-size: 14px; }
+.an-help code { font-family: var(--mono); font-size: 12.5px; word-break: break-all; }
+@media (max-width: 600px) { .an-table th[scope=row] { width: 44%; } .an-drop { padding: 16px; } }

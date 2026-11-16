@@ -76,6 +76,11 @@ The estimators are also an installable Python package, `seisatlas` (code in [src
 reads a CSV catalogue (USGS ComCat, EMSC, ISC or a national network) and reports Mc, b with its 95 % interval and
 quality code, b-positive, Mc per year and warnings, as HTML, Markdown or JSON.
 
+Without installing anything: open **[seismicityatlas.org/#v=analyze](https://seismicityatlas.org/#v=analyze)**
+("Your catalogue"), choose a CSV file and get the same numbers. The file is read and analysed in the browser and is
+never uploaded; `tests/test_analyze_js.py` checks that the browser code gives the same Mc, b and b-positive as the
+package.
+
 ```bash
 pip install "seisatlas @ git+https://github.com/ismoilovdevml/seismicity-atlas"
 seisatlas report events.csv -o report.html

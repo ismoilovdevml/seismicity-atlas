@@ -118,7 +118,7 @@ def analyze(cat: Catalog, *, dm: float = 0.1, nboot: int = al.NBOOT, seed: int =
     yrs = mc_by_year(cat, dm)
     res["mc_by_year"] = yrs
     mcs = [y["mc_maxc02"] for y in yrs if y["mc_maxc02"] is not None]
-    if len(mcs) >= 3 and max(mcs) - min(mcs) >= 0.3 and floor_periods is None:
+    if len(mcs) >= 3 and max(mcs) - min(mcs) >= 0.3 - 1e-9 and floor_periods is None:
         W.append(f"Yearly Mc ranges from {min(mcs):.1f} to {max(mcs):.1f}: completeness changed with time. Give "
                  "per-period floors (floor_periods / --floor-period) or restrict the time window; a single Mc "
                  "then biases b.")
