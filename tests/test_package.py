@@ -28,7 +28,8 @@ def synth(n=3000, b=1.0, mc=3.0, seed=1, start="2000-01-01", years=10, magtype="
 
 def test_version_matches_release():
     rel = json.loads((ROOT / "scripts" / "release.json").read_text())
-    assert sa.__version__ == rel["version"]
+    # the package may add a PEP 440 post-release (.postN) for documentation-only fixes of the same data version
+    assert sa.__version__.split(".post")[0] == rel["version"]
 
 
 def test_reader_maps_comcat_columns_and_filters_type():

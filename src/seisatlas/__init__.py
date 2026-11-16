@@ -12,7 +12,7 @@ Command line:  seisatlas report events.csv --lat 38.3 --lon 142.4 --radius-km 30
 Descriptive statistics only: not an earthquake forecast and not a seismic hazard assessment.
 Cite: Ismoilov, O. (2026), EarthArXiv, https://doi.org/10.31223/X5X23M
 """
-__version__ = "0.5.0"
+__version__ = "0.5.0.post1"
 
 from .analysis import DISCLAIMER, analyze, fmd_frame, mc_by_year  # noqa: E402
 from .catalog import Catalog, read_catalog, select  # noqa: E402
