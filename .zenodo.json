@@ -23,6 +23,12 @@
   ],
   "related_identifiers": [
     {
+      "identifier": "10.31223/X5X23M",
+      "relation": "isSupplementTo",
+      "resource_type": "publication-preprint",
+      "scheme": "doi"
+    },
+    {
       "identifier": "10.31905/D808B825",
       "relation": "isDerivedFrom",
       "resource_type": "dataset",
