@@ -1,20 +1,29 @@
 """Your catalogue: a CSV chosen in the page is analysed in the browser; no request carries the file."""
-import json
-import sys
-from pathlib import Path
+import math
+import random
 
 import pytest
 
 from conftest import no_hscroll
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from test_package import synth  # noqa: E402
+
+def write_catalogue(path, n=2000, b=1.0, mc=3.0, seed=1):
+    """Gutenberg-Richter magnitudes with a detection roll-off, pure Python (the e2e job has no numpy)."""
+    rnd = random.Random(seed)
+    rows = ["time,latitude,longitude,depth,mag,magType"]
+    k = 0
+    while k < n:
+        m = (mc - 0.6) + rnd.expovariate(b * math.log(10))
+        if rnd.random() < 1 / (1 + math.exp(-(m - (mc - 0.2)) / 0.08)):
+            k += 1
+            rows.append(f"2010-{1 + k % 12:02d}-{1 + k % 28:02d}T{k % 24:02d}:00:00Z,38.0,142.0,20,{m:.1f},ml")
+    path.write_text("\n".join(rows) + "\n")
 
 
 @pytest.mark.parametrize("viewport,scheme", [("desktop", "light"), ("phone", "dark")])
 def test_analyze_own_catalogue(site, viewport, scheme, tmp_path):
     csv = tmp_path / "events.csv"
-    synth(2000, b=1.0).to_csv(csv, index=False)
+    write_catalogue(csv)
     pg = site.open(viewport=viewport, scheme=scheme, ready=False)
     posts = []
     pg.on("request", lambda r: posts.append(r.url) if r.method != "GET" else None)

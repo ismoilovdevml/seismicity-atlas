@@ -126,7 +126,7 @@ def test_diagram_controls(site):
     open_concept(pg, "confidence-interval-bootstrap")
     pg.click("[data-ctl=skip]")
     pg.wait_for_selector(".lr-svg .band-rect")
-    assert "200" in readout(pg)
+    assert "1,000" in readout(pg)  # 1000 replicates since 0.5.0 (200 before)
 
     open_concept(pg, "omori-utsu")
     pg.click("[data-ctl=reset]")
