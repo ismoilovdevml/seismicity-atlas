@@ -202,7 +202,7 @@ export function renderAnalyze(el) {
     form, status, result,
     h('details', { class: 'an-help' }, h('summary', { text: t('an.helpH') }),
       h('p', { text: t('an.helpCols') }), h('p', { text: t('an.helpMethod') }),
-      h('p', {}, t('an.helpPip'), ' ', h('code', { text: 'pip install "seisatlas @ git+https://github.com/ismoilovdevml/seismicity-atlas"' }))));
+      h('p', {}, t('an.helpPip'), ' ', h('code', { text: 'pip install seisatlas' }))));
   if (file) fillTypes();
   if (last) result.replaceChildren(resultView(last.res, last.opts));
 }

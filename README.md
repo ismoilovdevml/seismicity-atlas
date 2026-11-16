@@ -72,7 +72,8 @@ out of every b ([method §2.1](docs/method.md)).
 
 ## Use the method on your own catalogue
 
-The estimators are also an installable Python package, `seisatlas` (code in [src/seisatlas](src/seisatlas)). It
+The estimators are also an installable Python package, [`seisatlas` on PyPI](https://pypi.org/project/seisatlas/) (code in
+[src/seisatlas](src/seisatlas)). It
 reads a CSV catalogue (USGS ComCat, EMSC, ISC or a national network) and reports Mc, b with its 95 % interval and
 quality code, b-positive, Mc per year and warnings, as HTML, Markdown or JSON.
 
@@ -82,7 +83,7 @@ never uploaded; `tests/test_analyze_js.py` checks that the browser code gives th
 package.
 
 ```bash
-pip install "seisatlas @ git+https://github.com/ismoilovdevml/seismicity-atlas"
+pip install seisatlas
 seisatlas report events.csv -o report.html
 seisatlas report events.csv --lat 38.3 --lon 142.4 --radius-km 300 --depth-max 70 --mag-type mw -o japan.html
 ```

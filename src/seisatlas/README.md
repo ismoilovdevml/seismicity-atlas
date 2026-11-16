@@ -5,7 +5,7 @@ earthquake catalogue: the estimators of the [Global Seismicity Atlas](https://se
 library and a command-line tool.
 
 ```bash
-pip install "seisatlas @ git+https://github.com/ismoilovdevml/seismicity-atlas"
+pip install seisatlas
 seisatlas report events.csv -o report.html
 seisatlas report events.csv --lat 38.3 --lon 142.4 --radius-km 300 --mag-type mw -o tohoku.html
 ```
