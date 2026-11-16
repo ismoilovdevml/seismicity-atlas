@@ -28,6 +28,9 @@ Method release after a review; same data cut-off (2026-11-13). Every old → new
 - Docs: the relative mask, the 1000 replicates and the Mc caveat (ISC-GEM inclusion thresholds) in `method.md`;
   `validation.md` re-classified; Learn pages `quality-codes` and `confidence-interval-bootstrap` updated in four
   languages (native review of uz/ru/es pending, `docs/learn.md`).
+- **GEM hazard comparison recomputed** (`results/sci2_gem_hazard.json`, `docs/comparisons.md` §3): of 555 cells with
+  mean PGA ≥ 0.2 g, 400 (72 %) have no shallow b (before: 369, 67 %). The first run (2026-11-14) read a working
+  cells file that did not match the published map; `scripts/sci2/gem_hazard.py` now stops unless it does.
 - `run_all.sh` runs the unit tests without `tests/e2e` (collecting both `test_monitor.py` files stopped pytest).
 - The cell layer fixtures of the browser tests moved to cells that keep their code under the new gate.
 

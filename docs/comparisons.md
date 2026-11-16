@@ -12,7 +12,7 @@ and `docs/img/sci2-*.png`. Every number below comes from those outputs (runs of 
 |---|---|---|---|---|
 | 1 | Taroni, Zhuang & Marzocchi (2021) HD b map of Italy; comment by Gulia, Gasperini & Wiemer (2022) | paper: author accepted manuscript, CC0 1.0 (INGV Earth-prints); input catalogue: subset of HORUS (CC BY 4.0) released in a GitHub repository without a licence | comparison only; files kept in the local cache, not redistributed | our Italy layer agrees in ranks (Spearman 0.62) with no bias (median −0.013); differences are concentrated in the Po Plain and eastern Sicily |
 | 2 | pybvalue v0.0.1 | Zenodo metadata: CC BY 4.0; archive LICENSE file: MIT | method re-implemented (the archive holds no b-value code) | agrees with our layer when the same +0.2 completeness correction is used (Spearman 0.87, median +0.003) |
-| 3 | GEM Global Seismic Hazard Map v2026.1 | CC BY-NC-SA 4.0 | not redistributed, link only; internal analysis with aggregate statistics only | 369 of 555 cells with mean PGA ≥ 0.2 g have no shallow b; the cause is few events, not a high Mc |
+| 3 | GEM Global Seismic Hazard Map v2026.1 | CC BY-NC-SA 4.0 | not redistributed, link only; internal analysis with aggregate statistics only | 400 of 555 cells with mean PGA ≥ 0.2 g have no shallow b; the cause is few events, not a high Mc |
 | 4 | Zhang, Werner & Goda (2020) ETAS parameters | journal article; parameters quoted as facts | optional data fields of the monitor | the shallow subduction sequences lie inside the range of the published sequences (ratios 2.3–6.0 vs 1.2–10.4) |
 | 5 | Savran et al. (2020); pyCSEP | pyCSEP BSD-3-Clause | the Poisson N-test re-implemented (same definition) for a retrospective check | the Omori fit extrapolated past its data fails 9 of 12 tests (6 with parameter uncertainty); the monitor stays descriptive |
 
@@ -191,26 +191,32 @@ breaks of the GEM colour table. "Thin" = no atlas cell, or shallow b quality `in
 
 | PGA class | Cells | No atlas cell | Insufficient | C | A or B | Thin share | Median Mc (cells with Mc) | Median ISC-GEM events |
 |---|---|---|---|---|---|---|---|---|
-| < 0.08 g | 4,698 | 3,276 | 1,420 | 1 | 1 | 100 % | 5.4 (96) | 0 |
-| 0.08–0.2 g | 629 | 7 | 590 | 14 | 18 | 97 % | 5.3 (352) | 8 |
-| 0.2–0.35 g | 342 | 1 | 254 | 46 | 41 | 88 % | 5.4 (315) | 42 |
-| ≥ 0.35 g | 213 | 0 | 48 | 21 | 144 | 32 % | 5.4 (213) | 150 |
+| < 0.08 g | 4,698 | 3,276 | 1,421 | 0 | 1 | 100 % | 5.3 (86) | 0 |
+| 0.08–0.2 g | 629 | 7 | 602 | 4 | 16 | 98 % | 5.3 (292) | 8 |
+| 0.2–0.35 g | 342 | 1 | 283 | 24 | 34 | 90 % | 5.3 (294) | 42 |
+| ≥ 0.35 g | 213 | 0 | 68 | 24 | 121 | 43 % | 5.4 (211) | 150 |
 
 High hazard (mean PGA ≥ 0.2 g), 555 cells:
 
-- **369 (67 %) have no shallow b** (302 insufficient, 67 C, 1 without an atlas cell); 185 have A or B.
-- Median ISC-GEM events: 44 in the thin cells against 166 in the A/B cells. The thin cells are thin because few
+- **400 (72 %) have no shallow b** (351 insufficient, 48 C, 1 without an atlas cell); 155 have A or B.
+- Median ISC-GEM events: 48 in the thin cells against 203 in the A/B cells. The thin cells are thin because few
   events above Mc occurred there in 1976–2021, not because Mc is high: the median measured Mc is 5.3–5.4 in every
-  hazard class, only 27 of the thin high-hazard cells have Mc ≥ 5.6, and the rank correlation of PGA with Mc is
+  hazard class, only 28 of the thin high-hazard cells have Mc ≥ 5.6, and the rank correlation of PGA with Mc is
   0.04 (with the ISC-GEM event count 0.75).
-- Plate-boundary class of the thin high-hazard cells: 81 oceanic transform, 58 oceanic ridge, 73 more than 200 km
-  from a boundary step, 61 subduction, 39 continental convergent, 30 continental transform, 14 continental rift,
+- Plate-boundary class of the thin high-hazard cells: 86 subduction, 80 oceanic transform, 76 more than 200 km
+  from a boundary step, 58 oceanic ridge, 40 continental convergent, 31 continental transform, 15 continental rift,
   13 oceanic convergent. Many of them are offshore, where the GEM README notes that hazard values "are affected by
   significant uncertainty".
 - With the 90th percentile of PGA in a cell instead of the mean, 980 cells reach 0.2 g.
 
-**Verdict.** Where GEM models the highest hazard (≥ 0.35 g), two thirds of the cells have a b-value; at
-0.2–0.35 g only 12 % do. The gap is a sample-size gap of a global M ≥ 5 catalogue over 46 years, not a completeness
+**Correction (2026-11-16, release 0.5.0).** The numbers above were recomputed with the 0.5.0 quality codes, read from
+`data/work/cells.pkl` after checking that it equals the published `site/data/cells.geojson` cell by cell. The first
+version of this section (2026-11-14: 369 of 555 thin, 185 A/B) cannot have come from the published map, which had
+only 170 shallow A/B cells in total; the working file had most likely been overwritten by a sensitivity run with
+every ISC-GEM event. `gem_hazard.py` now refuses to run when the working file and the published layer disagree.
+
+**Verdict.** Where GEM models the highest hazard (≥ 0.35 g), 121 of 213 cells (57 %) have a b-value; at
+0.2–0.35 g only 34 of 342 (10 %) do. The gap is a sample-size gap of a global M ≥ 5 catalogue over 46 years, not a completeness
 gap, so regional catalogues (as in the regional layers) are the way to fill it, not a lower global Mc. Not done:
 any map or per-cell output (licence), and deeper cells (only the shallow quality was compared).
 

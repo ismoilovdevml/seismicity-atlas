@@ -71,12 +71,26 @@ def summarise(sub):
             "iscgem_events_median": float(sub.n_iscgem.fillna(0).median())}
 
 
+def check_matches_published(ours):
+    """Stop unless the working cells file has the quality codes of the published layer (site/data/cells.geojson).
+
+    The first run of this analysis (2026-11-14) read a cells.pkl overwritten by a sensitivity run and reported
+    numbers that did not belong to the published map (docs/comparisons.md, correction of 2026-11-16)."""
+    pub = json.loads((ROOT / "site" / "data" / "cells.geojson").read_text())
+    q = {f["properties"]["id"]: f["properties"]["sh_q"] for f in pub["features"]}
+    mism = [h for h, v in q.items() if h not in ours.index or ours.at[h, "sh_b_q"] != v]
+    if mism or len(q) != len(ours):
+        sys.exit(f"data/work/cells.pkl differs from site/data/cells.geojson ({len(mism)} cells, {len(ours)} vs "
+                 f"{len(q)} rows): run scripts/run_all.sh first")
+
+
 def main():
     gpkg = Path(sys.argv[1])
     lon, lat, pga = load_gem(gpkg)
     print(f"{lon.size} GEM points, PGA {np.nanmin(pga):.4f}-{np.nanmax(pga):.3f} g", flush=True)
     g = per_cell(lon, lat, pga)
     ours = pd.read_pickle(ROOT / "data" / "work" / "cells.pkl").set_index("h3")
+    check_matches_published(ours)
     allc = g.join(ours[["sh_b_q", "sh_mc", "n_iscgem", "pb_class"]], how="left")
     allc["cls"] = pd.cut(allc.pga_mean, BREAKS, labels=LABELS, right=False)
     out = {"source": "GEM Global Seismic Hazard Map v2026.1, Johnson et al. (2026), doi:10.5281/zenodo.20735384 "
