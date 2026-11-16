@@ -70,6 +70,22 @@ published uncertainty, or not testable. Full tables and the reasons for each ver
 [docs/validation.md](docs/validation.md). Since v0.2, b uses direct (measured) Mw only; converted Ms and mb are left
 out of every b ([method §2.1](docs/method.md)).
 
+## Use the method on your own catalogue
+
+The estimators are also an installable Python package, `seisatlas` (code in [src/seisatlas](src/seisatlas)). It
+reads a CSV catalogue (USGS ComCat, EMSC, ISC or a national network) and reports Mc, b with its 95 % interval and
+quality code, b-positive, Mc per year and warnings, as HTML, Markdown or JSON.
+
+```bash
+pip install "seisatlas @ git+https://github.com/ismoilovdevml/seismicity-atlas"
+seisatlas report events.csv -o report.html
+seisatlas report events.csv --lat 38.3 --lon 142.4 --radius-km 300 --depth-max 70 --mag-type mw -o japan.html
+```
+
+Check against the atlas: ISC-GEM, shallow, 1976–2021, every event with the atlas floors
+(`--floor-period 1976-2003:5.8 --floor-period 2004-2021:5.3`) gives b = 1.053 [1.036, 1.069], the "every event" value
+of the atlas. More in [src/seisatlas/README.md](src/seisatlas/README.md).
+
 ## What changed in v0.5.0
 
 A method release after a review; same data cut-off (2026-11-13). Old → new numbers with reasons:

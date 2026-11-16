@@ -9,3 +9,8 @@ AGENTS.md
 .DS_Store
 .netrc
 *.env
+
+# Python package build artefacts
+/build/
+/dist/
+*.egg-info/
