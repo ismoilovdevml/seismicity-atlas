@@ -192,8 +192,8 @@ The method and results are described in a paper (preprint, not peer reviewed; su
 > Ismoilov, O. (2026). A reproducible global atlas of earthquake-catalogue completeness and b-value with uncertainty. EarthArXiv. https://doi.org/10.31223/X5X23M
 
 For the data and code, cite the archived release on Zenodo: **doi:[10.5281/zenodo.24228387](https://doi.org/10.5281/zenodo.24228387)**
-(this concept DOI always resolves to the latest version; v0.4.0 is
-[10.5281/zenodo.24254373](https://doi.org/10.5281/zenodo.24254373)). The full metadata is in [CITATION.cff](CITATION.cff)
+(this concept DOI always resolves to the latest version; v0.5.0 is
+[10.5281/zenodo.24286135](https://doi.org/10.5281/zenodo.24286135)). The full metadata is in [CITATION.cff](CITATION.cff)
 (GitHub shows a "Cite this repository" button). Also cite the underlying catalogues listed below, and quote the data
 cut-off date shown on the site.
 

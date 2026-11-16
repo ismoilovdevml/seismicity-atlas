@@ -14,8 +14,8 @@ identifiers:
     value: "10.5281/zenodo.24228387"
     description: "Concept DOI (all versions)"
   - type: doi
-    value: "10.5281/zenodo.24254373"
-    description: "Version 0.4.0"
+    value: "10.5281/zenodo.24286135"
+    description: "Version 0.5.0"
   - type: doi
     value: "10.31223/X5X23M"
     description: "Paper describing the atlas (EarthArXiv preprint, not peer reviewed)"
