@@ -1,4 +1,4 @@
-name: Deploy site to GitHub Pages
+name: Deploy site (Cloudflare Pages + GitHub Pages mirror)
 
 on:
   push:
@@ -34,6 +34,26 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
+
+  # seismicityatlas.org is served by Cloudflare Pages (project seismicity-atlas) since 2026-11-18: GitHub Pages was
+  # very slow from Central Asia (cells.geojson 1.5 MB: 49-51 s against 1.8-2.2 s). GitHub Pages stays as a mirror.
+  # Needs the repository secret CLOUDFLARE_API_TOKEN (Account > Cloudflare Pages > Edit); skipped without it.
+  cloudflare:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Cloudflare Pages limits (20,000 files, 25 MiB per file)
+        run: |
+          n=$(find site -type f | wc -l); echo "files: $n"; test "$n" -le 20000
+          big=$(find site -type f -size +25M); if [ -n "$big" ]; then echo "over 25 MiB: $big"; exit 1; fi
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 95c89337261f10f37ac1310191b2ebb7
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then echo "::warning::CLOUDFLARE_API_TOKEN not set: Cloudflare Pages (the live site) was NOT updated"; exit 0; fi
+          npx --yes wrangler@4.164.0 pages deploy site --project-name seismicity-atlas --branch main --commit-hash "$GITHUB_SHA" --commit-message "$(git log -1 --format=%s | head -c 200)"
 
   deploy:
     needs: build

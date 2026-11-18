@@ -1,0 +1,8 @@
+# Cloudflare Pages response headers (ignored by GitHub Pages, the mirror).
+# Versioned third-party files and fonts never change at the same path: cache for a year.
+# Everything else (pages, js, css, data/) revalidates, because the monitor data change every few hours.
+/vendor/*
+  Cache-Control: public, max-age=31536000, immutable
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
