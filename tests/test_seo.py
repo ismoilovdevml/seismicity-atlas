@@ -31,3 +31,34 @@ def test_robots_points_to_sitemap():
 def test_home_has_dataset_jsonld():
     html = (SITE / "index.html").read_text()
     assert '"@type": "Dataset"' in html and "10.5281/zenodo.24228387" in html
+
+
+def _jsonld_objects(html):
+    """Every JSON object in the page's JSON-LD blocks, nested ones included."""
+    import json
+
+    out = []
+
+    def walk(x):
+        if isinstance(x, dict):
+            out.append(x)
+            for v in x.values():
+                walk(v)
+        elif isinstance(x, list):
+            for v in x:
+                walk(v)
+
+    for block in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S):
+        walk(json.loads(block))
+    return out
+
+
+def test_every_dataset_node_is_complete():
+    """Google's Dataset rich result rejects any node typed Dataset without name/description (and warns without
+    license/creator). A nested {"@type": "Dataset"} reference triggered that on 2026-11-18; link by @id instead."""
+    pages = [SITE / "index.html"] + sorted(SITE.glob("**/learn/**/index.html"))
+    for page in pages:
+        for o in _jsonld_objects(page.read_text()):
+            if o.get("@type") == "Dataset":
+                missing = [k for k in ("name", "description", "license", "creator") if not o.get(k)]
+                assert not missing, (str(page.relative_to(SITE)), missing)
