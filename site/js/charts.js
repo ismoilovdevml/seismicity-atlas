@@ -264,7 +264,7 @@ export function xyChart(spec) {
             svgEl('circle', { cx: px, cy: py, r: 5, class: 'dot focus', style: `--c:${s.color}` }, hl);
           }
         }
-        fillTip(tip, spec.hoverTitle ? spec.hoverTitle(xv) : String(xv), rows.length ? rows : [{ value: 'no value', name: '' }]);
+        fillTip(tip, spec.hoverTitle ? spec.hoverTitle(xv) : String(xv), rows.length ? rows : [{ value: tr('chart.noValue'), name: '' }]);
         placeTip(tip, wrap, px, Math.min(ty, H - 60) - 10);
       };
       const hide = () => { cross.setAttribute('visibility', 'hidden'); hl.replaceChildren(); tip.hidden = true; };
@@ -376,7 +376,7 @@ export function sparkColumns(spec) {
       const show = (i) => {
         const b = bars[i];
         cross.setAttribute('x', b.x - bw / 2); cross.setAttribute('visibility', 'visible');
-        fillTip(tip, String(spec.x0 + i), [{ value: b.v === null ? 'no data' : String(b.v), name: spec.unit || '' }]);
+        fillTip(tip, String(spec.x0 + i), [{ value: b.v === null ? tr('yr.nodata') : String(b.v), name: spec.unit || '' }]);
         placeTip(tip, wrap, b.x, 0);
       };
       const hide = () => { cross.setAttribute('visibility', 'hidden'); tip.hidden = true; };

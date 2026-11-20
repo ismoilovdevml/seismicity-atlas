@@ -225,8 +225,8 @@ function zoneBlock(p) {
   }
   const dl = h('dl', { class: 'facts df-facts' });
   const fact = (k, v) => dl.append(h('dt', { text: k }), h('dd', { text: v }));
-  fact(t('df.mg'), `${sci(p.mg)} [${sci(p.mg_lo)}, ${sci(p.mg_hi)}] N m/yr`);
-  fact(t('df.msObs'), `${sci(p.ms_obs)} N m/yr`);
+  fact(t('df.mg'), `${sci(p.mg)} [${sci(p.mg_lo)}, ${sci(p.mg_hi)}] ${t('unit.nmyr')}`);
+  fact(t('df.msObs'), `${sci(p.ms_obs)} ${t('unit.nmyr')}`);
   fact(t('df.pHalf'), pTxt(p.p_half));
   fact(t('df.mcBal'), `Mw ${f.fixed(p.mc_bal, 2)}`);
   fact(t('df.models'), (p.models || []).join(', '));

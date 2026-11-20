@@ -549,7 +549,7 @@ function openEventPopup(hit) {
     h('h3', { text: t('ev.title', { m: f.mag(p.m) }) }),
     h('dl', {},
       h('dt', { text: t('ev.date') }), h('dd', { text: t('ev.dateVal', { d: f.decYearDate(p.y) }) }),
-      h('dt', { text: t('ev.depth') }), h('dd', { text: `${f.int(p.d)} km` }),
+      h('dt', { text: t('ev.depth') }), h('dd', { text: `${f.int(p.d)} ${t('unit.km')}` }),
       h('dt', { text: t('ev.location') }), h('dd', { text: f.latlon(e.lat[p.i], e.lon[p.i]) }),
       h('dt', { text: t('ev.magnitude') }), h('dd', { text: codes.mt[String(p.t)] || '' }),
       h('dt', { text: t('ev.in') }), h('dd', { text: codes.src[String(p.s)] || '' })),
