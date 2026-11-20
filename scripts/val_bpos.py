@@ -79,7 +79,7 @@ def bpos_pairs(m, t_days, floor, dt_split=1.0, dm=0.1, dmc=0.2):
     for sel in (dt <= dt_split, dt > dt_split):
         x = d[sel]
         x = x[x >= dmc - dm / 2 + 1e-9]
-        out.append((LOG10E / (x.mean() - (dmc - dm / 2)) if x.size >= 10 else np.nan, int(x.size)))
+        out.append((sl.b_from_excess(x.mean() - sl.bin_mag(dmc, dm), dm) if x.size >= 10 else np.nan, int(x.size)))
     return tuple(out)
 
 

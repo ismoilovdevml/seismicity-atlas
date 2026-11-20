@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import seislib as sl  # noqa: E402
@@ -105,6 +106,39 @@ def test_mc_lilliefors_res_equal_step_finds_true_mc():
         m = sl.synth_gr(2000, 1.0, 2.1, 0.1, rng=seed)
         mc, table = sl.mc_lilliefors(m, res=0.1, step=0.1, rng=seed)
         assert mc == 2.1, table[:2]
+
+
+def test_bin_mag_ties_go_up():
+    x = np.round(np.arange(5.05, 6.0, 0.1), 2)
+    assert sl.bin_mag(x).tolist() == [round(v + 0.05, 1) for v in x]       # 5.25, 5.35, 5.45 went down before 0.6.0
+    assert sl.bin_mag([-0.25, -0.24, 2.449, 2.45]).tolist() == [-0.2, -0.2, 2.4, 2.5]
+    assert sl.bin_mag([6.84, 7.02, 2.9999999]).tolist() == [6.8, 7.0, 3.0]
+
+
+def test_binned_mle_is_unbiased_where_aki_utsu_is_not():
+    # the Aki-Utsu dm/2 correction is an approximation: -0.3 % at b = 1, -1 % at b = 1.5 for 0.1 bins
+    for b_true in (1.0, 1.5):
+        bs, bp = [], []
+        for s in range(20):
+            m = sl.synth_gr(20000, b_true, 3.0, rng=s)
+            bs.append(sl.b_aki(m, 3.0)[0])
+            bp.append(sl.b_positive(m)[0])
+        assert abs(np.mean(bs) / b_true - 1) < 0.004, (b_true, np.mean(bs))   # se of the mean 0.16 %
+        assert abs(np.mean(bp) / b_true - 1) < 0.008, (b_true, np.mean(bp))   # se 0.3 %
+    x = 0.4
+    assert sl.b_from_excess(x, 0.1) == pytest.approx(np.log1p(0.1 / x) / 0.1 * np.log10(np.e))
+    assert sl.b_from_excess(x, 0.0) == pytest.approx(np.log10(np.e) / x)
+    assert np.isnan(sl.b_from_excess(0.0, 0.1))
+
+
+def test_two_decimal_magnitudes_no_threshold_parity_artefact():
+    # ISC-GEM Mw has two decimals; with ties split by float noise b changed with the parity of the threshold by up
+    # to 0.015. Equal-width bins + the binned MLE: b is flat against the threshold
+    r = np.random.default_rng(12)
+    m = np.round(5.0 + r.exponential(np.log10(np.e), 400_000), 2)            # b = 1, reported to 0.01
+    bs = [sl.b_aki(m, thr)[0] for thr in (5.5, 5.6, 5.7, 5.8)]
+    assert max(abs(b - 1.0) for b in bs) < 0.012, bs
+    assert max(bs) - min(bs) < 0.015, bs
 
 
 def test_declustering_per_depth_layer():

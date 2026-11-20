@@ -1,9 +1,13 @@
 """Catalogue statistics: completeness, Gutenberg-Richter b-value, declustering, Omori-Utsu.
 
-All functions take plain numpy arrays. Magnitudes are binned to `dm` (default 0.1) before any estimate.
+All functions take plain numpy arrays. Magnitudes are binned to `dm` (default 0.1) before any estimate, rounding
+half up (bin x holds [x - dm/2, x + dm/2)), so every bin has the same width also for magnitudes reported with two
+decimals. b is the maximum-likelihood estimate for binned magnitudes (geometric distribution of the excess over the
+lowest bin; Tinti & Mulargia 1987, as in van der Elst 2021 and SeismoStats); the Aki-Utsu formula with the dm/2
+correction is its approximation and was used before 0.6.0 (-0.3 % at b = 1, -1 % at b = 1.5).
 
 References
-  Aki 1965; Utsu 1965 (b MLE); Shi & Bolt 1982 (b uncertainty); van der Elst 2021 (b-positive);
+  Aki 1965; Utsu 1965; Tinti & Mulargia 1987 (b MLE); Shi & Bolt 1982 (b uncertainty); van der Elst 2021 (b-positive);
   Wiemer & Wyss 2000 (MAXC, goodness of fit); Cao & Gao 2002, Woessner & Wiemer 2005 (b-stability, +0.2 MAXC);
   Gardner & Knopoff 1974 (declustering windows); Ogata 1983 (Omori-Utsu MLE);
   Reasenberg & Jones 1989; Page et al. 2016 (aftershock rate model, time-dependent completeness).
@@ -18,8 +22,23 @@ LOG10E = np.log10(np.e)
 
 # ----------------------------------------------------------------------------------------------- magnitudes
 def bin_mag(m, dm: float = 0.1):
-    """Round magnitudes to the nearest bin centre (avoids float artefacts like 2.9999)."""
-    return np.round(np.round(np.asarray(m, float) / dm) * dm, 6)
+    """Nearest bin centre, ties (x.x5 for dm 0.1) up: bin x holds [x - dm/2, x + dm/2).
+
+    Before 0.6.0 ties went to whichever side the float quotient fell (5.25, 5.35, 5.45 down, 5.15, 5.75 up), so for
+    two-decimal magnitudes (ISC-GEM Mw: 9 % ties) the bins had unequal widths and b changed with the parity of the
+    threshold by up to 0.015. The 1e-6 absorbs float noise in m / dm."""
+    return np.round(np.floor(np.asarray(m, float) / dm + 0.5 + 1e-6) * dm, 6)
+
+
+def b_from_excess(mean_excess, dm: float = 0.1):
+    """b from the mean excess of binned magnitudes over their lowest kept bin (centre), maximum likelihood for
+    binned data: beta = ln(1 + dm / mean) / dm (Tinti & Mulargia 1987), b = beta log10(e); dm = 0 gives the
+    continuous estimator 1 / mean. NaN when the mean is not positive (every event in the lowest bin)."""
+    x = np.asarray(mean_excess, float)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        beta = np.log1p(dm / x) / dm if dm > 0 else 1.0 / x
+    b = np.where((x > 0) & np.isfinite(beta), beta * LOG10E, np.nan)
+    return float(b) if b.ndim == 0 else b
 
 
 def haversine_km(lat1, lon1, lat2, lon2):
@@ -30,16 +49,15 @@ def haversine_km(lat1, lon1, lat2, lon2):
 
 # ----------------------------------------------------------------------------------------------- b-value
 def b_aki(m, mc: float, dm: float = 0.1):
-    """Aki-Utsu maximum-likelihood b with the binning correction, plus Shi-Bolt (1982) standard error.
-
-    Returns (b, sigma_b, n, a) where a is log10 N(>=mc)."""
+    """Maximum-likelihood b of binned magnitudes at or above the bin mc (b_from_excess), plus the Shi-Bolt (1982)
+    standard error. Returns (b, sigma_b, n, a) where a is log10 N(>=mc)."""
     m = bin_mag(m, dm)
     m = m[m >= mc - dm / 2 + 1e-9]
     n = m.size
     if n < 2:
         return np.nan, np.nan, n, np.nan
     mean = m.mean()
-    b = LOG10E / (mean - (mc - dm / 2))
+    b = b_from_excess(mean - bin_mag(mc, dm), dm)
     sig = 2.3 * b ** 2 * np.sqrt(np.sum((m - mean) ** 2) / (n * (n - 1)))
     return b, sig, n, np.log10(n)
 
@@ -56,7 +74,8 @@ def b_bootstrap(m, mc: float, dm: float = 0.1, nboot: int = 500, rng=None):
 
 
 def b_positive(m_time_ordered, dm: float = 0.1, dmc: float = 0.2):
-    """b-positive (van der Elst 2021): Aki-Utsu on positive successive magnitude differences >= dmc.
+    """b-positive (van der Elst 2021): the binned maximum-likelihood b (b_from_excess) of the positive successive
+    magnitude differences >= dmc.
 
     Insensitive to short-term aftershock incompleteness. Input must be ordered in time.
     Returns (b, sigma_b, n_differences)."""
@@ -66,8 +85,9 @@ def b_positive(m_time_ordered, dm: float = 0.1, dmc: float = 0.2):
     n = d.size
     if n < 2:
         return np.nan, np.nan, n
-    # differences of exponentials are Laplace; the positive side is exponential with the same beta
-    b = LOG10E / (d.mean() - (dmc - dm / 2))
+    # differences of exponentials are Laplace; the positive side is exponential with the same beta (geometric
+    # with the same ratio for binned magnitudes)
+    b = b_from_excess(d.mean() - bin_mag(dmc, dm), dm)
     sig = 2.3 * b ** 2 * np.sqrt(np.sum((d - d.mean()) ** 2) / (n * (n - 1)))
     return b, sig, n
 
@@ -490,18 +510,18 @@ def omori_fit_mct(t, m, T1: float, T2: float, mag_main: float, mcat: float, b: f
 
 # ----------------------------------------------------------------------------------------------- atlas additions
 def b_varmc(m, thr, dm: float = 0.1):
-    """Aki-Utsu MLE with a per-event completeness threshold (e.g. Mc changing with time).
+    """Maximum-likelihood b with a per-event completeness threshold (e.g. Mc changing with time).
 
-    Each event's excess over its own threshold is exponential with the same beta (memoryless property), so
-    beta = n / sum(m_i - (thr_i - dm/2)) over events with m_i >= thr_i. Returns (b, sigma_b Shi-Bolt-type, n)."""
+    Each event's excess over its own threshold bin is geometric with the same ratio (memoryless property), so b is
+    b_from_excess of the mean of m_i - thr_i over events with m_i >= thr_i. Returns (b, sigma_b Shi-Bolt-type, n)."""
     m = bin_mag(m, dm)
     thr = bin_mag(thr, dm)
     keep = m >= thr - 1e-9
-    x = m[keep] - (thr[keep] - dm / 2)
+    x = m[keep] - thr[keep]
     n = x.size
     if n < 2:
         return np.nan, np.nan, n
-    b = LOG10E / x.mean()
+    b = b_from_excess(x.mean(), dm)
     sig = 2.3 * b ** 2 * np.sqrt(np.sum((x - x.mean()) ** 2) / (n * (n - 1)))
     return b, sig, n
 

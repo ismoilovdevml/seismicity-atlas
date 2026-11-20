@@ -165,8 +165,10 @@ exact selector. The reader does not use it yet, because the current header could
   of the sample in the circle. A cell can therefore raise the threshold where the network was worse than
   average, but never lower it below the global floor.
 - **b with time-varying Mc.** Each event's excess over its own threshold is exponential with the same β
-  (memoryless property), so β̂ = n / Σ(mᵢ − (thrᵢ − ΔM/2)). This is Aki-Utsu with a per-event Mc
-  (`seislib.b_varmc`).
+  (memoryless property); for binned magnitudes the excess in bins is geometric with the same ratio, so
+  β̂ = ln(1 + ΔM / x̄) / ΔM with x̄ the mean of mᵢ − thrᵢ (`seislib.b_varmc`, `b_from_excess`; since 0.6.0).
+  Until 0.5.0 it was the Aki-Utsu form n / Σ(mᵢ − (thrᵢ − ΔM/2)), whose ΔM/2 correction is an approximation
+  (−0.3 % at b = 1, −1 % at b = 1.5).
   - Synthetic test with two periods complete above 6.0 and above 5.2: the per-event version recovers b = 1. A
     single threshold at 5.2 is biased low by more than 3σ (`tests/test_atlaslib.py`).
 - **Mc(t) shown per cell** (detail files):
@@ -185,7 +187,11 @@ exact selector. The reader does not use it yet, because the current header could
 
 ## 4. b-value, uncertainty and the mask
 
-- **Estimator.** Aki-Utsu maximum likelihood with the ΔM/2 binning correction, on magnitudes binned to 0.1.
+- **Estimator.** Maximum likelihood for binned magnitudes (Tinti & Mulargia 1987; the form van der Elst 2021 and
+  SeismoStats use), on magnitudes binned to 0.1 with ties rounded up, so that every bin has the same width also for
+  two-decimal Mw (9 % of ISC-GEM Mw end in 5; their float-dependent rounding made b depend on the parity of the
+  threshold by up to 0.015 until 0.5.0). Until 0.5.0: Aki-Utsu with the ΔM/2 correction. b-positive uses the same
+  estimator on the positive differences.
 - **Uncertainty.** 1000 bootstrap resamples of the events in the circle (`atlaslib.NBOOT`; 200 until 0.4.0). Each
   replicate re-estimates the cell Mc, so the 95 % percentile interval includes the Mc uncertainty (Woessner &
   Wiemer 2005). Seeds are fixed (`atlas.py`: `RNG`). Why 1000: the bounds of a percentile interval are themselves

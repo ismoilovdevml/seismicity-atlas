@@ -168,7 +168,7 @@ def b_region(m, thr, nboot=al.NBOOT, rng=None, dm=0.1):
     b, sig, n = sl.b_varmc(m, thr, dm)
     if n < al.NMIN_B:
         return {"b": np.nan, "lo": np.nan, "hi": np.nan, "n": int(n)}
-    x = m - (thr - dm / 2)
-    bs = np.log10(np.e) / np.array([x[rng.integers(0, n, n)].mean() for _ in range(nboot)])
+    x = m - thr
+    bs = sl.b_from_excess(np.array([x[rng.integers(0, n, n)].mean() for _ in range(nboot)]), dm)
     lo, hi = np.percentile(bs, [2.5, 97.5])
     return {"b": float(b), "lo": float(lo), "hi": float(hi), "n": int(n), "sigma_shibolt": float(sig)}

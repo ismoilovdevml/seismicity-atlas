@@ -93,3 +93,19 @@ Each item: what was wrong, what changed, which outputs move after the rebuild.
   every checksum against the file on disk.
 - **Depth labels.** `release_diff.py` (and so docs/changes-0.5.md) labelled the depth classes "< 60 km" and
   "60-300 km"; the atlas split is ≤ 70 km and > 70 km (to the deepest event, 693 km). Text only.
+- **Magnitude bins and the b estimator.** (1) `bin_mag` rounded ties (x.x5) to whichever side the float quotient
+  fell (5.25, 5.35, 5.45 down; 5.15, 5.75 up). 9 % of ISC-GEM Mw end in 5, so the 0.1 bins had unequal widths and b
+  changed with the parity of the threshold: global shallow direct-Mw b at thresholds 5.5…6.3 zigzagged by up to
+  0.015 (e.g. 1.035 at 5.8, 1.017 at 5.9, 1.040 at 6.0). Ties now go up (bin x = [x − 0.05, x + 0.05)). (2) b,
+  b with per-event thresholds, b-positive and every bootstrap replicate use the maximum-likelihood estimator for
+  binned magnitudes, β = ln(1 + ΔM / x̄) / ΔM (Tinti & Mulargia 1987; the form of van der Elst 2021 and SeismoStats),
+  instead of the Aki-Utsu ΔM/2 approximation, which is biased by −0.3 % at b = 1 and −1 % at b = 1.5. The Shi-Bolt
+  σ is kept: on synthetic data it matches the spread of the estimates within the Monte Carlo error (ratio 0.96–1.02
+  for b 0.8–1.5, n 300–3000), so the claimed 2–4 % underestimate was not confirmed. Outputs: every b, b-positive,
+  interval, quality code and Mc (MAXC bins of tie magnitudes) on the map, in the regional and induced layers, the
+  validation rows and the monitor; global shallow b of the Python/JS analysis of ISC-GEM 1976–2021 1.053 → 1.057.
+  The browser analysis (`site/js/analyze/core.js`) must get the same change (the JS/Python parity test checks it).
+- **b-positive threshold (checked, not changed for the map).** The map uses events above the period floor (method.md
+  §5: the floor is the static completeness; the cell Mc is raised by aftershock gaps, which b-positive is meant to
+  tolerate); `analysis.py` and the browser use max(Mc, floor) because a user catalogue has no separate floor. The
+  sequence b-positive (monitor, `sequences.py`) used no threshold at all; it now uses Mcat (see above).
