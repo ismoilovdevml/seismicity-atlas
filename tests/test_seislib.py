@@ -96,3 +96,12 @@ def test_omori_mct_recovers_p_with_early_incompleteness():
     f = sl.omori_fit_mct(t[keep], m[keep], 0.0, 2000.0, 7.1, 3.0, 1.0, fix_c=c)
     assert abs(f["p"] - p) < 3 * f["sp"], f
     assert abs(np.log10(f["K"]) - 2.0) < 0.05, f
+
+
+def test_mc_lilliefors_res_equal_step_finds_true_mc():
+    # magnitudes reported at 0.1 and tested on the 0.1 grid: (c - step/2)/res ends in .5, so a half-to-even round
+    # put the bin edge one bin low for odd tenths and rejected the true Mc (audit fix)
+    for seed in (0, 1, 2):
+        m = sl.synth_gr(2000, 1.0, 2.1, 0.1, rng=seed)
+        mc, table = sl.mc_lilliefors(m, res=0.1, step=0.1, rng=seed)
+        assert mc == 2.1, table[:2]

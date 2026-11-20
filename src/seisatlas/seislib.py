@@ -194,7 +194,9 @@ def lilliefors_offset(m, thr, offsets, res: float = 0.01, step: float = 0.1, alp
         s = m[keep]
         if s.size < nmin:
             break
-        edge = np.round((c[keep] - step / 2) / res) * res - res / 2
+        # lower edge of the lowest kept `res` bin: the first res-grid value >= c - step/2, minus res/2. ceil, not
+        # round: with res == step, (c - step/2)/res ends in .5 and round-half-to-even moved the edge one bin down
+        edge = np.ceil((c[keep] - step / 2) / res - 1e-6) * res - res / 2
         beta = 1.0 / (s - edge).mean()
         ps = [lilliefors_exp_p(_dither_trexp(s, res, beta, rng) - edge, nsim, rng) for _ in range(ndither)]
         p = float(np.median(ps))
