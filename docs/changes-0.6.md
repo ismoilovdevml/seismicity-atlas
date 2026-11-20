@@ -85,8 +85,8 @@ Each item: what was wrong, what changed, which outputs move after the rebuild.
   b-positive and the N-test still used 200. Every one now takes `atlaslib.NBOOT`. Outputs: interval ends of
   `regional/*/summary.json` `region_b`, `results/val_bpos.json`, `induced/groningen` moving b-positive,
   `results/sci2_ntest.json`.
-- **Groningen ML ≥ 3.0.** The list of ML ≥ 3.0 events used the 0.1 bin, which also holds ML 2.95 and 2.99: 16 events
-  instead of 14. It now uses the reported ML. Outputs: `induced/groningen/rates.json` `events_ge3` (14 events), the
+- **Groningen ML ≥ 3.0.** The list of ML ≥ 3.0 events used the 0.1 bin, which also holds ML 2.95, 2.99 and 2.995 (knmi2009iylo): 16 events
+  instead of 13. It now uses the reported ML. Outputs: `induced/groningen/rates.json` `events_ge3` (13 events), the
   stars of the map figure, the "16 events" in docs/induced.md (to be updated with the rebuild).
 - **Manifest checksums.** `site_layers.py` hashed `rating.json` before `build_rating.py` rewrote it, so a changed
   rating left a stale checksum. `run_all.sh` now ends the site step with `site_layers.py --rehash`; a test checks
@@ -119,7 +119,7 @@ Each item: what was wrong, what changed, which outputs move after the rebuild.
 | Shallow floor 1976–2003 / 2004–2021 | 5.8 / 5.3 | 6.3 / 5.2 |
 | Deeper floor 1976–2003 / 2004–2021 | 5.4 / 5.2 | 5.5 / 5.3 |
 | Cells with a shown b, shallow / deeper | 172 / 71 | 136 / 66 |
-| High-hazard cells (GEM PGA ≥ 0.35 g) without a b | 400 of 555 (72 %) | 429 of 555 (77 %) |
+| High-hazard cells (GEM PGA ≥ 0.35 g) without a b | 400 of 555 (72 %) | 430 of 555 (77 %) |
 | Validation, independent data | 1 match, 2 differ | 2 match, 1 differs |
 
 Why the shallow 1976–2003 floor rose: with the old tie rounding the bin counts were uneven (5.7: 947 events,
