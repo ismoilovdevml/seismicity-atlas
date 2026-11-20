@@ -4,55 +4,71 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Коды качества A, B, C и «недостаточно» — Пояснения · Global Seismicity Atlas</title>
-<meta name="description" content="Каждая ячейка получает код качества — A, B, C или «недостаточно» — по числу событий и ширине 95 % интервала, а b-значение показывается только для A и B.">
+<meta name="description" content="Каждая ячейка получает код качества — A, B, C или «недостаточно» — по числу событий и ширине 95 % интервала относительно b, а b-значение показывается только…">
 <link rel="canonical" href="https://seismicityatlas.org/ru/learn/quality-codes/">
 <link rel="alternate" hreflang="en" href="https://seismicityatlas.org/learn/quality-codes/">
 <link rel="alternate" hreflang="uz" href="https://seismicityatlas.org/uz/learn/quality-codes/">
 <link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/quality-codes/">
 <link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/quality-codes/">
 <link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/quality-codes/">
+<link rel="preload" href="/vendor/fonts/inter-400-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/vendor/fonts/inter-400-700-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Global Seismicity Atlas">
 <meta property="og:title" content="Коды качества A, B, C и «недостаточно» — Пояснения · Global Seismicity Atlas">
-<meta property="og:description" content="Каждая ячейка получает код качества — A, B, C или «недостаточно» — по числу событий и ширине 95 % интервала, а b-значение показывается только для A и B.">
+<meta property="og:description" content="Каждая ячейка получает код качества — A, B, C или «недостаточно» — по числу событий и ширине 95 % интервала относительно b, а b-значение показывается только…">
 <meta property="og:url" content="https://seismicityatlas.org/ru/learn/quality-codes/">
 <meta property="og:image" content="https://seismicityatlas.org/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Глобус с западной частью Тихого океана и ячейками b-значения закона Гутенберга-Рихтера от синего (низкое) до оранжевого (высокое), рядом с названием атласа.">
 <meta property="og:locale" content="ru_RU">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="uz_UZ">
+<meta property="og:locale:alternate" content="es_ES">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Коды качества A, B, C и «недостаточно» — Пояснения · Global Seismicity Atlas">
+<meta name="twitter:description" content="Каждая ячейка получает код качества — A, B, C или «недостаточно» — по числу событий и ширине 95 % интервала относительно b, а b-значение показывается только…">
+<meta name="twitter:image" content="https://seismicityatlas.org/og-image.png">
+<meta name="twitter:image:alt" content="Глобус с западной частью Тихого океана и ячейками b-значения закона Гутенберга-Рихтера от синего (низкое) до оранжевого (высокое), рядом с названием атласа.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <style>
-:root{--bg:#fbfaf7;--fg:#1d2126;--muted:#5b6470;--line:#e3e0d8;--accent:#0e6b73;--card:#fff}
-@media (prefers-color-scheme:dark){:root{--bg:#16191d;--fg:#e8eaed;--muted:#a3abb5;--line:#2c3138;--accent:#5cc3cb;--card:#1d2126}}
-@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-latin.woff2) format("woff2");font-weight:400 700;font-display:swap}
+:root{--bg:#fbfaf7;--fg:#1d2126;--muted:#5b6470;--line:#e3e0d8;--accent:#0e6b73;--on-accent:#fff;--card:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#16191d;--fg:#e8eaed;--muted:#a3abb5;--line:#2c3138;--accent:#5cc3cb;--on-accent:#16191d;--card:#1d2126}}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-latin.woff2) format("woff2");font-weight:400 700;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-cyrillic.woff2) format("woff2");font-weight:400 700;font-display:swap;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-latin-ext.woff2) format("woff2");font-weight:400 700;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-greek.woff2) format("woff2");font-weight:400 700;font-display:swap;unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
 a{color:var(--accent)}header,main,footer{max-width:760px;margin:0 auto;padding:0 16px}
 header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
 .brand{font-weight:700;text-decoration:none;color:var(--fg)}.langs a{margin-left:10px;font-size:14px}
 nav.crumbs{font-size:14px;color:var(--muted);margin:18px 0 4px}h1{font-size:30px;line-height:1.25;margin:6px 0 10px}
 .lead{font-size:19px;color:var(--fg);margin:0 0 22px}h2{font-size:19px;margin:30px 0 8px}
-.cta{display:inline-block;margin:6px 0 10px;padding:10px 16px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+.cta{display:inline-block;margin:6px 0 10px;padding:10px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent);text-decoration:none;font-weight:600}
 blockquote{margin:0;padding:12px 16px;border-left:3px solid var(--accent);background:var(--card)}
 code.lr-formula{display:block;margin:8px 0;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow-x:auto;white-space:pre-wrap}
 ol.refs{padding-left:20px;font-size:14px}ul.idx{padding-left:20px}ul.idx li{margin:6px 0}.sum{color:var(--muted)}
 .pager{display:flex;justify-content:space-between;gap:12px;margin:34px 0 10px;font-size:15px}
 footer{margin-top:30px;padding-top:14px;padding-bottom:30px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}</style>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Коды качества A, B, C и «недостаточно»","headline":"Коды качества A, B, C и «недостаточно»","description":"Каждая ячейка получает код качества — A, B, C или «недостаточно» — по числу событий и ширине 95 % интервала, а b-значение показывается только для A и B.","inLanguage":"ru","url":"https://seismicityatlas.org/ru/learn/quality-codes/","learningResourceType":"explanation","educationalLevel":"beginner to expert","about":{"@type":"DefinedTerm","name":"Quality codes A, B, C and insufficient","inDefinedTermSet":"https://seismicityatlas.org/learn/"},"author":{"@type":"Person","name":"Otabek Ismoilov","sameAs":"https://orcid.org/0009-0008-2785-3691"},"isPartOf":{"@type":"WebSite","name":"Global Seismicity Atlas","url":"https://seismicityatlas.org/"},"citation":["Woessner, J. & Wiemer, S. (2005). Assessing the quality of earthquake catalogues: estimating the magnitude of completeness and its uncertainty. BSSA, 95(2), 684–698.","Marzocchi, W., Spassiani, I., Stallone, A. & Taroni, M. (2020). How to be fooled searching for significant variations of the b-value. Geophysical Journal International, 220, 1845–1856.","Wiemer, S. & Wyss, M. (2002). Mapping spatial variability of the frequency-magnitude distribution of earthquakes. Advances in Geophysics, 45, 259–302."]},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Seismicity Atlas","item":"https://seismicityatlas.org/"},{"@type":"ListItem","position":2,"name":"Пояснения","item":"https://seismicityatlas.org/ru/learn/"},{"@type":"ListItem","position":3,"name":"Коды качества A, B, C и «недостаточно»","item":"https://seismicityatlas.org/ru/learn/quality-codes/"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Коды качества A, B, C и «недостаточно»","headline":"Коды качества A, B, C и «недостаточно»","description":"Каждая ячейка получает код качества — A, B, C или «недостаточно» — по числу событий и ширине 95 % интервала относительно b, а b-значение показывается только для A и B.","inLanguage":"ru","url":"https://seismicityatlas.org/ru/learn/quality-codes/","learningResourceType":"explanation","educationalLevel":"beginner to expert","about":{"@type":"DefinedTerm","name":"Quality codes A, B, C and insufficient","inDefinedTermSet":"https://seismicityatlas.org/learn/"},"author":{"@type":"Person","name":"Otabek Ismoilov","sameAs":"https://orcid.org/0009-0008-2785-3691"},"isPartOf":{"@type":"WebSite","name":"Global Seismicity Atlas","url":"https://seismicityatlas.org/"},"citation":["Woessner, J. & Wiemer, S. (2005). Assessing the quality of earthquake catalogues: estimating the magnitude of completeness and its uncertainty. BSSA, 95(2), 684–698.","Marzocchi, W., Spassiani, I., Stallone, A. & Taroni, M. (2020). How to be fooled searching for significant variations of the b-value. Geophysical Journal International, 220, 1845–1856.","Wiemer, S. & Wyss, M. (2002). Mapping spatial variability of the frequency-magnitude distribution of earthquakes. Advances in Geophysics, 45, 259–302."]},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Seismicity Atlas","item":"https://seismicityatlas.org/"},{"@type":"ListItem","position":2,"name":"Пояснения","item":"https://seismicityatlas.org/ru/learn/"},{"@type":"ListItem","position":3,"name":"Коды качества A, B, C и «недостаточно»","item":"https://seismicityatlas.org/ru/learn/quality-codes/"}]}]</script>
 </head>
 <body>
 <header><a class="brand" href="/">Global Seismicity Atlas</a><span class="langs"><a href="/learn/quality-codes/" hreflang="en" lang="en">English</a><a href="/uz/learn/quality-codes/" hreflang="uz" lang="uz">Oʻzbekcha</a><a href="/es/learn/quality-codes/" hreflang="es" lang="es">Español</a></span></header>
 <main>
 <nav class="crumbs" aria-label="Навигационная цепочка"><a href="/">Global Seismicity Atlas</a> › <a href="/ru/learn/">Пояснения</a> › Коды качества A, B, C и «недостаточно»</nav>
 <h1>Коды качества A, B, C и «недостаточно»</h1>
-<p class="lead">Каждая ячейка получает код качества — A, B, C или «недостаточно» — по числу событий и ширине 95 % интервала, а b-значение показывается только для A и B.</p>
+<p class="lead">Каждая ячейка получает код качества — A, B, C или «недостаточно» — по числу событий и ширине 95 % интервала относительно b, а b-значение показывается только для A и B.</p>
 <a class="cta" href="/#v=learn&t=quality-codes&lang=ru">Интерактивная диаграмма · Реальный пример из атласа →</a>
 <h2>Простое объяснение</h2>
 <p>У атласа одно жёсткое правило: <strong>никакого b-значения без его интервала и кода качества</strong>.</p>
-<p>Если выше порога полноты слишком мало землетрясений, ячейка получает код <strong>«недостаточно»</strong>. Если событий достаточно, но интервал всё ещё очень широк, ячейка получает код <strong>C</strong> и b скрывается: число, которое может оказаться чем угодно в широком диапазоне, вводило бы в заблуждение. Узкие интервалы дают <strong>A</strong>, умеренно узкие — <strong>B</strong>.</p>
+<p>Если выше порога полноты слишком мало землетрясений, ячейка получает код <strong>«недостаточно»</strong>. Если событий достаточно, но интервал всё ещё очень широк по сравнению с самим b, ячейка получает код <strong>C</strong> и b скрывается: число, которое может оказаться чем угодно в широком диапазоне, вводило бы в заблуждение. Узкие интервалы дают <strong>A</strong>, умеренно узкие — <strong>B</strong>.</p>
 <p>Поэтому серые и заштрихованные области на карте — не недоделанная работа. Это честный ответ для глобального каталога умеренных и сильных землетрясений.</p>
 <h2>Пример из жизни</h2>
 <blockquote>Метеостанция, которая в прошлом году передала данные только за два дня, не может дать надёжное среднегодовое значение. Атлас скорее оставит графу пустой и объяснит почему, чем напечатает догадку.</blockquote>
 <h2>Технические подробности</h2>
-<p>Правило (manifest.json, method.quality): не меньше {nMin} событий выше порогов для каждого события, иначе <code>insufficient</code>; затем A, если бутстреп-интервал 95 % не шире {wA}, B — если не шире {wB}, иначе C (b скрыто, публикуется только ширина).</p>
+<p>Правило (manifest.json, method.quality): не меньше {nMin} событий выше порогов для каждого события, иначе <code>insufficient</code>; затем A, если бутстреп-интервал 95 % не шире {wA} × b (b — точечная оценка ячейки), B — если не шире {wB} × b, иначе C (b скрыто, публикуется только ширина).</p>
+<p>Почему относительно b (с выпуска 0.5.0; раньше пороги задавались абсолютной шириной): интервал растёт вместе с самим b, примерно как 3.92 × b/√n, поэтому абсолютный порог оставлял ячейки с низким b и скрывал ячейки с высоким b при том же числе событий. На синтетических ячейках с 70 событиями выше известного порога старое правило показывало 98 % ячеек с b = 0.8 и 2 % ячеек с b = 1.5, а показанное b ячеек с b = 1.5 в среднем равнялось 1.24; относительное правило показывает от 73 до 77 % при любом b, и среднее по показанным ячейкам отличается от истинного b не более чем на 0.02 (tests/test_atlaslib.py). При одинаковом общем числе событий ячейки с высоким b всё же проходят реже, потому что выше MAXC + 0.2 лежит меньшая доля их событий.</p>
 <p>Почему ширина, а не только n: одно и то же n может давать разную ширину, если Mc плохо определена или выборка смешивает периоды; бутстреп-ширина включает неопределённость Mc. Флаг устойчивости к порогу (<code>unstable</code>) добавляется, когда b при пороге + 0.2 и + 0.4 в обоих случаях выходит за интервал с одной и той же стороны.</p>
 <p>Условные обозначения на карте: A — полный цвет, B — тот же цвет с пониженной непрозрачностью, C — штриховка, «недостаточно» — светло-серая заливка. Легенда показывает, сколько ячеек проходят критерий качества.</p>
 <p>Ограничение: критерий качества контролирует точность (разброс), а не отсутствие систематической ошибки. Ячейка может иметь код A и всё равно быть смещённой (например, из-за неверного порога), а соседние ячейки A имеют общие события (Wiemer & Wyss 2002; Marzocchi et al. 2020).</p>
@@ -60,6 +76,6 @@ footer{margin-top:30px;padding-top:14px;padding-bottom:30px;border-top:1px solid
 <ol class="refs"><li>Woessner, J. &amp; Wiemer, S. (2005). Assessing the quality of earthquake catalogues: estimating the magnitude of completeness and its uncertainty. BSSA, 95(2), 684–698. <a href="https://doi.org/10.1785/0120040007">doi.org/10.1785/0120040007</a></li><li>Marzocchi, W., Spassiani, I., Stallone, A. &amp; Taroni, M. (2020). How to be fooled searching for significant variations of the b-value. Geophysical Journal International, 220, 1845–1856. <a href="https://doi.org/10.1093/gji/ggz541">doi.org/10.1093/gji/ggz541</a></li><li>Wiemer, S. &amp; Wyss, M. (2002). Mapping spatial variability of the frequency-magnitude distribution of earthquakes. Advances in Geophysics, 45, 259–302. <a href="https://doi.org/10.1016/S0065-2687(02)80007-3">doi.org/10.1016/S0065-2687(02)80007-3</a></li></ol>
 <div class="pager"><a href="/ru/learn/confidence-interval-bootstrap/">← 95 % интервал и бутстреп</a><a href="/ru/learn/b-positive/">b-positive →</a></div>
 </main>
-<footer>Каждая страница берёт свои примеры из тех же файлов данных, что и карта, поэтому числа следуют за ежемесячным обновлением. · <a href="/">Global Seismicity Atlas</a> · Not a forecast and not a hazard map. · <a href="https://doi.org/10.5281/zenodo.24228387">doi:10.5281/zenodo.24228387</a></footer>
+<footer>Каждая страница берёт свои примеры из тех же файлов данных, что и карта, поэтому числа следуют за ежемесячным обновлением. · <a href="/">Global Seismicity Atlas</a> · Это не прогноз. Это не официальная карта опасности. · <a href="https://doi.org/10.5281/zenodo.24228387">doi:10.5281/zenodo.24228387</a></footer>
 </body>
 </html>

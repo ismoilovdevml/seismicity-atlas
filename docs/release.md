@@ -20,8 +20,11 @@ change. The tag is `v` + the version in `release.json` on that commit (for examp
 
 ### Interface-only changes
 
-The version in `release.json` is the version of the **data contract** (`site/data/`): `bump_release.py` writes only
-`release.json`, and the number reaches the site through `site_layers.py`, that is, through a pipeline run. An
+The version in `release.json` is the version of the **data contract** (`site/data/`): `bump_release.py` writes
+`release.json` and copies the new version into `pyproject.toml`, `src/seisatlas/__init__.py` (dropping a `.postN`) and
+`CITATION.cff` (`version`, `date-released`), and the number reaches the site through `site_layers.py`, that is,
+through a pipeline run, and through `node scripts/seo_pages.mjs` (Dataset JSON-LD `version` and `temporalCoverage` in
+`site/index.html`, sitemap `lastmod` of the home page = the cut-off), which the monthly workflow runs after the bump. An
 interface change that does not touch `site/data/` schema or numbers (for example the v0.3 two-mode redesign of
 2026-11-14: Simple and Scientist views, place search, place card) therefore does **not** bump the version; the site
 keeps showing the data version (0.2.0). The new `site/data/places.json` is a static gazetteer for the interface
@@ -108,8 +111,9 @@ robust split:
   refresh the screenshots on each release (minor or patch with interface changes) and look at each one.
   `tests/test_readme.py` fails if the README uses a missing image, if `docs/img/readme/` holds an image the README
   does not use, if one is over 400 KB, or if an old-style `docs/img/site-*.png` is left that no document uses.
-- `CITATION.cff` (`version`, `date-released`) is set by hand on each release; the test checks that
-  `scripts/release.json` and `site/data/manifest.json` agree.
+- `CITATION.cff` (`version`, `date-released`), `pyproject.toml` and `src/seisatlas/__init__.py` follow
+  `scripts/release.json` through `bump_release.py`; `tests/test_readme.py` checks that all of them and
+  `site/data/manifest.json` agree (the package may carry a documentation-only `.postN`).
 
 ### Not updated automatically
 
@@ -124,6 +128,7 @@ robust split:
 
 ```bash
 .venv/bin/python -I scripts/bump_release.py --cutoff "$(date -u +%F)"
+node scripts/seo_pages.mjs
 .venv/bin/python -I scripts/fetch.py comcat --refresh --end "$(date -u +%F)"
 ./scripts/run_all.sh
 ```
@@ -148,8 +153,8 @@ robust split:
 5. Add the badge to `README.md` under the title, using the concept DOI:
    `[![DOI](https://zenodo.org/badge/DOI/<concept DOI>.svg)](https://doi.org/<concept DOI>)`
    and add `doi: <concept DOI>` to `CITATION.cff` (top level) and to the "How to cite" text on the site if wanted.
-6. For later releases: bump `CITATION.cff` `version` and `date-released`, then create the release `vX.Y.Z`. Zenodo
-   makes a new version DOI under the same concept DOI automatically.
+6. For later releases: `CITATION.cff` `version` and `date-released` already follow `bump_release.py`; create the
+   release `vX.Y.Z`. Zenodo makes a new version DOI under the same concept DOI automatically.
 
 ## Official ISC-GEM release (optional input)
 

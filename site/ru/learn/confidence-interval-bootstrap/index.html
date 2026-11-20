@@ -11,26 +11,41 @@
 <link rel="alternate" hreflang="ru" href="https://seismicityatlas.org/ru/learn/confidence-interval-bootstrap/">
 <link rel="alternate" hreflang="es" href="https://seismicityatlas.org/es/learn/confidence-interval-bootstrap/">
 <link rel="alternate" hreflang="x-default" href="https://seismicityatlas.org/learn/confidence-interval-bootstrap/">
+<link rel="preload" href="/vendor/fonts/inter-400-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/vendor/fonts/inter-400-700-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Global Seismicity Atlas">
 <meta property="og:title" content="95 % интервал и бутстреп — Пояснения · Global Seismicity Atlas">
 <meta property="og:description" content="95 % интервал, показываемый при каждом b-значении, — это диапазон, который накрывал бы истинное b в 95 из 100 повторений измерения; атлас оценивает его…">
 <meta property="og:url" content="https://seismicityatlas.org/ru/learn/confidence-interval-bootstrap/">
 <meta property="og:image" content="https://seismicityatlas.org/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Глобус с западной частью Тихого океана и ячейками b-значения закона Гутенберга-Рихтера от синего (низкое) до оранжевого (высокое), рядом с названием атласа.">
 <meta property="og:locale" content="ru_RU">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="uz_UZ">
+<meta property="og:locale:alternate" content="es_ES">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="95 % интервал и бутстреп — Пояснения · Global Seismicity Atlas">
+<meta name="twitter:description" content="95 % интервал, показываемый при каждом b-значении, — это диапазон, который накрывал бы истинное b в 95 из 100 повторений измерения; атлас оценивает его…">
+<meta name="twitter:image" content="https://seismicityatlas.org/og-image.png">
+<meta name="twitter:image:alt" content="Глобус с западной частью Тихого океана и ячейками b-значения закона Гутенберга-Рихтера от синего (низкое) до оранжевого (высокое), рядом с названием атласа.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <style>
-:root{--bg:#fbfaf7;--fg:#1d2126;--muted:#5b6470;--line:#e3e0d8;--accent:#0e6b73;--card:#fff}
-@media (prefers-color-scheme:dark){:root{--bg:#16191d;--fg:#e8eaed;--muted:#a3abb5;--line:#2c3138;--accent:#5cc3cb;--card:#1d2126}}
-@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-latin.woff2) format("woff2");font-weight:400 700;font-display:swap}
+:root{--bg:#fbfaf7;--fg:#1d2126;--muted:#5b6470;--line:#e3e0d8;--accent:#0e6b73;--on-accent:#fff;--card:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#16191d;--fg:#e8eaed;--muted:#a3abb5;--line:#2c3138;--accent:#5cc3cb;--on-accent:#16191d;--card:#1d2126}}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-latin.woff2) format("woff2");font-weight:400 700;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-cyrillic.woff2) format("woff2");font-weight:400 700;font-display:swap;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-latin-ext.woff2) format("woff2");font-weight:400 700;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:Inter;src:url(/vendor/fonts/inter-400-700-greek.woff2) format("woff2");font-weight:400 700;font-display:swap;unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
 a{color:var(--accent)}header,main,footer{max-width:760px;margin:0 auto;padding:0 16px}
 header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding-top:18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
 .brand{font-weight:700;text-decoration:none;color:var(--fg)}.langs a{margin-left:10px;font-size:14px}
 nav.crumbs{font-size:14px;color:var(--muted);margin:18px 0 4px}h1{font-size:30px;line-height:1.25;margin:6px 0 10px}
 .lead{font-size:19px;color:var(--fg);margin:0 0 22px}h2{font-size:19px;margin:30px 0 8px}
-.cta{display:inline-block;margin:6px 0 10px;padding:10px 16px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+.cta{display:inline-block;margin:6px 0 10px;padding:10px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent);text-decoration:none;font-weight:600}
 blockquote{margin:0;padding:12px 16px;border-left:3px solid var(--accent);background:var(--card)}
 code.lr-formula{display:block;margin:8px 0;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow-x:auto;white-space:pre-wrap}
 ol.refs{padding-left:20px;font-size:14px}ul.idx{padding-left:20px}ul.idx li{margin:6px 0}.sum{color:var(--muted)}
@@ -53,6 +68,7 @@ footer{margin-top:30px;padding-top:14px;padding-bottom:30px;border-top:1px solid
 <blockquote>Чтобы узнать, насколько мог бы «гулять» результат опроса, можно много раз опросить новую случайную группу того же размера. Бутстреп делает это с теми, кого вы уже опросили, вытягивая их заново случайным образом.</blockquote>
 <h2>Технические подробности</h2>
 <p>Процедура для каждой ячейки и класса глубины: вытянуть с возвращением n событий из n событий в круге выборки; переоценить Mc ячейки (MAXC + 0.2) и пороги для каждого события; вычислить b оценкой Aki-Utsu; повторить {nboot} раз. Интервал — от 2.5-го до 97.5-го процентиля повторных выборок, поэтому он включает неопределённость Mc (Woessner & Wiemer 2005).</p>
+<p>Почему {nboot} повторных выборок (1000 с выпуска 0.5.0, раньше 200): границы интервала сами оцениваются по случайным выборкам, и вблизи порогов A/B/C их разброс может менять код ячейки. В тестовой ячейке со 150 событиями (88 выше порога) нижняя и верхняя границы менялись между случайными зёрнами со стандартным отклонением 0.012 и 0.024 при 200 выборках и 0.005 и 0.009 при 1000 (tests/test_atlaslib.py).</p>
 <p>Почему не только формула: классическая стандартная ошибка b, σ ≈ b/√n (Aki) или в форме Shi–Bolt, предполагает известную фиксированную Mc. Здесь сам порог оценивается, а выборка невелика, поэтому процентильный бутстреп — более честная сводка. Графики зависимости от порога в подробностях ячейки ради скорости используют ±1.96 σ по Shi–Bolt.</p>
 <p>Ограничения: бутстреп воспроизводит выборочный шум, а не систематические ошибки (неверная магнитудная шкала, пропущенные события выше Mc, смешение двух совокупностей). Перекрывающиеся интервалы не доказывают равенства; неперекрывающиеся — консервативный признак различия, а не формальный тест (Marzocchi et al. 2020).</p>
 <p>На сайте: полоса интервала на шкале b на панели ячейки, скобки после каждого значения b, ширина интервала, задающая код качества, и двухстрочный график интервалов в режиме сравнения.</p>
@@ -60,6 +76,6 @@ footer{margin-top:30px;padding-top:14px;padding-bottom:30px;border-top:1px solid
 <ol class="refs"><li>Woessner, J. &amp; Wiemer, S. (2005). Assessing the quality of earthquake catalogues: estimating the magnitude of completeness and its uncertainty. BSSA, 95(2), 684–698. <a href="https://doi.org/10.1785/0120040007">doi.org/10.1785/0120040007</a></li><li>Marzocchi, W., Spassiani, I., Stallone, A. &amp; Taroni, M. (2020). How to be fooled searching for significant variations of the b-value. Geophysical Journal International, 220, 1845–1856. <a href="https://doi.org/10.1093/gji/ggz541">doi.org/10.1093/gji/ggz541</a></li></ol>
 <div class="pager"><a href="/ru/learn/gutenberg-richter-b-value/">← b-значение Гутенберга–Рихтера</a><a href="/ru/learn/quality-codes/">Коды качества A, B, C и «недостаточно» →</a></div>
 </main>
-<footer>Каждая страница берёт свои примеры из тех же файлов данных, что и карта, поэтому числа следуют за ежемесячным обновлением. · <a href="/">Global Seismicity Atlas</a> · Not a forecast and not a hazard map. · <a href="https://doi.org/10.5281/zenodo.24228387">doi:10.5281/zenodo.24228387</a></footer>
+<footer>Каждая страница берёт свои примеры из тех же файлов данных, что и карта, поэтому числа следуют за ежемесячным обновлением. · <a href="/">Global Seismicity Atlas</a> · Это не прогноз. Это не официальная карта опасности. · <a href="https://doi.org/10.5281/zenodo.24228387">doi:10.5281/zenodo.24228387</a></footer>
 </body>
 </html>

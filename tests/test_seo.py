@@ -62,3 +62,40 @@ def test_every_dataset_node_is_complete():
             if o.get("@type") == "Dataset":
                 missing = [k for k in ("name", "description", "license", "creator") if not o.get(k)]
                 assert not missing, (str(page.relative_to(SITE)), missing)
+
+
+def test_static_pages_social_tags_and_language():
+    """Learn indexes are og:type website, concept pages article; every page has the image size/alt and Twitter tags;
+    the footer notice is in the page language (it was English on every page until 2026-11-20); Russian pages preload
+    the Cyrillic font subset; the dark-mode button text is dark on the light accent (white was 2.1:1)."""
+    notice = {"": "Not a forecast.", "uz/": "Prognoz emas.", "ru/": "Это не прогноз.", "es/": "No es un pronóstico."}
+    for lang, text in notice.items():
+        idx = (SITE / f"{lang}learn/index.html").read_text()
+        page = (SITE / f"{lang}learn/b-positive/index.html").read_text()
+        assert '<meta property="og:type" content="website">' in idx
+        assert '<meta property="og:type" content="article">' in page
+        for html in (idx, page):
+            for tag in ('og:image:width" content="1200"', 'og:image:height" content="630"', 'og:image:alt"',
+                        'twitter:title"', 'twitter:description"', 'twitter:image"', 'twitter:image:alt"'):
+                assert tag in html, (lang, tag)
+            footer = html.split("<footer>", 1)[1]
+            assert text in footer, lang
+            if lang:
+                assert "Not a forecast" not in footer, lang
+            assert ('inter-400-700-cyrillic.woff2" as="font"' in html) == (lang == "ru/"), lang
+            assert "color:var(--on-accent)" in html and "--on-accent:#16191d" in html
+
+
+def test_release_facts_follow_release_json():
+    """scripts/seo_pages.mjs writes version and cut-off from scripts/release.json into the Dataset JSON-LD of
+    index.html and into the sitemap lastmod of the home page."""
+    import json
+
+    rel = json.loads((SITE.parent / "scripts" / "release.json").read_text())
+    ds = [o for o in _jsonld_objects((SITE / "index.html").read_text()) if o.get("@type") == "Dataset"]
+    assert len(ds) == 1
+    assert ds[0]["version"] == rel["version"]
+    assert ds[0]["temporalCoverage"].endswith("/" + rel["data_cutoff_utc"])
+    xml = (SITE / "sitemap.xml").read_text()
+    home = re.search(rf"<loc>{re.escape(BASE)}/</loc>\s*<lastmod>([^<]+)</lastmod>", xml)
+    assert home and home.group(1) == rel["data_cutoff_utc"]
