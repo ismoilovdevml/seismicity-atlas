@@ -24,11 +24,12 @@ from scipy.spatial import cKDTree
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import atlaslib as al  # noqa: E402
 import seislib as sl  # noqa: E402
-from common import (B_MAGERR_MAX, CUTOFF_YEAR, H3_RES, RES, SAMPLE_R_KM, SITE, WORK, b_sample_label,  # noqa: E402
-                    b_sample_mask, jdump, load_work)
+from common import (B_MAGERR_MAX, CUTOFF_YEAR, H3_RES, ISCGEM_LAST_YEAR, RES, SAMPLE_R_KM, SITE, WORK,  # noqa: E402
+                    b_sample_label, b_sample_mask, jdump, load_work)
 
-PERIODS = [(1976, 2003), (2004, 2021)]
-Y0, Y1 = 1976, 2021
+Y0, Y1 = 1976, ISCGEM_LAST_YEAR          # b period: the GCMT era to the last ISC-GEM year (common.py)
+PERIODS = [(1976, 2003), (2004, Y1)]
+RATE_Y0 = 1964                             # M6 rate period: RATE_Y0..Y1
 NBOOT = al.NBOOT  # 1000 since v0.5 (200 before)
 RNG = 20261113
 
@@ -112,7 +113,7 @@ def main(radius=SAMPLE_R_KM):
 
     # rate / membership counts (cell, not circle)
     area = {h: h3.cell_area(h, "km^2") for h in cells}
-    g64 = g[(g.year >= 1964) & (g.year <= 2021)]
+    g64 = g[(g.year >= RATE_Y0) & (g.year <= Y1)]
     n_m6 = g64[g64.mag >= 5.95].groupby("h3").size()
     n_g = g.groupby("h3").size()
     n_c = c.groupby("h3").size()
@@ -129,9 +130,9 @@ def main(radius=SAMPLE_R_KM):
     mtb = mt[mt.type_c == "mb"]
     cons["cons_dmag_mb"] = (mtb.mag_c - mtb.mw_g).groupby(mtb.h3).median()
     cons["cons_n_mb"] = mtb.groupby("h3").size()
-    ov = (g.time >= c.time.min()) & (g.year <= 2021)
+    ov = (g.time >= c.time.min()) & (g.year <= Y1)
     cons_g_only = g[ov & (g.match < 0)].groupby("h3").size()
-    cons_c_only = c[(c.year <= 2021) & (c.match < 0) & (c.mw_proxy >= 5.95)].groupby("h3").size()
+    cons_c_only = c[(c.year <= Y1) & (c.match < 0) & (c.mw_proxy >= 5.95)].groupby("h3").size()
 
     sets = {}
     for dname, dsel_g, dsel_c in (("sh", ~g.deep, ~c.deep), ("dp", g.deep, c.deep)):
@@ -148,7 +149,7 @@ def main(radius=SAMPLE_R_KM):
         la, lo = cen[k]
         row = {"h3": h, "lat": round(float(la), 3), "lon": round(float(lo), 3), "area_km2": round(area[h], 0),
                "n_iscgem": int(n_g.get(h, 0)), "n_comcat": int(n_c.get(h, 0)),
-               "rate_m6": round(float(n_m6.get(h, 0)) / 58.0 / area[h] * 1e5, 4),
+               "rate_m6": round(float(n_m6.get(h, 0)) / (Y1 - RATE_Y0 + 1) / area[h] * 1e5, 4),
                "pb_class": pb.get(h, "none")}
         p = xyz(np.array([la]), np.array([lo]))[0]
         det = {"h3": h, "lat": row["lat"], "lon": row["lon"], "radius_km": SAMPLE_R_KM}
@@ -182,6 +183,7 @@ def main(radius=SAMPLE_R_KM):
                         pre + "b_unstable": r.get("cutoff_unstable", False),
                         pre + "b_decl": rd.get("b_raw", np.nan), pre + "b_decl_lo": rd.get("b_lo_raw", np.nan),
                         pre + "b_decl_hi": rd.get("b_hi_raw", np.nan), pre + "n_decl": rd.get("n_b", 0),
+                        pre + "b_decl_q": rd.get("quality"),
                         pre + "bpos": rp.get("bpos", np.nan), pre + "bpos_lo": rp.get("bpos_lo", np.nan),
                         pre + "bpos_hi": rp.get("bpos_hi", np.nan), pre + "n_bpos": rp.get("n_bpos", 0),
                         pre + "mc_cc_2010": mc_rec, pre + "mc_cc_pre1990": mc_old, pre + "n_cc_sample": int(ic.size)})
@@ -193,7 +195,7 @@ def main(radius=SAMPLE_R_KM):
                 det[dname] = {
                     "fmd_iscgem": fmd_pairs(sl.bin_mag(mg)) if ig.size else [],
                     "fmd_comcat": fmd_pairs(sl.bin_mag(mc_)) if ic.size else [],
-                    "mc_t_iscgem": mc_windows(ga.mag.to_numpy()[ia], ga.year.to_numpy()[ia], 1904, 2021, 10)
+                    "mc_t_iscgem": mc_windows(ga.mag.to_numpy()[ia], ga.year.to_numpy()[ia], 1904, Y1, 10)
                     if ia.size else [],
                     "mc_t_comcat": mc_windows(mc_, yc, 1973, CUTOFF_YEAR, 5) if ic.size else [],
                     "b_cutoff": b_cutoff_curve(sl.bin_mag(mg), sl.bin_mag(fg), np.round(np.arange(5.0, 7.01, 0.1), 1))

@@ -79,7 +79,7 @@ def _sub_blocks(blocks, window):
     return out, owner
 
 
-def cell_b_tv(m, per, fallback, nboot=200, rng=None, dm=0.1, nmin_p=NMIN_P, window=None):
+def cell_b_tv(m, per, fallback, nboot=al.NBOOT, rng=None, dm=0.1, nmin_p=NMIN_P, window=None):
     """b with a per-cell, per-period Mc. `m` and `per` must be in time order with periods chronological.
 
     `fallback[p]` is the regional floor of period p (used only when the period has fewer than nmin_p events).
@@ -158,7 +158,7 @@ def regional_floor(m, dm=0.1):
     return float(max(mx, mbs) if np.isfinite(mbs) else mx), float(mx), float(mbs)
 
 
-def b_region(m, thr, nboot=200, rng=None, dm=0.1):
+def b_region(m, thr, nboot=al.NBOOT, rng=None, dm=0.1):
     """Region-wide b with fixed per-event thresholds and a bootstrap 95 % interval (thresholds not re-estimated)."""
     rng = np.random.default_rng(rng)
     m = sl.bin_mag(m, dm)
@@ -168,7 +168,7 @@ def b_region(m, thr, nboot=200, rng=None, dm=0.1):
     b, sig, n = sl.b_varmc(m, thr, dm)
     if n < al.NMIN_B:
         return {"b": np.nan, "lo": np.nan, "hi": np.nan, "n": int(n)}
-    x = m - (thr - dm / 2)
-    bs = np.log10(np.e) / np.array([x[rng.integers(0, n, n)].mean() for _ in range(nboot)])
+    x = m - thr
+    bs = sl.b_from_excess(np.array([x[rng.integers(0, n, n)].mean() for _ in range(nboot)]), dm)
     lo, hi = np.percentile(bs, [2.5, 97.5])
     return {"b": float(b), "lo": float(lo), "hi": float(hi), "n": int(n), "sigma_shibolt": float(sig)}

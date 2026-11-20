@@ -8,19 +8,24 @@ Selection : ComCat mainshocks M >= 7.0 in the 365 days before the cut-off (M >= 
             Largest first; an event inside the window of a larger mainshock (0-365 days after, within R), or a
             doublet within 1 day and 2 R of it, joins that sequence instead of starting its own.
 Window    : epicentral radius R = max(100 km, 10^(-2.44 + 0.59 M)) (Wells & Coppersmith 1994, the atlas rule),
-            from the mainshock to the cut-off. ComCat events M >= 2.5, as served (mixed magnitude types).
+            depth within 100 km of the mainshock depth, from the mainshock to the cut-off. ComCat events M >= 2.5,
+            as served (mixed magnitude types); a query above ComCat's 20,000-event limit is repeated at M >= 3.5,
+            then split in time.
 Mcat      : MAXC + 0.2 of the events after min(10 days, half the sequence age); 4.5 if fewer than 30 such events.
 Mc(t)     : max(Mcat, Mm - 4.5 - 0.75 log10 t) (Helmstetter et al. 2006; Page et al. 2016).
 Omori     : Omori-Utsu MLE above Mc(t) (seislib.omori_fit_mct), b = sequence b-positive if >= 50 differences, else 1.
-            95 % intervals from the observed information; quality A/B/C as in the atlas sequence fits.
+            95 % intervals from the observed information (K with its covariance with p and c); c >= 1e-4 day;
+            quality A/B/C as in the atlas sequence fits.
 b         : Aki-Utsu with the per-event threshold Mc(t); 1000 bootstrap resamples with Mcat re-estimated; shown only
-            for quality A (95 % interval width / b <= 0.30) or B (<= 0.50) with >= 50 events. b-positive (van der Elst 2021).
-ZW2020    : optional, subduction-zone regimes only: count above Mc(t) divided by the direct-aftershock count of
-            the Zhang & Werner (2020) Table 6 ETAS parameters over the same span, next to the same ratio for their
-            own Case 3 sequences (descriptive; nothing is extrapolated past the cut-off).
+            for quality A (95 % interval width / b <= 0.30) or B (<= 0.50) with >= 50 events. b-positive (van der Elst 2021)
+            on the events at or above Mcat.
+ZW2020    : optional, subduction-zone regimes only: count above Mc(t) divided by the direct-aftershock count above
+            Mc(t) of the Zhang & Werner (2020) Table 6 ETAS parameters over the same span, next to the same ratio
+            (also above Mc(t)) for their own Case 3 sequences (descriptive; nothing is extrapolated past the cut-off).
 Productivity : sequence a-value with p, c, b fixed at the generic values of Page et al. (2016) for the Garcia et
-            al. (2012) tectonic region of the epicentre, compared with the regional mean a. "more" / "less" only
-            when the 95 % interval of the sequence a excludes the regional mean; otherwise "typical".
+            al. (2012) tectonic region of the epicentre, compared with the regional distribution of a (mean,
+            sigma). "more" / "less" only when the whole 95 % interval of the sequence a lies above the 75th /
+            below the 25th percentile of the regional distribution (mean +/- 0.6745 sigma); otherwise "typical".
 
 Usage
   python -I scripts/monitor/build_monitor.py                      # cut-off = now (UTC, whole hour)
@@ -45,14 +50,15 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent))
 import monitorlib as ml  # noqa: E402
 import seislib as sl  # noqa: E402
-from fetch import COMCAT, PAUSE_S, TooMany, cache_get  # noqa: E402
+from fetch import COMCAT, MIN_CHUNK_DAYS, PAUSE_S, TooMany, cache_get  # noqa: E402
 
 ROOT = HERE.parents[1]
 OUT = ROOT / "site" / "data" / "monitor"
-METHOD_VERSION = "monitor-1.1"
+METHOD_VERSION = "monitor-1.2"   # 1.2 (0.6.0): depth window, b-positive above Mcat, bounded c, K error, ZW Mc(t)
 MIN_MAG_MAIN, FALLBACK_MAG, MIN_SEQUENCES = 7.0, 6.5, 5
 WINDOW_DAYS = 365
 QUERY_MINMAG = 2.5
+TOOMANY_MINMAG = 3.5      # second try when ComCat refuses the M >= 2.5 query (more than 20,000 events)
 REGIME_URL = ("https://raw.githubusercontent.com/opensha/opensha-oaf/20431f4202b1a15904f381f4ca236fa8518daedb/"
               "src/main/resources/org/opensha/oaf/rj/TectonicRegimeTable.dat")
 DISCLAIMER = ("Descriptive only, not a forecast. These numbers describe aftershocks recorded between each mainshock "
@@ -75,6 +81,32 @@ def comcat_csv(params, refresh=False) -> pd.DataFrame:
     df = df[df["type"] == "earthquake"].dropna(subset=["mag"]).drop_duplicates("id")
     df["time"] = pd.to_datetime(df["time"], utc=True, format="ISO8601")
     return df.sort_values("time").reset_index(drop=True)
+
+
+def comcat_csv_split(params, refresh=False, min_days=MIN_CHUNK_DAYS) -> pd.DataFrame:
+    """comcat_csv over [starttime, endtime], halving the time span while ComCat refuses it as too large (HTTP 400);
+    a span of min_days that is still refused is an error, as in fetch.py."""
+    try:
+        return comcat_csv(params, refresh)
+    except TooMany:
+        t0, t1 = pd.Timestamp(params["starttime"]), pd.Timestamp(params["endtime"])
+        if (t1 - t0) <= pd.Timedelta(days=min_days):
+            raise
+        mid = (t0 + (t1 - t0) / 2).floor("s")
+        a = comcat_csv_split({**params, "endtime": mid.strftime("%Y-%m-%dT%H:%M:%S")}, refresh, min_days)
+        b = comcat_csv_split({**params, "starttime": mid.strftime("%Y-%m-%dT%H:%M:%S")}, refresh, min_days)
+        df = pd.concat([a, b], ignore_index=True).drop_duplicates("id")
+        return df.sort_values("time").reset_index(drop=True)
+
+
+def sequence_events(q, refresh=False) -> pd.DataFrame:
+    """Events of one sequence query. M >= QUERY_MINMAG; if ComCat refuses that (> 20,000 events), M >=
+    TOOMANY_MINMAG; if still refused, the same query split in time. q["minmagnitude"] records what was used."""
+    try:
+        return comcat_csv(q, refresh)
+    except TooMany:
+        q["minmagnitude"] = TOOMANY_MINMAG
+    return comcat_csv_split(q, refresh)
 
 
 def load_regimes(refresh=False) -> ml.RegimeTable:
@@ -105,21 +137,18 @@ def sequence(ms, absorbed, overlaps, end, regimes, refresh):
     q = {"latitude": round(float(ms.latitude), 4), "longitude": round(float(ms.longitude), 4),
          "maxradiuskm": round(R, 1), "starttime": t0.strftime("%Y-%m-%dT%H:%M:%S"),
          "endtime": end.strftime("%Y-%m-%dT%H:%M:%S"), "minmagnitude": QUERY_MINMAG}
-    try:
-        ev = comcat_csv(q, refresh)
-    except TooMany:
-        q["minmagnitude"] = 3.5
-        ev = comcat_csv(q, refresh)
+    ev = sequence_events(q, refresh)
     ev = ev[(ev.id != ms.id)]
     t = ((ev.time - t0).dt.total_seconds() / 86400).to_numpy()
-    keep = (t > 0) & (t <= age)
+    depth_main = float(ms.depth) if pd.notna(ms.depth) else None
+    keep = (t > 0) & (t <= age) & ml.depth_window(ev.depth.to_numpy(float), depth_main)
     ev, t = ev[keep].reset_index(drop=True), t[keep]
     m = sl.bin_mag(ev.mag.to_numpy(float), ml.DM)
     regime = regimes.regime(float(ms.latitude), float(ms.longitude))
     mcat, mcat_how = ml.estimate_mcat(t, m, age, q["minmagnitude"] + 0.2)
     contaminated = bool((m >= Mm - 0.5).any() or any(o["mag"] >= Mm - 0.5 for o in overlaps))
 
-    bp = ml.b_positive_seq(t, m)
+    bp = ml.b_positive_seq(t, m, mcat)
     b_fit = bp["b"] if bp["b"] is not None else 1.0
     fit = ml.omori_fit(t, m, age, Mm, mcat, b_fit)
     fit["quality"] = ml.omori_quality(fit, contaminated)
@@ -154,7 +183,7 @@ def sequence(ms, absorbed, overlaps, end, regimes, refresh):
         "url": f"https://earthquake.usgs.gov/earthquakes/eventpage/{ms.id}",
         "regime": regime, "radius_km": round(R, 1), "age_days": round(age, 2),
         "absorbed": absorbed, "overlaps": overlaps,
-        "query": {k: v for k, v in q.items()},
+        "query": {k: v for k, v in q.items()}, "depth_window_km": ml.DZ_KM,
         "counts": {"n_all": int(m.size), "n_mcat": int((m >= mcat - 1e-9).sum()), "n_fit": int(above.sum()),
                    "n_last7": int((t > age - 7).sum()), "n_last7_mcat": int(((t > age - 7) & (m >= mcat - 1e-9)).sum()),
                    "last_event": iso(ev.time.iat[-1]) if m.size else None},

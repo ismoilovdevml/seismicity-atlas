@@ -24,7 +24,8 @@ from scipy.spatial import cKDTree
 
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
 import seislib as sl  # noqa: E402
-from common import AUX, DEPTH_SPLIT, H3_RES, MW_TYPES, PROC, RES, WORK, decimal_year, jdump  # noqa: E402
+from common import (AUX, COMCAT_MINMAG, DEPTH_SPLIT, H3_RES, ISCGEM_LAST_YEAR, MW_TYPES, PROC, RES, WORK,  # noqa: E402
+                    decimal_year, jdump)
 
 
 def standardise(df: pd.DataFrame, src: str) -> pd.DataFrame:
@@ -92,8 +93,15 @@ def boundary_class(lat, lon, steps, max_km=200.0):
 def main():
     g = standardise(pd.read_csv(PROC / "iscgem.csv", low_memory=False), "iscgem")
     c = standardise(pd.read_csv(PROC / "comcat_m45.csv", low_memory=False), "comcat")
+    late = g[g.year > ISCGEM_LAST_YEAR]
+    if len(late):   # a newer ISC-GEM release: every ISC-GEM period ends at iscgem_last_year, so stop instead of cutting
+        raise SystemExit(f"ISC-GEM holds {len(late)} events after {ISCGEM_LAST_YEAR} (to {g.time.max()}): set "
+                         "iscgem_last_year in scripts/release.json to its last complete year")
     info = {"iscgem_n": len(g), "comcat_n": len(c), "iscgem_span": [str(g.time.min()), str(g.time.max())],
             "comcat_span": [str(c.time.min()), str(c.time.max())]}
+    below = c.mag < COMCAT_MINMAG - 1e-9      # the query is M >= 4.5, but ComCat has served smaller events
+    c = c[~below].reset_index(drop=True)
+    info["comcat_dropped_below_minmag"] = {"n": int(below.sum()), "minmag": COMCAT_MINMAG}
     c = c[np.isfinite(c["depth"])].reset_index(drop=True)
     info["comcat_dropped_no_depth"] = info["comcat_n"] - len(c)
 
@@ -118,7 +126,7 @@ def main():
 
     # ------------------------------------------------------------------ mb -> Mw proxy
     def covered_bins(types):
-        cov = c[(c.year <= 2021) & c.magtype.isin(types)].copy()
+        cov = c[(c.year <= ISCGEM_LAST_YEAR) & c.magtype.isin(types)].copy()
         cov["b"] = sl.bin_mag(cov["mag"])
         frac = cov.groupby("b")["match"].apply(lambda s: (s >= 0).mean())
         cnt = cov.groupby("b").size()
@@ -169,17 +177,22 @@ def main():
 
     # ------------------------------------------------------------------ cells, boundary class, declustering
     st = json.loads((AUX / "PB2002_steps.json").read_text())["features"]
-    steps = pd.DataFrame([{"lat": (f["properties"]["STARTLAT"] + f["properties"]["FINALLAT"]) / 2,
-                           "lon": (f["properties"]["STARTLONG"] + f["properties"]["FINALLONG"]) / 2,
+    steps = pd.DataFrame([{"lat": f["properties"]["STARTLAT"], "lon": f["properties"]["STARTLONG"],
+                           "lat2": f["properties"]["FINALLAT"], "lon2": f["properties"]["FINALLONG"],
                            "cls": f["properties"]["STEPCLASS"], "age": f["properties"]["SEAFLOORAG"],
                            "vel": f["properties"]["VELOCITYLE"]} for f in st])
+    # step midpoint on the sphere: the mean of the longitudes put the 11 steps that cross 180 E near 0 E
+    steps["lat"], steps["lon"] = sl.great_circle_midpoint(steps.lat, steps.lon, steps.lat2, steps.lon2)
     for d in (g, c):
         d["h3"] = [h3.latlng_to_cell(la, lo, H3_RES) for la, lo in zip(d.lat, d.lon)]
         cls, dist, age, vel = boundary_class(d.lat.to_numpy(), d.lon.to_numpy(), steps)
         d["pb_class"], d["pb_dist_km"], d["pb_age"], d["pb_vel"] = cls, dist, age, vel
         dd = ((d.time - pd.Timestamp("1900-01-01", tz="UTC")).dt.total_seconds() / 86400).to_numpy()
         mags = d["mag"].to_numpy() if d.src.iat[0] == "iscgem" else d["mw_proxy"].to_numpy()
-        d["mainshock"] = sl.decluster_gk(dd, d.lat.to_numpy(), d.lon.to_numpy(), mags)
+        # per depth layer (<= 70 / > 70 km), as the layers are analysed separately: the windows are epicentral, so
+        # on the whole catalogue a deep event removed shallow events above it (9 % of the deeper and 1.4 % of the
+        # shallow ISC-GEM events changed class)
+        d["mainshock"] = sl.decluster_gk_layers(dd, d.lat.to_numpy(), d.lon.to_numpy(), mags, d.deep.to_numpy())
     info["declustering"] = {s: {"n": int(len(d)), "mainshocks": int(d.mainshock.sum())} for s, d in
                             (("iscgem", g), ("comcat", c))}
     info["pb_class_counts_iscgem_shallow"] = g[~g.deep].pb_class.value_counts().to_dict()

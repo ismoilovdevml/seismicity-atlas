@@ -101,3 +101,45 @@ def test_small_helpers():
     g = ml.cum_grid(3.4)
     assert g[0] == round(1 / 24, 4) and g[-1] == 3.4 and np.all(np.diff(g) > 0)
     assert ml.wc_radius_km(6.0) == 100.0 and abs(ml.wc_radius_km(8.0) - 10 ** 2.28) < 1e-9
+
+
+def test_depth_window():
+    z = np.array([10.0, 120.0, 590.0, np.nan, 499.0])
+    assert ml.depth_window(z, 600.0).tolist() == [False, False, True, True, False]   # deep mainshock: shallow out
+    assert ml.depth_window(z, 25.0).tolist() == [True, True, False, True, False]     # intraslab below a megathrust in
+    assert ml.depth_window(z, None).all() and ml.depth_window(z, float("nan")).all()
+
+
+def test_b_positive_seq_uses_events_above_mcat():
+    # complete above 3.0 only: half of the events between 2.5 and 3.0 are missing (static incompleteness), which
+    # biases b-positive low when they enter the differences (audit fix: the monitor now cuts at Mcat)
+    r = np.random.default_rng(4)
+    m = sl.synth_gr(20000, 1.0, 2.5, rng=5)
+    m = m[(m >= 3.0 - 0.05) | (r.random(m.size) < 0.3)]
+    t = np.sort(r.uniform(0, 100, m.size))
+    all_ = ml.b_positive_seq(t, m)
+    cut = ml.b_positive_seq(t, m, 3.0)
+    assert cut["n"] < all_["n"]
+    assert cut["lo"] < 1.0 < cut["hi"], cut
+    assert all_["hi"] < 1.0, all_
+
+
+def test_sequence_query_falls_back_to_higher_magnitude_then_time_split(monkeypatch):
+    import pandas as pd
+    import build_monitor as bm
+    calls = []
+
+    def fake(params, refresh=False):
+        calls.append(dict(params))
+        span = pd.Timestamp(params["endtime"]) - pd.Timestamp(params["starttime"])
+        if params["minmagnitude"] < 3.5 or span > pd.Timedelta(days=100):
+            raise bm.TooMany("too many")
+        t0 = pd.Timestamp(params["starttime"], tz="UTC")
+        return pd.DataFrame({"time": [t0 + pd.Timedelta(hours=1)], "id": [params["starttime"]], "mag": [4.0]})
+
+    monkeypatch.setattr(bm, "comcat_csv", fake)
+    q = {"starttime": "2025-01-01T00:00:00", "endtime": "2025-12-31T00:00:00", "minmagnitude": 2.5}
+    ev = bm.sequence_events(q)
+    assert q["minmagnitude"] == 3.5                    # recorded for the Mcat floor
+    assert len(ev) == 4 and ev.time.is_monotonic_increasing
+    assert calls[0]["minmagnitude"] == 2.5 and all(c["minmagnitude"] == 3.5 for c in calls[1:])

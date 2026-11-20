@@ -43,6 +43,7 @@ for p in (HERE, ROOT / "scripts", ROOT / "scripts" / "regional"):
 import build_regional as br  # noqa: E402
 import regionlib as rl  # noqa: E402
 import sci2lib as s2  # noqa: E402
+from common import jdump  # noqa: E402
 from fetch import cache_get  # noqa: E402
 from regions import REGIONS  # noqa: E402
 
@@ -254,7 +255,7 @@ def main():
                   "published per-period Mc, events after M >= 5.5 within 3 days and 30 km removed.",
                   "b in ML and b in Mw differ by the slope of the ML-Mw relation, so a constant ratio between the two "
                   "is expected; correlation and ranks are the like-for-like part of the comparison."]})
-    OUT_JSON.write_text(json.dumps(out, indent=1, default=lambda o: o.item() if hasattr(o, "item") else str(o)))
+    jdump(out, OUT_JSON, indent=1)
 
     pyb = {"package": "pybvalue v0.0.1 (doi:10.5281/zenodo.11508511)", "licence": "MIT (LICENSE in the Zenodo archive)",
            "archive_contents": "README, LICENSE, ProjectDescription.pdf, one notebook (catalogue download and reading "
@@ -268,7 +269,7 @@ def main():
            "maxc_inside_our_interval": int(((ab.pyb >= ab.sh_b_lo) & (ab.pyb <= ab.sh_b_hi)).sum()),
            "maxc02_inside_our_interval": int(((ab.pyb02 >= ab.sh_b_lo) & (ab.pyb02 <= ab.sh_b_hi)).sum()),
            "mc_single_minus_ours_latest_median": r(float(np.nanmedian(ab.pyb_mc - ab.sh_mc)) if "sh_mc" in ab else np.nan)}
-    OUT_PYB.write_text(json.dumps(pyb, indent=1))
+    jdump(pyb, OUT_PYB, indent=1)
     print(json.dumps(out["comparisons"], indent=1))
     print(json.dumps(agree), json.dumps(pyb, indent=1))
     print(json.dumps({k: v for k, v in qb.items() if k != "cells_dn_gt_1_5_list"}, indent=1))

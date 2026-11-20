@@ -32,7 +32,8 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent))
 import momentlib as ml  # noqa: E402
 import seislib as sl  # noqa: E402
-from common import CUTOFF, MW_TYPES, PROC, SITE, VERSION, WORK, decimal_year, jdump  # noqa: E402
+from common import (CUTOFF, ISCGEM_END, ISCGEM_LAST_YEAR, MW_TYPES, PROC, SITE, VERSION, WORK,  # noqa: E402
+                    decimal_year, jdump)
 
 OUT = SITE / "deficit"
 WD = WORK / "deficit"
@@ -44,8 +45,10 @@ MU_RANGE = (28e9, 33e9)          # Pa, uniform
 H_RANGE = (15e3, 25e3)           # m, uniform
 MC_RANGE = (7.75, 8.5)           # corner magnitude, uniform (tapered G-R long-term rate)
 MW_T = 6.0                       # threshold of the rate alpha, counted from YEAR_T
+MC_SEARCH = (6.0, 10.5)          # corner magnitudes searched for the moment balance
 YEAR_T = 1964.0
 B_MIN = 5.8                      # b from Mw >= 5.8, 1976 - cut-off (whole belt; sub-zones are too small)
+DM = 0.1                         # magnitude bin of the b estimate: bin 5.8 holds Mw 5.75-5.84
 # Michael (2014) ISC-GEM shallow completeness, as magnitude bands with the first complete year
 BANDS = [(5.8, 6.0, 1976.0), (6.0, 6.5, 1964.0), (6.5, 6.8, 1955.0), (6.8, 7.0, 1940.0), (7.0, 7.7, 1918.0),
          (7.7, 99.0, 1904.0)]
@@ -81,17 +84,18 @@ def load_catalogue():
     t_end = float(decimal_year(pd.Series(pd.to_datetime([CUTOFF], utc=True)))[0])
     a = pd.read_csv(PROC / "iscgem.csv", usecols=["time", "latitude", "longitude", "depth", "mag", "magError", "id"])
     a["time"] = pd.to_datetime(a["time"], utc=True, format="ISO8601")
-    a = a[a["time"] < pd.Timestamp("2022-01-01", tz="UTC")]
+    a = a[a["time"] < pd.Timestamp(ISCGEM_END, tz="UTC")]           # ISC-GEM to its last year, ComCat after
     a["src"] = "iscgem"
     a["magError"] = a["magError"].fillna(0.2)          # ISC-GEM Mw uncertainty; 0.2 where missing
     c = pd.read_csv(PROC / "comcat_m45.csv", usecols=["time", "latitude", "longitude", "depth", "mag", "magType", "id"])
     c["time"] = pd.to_datetime(c["time"], utc=True, format="ISO8601")
-    c = c[(c["time"] >= pd.Timestamp("2022-01-01", tz="UTC")) & c["magType"].str.lower().isin(MW_TYPES)]
+    c = c[(c["time"] >= pd.Timestamp(ISCGEM_END, tz="UTC")) & c["magType"].str.lower().isin(MW_TYPES)]
     c = c.drop(columns="magType")
     c["src"] = "comcat"
-    c["magError"] = 0.1                                 # assumed for ComCat Mww/Mwr 2022 - cut-off
+    c["magError"] = 0.1                                 # assumed for ComCat Mww/Mwr after ISC-GEM - cut-off
     e = pd.concat([a, c], ignore_index=True)
-    e = e[(e["depth"].fillna(0) <= 70.0) & (e["mag"] >= B_MIN - 1e-9)]
+    # Mw >= B_MIN - DM/2: the lowest bin of the b estimate (moment bands and counts use Mw >= B_MIN, see zone_inputs)
+    e = e[(e["depth"].fillna(0) <= 70.0) & (e["mag"] >= B_MIN - DM / 2 - 1e-9)]
     e = e[e["longitude"].between(60, 95) & e["latitude"].between(35, 52)].copy()
     e["year"] = decimal_year(e["time"])
     return e.reset_index(drop=True), t_end
@@ -112,7 +116,8 @@ def zone_inputs(poly, g, LO, LA, area, ev):
             w = area[ok] / area[ok].sum()
             integ_meant[m] = float(ml.savage_simpson_rate((d["exx"][ok] * w).sum(), (d["eyy"][ok] * w).sum(),
                                                           (d["exy"][ok] * w).sum()) * a_zone)
-    sel = shapely.contains_xy(poly, ev["longitude"].to_numpy(), ev["latitude"].to_numpy())
+    sel = shapely.contains_xy(poly, ev["longitude"].to_numpy(), ev["latitude"].to_numpy()) & \
+        (ev["mag"].to_numpy(float) >= B_MIN - 1e-9)
     return {"area_m2": a_zone, "integ": integ, "integ_meantensor": integ_meant, "cov": cov, "events": ev[sel]}
 
 
@@ -156,9 +161,11 @@ def zone_mc(zi, t_end, b_boot, rng):
     # catalogue-length test: corner magnitude that balances chi * Mdot_geod, then simulated band-wise estimates
     k = np.arange(N_SIM)
     for chi, key in ((1.0, "full"), (0.5, "half")):
-        mcb = np.array([ml.balance_corner_mw(chi * mg[i], alpha6[i], MW_T, beta[i]) for i in k])
-        unbal = ~np.isfinite(mcb)
-        mcb_use = np.where(unbal, 10.5, mcb)
+        mcb = np.array([ml.balance_corner_mw(chi * mg[i], alpha6[i], MW_T, beta[i], *MC_SEARCH) for i in k])
+        unbal = mcb == np.inf            # no corner up to 10.5 balances the budget: those draws use 10.5
+        over = mcb == -np.inf            # the observed rate exceeds the budget even with a corner at 6.0: use 6.0
+        mcb_use = np.where(unbal, MC_SEARCH[1], np.where(over, MC_SEARCH[0], mcb))
+        mcb_use = np.where(np.isfinite(mcb_use), mcb_use, MC_SEARCH[1])
         # rate above B_MIN implied by alpha6 and the tapered G-R survivor between B_MIN and MW_T
         m0t, m06 = ml.mw_to_m0(B_MIN), ml.mw_to_m0(MW_T)
         surv = (m0t / m06) ** beta[k] * np.exp((m0t - m06) / ml.mw_to_m0(mcb_use))
@@ -172,8 +179,10 @@ def zone_mc(zi, t_end, b_boot, rng):
             s = (mws >= lo) & (mws < hi) & (yrs >= y0)
             est += np.bincount(sim[s], weights=ml.mw_to_m0(mws[s]), minlength=N_SIM) / (t_end - y0)
         out[f"p_{key}"] = float((est <= ms_obs).mean())
-        out[f"mc_bal_{key}"] = ml.ratio_summary(mcb[~unbal]) if (~unbal).any() else {"lo": None, "med": None, "hi": None}
+        ok = np.isfinite(mcb)
+        out[f"mc_bal_{key}"] = ml.ratio_summary(mcb[ok]) if ok.any() else {"lo": None, "med": None, "hi": None}
         out[f"unbalanced_{key}"] = float(unbal.mean())
+        out[f"over_budget_{key}"] = float(over.mean())
         out[f"sim_med_ratio_{key}"] = float(np.median(est / (chi * mg[k])))
     out["q"] = "ok" if n6 >= 5 else "few"
     return out
@@ -286,6 +295,7 @@ def props(zid, name, res, area_m2):
     p["p_full"], p["p_half"] = r3(res["p_full"], 2), r3(res["p_half"], 2)
     p["mc_bal"] = r3(res["mc_bal_full"]["med"])
     p["unbal"] = r3(res["unbalanced_full"], 2)
+    p["over"] = r3(res["over_budget_full"], 2)
     p["cov_min"] = r3(min(res["cov"][m] for m in res["models"]), 2)
     return p
 
@@ -305,8 +315,10 @@ def main():
     # b (hence beta) for the whole belt, bootstrap
     sel = shapely.contains_xy(ts, ev["longitude"].to_numpy(), ev["latitude"].to_numpy()) & (ev["year"] >= 1976)
     mb = ev.loc[sel, "mag"].to_numpy(float)
-    b, bsig, nb, _ = sl.b_aki(mb, B_MIN)
-    b_boot = np.array([sl.b_aki(rng.choice(mb, mb.size), B_MIN)[0] for _ in range(2000)])
+    # binned estimate: b_aki bins to DM and keeps bins >= B_MIN, i.e. Mw >= B_MIN - DM/2 (before 0.6.0 the sample
+    # was cut at Mw >= 5.80 first, so bin 5.8 lost its 5.75-5.79 events and b came out low)
+    b, bsig, nb, _ = sl.b_aki(mb, B_MIN, DM)
+    b_boot = np.array([sl.b_aki(rng.choice(mb, mb.size), B_MIN, DM)[0] for _ in range(2000)])
     b_boot = b_boot[np.isfinite(b_boot)]
     print(f"b (Mw>={B_MIN}, 1976-cut-off, whole belt) = {b:.3f} +/- {bsig:.3f}, n = {nb}; "
           f"bootstrap 95% [{np.percentile(b_boot, 2.5):.3f}, {np.percentile(b_boot, 97.5):.3f}]")
@@ -371,8 +383,9 @@ def main():
              "role": "strain-rate models chang_bforstrain, chang_gpsgridder, chang_locavggrad, chang_visr",
              "paper": "Chang et al. (2025) GRL 52, e2025GL118470, doi:10.1029/2025GL118470"},
             {"name": "ISC-GEM Global Instrumental Earthquake Catalogue", "licence": "CC BY-SA 3.0",
-             "role": "seismic moment 1904-2021", "citation": "Storchak et al. 2013; Di Giacomo et al. 2018"},
-            {"name": "USGS ComCat", "licence": "public domain", "role": "seismic moment 2022-cut-off, Mw types only"},
+             "role": f"seismic moment 1904-{ISCGEM_LAST_YEAR}", "citation": "Storchak et al. 2013; Di Giacomo et al. 2018"},
+            {"name": "USGS ComCat", "licence": "public domain",
+             "role": f"seismic moment {ISCGEM_LAST_YEAR + 1}-cut-off, Mw types only"},
         ],
         "not_used": [{"name": "GSRM v2.1 (Kreemer et al. 2014, G3 15, 3849-3889)",
                       "reason": "GEM product page states CC BY-NC-SA 4.0 in its text and CC BY-SA 3.0 in its licence "

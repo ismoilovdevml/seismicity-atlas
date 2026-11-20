@@ -16,12 +16,14 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import atlaslib as al  # noqa: E402
 import seislib as sl  # noqa: E402
 
 DM = 0.1
 F_MC, G_MC, H_MC = 1.0, 4.5, 0.75   # Mc(t) = max(Mcat, F Mm - G - H log10 t), Helmstetter et al. 2006; Page et al. 2016
 MCAT_DEFAULT = 4.5                  # used when a sequence has too few events to estimate its completeness
-NBOOT = 1000                        # bootstrap replicates for b (200 before 0.5.0)
+NBOOT = al.NBOOT                    # bootstrap replicates for b: the atlas constant (200 before 0.5.0)
+DZ_KM = 100.0                       # aftershock depth window: |depth - mainshock depth| <= DZ_KM (since 0.6.0)
 LN10 = math.log(10)
 
 # Page et al. (2016, BSSA 106(5), 2290-2301, doi:10.1785/0120160073), generic Reasenberg-Jones parameters per
@@ -55,6 +57,17 @@ REGIME_ORDER = ["ANSR-DEEPCON", "ANSR-HOTSPOT", "ANSR-OCEANBD", "ANSR-SHALCON", 
 def wc_radius_km(mag: float) -> float:
     """Sequence radius used across the atlas: max(100 km, L), L = 10^(-2.44 + 0.59 M) (Wells & Coppersmith 1994)."""
     return max(100.0, 10 ** (-2.44 + 0.59 * mag))
+
+
+def depth_window(depth, depth_main, dz: float = DZ_KM):
+    """True for events whose depth is within dz km of the mainshock depth (events or a mainshock without a depth
+    are kept). The epicentral circle alone let shallow background around a deep mainshock into its sequence
+    (2018 Fiji M8.2 at 600 km: 12 % of the events above Mcat were more than 100 km shallower); 100 km keeps the
+    intraslab events below a shallow megathrust rupture."""
+    d = np.asarray(depth, float)
+    if depth_main is None or not np.isfinite(depth_main):
+        return np.ones(d.shape, bool)
+    return ~(np.abs(d - float(depth_main)) > dz)
 
 
 def a_sigma(regime: str, mag: float) -> float:
@@ -161,8 +174,9 @@ def omori_fit(t, m, T2, mag_main, mcat, b):
     out = {"n": int(f["n"]), "K": f["K"], "c": f["c"], "p": f["p"], "sK": sK, "sc": sc, "sp": sp,
            "p_lo": f["p"] - 1.96 * sp if np.isfinite(sp) else None,
            "p_hi": f["p"] + 1.96 * sp if np.isfinite(sp) else None,
-           "K_lo": max(0.0, f["K"] - 1.96 * sK), "K_hi": f["K"] + 1.96 * sK,
-           "c_resolved": bool(f["c"] >= 1e-3 and np.isfinite(sc))}
+           "K_lo": max(0.0, f["K"] - 1.96 * sK) if np.isfinite(sK) else None,
+           "K_hi": f["K"] + 1.96 * sK if np.isfinite(sK) else None,
+           "c_resolved": bool(f["c"] >= 1e-3 and np.isfinite(sc)), "c_at_bound": f["c_at_bound"]}
     if out["c_resolved"]:
         s = sc / f["c"]
         out["c_lo"], out["c_hi"] = f["c"] * math.exp(-1.96 * s), f["c"] * math.exp(1.96 * s)
@@ -261,17 +275,30 @@ def zw_case3_window_days(mag):
     return None
 
 
+def zw_direct_count_mct(mag_main, T, mcat):
+    """Direct aftershocks above Mc(t) = max(mcat, Mm - 4.5 - 0.75 log10 t) between 0 and T days implied by the
+    Table 6 parameters: K0 e^(alpha (Mm - Mcut)) int_0^T v(t) 10^(-b (Mc(t) - Mcut)) dt."""
+    z = ZW2020
+    g = _grid(T)
+    v = (z["p"] - 1) * z["c"] ** (z["p"] - 1) * (g + z["c"]) ** (-z["p"])
+    w = 10 ** (-z["b"] * (mc_t(g, mag_main, mcat) - z["mcut"]))
+    return z["K0"] * math.exp(z["alpha"] * (mag_main - z["mcut"])) * float(np.trapezoid(v * w, g))
+
+
 def zw_reference_ratios():
     """Observed / direct-expected count for their own Case 3 sequences: their Table 2 count of M >= 4.5 events
-    divided by zw_direct_count over their window. Kept: Mc <= 4.5 (complete at Mcut), >= 100 events and a defined
-    window (their own robustness rule is Mc <= 4.5 and >= 100 events). The counts include secondary aftershocks
-    and background events, as ours do, so the ratio is normally above 1."""
+    divided by the direct count above Mc(t) (Mcat = 4.5) over their window, i.e. the same expected count as
+    zw2020_productivity uses for our sequences. Their counts come from the NEIC catalogue, which misses the same
+    early small aftershocks; without the Mc(t) term (before 0.6.0) the reference ratios were too low by a factor
+    1.12 (M 8.0), 1.34 (M 8.5) and 1.75 (M 9.0) relative to ours. Kept: Mc <= 4.5 (complete at Mcut), >= 100
+    events and a defined window (their own robustness rule is Mc <= 4.5 and >= 100 events). The counts include
+    secondary aftershocks and background events, as ours do, so the ratio is normally above 1."""
     out = []
     for idx, M, mc, n in ZW2020_TABLE2_CASE3:
         T = zw_case3_window_days(M)
         if T is None or mc > ZW2020["mcut"] + 1e-9 or n < 100:
             continue
-        out.append((idx, M, n, n / zw_direct_count(M, T)))
+        out.append((idx, M, n, n / zw_direct_count_mct(M, T, ZW2020["mcut"])))
     return out
 
 
@@ -290,11 +317,7 @@ def zw2020_productivity(t, m, T2, mag_main, mcat, regime, depth_km):
         return {"applicable": False, "reason": "not a subduction-zone regime"}
     keep = sl.bin_mag(m, DM) >= mc_t(t, mag_main, mcat) - DM / 2 + 1e-9
     n = int(keep.sum())
-    g = _grid(T2)
-    v = (z["p"] - 1) * z["c"] ** (z["p"] - 1) * (g + z["c"]) ** (-z["p"])
-    w = 10 ** (-z["b"] * (mc_t(g, mag_main, mcat) - z["mcut"]))
-    integ = float(np.trapezoid(v * w, g))
-    direct = z["K0"] * math.exp(z["alpha"] * (mag_main - z["mcut"])) * integ
+    direct = zw_direct_count_mct(mag_main, T2, mcat)
     ref = np.array([x[3] for x in zw_reference_ratios()])
     out = {"applicable": True, "n": n, "direct_count_zw": direct, "mcut": z["mcut"],
            "in_calibration_range": bool(7.5 <= mag_main <= 9.0 and (depth_km is None or depth_km < 100)),
@@ -342,9 +365,15 @@ def b_bootstrap_seq(t, m, age_days, mag_main, floor, nboot=NBOOT, rng=0):
     return {"b": float(b) if q in ("A", "B") else None, "b_raw": float(b), "lo": lo, "hi": hi, "n": int(n), "q": q}
 
 
-def b_positive_seq(t, m):
+def b_positive_seq(t, m, mcat=None):
+    """b-positive (differences >= 0.2) of the events at or above Mcat, in time order. Mcat is the sequence's static
+    completeness (MAXC + 0.2 of the late events), the same role as the period floor of the map cells; before
+    0.6.0 every queried event entered, also those between the query minimum and Mcat."""
     o = np.argsort(t)
-    b, s, n = sl.b_positive(m[o], DM, 0.2)
+    mo = sl.bin_mag(m[o], DM)
+    if mcat is not None:
+        mo = mo[mo >= mcat - DM / 2 + 1e-9]
+    b, s, n = sl.b_positive(mo, DM, 0.2)
     if n < 50 or not np.isfinite(b):
         return {"b": None, "lo": None, "hi": None, "n": int(n)}
     return {"b": float(b), "lo": float(b - 1.96 * s), "hi": float(b + 1.96 * s), "n": int(n)}

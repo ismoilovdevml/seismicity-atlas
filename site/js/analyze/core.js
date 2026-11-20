@@ -41,8 +41,13 @@ export function rint(x) {
   return f % 2 === 0 ? f : f + 1;
 }
 const r6 = (x) => rint(x * 1e6) / 1e6;
-/** seislib.bin_mag: np.round(np.round(m / dm) * dm, 6). */
-export const binMag = (x, dm = 0.1) => r6(rint(x / dm) * dm);
+/** seislib.bin_mag: np.round(np.floor(m / dm + 0.5 + 1e-6) * dm, 6), ties up (since 0.6.0). */
+export const binMag = (x, dm = 0.1) => r6(Math.floor(x / dm + 0.5 + 1e-6) * dm);
+/** seislib.b_from_excess: binned maximum-likelihood b from the mean excess over the lowest bin (Tinti & Mulargia 1987). */
+export function bFromExcess(mean, dm = 0.1) {
+  const beta = dm > 0 ? Math.log1p(dm / mean) / dm : 1 / mean;
+  return mean > 0 && Number.isFinite(beta) ? beta * LOG10E : NaN;
+}
 
 /** Seeded generator (mulberry32). */
 export function rng(seed) {
@@ -84,7 +89,7 @@ export function bVarMc(mb, thr, dm = 0.1) {
   const x = [];
   for (let i = 0; i < mb.length; i++) {
     const t = binMag(thr[i], dm);
-    if (mb[i] >= t - 1e-9) x.push(mb[i] - (t - dm / 2));
+    if (mb[i] >= t - 1e-9) x.push(mb[i] - t);
   }
   const n = x.length;
   if (n < 2) return [NaN, NaN, n];
@@ -93,7 +98,7 @@ export function bVarMc(mb, thr, dm = 0.1) {
   const mean = s / n;
   let ss = 0;
   for (const v of x) ss += (v - mean) ** 2;
-  const b = LOG10E / mean;
+  const b = bFromExcess(mean, dm);
   return [b, 2.3 * b * b * Math.sqrt(ss / (n * (n - 1))), n];
 }
 
@@ -135,9 +140,9 @@ export function cellB(m, floor, { nboot = NBOOT, seed = 20261116, dm = 0.1, nmin
     let c = 0;
     for (let i = 0; i < N; i++) {
       th[i] = Math.max(mcr, ff[i]);
-      if (mm[i] >= th[i] - 1e-9) { s += mm[i] - (th[i] - dm / 2); c++; }
+      if (mm[i] >= th[i] - 1e-9) { s += mm[i] - th[i]; c++; }
     }
-    if (c >= 2) bb.push(LOG10E / (s / c));
+    if (c >= 2) bb.push(bFromExcess(s / c, dm));
   }
   const [lo, hi] = bb.length > 0.8 * nboot ? [percentile(bb, 2.5), percentile(bb, 97.5)] : [NaN, NaN];
   const q = quality(n, lo, hi, b);
@@ -164,7 +169,7 @@ export function bPositive(mOrdered, thr, dm = 0.1, dmc = 0.2) {
   if (n < 2) return [NaN, NaN, n];
   const mean = d.reduce((a, v) => a + v, 0) / n;
   const ss = d.reduce((a, v) => a + (v - mean) ** 2, 0);
-  const b = LOG10E / (mean - (dmc - dm / 2));
+  const b = bFromExcess(mean - binMag(dmc, dm), dm);
   return [b, 2.3 * b * b * Math.sqrt(ss / (n * (n - 1))), n];
 }
 

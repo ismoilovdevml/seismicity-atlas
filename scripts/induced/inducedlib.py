@@ -71,8 +71,8 @@ def annual_mc(years, mags, year_bins, nmin: int = 30):
 
 
 # ------------------------------------------------------------------------------------------------ b-values
-def b_fixed(m, mc: float, nboot: int = 1000, rng=None) -> dict:
-    """Aki-Utsu b at a fixed completeness (binned magnitudes >= mc), 95 % percentile bootstrap interval,
+def b_fixed(m, mc: float, nboot: int = al.NBOOT, rng=None) -> dict:
+    """b (seislib.b_aki) at a fixed completeness (binned magnitudes >= mc), 95 % percentile bootstrap interval,
     plus the Shi-Bolt standard error. Used where the literature fixes Mc (e.g. ML 1.5 at Groningen)."""
     rng = np.random.default_rng(rng)
     m = sl.bin_mag(m, DM)
@@ -82,12 +82,12 @@ def b_fixed(m, mc: float, nboot: int = 1000, rng=None) -> dict:
         return {"mc": mc, "n": int(n), "b": np.nan, "lo": np.nan, "hi": np.nan, "sigma_shibolt": np.nan}
     b, sig, _, _ = sl.b_aki(m, mc, DM)
     mm = m[rng.integers(0, n, (nboot, n))]
-    bb = sl.LOG10E / (mm.mean(axis=1) - (mc - DM / 2))
+    bb = sl.b_from_excess(mm.mean(axis=1) - sl.bin_mag(mc, DM), DM)
     lo, hi = np.percentile(bb, [2.5, 97.5])
     return {"mc": mc, "n": int(n), "b": float(b), "lo": float(lo), "hi": float(hi), "sigma_shibolt": float(sig)}
 
 
-def moving_bpos(t_years, m, floor: float, window: int = 200, step: int = 10, nboot: int = 200, rng=None):
+def moving_bpos(t_years, m, floor: float, window: int = 200, step: int = 10, nboot: int = al.NBOOT, rng=None):
     """b-positive in moving windows of `window` consecutive events (above `floor`), time = last event of the
     window (Tormann et al. 2013 convention), with a bootstrap 95 % interval over the window's differences."""
     rng = np.random.default_rng(rng)
@@ -101,9 +101,9 @@ def moving_bpos(t_years, m, floor: float, window: int = 200, step: int = 10, nbo
         d = d[d >= 0.2 - DM / 2 + 1e-9]
         if d.size < al.NMIN_B:
             continue
-        b = sl.LOG10E / (d.mean() - (0.2 - DM / 2))
+        b = sl.b_from_excess(d.mean() - 0.2, DM)
         dd = d[rng.integers(0, d.size, (nboot, d.size))]
-        bb = sl.LOG10E / (dd.mean(axis=1) - (0.2 - DM / 2))
+        bb = sl.b_from_excess(dd.mean(axis=1) - 0.2, DM)
         lo, hi = np.percentile(bb, [2.5, 97.5])
         rows.append((float(t[e - window]), float(t[e - 1]), float(b), float(lo), float(hi), int(d.size)))
     return pd.DataFrame(rows, columns=["t0", "t", "b", "lo", "hi", "n_diff"])
@@ -120,7 +120,7 @@ def grid_nodes(geom_rd, spacing_m: float = 1000.0, buffer_m: float = 0.0):
     return X[ok], Y[ok]
 
 
-def b_map(nx, ny, ex, ey, em, floor, bpos_floor: float, radius_m: float = 5000.0, nboot: int = 200, rng=0):
+def b_map(nx, ny, ex, ey, em, floor, bpos_floor: float, radius_m: float = 5000.0, nboot: int = al.NBOOT, rng=0):
     """Per node: atlas cell_b (MAXC+0.2 with a per-event floor, bootstrap CI, A/B/C quality) and atlas
     cell_bpos (b-positive, at least 50 positive differences, as in Gulia & Wiemer 2026) of the events within
     radius_m. ex, ey, em, floor are aligned arrays of the events ORDERED IN TIME (b-positive needs the order)."""

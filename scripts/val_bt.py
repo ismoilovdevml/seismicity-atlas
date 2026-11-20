@@ -35,12 +35,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import atlaslib as al  # noqa: E402
 import seislib as sl  # noqa: E402
 from atlas import floor_of  # noqa: E402
-from common import D_INDEP, D_NONE, RES, SITE, b_sample_mask, jdump, load_work  # noqa: E402
+from common import (D_INDEP, D_NONE, ISCGEM_END, ISCGEM_LAST_YEAR, RES, SITE, b_sample_mask, jdump,  # noqa: E402
+                    load_work)
 from validate import box  # noqa: E402
 
 WINDOWS = {"pre_5y": (-5 * 365.25, 0.0), "pre_1y": (-365.25, 0.0), "post_0_30d": (0.0, 30.0),
            "post_30_365d": (30.0, 365.0)}
-COVER = (pd.Timestamp("1976-01-01", tz="UTC"), pd.Timestamp("2022-01-01", tz="UTC"))
+COVER = (pd.Timestamp("1976-01-01", tz="UTC"), pd.Timestamp(ISCGEM_END, tz="UTC"))
 NBOOT = al.NBOOT  # 1000 since 0.5.0 (500 before)
 
 
@@ -95,7 +96,7 @@ def sequence_bt(g, fl_all, seq):
     for k, (a, b) in WINDOWS.items():
         lo_t, hi_t = t0 + pd.Timedelta(days=a), t0 + pd.Timedelta(days=b)
         if lo_t < COVER[0] or hi_t > COVER[1]:
-            res[k] = {"b": None, "q": "not covered", "reason": "window outside ISC-GEM 1976-2021"}
+            res[k] = {"b": None, "q": "not covered", "reason": f"window outside ISC-GEM 1976-{ISCGEM_LAST_YEAR}"}
             continue
         sel = near & (dt > a) & (dt <= b) if a >= 0 else near & (dt >= a) & (dt < 0)
         if ms.size:
@@ -114,7 +115,7 @@ def overlap(a, b):
 def main():
     g = load_work("iscgem")
     fl = json.loads((RES / "atlas_globals.json").read_text())["floors"]
-    g = g[(g.year >= 1976) & (g.year <= 2021) & b_sample_mask(g.magerr)].reset_index(drop=True)
+    g = g[(g.year >= 1976) & (g.year <= ISCGEM_LAST_YEAR) & b_sample_mask(g.magerr)].reset_index(drop=True)
     fl_all = floors(g, fl)
     path = SITE / "sequences.json"
     doc = json.loads(path.read_text())

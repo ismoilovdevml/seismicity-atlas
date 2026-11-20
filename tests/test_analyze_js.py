@@ -121,7 +121,7 @@ def test_js_real_catalogue(tmp_path):
     fp = [[1976, 2003, 5.8], [2004, 2021, 5.3]]
     py = sa.analyze(sa.read_catalog(csv), nboot=300, floor_periods=fp)
     js = run_js(csv, 300, fp)
-    assert js["b"]["b"] == pytest.approx(py["b"]["b"], abs=1e-9) == pytest.approx(1.053, abs=5e-4)
+    assert js["b"]["b"] == pytest.approx(py["b"]["b"], abs=1e-9) == pytest.approx(1.057, abs=5e-4)   # 1.053 before 0.6.0 (binning, binned MLE)
     assert js["mc"]["maxc02"] == py["mc"]["maxc02"]
 
 

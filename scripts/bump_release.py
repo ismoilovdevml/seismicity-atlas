@@ -75,12 +75,12 @@ def main(argv=None, path: Path = RELEASE, root: Path | None = None) -> str:
     if a.cutoff is None:
         if a.part == "patch":
             ap.error("a method-only bump (no --cutoff) needs --part minor or --part major")
-        rel = {"version": bump(rel["version"], a.part), "data_cutoff_utc": rel["data_cutoff_utc"]}
+        rel = {**rel, "version": bump(rel["version"], a.part)}
         return _write(path, rel, root)
     if a.cutoff <= date.fromisoformat(rel["data_cutoff_utc"]):
         print(rel["version"])
         return rel["version"]
-    rel = {"version": bump(rel["version"], a.part), "data_cutoff_utc": a.cutoff.isoformat()}
+    rel = {**rel, "version": bump(rel["version"], a.part), "data_cutoff_utc": a.cutoff.isoformat()}
     return _write(path, rel, root)
 
 

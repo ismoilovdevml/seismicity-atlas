@@ -1,9 +1,13 @@
 """Catalogue statistics: completeness, Gutenberg-Richter b-value, declustering, Omori-Utsu.
 
-All functions take plain numpy arrays. Magnitudes are binned to `dm` (default 0.1) before any estimate.
+All functions take plain numpy arrays. Magnitudes are binned to `dm` (default 0.1) before any estimate, rounding
+half up (bin x holds [x - dm/2, x + dm/2)), so every bin has the same width also for magnitudes reported with two
+decimals. b is the maximum-likelihood estimate for binned magnitudes (geometric distribution of the excess over the
+lowest bin; Tinti & Mulargia 1987, as in van der Elst 2021 and SeismoStats); the Aki-Utsu formula with the dm/2
+correction is its approximation and was used before 0.6.0 (-0.3 % at b = 1, -1 % at b = 1.5).
 
 References
-  Aki 1965; Utsu 1965 (b MLE); Shi & Bolt 1982 (b uncertainty); van der Elst 2021 (b-positive);
+  Aki 1965; Utsu 1965; Tinti & Mulargia 1987 (b MLE); Shi & Bolt 1982 (b uncertainty); van der Elst 2021 (b-positive);
   Wiemer & Wyss 2000 (MAXC, goodness of fit); Cao & Gao 2002, Woessner & Wiemer 2005 (b-stability, +0.2 MAXC);
   Gardner & Knopoff 1974 (declustering windows); Ogata 1983 (Omori-Utsu MLE);
   Reasenberg & Jones 1989; Page et al. 2016 (aftershock rate model, time-dependent completeness).
@@ -18,8 +22,23 @@ LOG10E = np.log10(np.e)
 
 # ----------------------------------------------------------------------------------------------- magnitudes
 def bin_mag(m, dm: float = 0.1):
-    """Round magnitudes to the nearest bin centre (avoids float artefacts like 2.9999)."""
-    return np.round(np.round(np.asarray(m, float) / dm) * dm, 6)
+    """Nearest bin centre, ties (x.x5 for dm 0.1) up: bin x holds [x - dm/2, x + dm/2).
+
+    Before 0.6.0 ties went to whichever side the float quotient fell (5.25, 5.35, 5.45 down, 5.15, 5.75 up), so for
+    two-decimal magnitudes (ISC-GEM Mw: 9 % ties) the bins had unequal widths and b changed with the parity of the
+    threshold by up to 0.015. The 1e-6 absorbs float noise in m / dm."""
+    return np.round(np.floor(np.asarray(m, float) / dm + 0.5 + 1e-6) * dm, 6)
+
+
+def b_from_excess(mean_excess, dm: float = 0.1):
+    """b from the mean excess of binned magnitudes over their lowest kept bin (centre), maximum likelihood for
+    binned data: beta = ln(1 + dm / mean) / dm (Tinti & Mulargia 1987), b = beta log10(e); dm = 0 gives the
+    continuous estimator 1 / mean. NaN when the mean is not positive (every event in the lowest bin)."""
+    x = np.asarray(mean_excess, float)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        beta = np.log1p(dm / x) / dm if dm > 0 else 1.0 / x
+    b = np.where((x > 0) & np.isfinite(beta), beta * LOG10E, np.nan)
+    return float(b) if b.ndim == 0 else b
 
 
 def haversine_km(lat1, lon1, lat2, lon2):
@@ -30,16 +49,15 @@ def haversine_km(lat1, lon1, lat2, lon2):
 
 # ----------------------------------------------------------------------------------------------- b-value
 def b_aki(m, mc: float, dm: float = 0.1):
-    """Aki-Utsu maximum-likelihood b with the binning correction, plus Shi-Bolt (1982) standard error.
-
-    Returns (b, sigma_b, n, a) where a is log10 N(>=mc)."""
+    """Maximum-likelihood b of binned magnitudes at or above the bin mc (b_from_excess), plus the Shi-Bolt (1982)
+    standard error. Returns (b, sigma_b, n, a) where a is log10 N(>=mc)."""
     m = bin_mag(m, dm)
     m = m[m >= mc - dm / 2 + 1e-9]
     n = m.size
     if n < 2:
         return np.nan, np.nan, n, np.nan
     mean = m.mean()
-    b = LOG10E / (mean - (mc - dm / 2))
+    b = b_from_excess(mean - bin_mag(mc, dm), dm)
     sig = 2.3 * b ** 2 * np.sqrt(np.sum((m - mean) ** 2) / (n * (n - 1)))
     return b, sig, n, np.log10(n)
 
@@ -56,7 +74,8 @@ def b_bootstrap(m, mc: float, dm: float = 0.1, nboot: int = 500, rng=None):
 
 
 def b_positive(m_time_ordered, dm: float = 0.1, dmc: float = 0.2):
-    """b-positive (van der Elst 2021): Aki-Utsu on positive successive magnitude differences >= dmc.
+    """b-positive (van der Elst 2021): the binned maximum-likelihood b (b_from_excess) of the positive successive
+    magnitude differences >= dmc.
 
     Insensitive to short-term aftershock incompleteness. Input must be ordered in time.
     Returns (b, sigma_b, n_differences)."""
@@ -66,8 +85,9 @@ def b_positive(m_time_ordered, dm: float = 0.1, dmc: float = 0.2):
     n = d.size
     if n < 2:
         return np.nan, np.nan, n
-    # differences of exponentials are Laplace; the positive side is exponential with the same beta
-    b = LOG10E / (d.mean() - (dmc - dm / 2))
+    # differences of exponentials are Laplace; the positive side is exponential with the same beta (geometric
+    # with the same ratio for binned magnitudes)
+    b = b_from_excess(d.mean() - bin_mag(dmc, dm), dm)
     sig = 2.3 * b ** 2 * np.sqrt(np.sum((d - d.mean()) ** 2) / (n * (n - 1)))
     return b, sig, n
 
@@ -194,7 +214,9 @@ def lilliefors_offset(m, thr, offsets, res: float = 0.01, step: float = 0.1, alp
         s = m[keep]
         if s.size < nmin:
             break
-        edge = np.round((c[keep] - step / 2) / res) * res - res / 2
+        # lower edge of the lowest kept `res` bin: the first res-grid value >= c - step/2, minus res/2. ceil, not
+        # round: with res == step, (c - step/2)/res ends in .5 and round-half-to-even moved the edge one bin down
+        edge = np.ceil((c[keep] - step / 2) / res - 1e-6) * res - res / 2
         beta = 1.0 / (s - edge).mean()
         ps = [lilliefors_exp_p(_dither_trexp(s, res, beta, rng) - edge, nsim, rng) for _ in range(ndither)]
         p = float(np.median(ps))
@@ -253,6 +275,29 @@ def decluster_gk(t_days, lat, lon, m, fs_time_prop: float = 1.0):
     return cluster == np.arange(t.size)
 
 
+def decluster_gk_layers(t_days, lat, lon, m, layer, fs_time_prop: float = 1.0):
+    """decluster_gk run separately within each depth layer (e.g. shallow <= 70 km / deeper), so that an event of
+    one layer can never remove an event of another: the windows are epicentral, and on the whole catalogue a
+    400 km deep event removed shallow ones above it. Returns the same boolean array as decluster_gk."""
+    layer = np.asarray(layer)
+    t, la, lo, mm = (np.asarray(a, float) for a in (t_days, lat, lon, m))
+    out = np.zeros(t.size, bool)
+    for v in np.unique(layer):
+        k = layer == v
+        out[k] = decluster_gk(t[k], la[k], lo[k], mm[k], fs_time_prop)
+    return out
+
+
+def great_circle_midpoint(lat1, lon1, lat2, lon2):
+    """Midpoint on the sphere of two points (degrees); correct across the antimeridian, where the arithmetic mean
+    of the longitudes is not (179.7 and -179.2 give 0.2 instead of 180.2)."""
+    la1, lo1, la2, lo2 = map(np.radians, (lat1, lon1, lat2, lon2))
+    x = np.cos(la1) * np.cos(lo1) + np.cos(la2) * np.cos(lo2)
+    y = np.cos(la1) * np.sin(lo1) + np.cos(la2) * np.sin(lo2)
+    z = np.sin(la1) + np.sin(la2)
+    return np.degrees(np.arctan2(z, np.hypot(x, y))), np.degrees(np.arctan2(y, x))
+
+
 # ----------------------------------------------------------------------------------------------- Omori-Utsu
 def _ou_integral(c, p, T1, T2):
     if abs(p - 1) < 1e-8:
@@ -260,11 +305,27 @@ def _ou_integral(c, p, T1, T2):
     return ((T2 + c) ** (1 - p) - (T1 + c) ** (1 - p)) / (1 - p)
 
 
-def omori_fit(t, T1: float, T2: float, c0: float = 0.05, p0: float = 1.1, fix_c: float | None = None):
+C_MIN_DAYS = 1e-4          # lower bound of the Omori c in the fits (8.6 s; below any catalogue's timing resolution)
+P_BOUNDS = (0.05, 5.0)     # search range of p (wide: only keeps the simplex out of meaningless values)
+
+
+def _c_bounds(T2: float, c_min: float):
+    return (np.log(c_min), np.log(max(float(T2), 1.0)))
+
+
+def _ou_starts(p0: float, logc0, lo: float, hi: float):
+    return [[p0, float(np.clip(x, lo, hi))] for x in logc0]
+
+
+def omori_fit(t, T1: float, T2: float, c0: float = 0.05, p0: float = 1.1, fix_c: float | None = None,
+              c_min: float = C_MIN_DAYS):
     """Maximum-likelihood Omori-Utsu fit, rate K/(t+c)^p on [T1, T2] (Ogata 1983). t in days after mainshock.
 
-    K is profiled out analytically (K = n / integral). Returns dict with K, c, p, standard errors from the
-    observed-information matrix, n and log-likelihood."""
+    K is profiled out analytically (K = n / integral). c is searched in [c_min, max(T2, 1)] days: without early
+    data the likelihood keeps rising as c -> 0, the old unconstrained search then returned c ~ 1e-15 with a singular
+    Hessian. When c ends at c_min (`c_at_bound`), c is reported as not resolved (sc NaN) and the standard errors
+    of K and p are those for c fixed there. Returns dict with K, c, p, standard errors from the observed-information
+    matrix, n and log-likelihood."""
     t = np.asarray(t, float)
     t = t[(t >= T1) & (t <= T2)]
     n = t.size
@@ -277,18 +338,22 @@ def omori_fit(t, T1: float, T2: float, c0: float = 0.05, p0: float = 1.1, fix_c:
             return 1e30
         return -(n * np.log(n / A) - n - p * np.sum(np.log(t + c)))
 
-    x0 = [p0] if fix_c is not None else [p0, np.log(c0)]
-    best = None
-    for start in ([x0] if fix_c is not None else [x0, [p0, np.log(0.005)], [p0, np.log(0.5)], [0.9, np.log(0.02)]]):
-        r = minimize(nll, start, method="Nelder-Mead", options={"xatol": 1e-7, "fatol": 1e-9, "maxiter": 20000})
-        if best is None or r.fun < best.fun:
-            best = r
-    p = best.x[0]
+    lo, hi = _c_bounds(T2, c_min)
+    if fix_c is not None:
+        starts, bounds = [[p0]], [P_BOUNDS]
+    else:
+        starts = _ou_starts(p0, [np.log(c0), np.log(0.005), np.log(0.5)], lo, hi) + [[0.9, max(np.log(0.02), lo)]]
+        bounds = [P_BOUNDS, (lo, hi)]
+    best = min((minimize(nll, s, method="Nelder-Mead", bounds=bounds,
+                         options={"xatol": 1e-7, "fatol": 1e-9, "maxiter": 20000}) for s in starts),
+               key=lambda r: r.fun)
+    p = float(best.x[0])
     c = fix_c if fix_c is not None else float(np.exp(best.x[1]))
+    at_bound = fix_c is None and best.x[1] - lo < 1e-3
     K = n / _ou_integral(c, p, T1, T2)
-    se = _omori_se(t, T1, T2, K, c, p, fix_c is not None)
+    se = _omori_se(t, T1, T2, K, c, p, fix_c is not None or at_bound)
     return {"K": K, "c": c, "p": p, "sK": se[0], "sc": se[1], "sp": se[2], "n": n, "T1": T1, "T2": T2,
-            "logL": -best.fun}
+            "logL": -best.fun, "c_at_bound": bool(at_bound)}
 
 
 def _omori_loglik(t, T1, T2, K, c, p):
@@ -310,14 +375,23 @@ def _omori_se(t, T1, T2, K, c, p, fixed_c: bool):
             ei = np.zeros(3); ej = np.zeros(3)
             ei[i] = h[i]; ej[j] = h[j]
             H[a, b] = (f(x + ei + ej) - f(x + ei - ej) - f(x - ei + ej) + f(x - ei - ej)) / (4 * h[i] * h[j])
-    try:
-        cov = np.linalg.inv(-H)
-        se = np.sqrt(np.clip(np.diag(cov), 0, None))
-    except np.linalg.LinAlgError:
-        se = np.full(len(free), np.nan)
     out = np.full(3, np.nan)
-    out[free] = se
+    cov = _inv_cov(-H)
+    if cov is not None:
+        out[free] = np.sqrt(np.diag(cov))
     return out
+
+
+def _inv_cov(info):
+    """Inverse of an observed-information matrix, or None when it is not finite and positive definite."""
+    if not np.isfinite(info).all():
+        return None
+    try:
+        np.linalg.cholesky(info)
+        cov = np.linalg.inv(info)
+    except np.linalg.LinAlgError:
+        return None
+    return cov if np.isfinite(cov).all() and (np.diag(cov) > 0).all() else None
 
 
 def rj_a_from_K(K: float, b: float, mag_main: float, mmin: float):
@@ -358,11 +432,18 @@ def mc_helmstetter(t, mag_main: float, mcat: float, F: float = 1.0, G: float = 4
 
 
 def omori_fit_mct(t, m, T1: float, T2: float, mag_main: float, mcat: float, b: float,
-                  F: float = 1.0, G: float = 4.5, H: float = 0.75, fix_c: float | None = None, dm: float = 0.1):
+                  F: float = 1.0, G: float = 4.5, H: float = 0.75, fix_c: float | None = None, dm: float = 0.1,
+                  c_min: float = C_MIN_DAYS):
     """Omori-Utsu MLE that keeps the early incomplete part of a sequence (Page et al. 2016 style).
 
     Only events with M >= Mc(t) are used; the expected rate of such events is
-    K (t+c)^-p 10^(-b (Mc(t) - Mcat)), K being the rate of M >= Mcat events. Returns the same dict as omori_fit."""
+    K (t+c)^-p 10^(-b (Mc(t) - Mcat)), K being the rate of M >= Mcat events. c is searched in [c_min, max(T2, 1)]
+    days (see omori_fit); `c_at_bound` marks a fit whose c ended at c_min.
+
+    Standard errors: (p, log c) from the observed information of the profile likelihood; K = n / A(p, c) with n
+    Poisson, so var(log K) = 1/n + g' Cov(p, log c) g, g = d log A / d(p, log c) (the K-K element of the inverse
+    full information; the old K/sqrt(n) left out the covariance with p and c and was about half the true scatter).
+    Non-finite or non-positive-definite information gives NaN errors. Returns the same dict as omori_fit."""
     t = np.asarray(t, float)
     m = bin_mag(m, dm)
     mct = mc_helmstetter(t, mag_main, mcat, F, G, H)
@@ -383,48 +464,64 @@ def omori_fit_mct(t, m, T1: float, T2: float, mag_main: float, mcat: float, b: f
         A = integral(c, p)
         return -(n * np.log(n / A) - n - p * np.sum(np.log(ts + c)) + np.sum(np.log(wi)))
 
-    starts = [[1.1]] if fix_c is not None else [[1.1, np.log(0.01)], [1.0, np.log(0.1)], [1.2, np.log(0.001)]]
-    best = min((minimize(nll, s, method="Nelder-Mead", options={"xatol": 1e-7, "fatol": 1e-9, "maxiter": 20000})
-                for s in starts), key=lambda r: r.fun)
-    p = best.x[0]
+    lo, hi = _c_bounds(T2, c_min)
+    if fix_c is not None:
+        starts, bounds = [[1.1]], [P_BOUNDS]
+    else:
+        starts = [[1.1, max(np.log(0.01), lo)], [1.0, max(np.log(0.1), lo)], [1.2, max(np.log(0.001), lo)]]
+        bounds = [P_BOUNDS, (lo, hi)]
+    best = min((minimize(nll, s, method="Nelder-Mead", bounds=bounds,
+                         options={"xatol": 1e-7, "fatol": 1e-9, "maxiter": 20000}) for s in starts),
+               key=lambda r: r.fun)
+    p = float(best.x[0])
     c = fix_c if fix_c is not None else float(np.exp(best.x[1]))
+    at_bound = fix_c is None and best.x[1] - lo < 1e-3
     K = n / integral(c, p)
 
-    # standard errors from a numerical Hessian of the profile likelihood in (p[, log c]), K from Poisson count
+    # observed information of the profile likelihood in (p[, log c]); c at its bound -> p alone, c fixed there
+    k = 1 if (fix_c is not None or at_bound) else 2
+    x = np.array([p, np.log(c)])[:k]
+
     def f(v):
-        return -nll(v)
-    x = best.x.copy()
-    k = x.size
+        return -nll(np.r_[v, np.log(c)] if (k == 1 and fix_c is None) else v)
+
+    def log_a(v):
+        return np.log(integral(c if k == 1 else np.exp(v[1]), v[0]))
+
     h = 1e-3
     Hm = np.zeros((k, k))
+    g = np.zeros(k)
     for i in range(k):
+        ei = np.zeros(k); ei[i] = h
+        g[i] = (log_a(x + ei) - log_a(x - ei)) / (2 * h)
         for j in range(k):
-            ei = np.zeros(k); ej = np.zeros(k); ei[i] = h; ej[j] = h
+            ej = np.zeros(k); ej[j] = h
             Hm[i, j] = (f(x + ei + ej) - f(x + ei - ej) - f(x - ei + ej) + f(x - ei - ej)) / (4 * h * h)
-    try:
-        cov = np.linalg.inv(-Hm)
+    cov = _inv_cov(-Hm)
+    if cov is None:
+        sp = sc = sK = np.nan
+    else:
         sp = float(np.sqrt(cov[0, 0]))
         sc = float(c * np.sqrt(cov[1, 1])) if k > 1 else np.nan
-    except np.linalg.LinAlgError:
-        sp = sc = np.nan
-    return {"K": K, "c": c, "p": p, "sK": K / np.sqrt(n), "sc": sc, "sp": sp, "n": n, "T1": T1, "T2": T2,
-            "logL": -best.fun}
+        sK = float(K * np.sqrt(1.0 / n + g @ cov @ g))
+    return {"K": K, "c": c, "p": p, "sK": sK, "sc": sc, "sp": sp, "n": n, "T1": T1, "T2": T2,
+            "logL": -best.fun, "c_at_bound": bool(at_bound)}
 
 
 # ----------------------------------------------------------------------------------------------- atlas additions
 def b_varmc(m, thr, dm: float = 0.1):
-    """Aki-Utsu MLE with a per-event completeness threshold (e.g. Mc changing with time).
+    """Maximum-likelihood b with a per-event completeness threshold (e.g. Mc changing with time).
 
-    Each event's excess over its own threshold is exponential with the same beta (memoryless property), so
-    beta = n / sum(m_i - (thr_i - dm/2)) over events with m_i >= thr_i. Returns (b, sigma_b Shi-Bolt-type, n)."""
+    Each event's excess over its own threshold bin is geometric with the same ratio (memoryless property), so b is
+    b_from_excess of the mean of m_i - thr_i over events with m_i >= thr_i. Returns (b, sigma_b Shi-Bolt-type, n)."""
     m = bin_mag(m, dm)
     thr = bin_mag(thr, dm)
     keep = m >= thr - 1e-9
-    x = m[keep] - (thr[keep] - dm / 2)
+    x = m[keep] - thr[keep]
     n = x.size
     if n < 2:
         return np.nan, np.nan, n
-    b = LOG10E / x.mean()
+    b = b_from_excess(x.mean(), dm)
     sig = 2.3 * b ** 2 * np.sqrt(np.sum((x - x.mean()) ** 2) / (n * (n - 1)))
     return b, sig, n
 

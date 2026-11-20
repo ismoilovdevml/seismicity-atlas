@@ -7,26 +7,21 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-import h3
 import numpy as np
 import pandas as pd
 from shapely.geometry import MultiLineString, mapping, shape
 from shapely.ops import linemerge
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import (AUX, CUTOFF, D_GCMT, D_INDEP, D_ISCGEM, D_NONE, PROC, RES, SITE, V_DIFFERS, V_MATCH,  # noqa: E402
-                    V_UNINF, VERSION, jdump, load_work, z_verdict)
+from common import (AUX, CUTOFF, D_GCMT, D_INDEP, D_ISCGEM, D_NONE, ISCGEM_LAST_YEAR, PROC, RES, SITE,  # noqa: E402
+                    V_DIFFERS, V_MATCH,
+                    V_UNINF, VERSION, h3_polygon, jdump, load_work, z_verdict)
 
 R = lambda x, n: None if x is None or not np.isfinite(x) else round(float(x), n)  # noqa: E731
 
 
 def cell_polygon(h):
-    ring = [(lo, la) for la, lo in h3.cell_to_boundary(h)]
-    lons = np.array([p[0] for p in ring])
-    if lons.max() - lons.min() > 180:  # antimeridian: make longitudes continuous
-        ring = [(lo + 360 if lo < 0 else lo, la) for lo, la in ring]
-    ring = [[round(lo, 2), round(la, 2)] for lo, la in ring]
-    return {"type": "Polygon", "coordinates": [ring + [ring[0]]]}
+    return h3_polygon(h, 2)
 
 
 def cells_layer(cells, detail_ids):
@@ -38,6 +33,9 @@ def cells_layer(cells, detail_ids):
         for d in ("sh", "dp"):
             g = lambda k: getattr(r, f"{d}_{k}")  # noqa: E731
             show = g("b_q") in ("A", "B")
+            # declustered b: its own sample must pass the same gate as the main b (n >= 50, relative width)
+            qd = g("b_decl_q") if hasattr(r, f"{d}_b_decl_q") else None
+            showd = show and qd in ("A", "B")
             p.update({f"{d}_n": int(g("n_sample")), f"{d}_nb": int(g("n_b")), f"{d}_mc": R(g("mc"), 1),
                       f"{d}_mc_lo": R(g("mc_lo"), 1), f"{d}_mc_hi": R(g("mc_hi"), 1),
                       f"{d}_b": R(g("b"), 3), f"{d}_b_lo": R(g("b_lo"), 3), f"{d}_b_hi": R(g("b_hi"), 3),
@@ -46,9 +44,10 @@ def cells_layer(cells, detail_ids):
                       f"{d}_bpos": R(g("bpos"), 3) if show else None,
                       f"{d}_bpos_lo": R(g("bpos_lo"), 3) if show else None,
                       f"{d}_bpos_hi": R(g("bpos_hi"), 3) if show else None,
-                      f"{d}_bdecl": R(g("b_decl"), 3) if show else None,
-                      f"{d}_bdecl_lo": R(g("b_decl_lo"), 3) if show else None,
-                      f"{d}_bdecl_hi": R(g("b_decl_hi"), 3) if show else None,
+                      f"{d}_bdecl": R(g("b_decl"), 3) if showd else None,
+                      f"{d}_bdecl_lo": R(g("b_decl_lo"), 3) if showd else None,
+                      f"{d}_bdecl_hi": R(g("b_decl_hi"), 3) if showd else None,
+                      f"{d}_qdecl": qd if isinstance(qd, str) else None,
                       f"{d}_mc_cc": R(g("mc_cc_2010"), 1), f"{d}_mc_cc0": R(g("mc_cc_pre1990"), 1)})
         n = int(r.cons_n_matched)
         dmw, dloc = r.cons_dmag_mw, r.cons_dloc_km
@@ -171,7 +170,7 @@ def validation_table(v, seq):
         else:
             vd, z = z_verdict(r["b"], lo, hi, pub)
         data = D_NONE if (pub is None and name in ("Japan", "Chile")) else D_INDEP
-        row(f"Regional b, {name}, shallow, ISC-GEM 1976-2021",
+        row(f"Regional b, {name}, shallow, ISC-GEM 1976-{ISCGEM_LAST_YEAR}",
             f"{r['b']:.3f} [{lo:.3f}, {hi:.3f}] n={r['n_b']} q={r['quality']}",
             f"{pub:.2f}" if pub is not None else r["source"], vd, data, z)
     pb = v["plate_boundary_types"]
@@ -224,7 +223,32 @@ def validation_counts(t):
     return out
 
 
+def file_hashes(site=SITE):
+    """bytes and sha256 of every top-level site/data/*.json and *.geojson except manifest.json itself."""
+    out = {}
+    for f in sorted(site.glob("*.json")) + sorted(site.glob("*.geojson")):
+        if f.name == "manifest.json":
+            continue
+        b = f.read_bytes()
+        out[f.name] = {"bytes": len(b), "sha256": hashlib.sha256(b).hexdigest()}
+    return out
+
+
+def rehash_manifest(site=SITE):
+    """Rewrite only the `files` checksums of manifest.json from the files on disk. run_all.sh calls this after the
+    last writer of a top-level file (build_rating.py rewrites rating.json after this script has hashed it)."""
+    path = site / "manifest.json"
+    man = json.loads(path.read_text())
+    man["files"] = file_hashes(site)
+    jdump(man, path, indent=1)
+    return man
+
+
 def main():
+    if "--rehash" in sys.argv[1:]:
+        rehash_manifest()
+        print("manifest.json: checksums refreshed")
+        return
     cells = load_work("cells")
     g, c = load_work("iscgem"), load_work("comcat")
     v = json.loads((RES / "validation.json").read_text())
@@ -249,12 +273,7 @@ def main():
            "floors": ag["floors"], "validation_table": vt, "validation_counts": validation_counts(vt)}, SITE / "global.json")
     jdump(vt, RES / "validation_table.json", indent=1)
 
-    files = {}
-    for f in sorted(SITE.glob("*.json")) + sorted(SITE.glob("*.geojson")):
-        if f.name == "manifest.json":
-            continue
-        b = f.read_bytes()
-        files[f.name] = {"bytes": len(b), "sha256": hashlib.sha256(b).hexdigest()}
+    files = file_hashes()
     det = list((SITE / "cells").glob("*.json"))
     manifest = {
         "name": "Global Seismicity Atlas", "version": VERSION,
@@ -284,7 +303,7 @@ def main():
             {"name": "USGS Slab2 subduction zone geometry (Depth 3D view)", "url": "https://doi.org/10.5066/F7PV6JNV",
              "licence": "CC0 1.0", "citation": "Hayes et al. 2018 Science 362, 58-61, doi:10.1126/science.aat4723"}],
         "method": {"cells": "H3 resolution 2", "sample_radius_km": ag["sample_radius_km"],
-                   "b_catalogue": "ISC-GEM Mw 1976-2021", "b_sample": ag.get("b_sample", "all events"),
+                   "b_catalogue": f"ISC-GEM Mw 1976-{ISCGEM_LAST_YEAR}", "b_sample": ag.get("b_sample", "all events"),
                    "b_magerr_max": ag.get("b_magerr_max"), "floors": ag["floors"], "nboot": ag["nboot"],
                    "quality": {"A": "95 % CI width / b <= 0.30", "B": "<= 0.50", "C": "wider: b masked",
                                "insufficient": "< 50 events above threshold"},

@@ -39,7 +39,7 @@ def main(old):
            f"| Quality A | {mo['method']['quality']['A']} | {mn['method']['quality']['A']} |",
            f"| Quality B | {mo['method']['quality']['B']} | {mn['method']['quality']['B']} |", "",
            "## Cells by quality code", "", "| depth | code | old | new |", "|---|---|---|---|"]
-    for d, name in (("sh", "shallow < 60 km"), ("dp", "deeper 60-300 km")):
+    for d, name in (("sh", "shallow <= 70 km"), ("dp", "deeper > 70 km")):
         co = collections.Counter(p[f"{d}_q"] for p in o.values())
         cn = collections.Counter(p[f"{d}_q"] for p in n.values())
         for q in ("A", "B", "C", "insufficient"):

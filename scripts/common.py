@@ -23,9 +23,15 @@ _RELEASE = json.loads((Path(__file__).resolve().parent / "release.json").read_te
 CUTOFF = _RELEASE["data_cutoff_utc"]    # data cut-off date (UTC) used for the ComCat download
 CUTOFF_YEAR = int(CUTOFF[:4])
 VERSION = _RELEASE["version"]
+# Last complete year of the ISC-GEM catalogue in use (2021 for the ComCat mirror and ISC-GEM v12). Every period that
+# ends with the ISC-GEM data (b sample, rates, the ISC-GEM / ComCat hand-over of the deficit layer) is derived from
+# it; prepare.py stops when the catalogue holds later events, so a newer release is never cut silently.
+ISCGEM_LAST_YEAR = int(_RELEASE.get("iscgem_last_year", 2021))
+ISCGEM_END = f"{ISCGEM_LAST_YEAR + 1}-01-01"          # exclusive end (UTC) of the ISC-GEM period
 H3_RES = 2                      # display cells: H3 resolution 2 (mean area 86,802 km2)
 SAMPLE_R_KM = 300.0             # sampling radius around each cell centre for Mc / b
 DEPTH_SPLIT = 70.0              # km: shallow <= 70 < intermediate/deep
+COMCAT_MINMAG = 4.5             # ComCat download: minmagnitude of the query, re-checked on the rows (fetch, prepare)
 DM = 0.1
 MW_TYPES = {"mww", "mwc", "mwb", "mwr", "mw", "mwp", "mi", "mwd"}
 
@@ -100,27 +106,42 @@ def decimal_year(t: pd.Series) -> np.ndarray:
     return (t.year + (t - start) / (end - start)).to_numpy(float)
 
 
-def jdump(obj, path: Path, indent=None):
-    def conv(o):
-        if isinstance(o, np.floating):
-            return None if not np.isfinite(o) else float(o)
-        if isinstance(o, np.integer):
-            return int(o)
-        if isinstance(o, np.ndarray):
-            return o.tolist()
-        if isinstance(o, np.bool_):
-            return bool(o)
-        return str(o)
+def _json_clean(o):
+    """NaN / inf -> None everywhere (also inside numpy scalars and arrays), so the output is valid JSON."""
+    if isinstance(o, (float, np.floating)):
+        return float(o) if np.isfinite(o) else None
+    if isinstance(o, (np.integer, np.bool_)):
+        return o.item()
+    if isinstance(o, np.ndarray):
+        return _json_clean(o.tolist())
+    if isinstance(o, dict):
+        return {k: _json_clean(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [_json_clean(v) for v in o]
+    return o
 
-    def clean(o):
-        if isinstance(o, float) and not np.isfinite(o):
-            return None
-        if isinstance(o, dict):
-            return {k: clean(v) for k, v in o.items()}
-        if isinstance(o, (list, tuple)):
-            return [clean(v) for v in o]
-        return o
-    path.write_text(json.dumps(clean(obj), indent=indent, default=conv, separators=None if indent else (",", ":")))
+
+def jdumps(obj, indent=None) -> str:
+    """JSON text with NaN / inf written as null; allow_nan=False makes any value that slipped through an error
+    instead of the invalid token NaN."""
+    return json.dumps(_json_clean(obj), indent=indent, default=str, allow_nan=False,
+                      separators=None if indent else (",", ":"))
+
+
+def jdump(obj, path: Path, indent=None):
+    path.write_text(jdumps(obj, indent))
+
+
+def h3_polygon(h: str, nd: int = 2) -> dict:
+    """GeoJSON Polygon of an H3 cell, longitudes made continuous across the antimeridian (a ring that would jump
+    by ~360 degrees gets its negative longitudes shifted by +360), rounded to nd decimals."""
+    import h3
+    ring = [(lo, la) for la, lo in h3.cell_to_boundary(h)]
+    lons = np.array([p[0] for p in ring])
+    if lons.max() - lons.min() > 180:
+        ring = [(lo + 360 if lo < 0 else lo, la) for lo, la in ring]
+    ring = [[round(lo, nd), round(la, nd)] for lo, la in ring]
+    return {"type": "Polygon", "coordinates": [ring + [ring[0]]]}
 
 
 def b_sample_mask(magerr, max_err=B_MAGERR_MAX) -> np.ndarray:

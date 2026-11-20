@@ -79,7 +79,7 @@ def bpos_pairs(m, t_days, floor, dt_split=1.0, dm=0.1, dmc=0.2):
     for sel in (dt <= dt_split, dt > dt_split):
         x = d[sel]
         x = x[x >= dmc - dm / 2 + 1e-9]
-        out.append((LOG10E / (x.mean() - (dmc - dm / 2)) if x.size >= 10 else np.nan, int(x.size)))
+        out.append((sl.b_from_excess(x.mean() - sl.bin_mag(dmc, dm), dm) if x.size >= 10 else np.nan, int(x.size)))
     return tuple(out)
 
 
@@ -165,7 +165,7 @@ def per_cell(samples, cells_df, rng, lilliefors=False):
         m, f = sl.bin_mag(s["m"]), sl.bin_mag(s["f"])
         if m.size < 30:
             continue
-        r = al.cell_b(m, f, nboot=200, rng=rng)
+        r = al.cell_b(m, f, nboot=al.NBOOT, rng=rng)       # the atlas's own interval (200 before 0.6.0)
         rp = al.cell_bpos(m, f)
         thr = np.maximum(float(sl.mc_maxc_fast(m)), f)
         row = {"h3": h, "pb": cells_df.loc[h, "pb_class"], "q": r.get("quality"), "b": r.get("b_raw", np.nan),
@@ -259,7 +259,7 @@ def main():
     # ---- (a) global per period: b(floor + k) direct vs every event, b-positive, Mc-Lilliefors
     rng = np.random.default_rng(RNG + 1)   # one stream per section: sections do not shift each other
     glob = {}
-    for (a, z), key in zip(PERIODS, ("1976-2003", "2004-2021")):
+    for (a, z), key in zip(PERIODS, [f"{a_}-{z_}" for a_, z_ in PERIODS]):
         ps = (yr >= a) & (yr <= z)
         f0 = fl_direct["sh"][key]["floor"]
         rows = []
@@ -350,7 +350,7 @@ def main():
                 f = sl.bin_mag(samp[h]["f"])
                 f = f[sl.bin_mag(samp[h]["m"]) >= f - 1e-9]
                 m = np.round((f - 0.05 + rng.exponential(LOG10E, f.size)) / resol) * resol   # b = 1
-                r = al.cell_b(m, f, nboot=200, rng=rng)
+                r = al.cell_b(m, f, nboot=al.NBOOT, rng=rng)
                 rp = al.cell_bpos(m, f)
                 if r.get("quality") in ("A", "B") and np.isfinite(rp["bpos"]):
                     rows.append((r["b"], r["b_lo"], r["b_hi"], rp["bpos"]))

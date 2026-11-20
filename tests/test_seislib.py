@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import seislib as sl  # noqa: E402
@@ -96,3 +97,90 @@ def test_omori_mct_recovers_p_with_early_incompleteness():
     f = sl.omori_fit_mct(t[keep], m[keep], 0.0, 2000.0, 7.1, 3.0, 1.0, fix_c=c)
     assert abs(f["p"] - p) < 3 * f["sp"], f
     assert abs(np.log10(f["K"]) - 2.0) < 0.05, f
+
+
+def test_mc_lilliefors_res_equal_step_finds_true_mc():
+    # magnitudes reported at 0.1 and tested on the 0.1 grid: (c - step/2)/res ends in .5, so a half-to-even round
+    # put the bin edge one bin low for odd tenths and rejected the true Mc (audit fix)
+    for seed in (0, 1, 2):
+        m = sl.synth_gr(2000, 1.0, 2.1, 0.1, rng=seed)
+        mc, table = sl.mc_lilliefors(m, res=0.1, step=0.1, rng=seed)
+        assert mc == 2.1, table[:2]
+
+
+def test_bin_mag_ties_go_up():
+    x = np.round(np.arange(5.05, 6.0, 0.1), 2)
+    assert sl.bin_mag(x).tolist() == [round(v + 0.05, 1) for v in x]       # 5.25, 5.35, 5.45 went down before 0.6.0
+    assert sl.bin_mag([-0.25, -0.24, 2.449, 2.45]).tolist() == [-0.2, -0.2, 2.4, 2.5]
+    assert sl.bin_mag([6.84, 7.02, 2.9999999]).tolist() == [6.8, 7.0, 3.0]
+
+
+def test_binned_mle_is_unbiased_where_aki_utsu_is_not():
+    # the Aki-Utsu dm/2 correction is an approximation: -0.3 % at b = 1, -1 % at b = 1.5 for 0.1 bins
+    for b_true in (1.0, 1.5):
+        bs, bp = [], []
+        for s in range(20):
+            m = sl.synth_gr(20000, b_true, 3.0, rng=s)
+            bs.append(sl.b_aki(m, 3.0)[0])
+            bp.append(sl.b_positive(m)[0])
+        assert abs(np.mean(bs) / b_true - 1) < 0.004, (b_true, np.mean(bs))   # se of the mean 0.16 %
+        assert abs(np.mean(bp) / b_true - 1) < 0.008, (b_true, np.mean(bp))   # se 0.3 %
+    x = 0.4
+    assert sl.b_from_excess(x, 0.1) == pytest.approx(np.log1p(0.1 / x) / 0.1 * np.log10(np.e))
+    assert sl.b_from_excess(x, 0.0) == pytest.approx(np.log10(np.e) / x)
+    assert np.isnan(sl.b_from_excess(0.0, 0.1))
+
+
+def test_two_decimal_magnitudes_no_threshold_parity_artefact():
+    # ISC-GEM Mw has two decimals; with ties split by float noise b changed with the parity of the threshold by up
+    # to 0.015. Equal-width bins + the binned MLE: b is flat against the threshold
+    r = np.random.default_rng(12)
+    m = np.round(5.0 + r.exponential(np.log10(np.e), 400_000), 2)            # b = 1, reported to 0.01
+    bs = [sl.b_aki(m, thr)[0] for thr in (5.5, 5.6, 5.7, 5.8)]
+    assert max(abs(b - 1.0) for b in bs) < 0.012, bs
+    assert max(bs) - min(bs) < 0.015, bs
+
+
+def test_declustering_per_depth_layer():
+    # a 400 km deep M7.5 above a shallow M5 a day later: on the whole catalogue the epicentral window removed the
+    # shallow event; per layer it stays independent
+    t = np.array([0.0, 1.0, 2.0]); lat = np.array([-20.0, -20.1, -20.0]); lon = np.array([-178.0, -178.0, -178.1])
+    m = np.array([7.5, 5.0, 5.2]); deep = np.array([True, False, True])
+    assert sl.decluster_gk(t, lat, lon, m).tolist() == [True, False, False]
+    assert sl.decluster_gk_layers(t, lat, lon, m, deep).tolist() == [True, True, False]
+    one = np.zeros(3, bool)
+    assert sl.decluster_gk_layers(t, lat, lon, m, one).tolist() == sl.decluster_gk(t, lat, lon, m).tolist()
+
+
+def test_great_circle_midpoint_across_the_antimeridian():
+    la, lo = sl.great_circle_midpoint(50.506, 179.688, 50.496, -179.202)     # PB2002 NA/PA SUB step
+    assert abs(la - 50.50) < 0.01 and abs(abs(lo) - 179.757) < 0.01          # the mean of the longitudes gave 0.24 E
+    la, lo = sl.great_circle_midpoint(10.0, 20.0, 12.0, 22.0)
+    assert abs(la - 11.0) < 0.01 and abs(lo - 21.0) < 0.01
+
+
+def test_omori_mct_sk_includes_parameter_covariance():
+    # K / sqrt(n) ignored the covariance of K with p and c (about half the true scatter); the new sK must match the
+    # spread of K between realisations (audit fix)
+    r = np.random.default_rng(3)
+    Ks, sKs, old = [], [], []
+    for _ in range(40):
+        t = sl.synth_omori(60.0, 0.05, 1.05, 0.0, 365.0, rng=r.integers(1e9))
+        m = sl.synth_gr(t.size, 1.0, 4.5, rng=r.integers(1e9))
+        keep = m >= sl.mc_helmstetter(t, 8.0, 4.5) - 0.05 + 1e-9
+        f = sl.omori_fit_mct(t[keep], m[keep], 0.0, 365.0, 8.0, 4.5, 1.0)
+        Ks.append(f["K"]); sKs.append(f["sK"]); old.append(f["K"] / np.sqrt(f["n"]))
+    ratio = np.std(Ks, ddof=1) / np.mean(sKs)
+    assert 0.75 < ratio < 1.35, ratio
+    assert np.mean(sKs) > 1.5 * np.mean(old)   # well above the old Poisson-only value
+
+
+def test_omori_c_is_bounded_and_errors_finite_or_flagged():
+    # true c far below the bound: the old unconstrained search returned c ~ 1e-15 with a singular Hessian
+    for s in range(3):
+        t = sl.synth_omori(20.0, 1e-7, 1.05, 0.0, 365.0, rng=s)
+        m = sl.synth_gr(t.size, 1.0, 4.5, rng=s + 10)
+        for f in (sl.omori_fit_mct(t, m, 0.0, 365.0, 7.0, 4.5, 1.0), sl.omori_fit(t, 0.0, 365.0)):
+            assert f["c"] >= sl.C_MIN_DAYS * (1 - 1e-9), f["c"]
+            assert f["c_at_bound"] and not np.isfinite(f["sc"])
+            assert np.isfinite(f["sp"]) and f["sp"] > 0 and np.isfinite(f["sK"]) and f["sK"] > 0, f

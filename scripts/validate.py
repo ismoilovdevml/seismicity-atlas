@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import atlaslib as al  # noqa: E402
 import seislib as sl  # noqa: E402
 from atlas import PERIODS, floor_of  # noqa: E402
-from common import (B_MAGERR_MAX, MICHAEL_DEEP, MICHAEL_SHALLOW, RES, b_sample_label, b_sample_mask,  # noqa: E402
+from common import (B_MAGERR_MAX, ISCGEM_LAST_YEAR, MICHAEL_DEEP, MICHAEL_SHALLOW, RES, b_sample_label, b_sample_mask,  # noqa: E402
                     jdump, load_work)
 
 RNG = 7
@@ -156,7 +156,7 @@ def main():
     print("global ...", flush=True)
     out["michael_periods"], out["michael_pooled"] = global_vs_michael(g)
 
-    g76_all = g[(g.year >= 1976) & (g.year <= 2021)]
+    g76_all = g[(g.year >= 1976) & (g.year <= ISCGEM_LAST_YEAR)]
     bsel = b_sample_mask(g76_all.magerr)
     out["b_sample"] = {"rule": b_sample_label(), "b_magerr_max": B_MAGERR_MAX, "n_1976_2021": len(g76_all),
                        "n_in_sample": int(bsel.sum()), "n_excluded": int((~bsel).sum())}
@@ -203,7 +203,7 @@ def main():
                                        **b_region(g76, sh & sel & (g76.pb_class == "SUB"), "sh", fl, 17)}
 
     # ComCat Mw-proxy vs ISC-GEM, same years, shallow: b against cutoff
-    cc = c[(~c.deep) & (c.year >= 2004) & (c.year <= 2021)]
+    cc = c[(~c.deep) & (c.year >= 2004) & (c.year <= ISCGEM_LAST_YEAR)]
     gg = g[(~g.deep) & (g.year >= 2004)]
     out["comcat_proxy_vs_iscgem_b_2004_2021"] = [
         {"cutoff": mc, "comcat_proxy": list(map(float, sl.b_aki(cc.mw_proxy, mc)[:3])),

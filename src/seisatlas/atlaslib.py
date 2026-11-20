@@ -25,11 +25,12 @@ def maxc_rows(mm, dm=0.1, corr=0.2):
 
 
 def b_rows(mm, thr, dm=0.1):
+    """seislib.b_varmc for every row of (B, N) binned magnitudes and thresholds (the bootstrap replicates)."""
     keep = mm >= thr - 1e-9
     n = keep.sum(axis=1)
-    s = np.where(keep, mm - (thr - dm / 2), 0.0).sum(axis=1)
+    s = np.where(keep, mm - thr, 0.0).sum(axis=1)
     with np.errstate(divide="ignore", invalid="ignore"):
-        b = LOG10E / (s / n)
+        b = np.asarray(sl.b_from_excess(s / n, dm), float)
     b[n < 2] = np.nan
     return b, n
 
