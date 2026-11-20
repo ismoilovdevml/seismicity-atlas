@@ -101,8 +101,10 @@ naive sum over 1904–present is biased low, and the synthetic test shows the bi
 Mc^(1−β) Γ(1−β, Mt/Mc) and Mt is the moment at Mw 6.0. The inputs are:
 
 - α6 is the rate of Mw ≥ 6.0 events since 1964 in the zone, drawn from its Jeffreys posterior Gamma(n + ½, T).
-- β = 2b/3, with b from all Mw ≥ 5.8 events in the whole outline, 1976 to cut-off. That gives b = 0.954 ± 0.127
-  (n = 38, bootstrap 95 % [0.750, 1.260]). The bootstrap distribution is sampled, and the sub-zones are too small for
+- β = 2b/3, with b from all events in the Mw 5.8 bin and above (Mw ≥ 5.75, binned to 0.1) in the whole outline,
+  1976 to cut-off. That gives b = 0.954 ± 0.127 (n = 38, bootstrap 95 % [0.750, 1.260]) in 0.5.0, where the sample
+  was cut at Mw ≥ 5.80 before binning, so the 5.8 bin lost its 5.75–5.79 events and b came out low (the 0.6.0
+  rebuild gives about 1.00, n = 40). The bootstrap distribution is sampled, and the sub-zones are too small for
   their own b.
 - The corner magnitude is uniform in 7.75–8.5. This range is an assumption. It is anchored on ISC-GEM's two largest
   events (1906 Mw 7.95 and 1911 Mw 8.02) and on Molnar & Ghose (2000), whose abstract mentions "two of comparable
@@ -125,6 +127,8 @@ For each of 4,000 draws:
 `p_full` is the fraction of simulated catalogues whose estimate is ≤ the observed one, for χ = 1. `p_half` is the
 same for χ = 0.5. A small `p_full` (e.g. < 0.05) would mean a release lower than full coupling usually produces in
 120 years. `unbal` is the fraction of draws where no corner magnitude ≤ 10.5 balances the budget. Those draws use
+10.5. `over` (since 0.6.0) is the fraction where even a corner at 6.0 releases more than the budget (the observed
+Mw ≥ 6 rate alone exceeds it); those draws use 6.0. Before 0.6.0 they were counted in `unbal` and simulated with
 10.5.
 
 ### Coupling
@@ -265,6 +269,7 @@ Feature properties (regions and cells):
 | `p_half` | 0–1 | the same at 50 % coupling |
 | `mc_bal` | Mw | median corner magnitude that balances the full-coupling geodetic budget at the observed Mw ≥ 6 rate |
 | `unbal` | 0–1 | fraction of draws where no corner magnitude ≤ 10.5 balances the budget |
+| `over` | 0–1 | fraction of draws where a corner at 6.0 already exceeds the budget (since 0.6.0) |
 
 Display guidance (implemented in v0.3.1 by `site/js/deficit.js`, the Scientist-view layer and its panel): show `r_obs` with its interval and `p_full` together, as in "observed / geodetic
 = 1.4 (0.9–9.0); full-coupling catalogues release less than this 81 % of the time". Grey out `few`. Put the

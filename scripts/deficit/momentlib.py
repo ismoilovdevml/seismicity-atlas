@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import numpy as np
 from scipy.optimize import brentq
-from scipy.special import gamma, gammaincc
+from scipy.special import exp1, gamma, gammaincc
 
 SEC_YR = 365.25 * 86400.0
 MW_C = 9.1   # log10 M0 = 1.5 Mw + 9.1 (M0 in N m; IASPEI 2013 standard form, used by ISC-GEM)
@@ -59,14 +59,35 @@ def geodetic_moment_rate(e_ss, area_m2, mu_pa, h_m):
 
 
 # ----------------------------------------------------------------------------------------------- seismic side
+def upper_gamma(s, x):
+    """Upper incomplete gamma function Gamma(s, x) for real s (also s <= 0) and x > 0.
+
+    scipy's gammaincc is the regularised form and needs s > 0; for s <= 0 the recurrence
+    Gamma(s, x) = (Gamma(s + 1, x) - x^s e^-x) / s is applied down from s + k > 0, with Gamma(0, x) = E1(x)."""
+    s, x = np.broadcast_arrays(np.asarray(s, float), np.asarray(x, float))
+    k = np.where(s > 0, 0, np.floor(-s) + 1).astype(int)          # steps up to s + k > 0 (s + k = 0 handled below)
+    top = s + k
+    zero = np.isclose(top, 1.0) & np.isclose(s, np.round(s)) & (s <= 0)   # integer s <= 0: start from Gamma(0, x)
+    top = np.where(zero, 0.0, top)
+    k = np.where(zero, k - 1, k)
+    with np.errstate(invalid="ignore"):
+        g = np.where(zero, exp1(x), gamma(np.where(zero, 1.0, top)) * gammaincc(np.where(zero, 1.0, top), x))
+    for j in range(int(k.max()) if k.size else 0, 0, -1):      # Gamma(a - 1, x) = (Gamma(a, x) - x^(a-1) e^-x) / (a - 1)
+        a = top - (k - j)                                       # current order for rows with k >= j
+        step = k >= j
+        g = np.where(step, (g - x ** (a - 1.0) * np.exp(-x)) / (a - 1.0), g)
+    return g if g.ndim else float(g)
+
+
 def tgr_mean_moment(m0_t, beta, m0_c):
-    """Mean moment of a tapered G-R (Kagan 2002) above threshold moment m0_t, corner moment m0_c, 0 < beta < 1.
+    """Mean moment of a tapered G-R (Kagan 2002) above threshold moment m0_t, corner moment m0_c, beta > 0.
 
     Survivor F(M) = (Mt/M)^beta exp((Mt - M)/Mc), M >= Mt;  E[M] = Mt + Mt^beta e^(Mt/Mc) Mc^(1-beta) Gamma(1-beta, Mt/Mc).
+    The exponential taper keeps the mean finite for every beta; for beta >= 1 (b >= 1.5) Gamma(1 - beta, x) has a
+    non-positive order and comes from upper_gamma (before 0.6.0 such draws gave NaN through gammaincc).
     """
     x = m0_t / m0_c
-    upper = gamma(1.0 - beta) * gammaincc(1.0 - beta, x)        # upper incomplete Gamma(1 - beta, x)
-    return m0_t + m0_t ** beta * np.exp(x) * m0_c ** (1.0 - beta) * upper
+    return m0_t + m0_t ** beta * np.exp(x) * m0_c ** (1.0 - beta) * upper_gamma(1.0 - beta, x)
 
 
 def tgr_moment_rate(rate_t, mw_t, beta, mw_c):
@@ -86,12 +107,18 @@ def tgr_sample_mw(n, mw_t, beta, mw_c, rng):
 def balance_corner_mw(mdot, rate_t, mw_t, beta, mw_lo=6.0, mw_hi=10.5):
     """Corner magnitude at which the tapered G-R moment rate equals `mdot` (moment conservation, Bird & Kagan 2004).
 
-    Returns nan when even the upper search bound is not enough or the lower bound already exceeds mdot.
+    Outside the search range the side is kept: -inf when even a corner at mw_lo gives more moment than mdot (the
+    observed rate alone exceeds the budget), +inf when a corner at mw_hi is not enough, nan when the rate is not
+    finite. Before 0.6.0 both sides were nan and the caller used mw_hi for both.
     """
     f = lambda mc: tgr_moment_rate(rate_t, mw_t, beta, mc) - mdot  # noqa: E731
     lo, hi = f(mw_lo), f(mw_hi)
-    if not (np.isfinite(lo) and np.isfinite(hi)) or lo > 0 or hi < 0:
+    if not (np.isfinite(lo) and np.isfinite(hi)):
         return float("nan")
+    if lo > 0:
+        return float("-inf")
+    if hi < 0:
+        return float("inf")
     return float(brentq(f, mw_lo, mw_hi, xtol=1e-4))
 
 

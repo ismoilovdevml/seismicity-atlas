@@ -73,7 +73,26 @@ def test_balance_corner_recovers_corner():
     for mc in (7.2, 8.0, 8.8):
         mdot = ml.tgr_moment_rate(rate, mt, beta, mc)
         assert ml.balance_corner_mw(mdot, rate, mt, beta) == pytest.approx(mc, abs=1e-3)
-    assert np.isnan(ml.balance_corner_mw(1e10, rate, mt, beta))       # below the minimum possible rate
+    assert ml.balance_corner_mw(1e10, rate, mt, beta) == -np.inf      # below the minimum possible rate
+    assert ml.balance_corner_mw(1e30, rate, mt, beta) == np.inf       # above the rate of a corner at 10.5
+
+
+def test_tgr_mean_moment_for_beta_at_and_above_one():
+    # b >= 1.5 (beta >= 1): the taper keeps the mean finite; it used to be NaN (gammaincc needs a positive order)
+    from scipy.integrate import quad
+    mt, mc = ml.mw_to_m0(6.0), ml.mw_to_m0(8.0)
+    for beta in (0.7, 1.0, 1.2, 1.6, 2.3):
+        # E[M] = Mt + int_Mt^inf F(M) dM, in u = ln(M / Mt)
+        surv = quad(lambda u: mt * np.exp(u) * np.exp(-beta * u) * np.exp((mt - mt * np.exp(u)) / mc), 0, 60,
+                    limit=400)[0]
+        got = ml.tgr_mean_moment(mt, beta, mc)
+        assert np.isfinite(got) and got == pytest.approx(mt + surv, rel=1e-6), beta
+    rng = np.random.default_rng(7)
+    m = ml.mw_to_m0(ml.tgr_sample_mw(1_000_000, 6.0, 1.2, 8.0, rng))
+    assert ml.tgr_mean_moment(mt, 1.2, mc) == pytest.approx(m.mean(), rel=0.03)
+    for s in (0.5, 0.0, -0.4, -1.0, -1.7):          # recurrence against direct integration of t^(s-1) e^-t
+        want = quad(lambda t: t ** (s - 1) * np.exp(-t), 0.3, np.inf)[0]
+        assert ml.upper_gamma(s, 0.3) == pytest.approx(want, rel=1e-8), s
 
 
 def test_bandwise_rate_recovers_truth_with_incomplete_early_years():
@@ -123,3 +142,32 @@ def test_kostrov_shortening_reproduces_molnar_ghose_2000():
     u = ml.kostrov_shortening(16.3e20, 3.3e10, 20e3, 1800e3, 100.0)
     assert u / 300e3 == pytest.approx(23.1e-9, rel=0.02)
     assert u * 1e3 == pytest.approx(7.0, abs=0.2)   # 6.86; the paper rounds to 7
+
+
+def test_deficit_b_sample_keeps_the_whole_lowest_bin(tmp_path, monkeypatch):
+    # bin 5.8 holds Mw 5.75-5.84; cutting the raw magnitudes at 5.80 first dropped 5.75-5.79 and biased b low
+    # (Tien Shan, 0.5.0: 0.954, n = 38; with the whole bin about 1.00, n = 40). Moment bands and counts keep Mw >= 5.8.
+    import pandas as pd
+    from shapely.geometry import box
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    import build_deficit as bd
+    import seislib as sl
+    rows = [("1990-01-01T00:00:00Z", 42.0, 75.0, 10.0, m, 0.1, f"e{i}") for i, m in enumerate((5.76, 5.79, 5.80, 6.1))]
+    pd.DataFrame(rows, columns=["time", "latitude", "longitude", "depth", "mag", "magError", "id"]).to_csv(
+        tmp_path / "iscgem.csv", index=False)
+    pd.DataFrame([("2023-01-01T00:00:00Z", 10.0, 10.0, 10.0, 6.0, "mww", "c1")],      # outside the box
+                 columns=["time", "latitude", "longitude", "depth", "mag", "magType", "id"]).to_csv(
+        tmp_path / "comcat_m45.csv", index=False)
+    monkeypatch.setattr(bd, "PROC", tmp_path)
+    ev, _ = bd.load_catalogue()
+    assert sorted(ev.mag) == [5.76, 5.79, 5.80, 6.1]
+    assert sl.b_aki(ev.mag.to_numpy(), bd.B_MIN, bd.DM)[2] == 4            # all four are in bins >= 5.8
+    LO, LA = np.meshgrid(np.arange(70, 80, 0.5), np.arange(40, 44, 0.5))
+    zi = bd.zone_inputs(box(70, 40, 80, 44), {}, LO, LA, np.ones(LO.shape), ev)
+    assert sorted(zi["events"].mag) == [5.80, 6.1]                          # counts and moment: Mw >= 5.8 only
+    # synthetic check of the bias itself: 2-decimal GR magnitudes, b = 1
+    r = np.random.default_rng(2)
+    m = np.round(5.745 + r.exponential(np.log10(np.e), 200_000), 2)
+    b_old = sl.b_aki(m[m >= 5.8 - 1e-9], 5.8)[0]
+    b_new = sl.b_aki(m[m >= 5.75 - 1e-9], 5.8)[0]
+    assert b_old < 0.96 and abs(b_new - 1.0) < 0.02, (b_old, b_new)
