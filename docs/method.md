@@ -249,7 +249,9 @@ above the period floor in time order. It is insensitive to the short-term incomp
   different b: globally, 1976–2021, direct Mw, b = 1.035 [1.018, 1.052] shallow (n = 15,725) and
   0.936 [0.911, 0.961] deeper (n = 4,976). (v0.1, every event: 1.043 and 0.969.)
   - For the comparison with Michael (2014) we used his 60 km split.
-- **Declustering is not applied to the main b.** Gardner-Knopoff windows (as in ZMAP and OpenQuake) mark 51 % of
+- **Declustering is not applied to the main b.** Gardner-Knopoff windows (as in ZMAP and OpenQuake), run within
+  each depth class separately since 0.6.0 (the windows are epicentral, so on the whole catalogue a deep event
+  removed shallow events above it), mark 51 % of
   ISC-GEM events as dependent. At M ≥ 6.5 the windows last years, so for a global M ≥ 5 catalogue they remove
   much more than aftershocks.
   - Global shallow b falls from 1.035 to 0.887 [0.867, 0.907].

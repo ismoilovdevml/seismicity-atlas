@@ -177,17 +177,22 @@ def main():
 
     # ------------------------------------------------------------------ cells, boundary class, declustering
     st = json.loads((AUX / "PB2002_steps.json").read_text())["features"]
-    steps = pd.DataFrame([{"lat": (f["properties"]["STARTLAT"] + f["properties"]["FINALLAT"]) / 2,
-                           "lon": (f["properties"]["STARTLONG"] + f["properties"]["FINALLONG"]) / 2,
+    steps = pd.DataFrame([{"lat": f["properties"]["STARTLAT"], "lon": f["properties"]["STARTLONG"],
+                           "lat2": f["properties"]["FINALLAT"], "lon2": f["properties"]["FINALLONG"],
                            "cls": f["properties"]["STEPCLASS"], "age": f["properties"]["SEAFLOORAG"],
                            "vel": f["properties"]["VELOCITYLE"]} for f in st])
+    # step midpoint on the sphere: the mean of the longitudes put the 11 steps that cross 180 E near 0 E
+    steps["lat"], steps["lon"] = sl.great_circle_midpoint(steps.lat, steps.lon, steps.lat2, steps.lon2)
     for d in (g, c):
         d["h3"] = [h3.latlng_to_cell(la, lo, H3_RES) for la, lo in zip(d.lat, d.lon)]
         cls, dist, age, vel = boundary_class(d.lat.to_numpy(), d.lon.to_numpy(), steps)
         d["pb_class"], d["pb_dist_km"], d["pb_age"], d["pb_vel"] = cls, dist, age, vel
         dd = ((d.time - pd.Timestamp("1900-01-01", tz="UTC")).dt.total_seconds() / 86400).to_numpy()
         mags = d["mag"].to_numpy() if d.src.iat[0] == "iscgem" else d["mw_proxy"].to_numpy()
-        d["mainshock"] = sl.decluster_gk(dd, d.lat.to_numpy(), d.lon.to_numpy(), mags)
+        # per depth layer (<= 70 / > 70 km), as the layers are analysed separately: the windows are epicentral, so
+        # on the whole catalogue a deep event removed shallow events above it (9 % of the deeper and 1.4 % of the
+        # shallow ISC-GEM events changed class)
+        d["mainshock"] = sl.decluster_gk_layers(dd, d.lat.to_numpy(), d.lon.to_numpy(), mags, d.deep.to_numpy())
     info["declustering"] = {s: {"n": int(len(d)), "mainshocks": int(d.mainshock.sum())} for s, d in
                             (("iscgem", g), ("comcat", c))}
     info["pb_class_counts_iscgem_shallow"] = g[~g.deep].pb_class.value_counts().to_dict()

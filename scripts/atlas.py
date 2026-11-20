@@ -183,6 +183,7 @@ def main(radius=SAMPLE_R_KM):
                         pre + "b_unstable": r.get("cutoff_unstable", False),
                         pre + "b_decl": rd.get("b_raw", np.nan), pre + "b_decl_lo": rd.get("b_lo_raw", np.nan),
                         pre + "b_decl_hi": rd.get("b_hi_raw", np.nan), pre + "n_decl": rd.get("n_b", 0),
+                        pre + "b_decl_q": rd.get("quality"),
                         pre + "bpos": rp.get("bpos", np.nan), pre + "bpos_lo": rp.get("bpos_lo", np.nan),
                         pre + "bpos_hi": rp.get("bpos_hi", np.nan), pre + "n_bpos": rp.get("n_bpos", 0),
                         pre + "mc_cc_2010": mc_rec, pre + "mc_cc_pre1990": mc_old, pre + "n_cc_sample": int(ic.size)})

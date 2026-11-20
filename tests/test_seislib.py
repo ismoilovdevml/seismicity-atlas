@@ -107,6 +107,24 @@ def test_mc_lilliefors_res_equal_step_finds_true_mc():
         assert mc == 2.1, table[:2]
 
 
+def test_declustering_per_depth_layer():
+    # a 400 km deep M7.5 above a shallow M5 a day later: on the whole catalogue the epicentral window removed the
+    # shallow event; per layer it stays independent
+    t = np.array([0.0, 1.0, 2.0]); lat = np.array([-20.0, -20.1, -20.0]); lon = np.array([-178.0, -178.0, -178.1])
+    m = np.array([7.5, 5.0, 5.2]); deep = np.array([True, False, True])
+    assert sl.decluster_gk(t, lat, lon, m).tolist() == [True, False, False]
+    assert sl.decluster_gk_layers(t, lat, lon, m, deep).tolist() == [True, True, False]
+    one = np.zeros(3, bool)
+    assert sl.decluster_gk_layers(t, lat, lon, m, one).tolist() == sl.decluster_gk(t, lat, lon, m).tolist()
+
+
+def test_great_circle_midpoint_across_the_antimeridian():
+    la, lo = sl.great_circle_midpoint(50.506, 179.688, 50.496, -179.202)     # PB2002 NA/PA SUB step
+    assert abs(la - 50.50) < 0.01 and abs(abs(lo) - 179.757) < 0.01          # the mean of the longitudes gave 0.24 E
+    la, lo = sl.great_circle_midpoint(10.0, 20.0, 12.0, 22.0)
+    assert abs(la - 11.0) < 0.01 and abs(lo - 21.0) < 0.01
+
+
 def test_omori_mct_sk_includes_parameter_covariance():
     # K / sqrt(n) ignored the covariance of K with p and c (about half the true scatter); the new sK must match the
     # spread of K between realisations (audit fix)

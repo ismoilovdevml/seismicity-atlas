@@ -132,6 +132,18 @@ def jdump(obj, path: Path, indent=None):
     path.write_text(jdumps(obj, indent))
 
 
+def h3_polygon(h: str, nd: int = 2) -> dict:
+    """GeoJSON Polygon of an H3 cell, longitudes made continuous across the antimeridian (a ring that would jump
+    by ~360 degrees gets its negative longitudes shifted by +360), rounded to nd decimals."""
+    import h3
+    ring = [(lo, la) for la, lo in h3.cell_to_boundary(h)]
+    lons = np.array([p[0] for p in ring])
+    if lons.max() - lons.min() > 180:
+        ring = [(lo + 360 if lo < 0 else lo, la) for lo, la in ring]
+    ring = [[round(lo, nd), round(la, nd)] for lo, la in ring]
+    return {"type": "Polygon", "coordinates": [ring + [ring[0]]]}
+
+
 def b_sample_mask(magerr, max_err=B_MAGERR_MAX) -> np.ndarray:
     """True for events that enter b estimates: Mw uncertainty <= max_err (all True when max_err is None).
 

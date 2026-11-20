@@ -255,6 +255,29 @@ def decluster_gk(t_days, lat, lon, m, fs_time_prop: float = 1.0):
     return cluster == np.arange(t.size)
 
 
+def decluster_gk_layers(t_days, lat, lon, m, layer, fs_time_prop: float = 1.0):
+    """decluster_gk run separately within each depth layer (e.g. shallow <= 70 km / deeper), so that an event of
+    one layer can never remove an event of another: the windows are epicentral, and on the whole catalogue a
+    400 km deep event removed shallow ones above it. Returns the same boolean array as decluster_gk."""
+    layer = np.asarray(layer)
+    t, la, lo, mm = (np.asarray(a, float) for a in (t_days, lat, lon, m))
+    out = np.zeros(t.size, bool)
+    for v in np.unique(layer):
+        k = layer == v
+        out[k] = decluster_gk(t[k], la[k], lo[k], mm[k], fs_time_prop)
+    return out
+
+
+def great_circle_midpoint(lat1, lon1, lat2, lon2):
+    """Midpoint on the sphere of two points (degrees); correct across the antimeridian, where the arithmetic mean
+    of the longitudes is not (179.7 and -179.2 give 0.2 instead of 180.2)."""
+    la1, lo1, la2, lo2 = map(np.radians, (lat1, lon1, lat2, lon2))
+    x = np.cos(la1) * np.cos(lo1) + np.cos(la2) * np.cos(lo2)
+    y = np.cos(la1) * np.sin(lo1) + np.cos(la2) * np.sin(lo2)
+    z = np.sin(la1) + np.sin(la2)
+    return np.degrees(np.arctan2(z, np.hypot(x, y))), np.degrees(np.arctan2(y, x))
+
+
 # ----------------------------------------------------------------------------------------------- Omori-Utsu
 def _ou_integral(c, p, T1, T2):
     if abs(p - 1) < 1e-8:

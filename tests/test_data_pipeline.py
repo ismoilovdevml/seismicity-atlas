@@ -116,6 +116,26 @@ def test_fetch_drops_rows_below_the_query_minmag():
     assert len(fetch.drop_below_minmag(df, None)) == 3                      # ISC-GEM: no magnitude limit
 
 
+def test_declustered_b_withheld_unless_its_own_sample_passes_the_gate():
+    # the declustered b was shown whenever the MAIN b was A/B, also from 7 events (Panama: 3.2 [0.78, 5.21])
+    import pandas as pd
+    import site_layers as sly
+    base = {"h3": "826687fffffffff", "lat": 8.0, "lon": -82.0, "area_km2": 86000.0, "pb_class": "SUB",
+            "n_iscgem": 300, "n_comcat": 500, "rate_m6": 1.0, "cons_n_matched": 50, "cons_dmag_mw": 0.0,
+            "cons_dmag_mb": 0.1, "cons_dloc_km": 10.0, "cons_ddepth_km": 2.0, "cons_iscgem_only": 0,
+            "cons_comcat_only_m6": 0}
+    for d in ("sh", "dp"):
+        base.update({f"{d}_{k}": v for k, v in dict(
+            n_sample=200, n_b=120, mc=5.5, mc_lo=5.4, mc_hi=5.6, b=1.0, b_lo=0.85, b_hi=1.2, b_q="B", b_ci_w=0.35,
+            b_ci_rel=0.35, b_unstable=False, bpos=1.05, bpos_lo=0.8, bpos_hi=1.3, b_decl=3.2, b_decl_lo=0.78,
+            b_decl_hi=5.21, b_decl_q="insufficient", mc_cc_2010=4.7, mc_cc_pre1990=5.0).items()})
+    good = dict(base, h3="82668ffffffffff", sh_b_decl=0.9, sh_b_decl_lo=0.8, sh_b_decl_hi=1.05, sh_b_decl_q="A")
+    fc = sly.cells_layer(pd.DataFrame([base, good]), set())
+    p0, p1 = (f["properties"] for f in fc["features"])
+    assert "sh_bdecl" not in p0 and p0["sh_qdecl"] == "insufficient" and p0["sh_b"] == 1.0
+    assert p1["sh_bdecl"] == 0.9 and p1["sh_qdecl"] == "A"
+
+
 def test_jdump_writes_null_for_nan_everywhere(tmp_path):
     import common
     obj = {"a": float("nan"), "b": np.float64("inf"), "c": np.array([1.0, np.nan]), "d": [np.float32(2.5), None],

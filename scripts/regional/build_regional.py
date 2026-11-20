@@ -25,7 +25,7 @@ sys.path.insert(0, str(HERE.parent))
 import atlaslib as al  # noqa: E402
 import regionlib as rl  # noqa: E402
 import seislib as sl  # noqa: E402
-from common import jdump  # noqa: E402
+from common import h3_polygon, jdump  # noqa: E402
 from fetch_regional import RAW, WORK, fetch, fetch_altmag  # noqa: E402
 from regions import REGIONS  # noqa: E402
 
@@ -63,8 +63,7 @@ def xyz(lat, lon):
 
 
 def cell_polygon(h, nd=3):
-    ring = [[round(lo, nd), round(la, nd)] for la, lo in h3.cell_to_boundary(h)]
-    return {"type": "Polygon", "coordinates": [ring + [ring[0]]]}
+    return h3_polygon(h, nd)       # shared with site_layers: continuous longitudes across the antimeridian
 
 
 def fmd_pairs(m):
@@ -109,11 +108,13 @@ def load_catalogue(cfg):
         sel &= df.status.astype(str).str.lower().eq("reviewed")
     df = df[sel & df.depth.notna()].copy()
     cnt["after_filters_all_types"] = int(len(df))
-    is_t = df.magtype.isin(cfg["magtypes"])
+    mt = df.magtype.astype(str).str.lower()      # case-insensitive: ComCat serves 'Ml' next to 'ml'
+    is_t = mt.isin([t.lower() for t in cfg["magtypes"]])
     other = df[~is_t]
     cnt["other_magtype"] = {k: int(v) for k, v in other.magtype.value_counts().items()}
     keep = df[is_t]
-    alt = other[other.magtype.isin(cfg.get("altmag_from", [])) & (other.mag >= cfg.get("altmag_minmag", -9))]
+    alt = other[mt[~is_t].isin([t.lower() for t in cfg.get("altmag_from", [])]) &
+                (other.mag >= cfg.get("altmag_minmag", -9))]
     if len(alt):  # larger events whose preferred magnitude is Mw/mB: use their local magnitude instead
         am = fetch_altmag(cfg["id"], alt.id.tolist())
         v = pd.to_numeric(alt.id.map(am), errors="coerce")
@@ -151,7 +152,10 @@ def build_region(rid):
     y0, y1 = periods[0][0], periods[-1][1]
     df, cnt, other = load_catalogue(cfg)
     df["per"] = rl.period_index(df.year.to_numpy(), periods)
-    df["ms"] = sl.decluster_gk(df.year.to_numpy() * 365.25, df.lat.to_numpy(), df.lon.to_numpy(), df.mag.to_numpy())
+    # Gardner-Knopoff per depth layer, as the layers are analysed separately (an event of one layer never removes
+    # an event of the other)
+    df["ms"] = sl.decluster_gk_layers(df.year.to_numpy() * 365.25, df.lat.to_numpy(), df.lon.to_numpy(),
+                                      df.mag.to_numpy(), (df.depth > DEPTH_SPLIT).to_numpy())
     print(f"{rid}: {len(df)} events used, {cnt['other_magtype']} other types; mainshocks {df.ms.mean():.3f}",
           flush=True)
     rng = np.random.default_rng(RNG)
@@ -222,11 +226,16 @@ def build_region(rid):
                           pre + "ciwr": R(al.rel_width(r.get("b_raw", np.nan), r.get("b_lo_raw", np.nan),
                                                        r.get("b_hi_raw", np.nan)), 3),
                           pre + "unstable": bool(r.get("cutoff_unstable", False))})
+            # declustered b: shown only when its own sample passes the gate of the main b (n >= 50, width)
+            showd = show and rd.get("quality") in ("A", "B")
+            if rd:
+                props[pre + "qdecl"] = rd.get("quality", "insufficient")
             if show:
                 props.update({pre + "bpos": R(rp.get("bpos", np.nan), 3),
                               pre + "bpos_lo": R(rp.get("bpos_lo", np.nan), 3),
-                              pre + "bpos_hi": R(rp.get("bpos_hi", np.nan), 3),
-                              pre + "bdecl": R(rd.get("b_raw", np.nan), 3),
+                              pre + "bpos_hi": R(rp.get("bpos_hi", np.nan), 3)})
+            if showd:
+                props.update({pre + "bdecl": R(rd.get("b_raw", np.nan), 3),
                               pre + "bdecl_lo": R(rd.get("b_lo_raw", np.nan), 3),
                               pre + "bdecl_hi": R(rd.get("b_hi_raw", np.nan), 3)})
             if ii.size >= MIN_DETAIL:
@@ -245,8 +254,10 @@ def build_region(rid):
                     "rate_above_thr": np.bincount((yr[m >= thr - 1e-9] - y0).astype(int),
                                                   minlength=yy.size)[: yy.size].tolist(),
                     "rate_all": np.bincount((yr - y0).astype(int), minlength=yy.size)[: yy.size].tolist(),
-                    "stats": {**stats, "b_decl": rd.get("b_raw"), "b_decl_lo": rd.get("b_lo_raw"),
-                              "b_decl_hi": rd.get("b_hi_raw"), "n_decl": rd.get("n_b"), **rp},
+                    "stats": {**stats, "b_decl": rd.get("b_raw") if showd else None,
+                              "b_decl_lo": rd.get("b_lo_raw") if showd else None,
+                              "b_decl_hi": rd.get("b_hi_raw") if showd else None, "n_decl": rd.get("n_b"),
+                              "q_decl": rd.get("quality"), **rp},
                 }
         props["detail"] = any(d in det for d in sets)
         if props["detail"]:

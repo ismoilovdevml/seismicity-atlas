@@ -60,3 +60,23 @@ Each item: what was wrong, what changed, which outputs move after the rebuild.
   val_bt.py, val_chile.py, prepare.py and the deficit layer (also as 58.0 years and 2022-01-01). It is now
   `iscgem_last_year` in `scripts/release.json`, and `prepare.py` stops when the catalogue holds later events
   instead of cutting them silently. Outputs: none for the current data.
+- **Declustering per depth layer.** Gardner-Knopoff windows are epicentral and were applied to the whole catalogue
+  before the ≤ 70 / > 70 km split, so a deep event could remove a shallow one above it (and the reverse): 9.1 % of
+  the deeper and 1.4 % of the shallow ISC-GEM events changed between mainshock and aftershock. Each layer is now
+  declustered on its own (`seislib.decluster_gk_layers`; prepare.py and the regional layers). Outputs: every
+  `*_bdecl` value, the declustered global b in validation.json, the declustered literature row,
+  `results/prepare.json` mainshock counts, the regional declustered b.
+- **Declustered b gate.** `*_bdecl` was published whenever the full-sample b passed, also from a handful of
+  declustered events (84 of 172 shown shallow cells and 39 of 71 deeper cells had fewer than 50; Panama 7 events,
+  3.2 [0.78, 5.21]; NZ regional cell n = 2 without an interval). It now needs its own quality A/B (n ≥ 50, relative
+  width), and the new `*_qdecl` gives that code. Outputs: `cells.geojson` (fewer `*_bdecl`), regional cells and
+  detail `stats.b_decl`.
+- **PB2002 step midpoints.** The midpoint of a boundary step was the arithmetic mean of its end longitudes, which
+  put the 11 steps that cross 180° near 0° (e.g. a NA/PA subduction step at 50.50 N 0.24 E). It is now the
+  great-circle midpoint. Outputs: the boundary class of 16 ISC-GEM events (`pb_class`, cell `pb`, boundary-type
+  validation rows by a few events).
+- **Regional polygons across 180°.** The regional layers drew 14 New Zealand cells with a 359.8° longitude jump;
+  they now use the same continuous-longitude polygon as the global cells (`common.h3_polygon`). Outputs:
+  `regional/nz/cells.geojson` geometry.
+- **Regional magnitude type case.** The SoCal filter compared magnitude types case-sensitively and dropped 4 events
+  served as `Ml`. The comparison is now case-insensitive. Outputs: SoCal counts by 4 events.

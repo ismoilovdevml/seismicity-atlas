@@ -7,7 +7,6 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-import h3
 import numpy as np
 import pandas as pd
 from shapely.geometry import MultiLineString, mapping, shape
@@ -16,18 +15,13 @@ from shapely.ops import linemerge
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (AUX, CUTOFF, D_GCMT, D_INDEP, D_ISCGEM, D_NONE, ISCGEM_LAST_YEAR, PROC, RES, SITE,  # noqa: E402
                     V_DIFFERS, V_MATCH,
-                    V_UNINF, VERSION, jdump, load_work, z_verdict)
+                    V_UNINF, VERSION, h3_polygon, jdump, load_work, z_verdict)
 
 R = lambda x, n: None if x is None or not np.isfinite(x) else round(float(x), n)  # noqa: E731
 
 
 def cell_polygon(h):
-    ring = [(lo, la) for la, lo in h3.cell_to_boundary(h)]
-    lons = np.array([p[0] for p in ring])
-    if lons.max() - lons.min() > 180:  # antimeridian: make longitudes continuous
-        ring = [(lo + 360 if lo < 0 else lo, la) for lo, la in ring]
-    ring = [[round(lo, 2), round(la, 2)] for lo, la in ring]
-    return {"type": "Polygon", "coordinates": [ring + [ring[0]]]}
+    return h3_polygon(h, 2)
 
 
 def cells_layer(cells, detail_ids):
@@ -39,6 +33,9 @@ def cells_layer(cells, detail_ids):
         for d in ("sh", "dp"):
             g = lambda k: getattr(r, f"{d}_{k}")  # noqa: E731
             show = g("b_q") in ("A", "B")
+            # declustered b: its own sample must pass the same gate as the main b (n >= 50, relative width)
+            qd = g("b_decl_q") if hasattr(r, f"{d}_b_decl_q") else None
+            showd = show and qd in ("A", "B")
             p.update({f"{d}_n": int(g("n_sample")), f"{d}_nb": int(g("n_b")), f"{d}_mc": R(g("mc"), 1),
                       f"{d}_mc_lo": R(g("mc_lo"), 1), f"{d}_mc_hi": R(g("mc_hi"), 1),
                       f"{d}_b": R(g("b"), 3), f"{d}_b_lo": R(g("b_lo"), 3), f"{d}_b_hi": R(g("b_hi"), 3),
@@ -47,9 +44,10 @@ def cells_layer(cells, detail_ids):
                       f"{d}_bpos": R(g("bpos"), 3) if show else None,
                       f"{d}_bpos_lo": R(g("bpos_lo"), 3) if show else None,
                       f"{d}_bpos_hi": R(g("bpos_hi"), 3) if show else None,
-                      f"{d}_bdecl": R(g("b_decl"), 3) if show else None,
-                      f"{d}_bdecl_lo": R(g("b_decl_lo"), 3) if show else None,
-                      f"{d}_bdecl_hi": R(g("b_decl_hi"), 3) if show else None,
+                      f"{d}_bdecl": R(g("b_decl"), 3) if showd else None,
+                      f"{d}_bdecl_lo": R(g("b_decl_lo"), 3) if showd else None,
+                      f"{d}_bdecl_hi": R(g("b_decl_hi"), 3) if showd else None,
+                      f"{d}_qdecl": qd if isinstance(qd, str) else None,
                       f"{d}_mc_cc": R(g("mc_cc_2010"), 1), f"{d}_mc_cc0": R(g("mc_cc_pre1990"), 1)})
         n = int(r.cons_n_matched)
         dmw, dloc = r.cons_dmag_mw, r.cons_dloc_km

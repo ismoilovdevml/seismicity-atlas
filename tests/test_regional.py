@@ -130,3 +130,25 @@ def test_event_windows_remove_sequence_incompleteness():
     assert abs(rw["b_raw"] - 1.0) < 0.08, rw["b_raw"]
     blocks, owner = rl._sub_blocks([(0, 1000), (1000, 1150)], 200)
     assert blocks[-1] == (1000, 1150) and blocks[-2] == (800, 1000) and set(owner) == {0, 1}
+
+
+def test_magtype_filter_is_case_insensitive(tmp_path, monkeypatch):
+    # ComCat serves 4 SoCal events as 'Ml' next to 252,189 'ml'; the filter dropped them (audit fix)
+    import build_regional as br
+    df = pd.DataFrame({"time": pd.to_datetime(["2010-01-01"] * 4, utc=True), "year": [2010.0] * 4,
+                       "lat": [34.0] * 4, "lon": [-118.0] * 4, "depth": [10.0] * 4, "mag": [2.0, 2.1, 2.2, 2.3],
+                       "magtype": ["ml", "Ml", "ML", "mh"], "author": ["ci"] * 4, "id": list("abcd"),
+                       "etype": ["earthquake"] * 4})
+    df.to_pickle(tmp_path / "t.pkl")
+    monkeypatch.setattr(br, "WORK", tmp_path)
+    cfg = {"id": "t", "bbox": [-120, 30, -110, 40], "periods": [[2010, 2011]], "magtypes": ["ml"], "authors": None}
+    used, cnt, other = br.load_catalogue(cfg)
+    assert sorted(used.id) == ["a", "b", "c"] and other.id.tolist() == ["d"]
+
+
+def test_regional_polygons_do_not_jump_across_the_antimeridian():
+    import build_regional as br
+    import h3
+    h = h3.latlng_to_cell(-38.0, 179.99, 4)
+    xs = [c[0] for c in br.cell_polygon(h)["coordinates"][0]]
+    assert max(xs) - min(xs) < 2, xs                     # before: about 359.8 for 14 NZ cells
