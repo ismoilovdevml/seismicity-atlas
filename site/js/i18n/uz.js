@@ -1068,7 +1068,7 @@ export default {
   "nav.analyze": "Sizning katalogingiz",
   "title.analyze": "Katalogingizni tahlil qiling",
   "an.h1": "Katalogingizning Mc va b-qiymati",
-  "an.lede": "Zilzilalar katalogini CSV fayl sifatida tanlang. Sahifa atlasdagi usul bilan toʻliqlik magnitudasini (Mc) va Gutenberg-Rixter b-qiymatini 95 % interval va sifat kodi bilan hisoblaydi.",
+  "an.lede": "Zilzilalar katalogini CSV fayl sifatida tanlang. Sahifa atlasdagi usul bilan toʻliqlik magnitudasini (Mc) va Gutenberg-Richter b-qiymatini 95 % interval va sifat kodi bilan hisoblaydi.",
   "an.privacy": "Faylingiz shu brauzerning oʻzida oʻqiladi va tahlil qilinadi. U hech qayerga yuborilmaydi va saqlanmaydi.",
   "an.choose": "CSV faylni tanlang",
   "an.dropHint": "yoki shu yerga tashlang. ComCat, EMSC, ISC va koʻpchilik tarmoq eksportlari toʻgʻridan-toʻgʻri ishlaydi.",

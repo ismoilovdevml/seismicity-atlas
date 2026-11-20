@@ -69,10 +69,9 @@ def test_plural_and_ordinal_forms(dicts):
 
 
 def test_uzbek_apostrophes(dicts):
-    """oʻ gʻ use U+02BB, the tutuq belgisi U+02BC; no curly quotes or ASCII apostrophes inside words.
-    The analysis view (an.*) is excluded until its own strings are normalised."""
+    """oʻ gʻ use U+02BB, the tutuq belgisi U+02BC; no curly quotes or ASCII apostrophes inside words."""
     import re
 
     bad = [(k, v[1][:60]) for k, v in dicts["uz"].items()
-           if not k.startswith("an.") and (re.search(r"[‘’]|\w'\w|[^oOgG]ʻ|[oOgG]ʼ", v[1]))]
+           if (re.search(r"[‘’]|\w'\w|[^oOgG]ʻ|[oOgG]ʼ", v[1]))]
     assert not bad, bad[:20]
