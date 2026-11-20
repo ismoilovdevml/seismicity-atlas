@@ -354,13 +354,16 @@ new emphasis is the summary card at the top of the case study.
 
 ### Font files: provenance
 
-The three WOFF2 files in `site/vendor/fonts/` (Inter 400–700 variable, IBM Plex Mono 400 and 500, Latin subsets) came
+The first three WOFF2 files in `site/vendor/fonts/` (Inter 400–700 variable, IBM Plex Mono 400 and 500, Latin subsets) came
 in with the first website commit (b76f41e, 2026-11-13) without a note on where they were downloaded. What the files
 themselves say (name table read with fontTools on 2026-11-15): Inter "Version 4.001;git-66647c0bb", unique ID
 "4.001;RSMS;Inter-Regular", 518 glyphs; IBM Plex Mono "Version 2.3", unique ID "2.3;IBM ;IBMPlexMono-Regular" and
 "…-Medium", 280 glyphs each. The family names are unchanged and the description and manufacturer records are stripped,
 which is what the Latin subsets built by Google Fonts and Fontsource look like, but that is an inference.
-**Not yet verified:** whether the Plex subsets are the publisher's (IBM, Google Fonts or Fontsource) builds or our own
-subsetting. If they were our own, OFL condition 3 (Reserved Font Name "Plex") would call for a renamed family; the
-check is to compare the files with the current Fontsource `@fontsource/ibm-plex-mono` Latin files and record the result
-here.
+**Verified 2026-11-20:** the three files are byte-identical (sha256) with the Latin subsets the Google Fonts CSS API
+serves today (`fonts.googleapis.com/css2?family=Inter:wght@400..700&family=IBM+Plex+Mono:wght@400;500`, Inter v20,
+IBM Plex Mono v23), so they are the publisher's builds, not our own subsetting, and OFL condition 3 does not apply.
+The Cyrillic, Latin Extended and (Inter only) Greek subsets added on 2026-11-20 come from the same CSS response,
+unchanged, and are declared with Google's `unicode-range` values in `site/css/app.css`, so a browser downloads a
+subset only when the page shows one of its characters. The Latin subset already covers Uzbek ʻ ʼ (U+02BB, U+02BC)
+and Spanish á é í ó ú ñ ü ¿ ¡; Russian text was the one language that fell back to a system font.
