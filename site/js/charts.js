@@ -105,8 +105,11 @@ function figure({ title, sub, alt, series = [], table, note, draw }) {
     det.addEventListener('toggle', () => { if (det.open && det.children.length === 1) det.append(tableEl(table)); }, { once: false });
     fig.append(det);
   }
-  let lastW = 0, ctl = null, idx = -1;
+  let lastW = 0, ctl = null, idx = -1, seen = false;
   const render = () => {
+    // a chart removed from the page (a panel or page re-rendered) stops being observed, so it can be collected
+    if (wrap.isConnected) seen = true;
+    else if (seen) { ro.disconnect(); return; }
     const w = Math.round(wrap.clientWidth);
     if (!w || Math.abs(w - lastW) < 4) return;
     lastW = w;

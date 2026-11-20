@@ -1122,4 +1122,10 @@ export default {
   "an.w.unstable": "b changes when the threshold is raised by 0.2 and 0.4: the sample may be incomplete or not exponential above Mc.",
   "an.w.small": "Only {n} events above the threshold; small samples make b sensitive to the largest events.",
   "an.w.mcTime": "Yearly Mc ranges from {lo} to {hi}: completeness changed with time. Give floors by period or a shorter time range; a single Mc then biases b.",
+  // audit fixes 2026-11-20 (translations pending)
+  "rail.close": "Close map controls",
+  "map.north": "Turn the map back to north",
+  "bm.terrainError": "3D terrain could not be loaded: the elevation tiles from AWS Terrain Tiles did not arrive. It is switched off; try again later.",
+  "sx.n5": "M5+ earthquakes",
+  "sx.noneHere5": "No earthquake of magnitude 5 or more was recorded within {km} km in {y0}–{y1}. Smaller ones may have happened, and this does not mean that none can happen.",
 };

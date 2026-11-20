@@ -4,13 +4,16 @@
 // when this view opens; without WebGL 2 the view shows a 2D cross-section instead.
 
 import { getJSON, mb } from './data.js';
+import { loadM5Columns } from './map.js';
 import { h, svgEl } from './charts.js';
 import { t } from './i18n/index.js';
 import { infoButton } from './info.js';
 import * as f from './fmt.js';
 import { oklch } from './color.js';
 import { isDark, cssVar } from './layers.js';
-import { defineKeys, commit, intIn, oneOf } from './hashx.js';
+import { commit } from './hashx.js';
+import { D3_PRESET_IDS } from './view-keys.js';
+import { EXT } from './util.js';
 
 // bbox: west, south, east, north (continuous longitudes). section: profile from a to b, half-width w (km).
 // slab: data/slab2/<id>.json exists (built by scripts/basemap/build_slab2.py, same boxes).
@@ -25,15 +28,8 @@ export const PRESETS = {
   // south-east through the Mw 7.8 epicentre. No Slab2 model covers it. note: a link shown under the view.
   turkey: { bbox: [34.5, 35.5, 41.5, 40], slab: false, section: { a: [35.6, 38.9], b: [38.6, 36.3], w: 120 }, note: 'turkey' },
 };
-const PRESET_IDS = [...Object.keys(PRESETS), 'view'];
-
-defineKeys([
-  { key: 'p3', def: 'japan', parse: oneOf(PRESET_IDS) },
-  { key: 'x3', def: 0, parse: intIn(0, 20) }, // depth exaggeration; 0 = automatic
-  { key: 'e3', def: 6, parse: (s) => (s === '5' || s === '6' ? +s : undefined) },
-  { key: 'm3', def: '3d', parse: oneOf(['3d', 'xs']) },
-  { key: 's3', def: 1, parse: intIn(0, 1) },
-]);
+// The URL keys (p3, x3, e3, m3, s3) are declared in view-keys.js, so links keep them before this module loads.
+export const PRESET_IDS = D3_PRESET_IDS;
 
 // Depth classes (km). 70 km is the atlas split between shallow and deeper statistics.
 export const DEPTH_BREAKS = [35, 70, 150, 300, 500];
@@ -59,6 +55,7 @@ let sceneLoading = null;
 let webgl = null; // true / false once probed
 let syncToken = 0;
 let current = null; // data shown now: {region, ev, slab, cells}
+let selCache = null; // {key, ev, sel}: the events selected for the current box
 
 const $ = (id) => document.getElementById(id);
 
@@ -69,6 +66,25 @@ export function show(el, ctx) {
   if (!C.cells) return;
   if (built !== document.documentElement.lang) build();
   sync();
+}
+
+/**
+ * Called by app.js when another view is shown: the WebGL scene is disposed (its context released, its animation
+ * frame cancelled) and made again on the next visit; the controls and statistics stay.
+ */
+export function hide() {
+  syncToken++; // a sync still loading data must not draw into the hidden view
+  if (scene) scene.dispose();
+  scene = null;
+  sceneLoading = null;
+  const stage = document.getElementById('d3-stage');
+  if (stage) stage.querySelector('canvas.d3-canvas')?.remove();
+}
+
+let syncFrame = 0;
+/** sync() once in the next frame, however many slider steps arrive before it. */
+function syncSoon() {
+  if (!syncFrame) syncFrame = requestAnimationFrame(() => { syncFrame = 0; sync(); });
 }
 
 // ------------------------------------------------------------------ region
@@ -171,7 +187,8 @@ function build() {
   $('d3-preset').addEventListener('change', (e) => { C.state.p3 = e.target.value; C.state.x3 = 0; commit(); sync(); if (scene) scene.reset(); });
   document.querySelectorAll('input[name=d3mode]').forEach((i) => i.addEventListener('change', () => { C.state.m3 = i.value; commit(); sync(); }));
   $('d3-m5').addEventListener('change', (e) => { C.state.e3 = e.target.checked ? 5 : 6; commit(); sync(); });
-  $('d3-ex').addEventListener('input', (e) => { C.state.x3 = +e.target.value; commit(); sync(); });
+  $('d3-ex').addEventListener('input', (e) => { C.state.x3 = +e.target.value; $('d3-ex-out').textContent = `×${C.state.x3}`; syncSoon(); });
+  $('d3-ex').addEventListener('change', () => commit());
   $('d3-ex-auto').addEventListener('click', () => { C.state.x3 = 0; commit(); sync(); });
   $('d3-slab').addEventListener('change', (e) => { C.state.s3 = e.target.checked ? 1 : 0; commit(); sync(); });
   $('d3-reset').addEventListener('click', () => { if (scene && C.state.m3 === '3d') scene.reset(); });
@@ -204,14 +221,15 @@ async function sync() {
   if (region.note) {
     // a link only: the relocated catalogue is not redistributed here (docs/basemap.md)
     note.replaceChildren(t(`d3.note.${region.note}`), ' ',
-      h('a', { href: 'https://doi.org/10.5281/zenodo.8089273', target: '_blank', rel: 'noopener', text: t('d3.note.turkeyLink') }));
+      h('a', { href: 'https://doi.org/10.5281/zenodo.8089273', ...EXT, text: t('d3.note.turkeyLink') }));
   }
   const my = ++syncToken;
   setStatus(t('d3.loading'));
   let ev, slab = null;
   try {
     const [e, sl] = await Promise.all([
-      getJSON(st.e3 === 5 ? 'events_m5.json' : 'events_m6.json'),
+      // M5: the columns the map's worker makes (no second 7.5 MB parse on the page)
+      st.e3 === 5 ? loadM5Columns() : getJSON('events_m6.json'),
       region.slab ? getJSON(`slab2/${region.id}.json`).catch(() => null) : Promise.resolve(null),
     ]);
     ev = e; slab = sl;
@@ -222,7 +240,10 @@ async function sync() {
     return;
   }
   if (my !== syncToken) return;
-  const sel = selectEvents(ev, region.bbox);
+  // the events in the box are the same while only the exaggeration or the mode changes
+  const selKey = `${region.bbox.join(',')}|${st.e3}`;
+  if (!selCache || selCache.key !== selKey || selCache.ev !== ev) selCache = { key: selKey, ev, sel: selectEvents(ev, region.bbox) };
+  const sel = selCache.sel;
   let maxD = 0;
   for (const d of sel.depth) if (d > maxD) maxD = d;
   if (slab && st.s3) for (const s of slab.slabs) for (const c of s.contours) if (c.d > maxD) maxD = c.d;
@@ -269,7 +290,11 @@ async function draw() {
       try {
         if (!scene) {
           if (!sceneLoading) sceneLoading = import('./depth3d-scene.js').then((m) => m.createScene(stage, canvas, { t }));
-          scene = await sceneLoading;
+          const loading = sceneLoading;
+          const made = await loading;
+          // the view was left (hide) while the scene was being made: release it at once
+          if (sceneLoading !== loading) { made.dispose(); return; }
+          scene = made;
         }
         scene.setData(sceneData());
         $('d3-caption').textContent = caption();
@@ -446,6 +471,20 @@ function renderSection(note) {
   }
   wrap.append(svg);
   wrap.append(h('p', { class: 'hint', text: t('d3.xsNote', { w: c.region.section.w, n: f.int(sd.pts.length), ex: exEff.toFixed(1) }) }));
+  // the same events as a table (the keyboard and screen-reader route into the section), built when opened
+  if (sd.pts.length) {
+    const det = h('details', { class: 'chart-table d3-xs-table' }, h('summary', { text: t('chart.table') }));
+    det.addEventListener('toggle', () => {
+      if (!det.open || det.querySelector('table')) return;
+      const rows = sd.pts.slice().sort((p, q) => p.x - q.x);
+      det.append(h('table', { class: 'data' },
+        h('caption', { class: 'sr-only', text: svg.getAttribute('aria-label') }),
+        h('thead', {}, h('tr', {}, [t('d3.xsDist'), t('d3.xsDepth'), 'M', t('ev.date')].map((x) => h('th', { scope: 'col', text: x })))),
+        h('tbody', {}, rows.map((p) => h('tr', {}, h('td', { class: 'num', text: f.int(p.x) }), h('td', { class: 'num', text: f.int(p.d) }),
+          h('td', { class: 'num', text: f.mag(c.ev.mag[p.i]) }), h('td', { text: f.decYearDate(c.ev.year[p.i]) }))))));
+    });
+    wrap.append(det);
+  }
   // hover readout: nearest event within 10 px
   const tip = h('div', { class: 'tooltip d3-tip', hidden: true });
   wrap.append(tip);

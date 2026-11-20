@@ -6,20 +6,17 @@ import { h, xyChart, padDomain } from './charts.js';
 import { getJSON } from './data.js';
 import { t } from './i18n/index.js';
 import { infoButton, infoKey } from './info.js';
+import { extLink, loadPage } from './util.js';
 
 const QCLS = { A: 'ok', B: 'close', C: 'na', insufficient: '' };
 const PROD_ARROW = { more: '↑', less: '↓', typical: '≈', insufficient: '' };
 
-const errorBox = (root, e, retry) => root.replaceChildren(h('p', { class: 'error', role: 'alert' }, `${e.message} `, h('button', { class: 'small-btn', type: 'button', onclick: retry, text: t('common.retry') })));
-
+// The index names the sequence files; they are then fetched together (one round trip for all of them).
+const FILE_RE = /^[A-Za-z0-9_.-]{1,80}\.json$/;
 export function renderMonitor(root, ctx) {
-  const run = () => {
-    root.replaceChildren(h('div', { class: 'loading', role: 'status', text: t('common.loading', { what: t('mon.loadingWhat') }) }));
-    getJSON('monitor/index.json')
-      .then((idx) => Promise.all(idx.sequences.map((s) => getJSON(`monitor/${s.file}`))).then((full) => draw(root, idx, full, ctx)))
-      .catch((e) => errorBox(root, e, run));
-  };
-  run();
+  loadPage(root, t('mon.loadingWhat'),
+    () => getJSON('monitor/index.json').then((idx) => Promise.all(idx.sequences.filter((s) => FILE_RE.test(s.file)).map((s) => getJSON(`monitor/${s.file}`))).then((full) => [idx, full])),
+    ([idx, full]) => draw(root, idx, full, ctx));
 }
 
 /** Scroll to the sequence named in the URL (#...&s=<id>) and mark it. */
@@ -102,7 +99,7 @@ function card(s, idx) {
   if (zw) par(t('mon.zw'), zwText(zw));
 
   const head = h('div', { class: 'seq-head' },
-    h('h3', {}, h('a', { href: `#v=monitor&s=${s.id}`, text: s.place || s.id, title: t('mon.link') })),
+    h('h2', {}, h('a', { href: `#v=monitor&s=${encodeURIComponent(s.id)}`, text: s.place || s.id, title: t('mon.link') })),
     h('span', { class: 'seq-mag', text: `M ${f.mag(s.mag)}` }));
   const meta = h('p', { class: 'seq-meta' }, t('mon.meta', { date: utc(s.time), d: f.int(s.depth), loc: f.latlon(s.lat, s.lon) }), h('br'),
     t('mon.age', { n: f.fixed(s.age_days, 1) }), ' · ', t('mon.regime', { r: t(`regime.${s.regime}`) }));
@@ -119,7 +116,7 @@ function card(s, idx) {
 
   if (s.cum && s.cum.fit) li.append(cumChart(s, idx));
   else li.append(h('p', { class: 'hint', text: t('mon.noFit', { n: f.int(c.n_fit) }) }));
-  li.append(h('p', { class: 'mon-links' }, h('a', { href: s.url, target: '_blank', rel: 'noopener', text: t('mon.usgs') })));
+  li.append(h('p', { class: 'mon-links' }, extLink(s.url, t('mon.usgs'))));
   return li;
 }
 

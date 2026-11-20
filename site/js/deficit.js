@@ -179,14 +179,17 @@ function headline() {
 
 // ------------------------------------------------------------------ panel
 
+let panelToken = 0;
 export async function renderDeficitPanel(id) {
+  const my = ++panelToken; // a slow first load must not draw over a zone chosen after it
   const panel = document.getElementById('panel');
   const body = document.getElementById('panel-body');
   panel.classList.remove('full');
   panel.hidden = false;
   document.getElementById('panel-eyebrow').textContent = t('df.eyebrow');
   body.replaceChildren(h('div', { class: 'loading', role: 'status', text: t('common.loading', { what: t('df.loadingWhat') }) }));
-  try { await loadDeficit(); } catch (e) { body.replaceChildren(h('p', { class: 'error', role: 'alert', text: e.message })); return; }
+  try { await loadDeficit(); } catch (e) { if (my === panelToken) body.replaceChildren(h('p', { class: 'error', role: 'alert', text: e.message })); return; }
+  if (my !== panelToken || (C && C.state.dz !== id)) return; // another zone, or a cell, was chosen meanwhile
   const p = lookup(id);
   if (!p) { body.replaceChildren(h('p', { class: 'hint', text: t('df.unknown') })); return; }
   document.getElementById('panel-title').textContent = zoneName(p);

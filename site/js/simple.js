@@ -10,6 +10,7 @@ import { t, lang } from './i18n/index.js';
 import { infoButton } from './info.js';
 import { defineKeys, intIn } from './hashx.js';
 import { mb } from './data.js';
+import { EXT } from './util.js';
 import { loadPlaces, searchPlaces, placeName, nearestPlace, placeStats, cellAtPoint, loadRating } from './places.js';
 
 defineKeys([
@@ -49,8 +50,12 @@ export function initSimple(opts) {
   wireTour();
   $('sx-card-close').addEventListener('click', closePlace);
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && S.state.mode === 'simple' && !$('sx-card').hidden && document.activeElement !== $('sx-q')) closePlace();
+    if (e.key !== 'Escape' || S.state.mode !== 'simple') return;
+    // the tour first (wherever the focus is), then the place card
+    if (!$('sx-tour').hidden) { endTour(); return; }
+    if (!$('sx-card').hidden && document.activeElement !== $('sx-q')) closePlace();
   });
+  addEventListener('resize', () => { if (!$('sx-tour').hidden) placeTour(); });
 }
 
 /** Re-render everything the simple view shows from the state (cheap when nothing changed). */
@@ -213,10 +218,17 @@ function renderLegend() {
     return h('span', {}, h('i', { style: `width:${2 * r}px;height:${2 * r}px` }), `M${m}`);
   });
   const fromYear = showM5 && !st.sr ? Math.max(y0, 1973) : y0;
+  const countText = t('sx.lgCount', { n: f.int(M.simpleCount()) });
+  // The legend itself is not a live region (it is redrawn on zoom); a short status line says what the filter shows.
+  const live = `${t('sx.lgTitle', { m: minM, y0, y1 })}: ${countText}`;
+  if ($('sx-live').dataset.text !== live) {
+    if ($('sx-live').dataset.text !== undefined) $('sx-live').textContent = live;
+    $('sx-live').dataset.text = live;
+  }
   el.replaceChildren(
     h('div', { class: 'sxl-head' },
       h('span', { class: 'sxl-title' }, t('sx.lgTitle', { m: minM, y0, y1 }), infoButton('magnitude-types')),
-      h('span', { class: 'sxl-count', id: 'sx-count', text: t('sx.lgCount', { n: f.int(M.simpleCount()) }) })),
+      h('span', { class: 'sxl-count', id: 'sx-count', text: countText })),
     h('ul', { class: 'sxl-depth' }, ['sh', 'mid', 'deep'].map((k, i) => h('li', {},
       h('i', { class: 'sxl-dot', style: `background:${ramp[i]}`, 'aria-hidden': 'true' }), h('span', { text: t(`sx.depth.${k}`) })))),
     h('div', { class: 'sxl-sizes', 'aria-hidden': 'true' }, sizes),
@@ -266,7 +278,7 @@ function eventLine(kind, ev) {
   return h('div', { class: 'sx-row', 'data-row': kind },
     h('dt', { text: t(`sx.${kind}`) }),
     h('dd', {}, h('span', { class: 'sx-row-val', text: txt }),
-      ev.id ? h('a', { href: USGS + encodeURIComponent(ev.id), target: '_blank', rel: 'noopener', class: 'sx-usgs', text: t('sx.usgs') }) : null));
+      ev.id ? h('a', { href: USGS + encodeURIComponent(ev.id), ...EXT, class: 'sx-usgs', text: t('sx.usgs') }) : null));
 }
 
 function renderCard() {
@@ -286,8 +298,10 @@ function renderCard() {
   card.hidden = false;
   if (wasHidden) M.resize();
   M.setPlace({ lat, lon, r: st.pr });
-  const { y0, y1 } = M.simpleFilterValues();
-  const key = [lat, lon, st.pr, y0, y1, lang(), named ? named.i : '', places ? 1 : 0, ev ? 1 : 0, rating ? 1 : 0, ratingError ? 1 : 0].join('|');
+  const { y0, y1, minM } = M.simpleFilterValues();
+  // with the 5+ filter (and the M5 file loaded) the card counts M5+ like the map; otherwise M6+ and M7+
+  const e5 = minM < 6 ? M.getEvents().e5 : null;
+  const key = [lat, lon, st.pr, y0, y1, e5 ? 5 : 6, lang(), named ? named.i : '', places ? 1 : 0, ev ? 1 : 0, rating ? 1 : 0, ratingError ? 1 : 0].join('|');
   if (key === cardKey) return;
   cardKey = key;
   if (!places) ensurePlaces().catch(() => {}); // names the point; renders the card again when loaded
@@ -303,7 +317,8 @@ function renderCard() {
   }
   if (!ev || !rating) { body.replaceChildren(h('p', { class: 'muted sx-loading', text: t('sx.loadingEvents') })); return; }
 
-  const s = placeStats(ev, lat, lon, st.pr, y0, y1);
+  const s = placeStats(ev, lat, lon, st.pr, y0, y1, e5 ? { minM: 5, e5 } : {});
+  const nAll = e5 ? s.n5 : s.n6;
   const cell = cellAtPoint(rating, lat, lon);
   const rate = cell ? cell.rating : 'few';
   const radiusSeg = h('div', { class: 'sx-seg sx-radius', role: 'group', 'aria-label': t('sx.radiusLabel') },
@@ -315,10 +330,10 @@ function renderCard() {
   const counts = h('section', { class: 'sx-sec', 'aria-labelledby': 'sx-h-counts' },
     h('h3', { id: 'sx-h-counts', class: 'sr-only', text: t('sx.countsHead') }),
     radiusSeg,
-    h('div', { class: 'sx-bigs' }, big(s.n6, t('sx.n6'), 'n6'), big(s.n7, t('sx.n7'), 'n7')),
+    h('div', { class: 'sx-bigs' }, e5 ? [big(s.n5, t('sx.n5'), 'n5'), big(s.n6, t('sx.n6'), 'n6')] : [big(s.n6, t('sx.n6'), 'n6'), big(s.n7, t('sx.n7'), 'n7')]),
     h('p', { class: 'sx-years', 'data-stat': 'years', text: t('sx.yearsLine', { y0, y1, km: f.int(st.pr) }) }),
-    s.n6 === 0 ? h('p', { class: 'sx-none', text: t('sx.noneHere', { km: f.int(st.pr), y0, y1 }) }) : null,
-    s.n6 ? h('dl', { class: 'sx-rows' },
+    nAll === 0 ? h('p', { class: 'sx-none', text: t(e5 ? 'sx.noneHere5' : 'sx.noneHere', { km: f.int(st.pr), y0, y1 }) }) : null,
+    nAll ? h('dl', { class: 'sx-rows' },
       eventLine('largest', s.largest),
       eventLine('recent', s.recent),
       h('div', { class: 'sx-row', 'data-row': 'depth' }, h('dt', { text: t('sx.depthHead') }),
@@ -368,10 +383,12 @@ function wireTour() {
 }
 
 function endTour() {
+  const hadFocus = $('sx-tour').contains(document.activeElement);
   setTourDone();
   tourStep = -1;
   $('sx-tour').hidden = true;
   document.body.dataset.tour = '';
+  if (hadFocus) $('sx-q').focus({ preventScroll: true });
 }
 
 /** The tour starts once the map is ready, in the simple map view, unless it was finished or skipped before. */
@@ -379,6 +396,8 @@ export function startTour() {
   if (tourDone() || tourStep >= 0) return;
   tourStep = 0;
   syncTour();
+  // a dialog: move the focus into it, so keyboard and screen-reader users meet it (Escape closes it from anywhere)
+  if (!$('sx-tour').hidden) $('sx-tour').focus({ preventScroll: true });
 }
 
 function syncTour() {
@@ -396,4 +415,17 @@ function renderTour() {
   $('sx-tour-text').textContent = t(`tour.${k}.text`);
   $('sx-tour-next').textContent = t(tourStep === TOUR.length - 1 ? 'tour.done' : 'tour.next');
   $('sx-tour-skip').hidden = tourStep === TOUR.length - 1;
+  placeTour();
+}
+
+/** Keep the tour box off the legend it explains: lift it above the legend when the two would overlap. */
+function placeTour() {
+  const box = $('sx-tour');
+  box.style.bottom = '';
+  const lg = $('sx-legend').getBoundingClientRect(), tb = box.getBoundingClientRect();
+  if (!lg.height || !tb.height) return;
+  const overlap = tb.left < lg.right && tb.right > lg.left && tb.top < lg.bottom && tb.bottom > lg.top;
+  if (!overlap) return;
+  const area = $('map-area').getBoundingClientRect();
+  box.style.bottom = `${Math.round(area.bottom - lg.top + 10)}px`;
 }

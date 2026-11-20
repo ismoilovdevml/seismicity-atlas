@@ -5,8 +5,8 @@ import { h, xyChart, forestChart, sparkColumns, padDomain } from './charts.js';
 import { getJSON, ruleNumber } from './data.js';
 import { CC_RULES } from './layers.js';
 import { t } from './i18n/index.js';
-import { downloadCellCsv } from './csv.js';
 import { infoButton } from './info.js';
+import { cumulativeFmd, EXT, extLink, safeUrl } from './util.js';
 
 const H3 = (key, concept) => h('h3', {}, t(key), infoButton(concept));
 
@@ -99,8 +99,8 @@ export function renderPanel(p, ctx) {
       ? h('p', { class: 'cmp-pinned', role: 'status' }, t('cmp.pinned'), ' ', h('button', { class: 'link-btn', type: 'button', onclick: ctx.onUnpin, text: t('cmp.cancel') }))
       : h('button', { class: 'btn', type: 'button', id: 'cmp-btn', onclick: () => ctx.onPin(p.id), text: t('cmp.start') })));
   full.append(h('div', { class: 'panel-actions' },
-    h('button', { class: 'btn primary', type: 'button', id: 'csv-btn', title: t('csv.title'), onclick: () => downloadCellCsv(p, d, { manifest: ctx.manifest, region: reg, detailPath: hasDetail ? detailPath : null }), text: t('csv.download') }),
-    hasDetail ? h('a', { class: 'btn', href: `data/${detailPath}`, target: '_blank', rel: 'noopener', text: t('panel.json') }) : null,
+    h('button', { class: 'btn primary', type: 'button', id: 'csv-btn', title: t('csv.title'), onclick: () => import('./csv.js').then((m) => m.downloadCellCsv(p, d, { manifest: ctx.manifest, region: reg, detailPath: hasDetail ? detailPath : null })), text: t('csv.download') }),
+    hasDetail ? h('a', { class: 'btn', href: `data/${detailPath}`, ...EXT, text: t('panel.json') }) : null,
     h('a', { class: 'btn', href: '#v=methods', text: t('panel.how') })));
 
   if (!hasDetail) {
@@ -132,12 +132,7 @@ function detailCharts(p, det, d, ctx) {
   const q = p[`${d}_q`];
 
   // 1. FMD
-  const cum = (pairs) => {
-    const out2 = []; let s = 0;
-    for (let i = pairs.length - 1; i >= 0; i--) { s += pairs[i][1]; out2.unshift([pairs[i][0], s]); }
-    return out2;
-  };
-  const fi = cum(dd.fmd_iscgem || []), fc = cum(dd.fmd_comcat || []);
+  const fi = cumulativeFmd(dd.fmd_iscgem || []), fc = cumulativeFmd(dd.fmd_comcat || []);
   if (fi.length || fc.length) {
     const ms = [...fi, ...fc].map((x) => x[0]);
     const ns = [...fi, ...fc].map((x) => x[1]).filter((n) => n > 0);
@@ -296,7 +291,7 @@ function regionalSource(reg) {
   const sec = h('section', {}, H3('reg.sourceH', 'regional-catalogues'), dl);
   if (reg.attribution) sec.append(h('p', { class: 'hint' }, `${t('reg.attribution')}: ${reg.attribution}`));
   if (reg.caveat) sec.append(h('p', { class: 'plain', text: `${t('reg.caveat')}: ${reg.caveat}` }));
-  if (typeof reg.source_url === 'string' && /^https:\/\//.test(reg.source_url)) sec.append(h('a', { href: reg.source_url, target: '_blank', rel: 'noopener', text: t('reg.source') }));
+  if (safeUrl(reg.source_url)) sec.append(extLink(reg.source_url, t('reg.source')));
   return sec;
 }
 
@@ -309,10 +304,9 @@ function regionalCharts(p, det, d, reg) {
   if (!dd) return [h('section', {}, h('p', { class: 'hint', text: t('panel.noDepth', { depth: f.depthShort(d) }) }))];
   const out = [];
   const mt = det.magtype || reg.magtype || '';
-  const cum = (pairs) => { const o = []; let s = 0; for (let i = pairs.length - 1; i >= 0; i--) { s += pairs[i][1]; o.unshift([pairs[i][0], s]); } return o; };
   const keys = Object.keys(dd).filter((k) => /^fmd(_|$)/.test(k) && Array.isArray(dd[k]) && dd[k].length);
   const colors = ['var(--s1)', 'var(--s2)', 'var(--s3)'];
-  const series = keys.slice(0, 3).map((k, i) => ({ key: 'line', name: k === 'fmd' ? reg.catalogue : k.replace(/^fmd_/, ''), color: colors[i], type: 'line', points: cum(dd[k]), fmt: (v) => `N = ${f.int(v)}` }));
+  const series = keys.slice(0, 3).map((k, i) => ({ key: 'line', name: k === 'fmd' ? reg.catalogue : k.replace(/^fmd_/, ''), color: colors[i], type: 'line', points: cumulativeFmd(dd[k]), fmt: (v) => `N = ${f.int(v)}` }));
   const mc = f.isNum(p[`${d}_mc`]) ? p[`${d}_mc`] : (dd.stats && f.isNum(dd.stats.mc) ? dd.stats.mc : undefined);
   if (series.length) {
     const pts = series.flatMap((s) => s.points);

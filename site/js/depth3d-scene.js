@@ -53,8 +53,10 @@ export function createScene(stage, canvas, { t }) {
   const orbit = { az: -0.55, el: 0.42, dist: 10, target: new THREE.Vector3() };
   let home = null;
   let raf = 0;
+  let surfCache = null; // {key: bbox, lines: Map(featureCollection -> positions)}
+  let disposed = false;
 
-  const requestRender = () => { if (!raf) raf = requestAnimationFrame(render); };
+  const requestRender = () => { if (!raf && !disposed) raf = requestAnimationFrame(render); };
 
   function toXZ(lon, lat) {
     return [(lon - geo.lon0) * DEG * Math.cos((geo.lat0 * Math.PI) / 180) * U, -(lat - geo.lat0) * DEG * U];
@@ -188,7 +190,12 @@ export function createScene(stage, canvas, { t }) {
     const my = data;
     d.getBase().then(([coast, plates]) => {
       if (data !== my) return;
+      // the surface lines depend on the box only: keep them while the exaggeration or the colours change
+      const bkey = keyOf(d);
+      if (!surfCache || surfCache.key !== bkey) surfCache = { key: bkey, lines: new Map() };
       const surf = (fc, color, opacity, dashed) => {
+        const cached = surfCache.lines.get(fc);
+        if (cached) { if (cached.length) world.add(lineObj(cached, col(color), opacity, dashed)); return; }
         const lp = [];
         for (const ft of fc.features) {
           const gm = ft.geometry;
@@ -200,6 +207,7 @@ export function createScene(stage, canvas, { t }) {
             if (inBox(...a) && inBox(...b)) lp.push(a[0], 0.002, a[1], b[0], 0.002, b[1]);
           }
         }
+        surfCache.lines.set(fc, lp);
         if (lp.length) world.add(lineObj(lp, col(color), opacity, dashed));
       };
       surf(coast, th.ink3, 0.9, false);
@@ -383,7 +391,19 @@ export function createScene(stage, canvas, { t }) {
   return {
     setData,
     reset,
-    dispose() { ro.disconnect(); clear(); renderer.dispose(); labels.remove(); tip.remove(); },
+    dispose() {
+      disposed = true;
+      cancelAnimationFrame(raf); raf = 0;
+      cancelAnimationFrame(hoverRaf); hoverRaf = 0;
+      ro.disconnect();
+      clear();
+      renderer.dispose();
+      // release the WebGL context now rather than when the garbage collector gets to it (browsers allow only a few)
+      renderer.forceContextLoss();
+      labels.remove();
+      tip.remove();
+      data = null;
+    },
     // test and debugging aid: the camera state and the number of drawn events
     info: () => ({ az: orbit.az, el: orbit.el, dist: orbit.dist, n: points ? points.xyz.length / 3 : 0, home: home && home.dist }),
   };
