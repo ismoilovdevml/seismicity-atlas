@@ -183,7 +183,7 @@ def test_deficit_layer_toggle_hover_and_simple_mode(site):
     assert pg.is_hidden("#panel")
 
 
-@pytest.mark.parametrize("code,head", [("uz", "Katalog shovqinidan tashqari aniqlanadigan taqchillik yo‘q"),
+@pytest.mark.parametrize("code,head", [("uz", "Katalog shovqinidan tashqari aniqlanadigan taqchillik yoʻq"),
                                        ("ru", "Обнаружимого дефицита сверх шума каталога нет"),
                                        ("es", "Ningún déficit detectable más allá del ruido del catálogo")])
 def test_deficit_languages(site, code, head):
