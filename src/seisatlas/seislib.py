@@ -262,11 +262,27 @@ def _ou_integral(c, p, T1, T2):
     return ((T2 + c) ** (1 - p) - (T1 + c) ** (1 - p)) / (1 - p)
 
 
-def omori_fit(t, T1: float, T2: float, c0: float = 0.05, p0: float = 1.1, fix_c: float | None = None):
+C_MIN_DAYS = 1e-4          # lower bound of the Omori c in the fits (8.6 s; below any catalogue's timing resolution)
+P_BOUNDS = (0.05, 5.0)     # search range of p (wide: only keeps the simplex out of meaningless values)
+
+
+def _c_bounds(T2: float, c_min: float):
+    return (np.log(c_min), np.log(max(float(T2), 1.0)))
+
+
+def _ou_starts(p0: float, logc0, lo: float, hi: float):
+    return [[p0, float(np.clip(x, lo, hi))] for x in logc0]
+
+
+def omori_fit(t, T1: float, T2: float, c0: float = 0.05, p0: float = 1.1, fix_c: float | None = None,
+              c_min: float = C_MIN_DAYS):
     """Maximum-likelihood Omori-Utsu fit, rate K/(t+c)^p on [T1, T2] (Ogata 1983). t in days after mainshock.
 
-    K is profiled out analytically (K = n / integral). Returns dict with K, c, p, standard errors from the
-    observed-information matrix, n and log-likelihood."""
+    K is profiled out analytically (K = n / integral). c is searched in [c_min, max(T2, 1)] days: without early
+    data the likelihood keeps rising as c -> 0, the old unconstrained search then returned c ~ 1e-15 with a singular
+    Hessian. When c ends at c_min (`c_at_bound`), c is reported as not resolved (sc NaN) and the standard errors
+    of K and p are those for c fixed there. Returns dict with K, c, p, standard errors from the observed-information
+    matrix, n and log-likelihood."""
     t = np.asarray(t, float)
     t = t[(t >= T1) & (t <= T2)]
     n = t.size
@@ -279,18 +295,22 @@ def omori_fit(t, T1: float, T2: float, c0: float = 0.05, p0: float = 1.1, fix_c:
             return 1e30
         return -(n * np.log(n / A) - n - p * np.sum(np.log(t + c)))
 
-    x0 = [p0] if fix_c is not None else [p0, np.log(c0)]
-    best = None
-    for start in ([x0] if fix_c is not None else [x0, [p0, np.log(0.005)], [p0, np.log(0.5)], [0.9, np.log(0.02)]]):
-        r = minimize(nll, start, method="Nelder-Mead", options={"xatol": 1e-7, "fatol": 1e-9, "maxiter": 20000})
-        if best is None or r.fun < best.fun:
-            best = r
-    p = best.x[0]
+    lo, hi = _c_bounds(T2, c_min)
+    if fix_c is not None:
+        starts, bounds = [[p0]], [P_BOUNDS]
+    else:
+        starts = _ou_starts(p0, [np.log(c0), np.log(0.005), np.log(0.5)], lo, hi) + [[0.9, max(np.log(0.02), lo)]]
+        bounds = [P_BOUNDS, (lo, hi)]
+    best = min((minimize(nll, s, method="Nelder-Mead", bounds=bounds,
+                         options={"xatol": 1e-7, "fatol": 1e-9, "maxiter": 20000}) for s in starts),
+               key=lambda r: r.fun)
+    p = float(best.x[0])
     c = fix_c if fix_c is not None else float(np.exp(best.x[1]))
+    at_bound = fix_c is None and best.x[1] - lo < 1e-3
     K = n / _ou_integral(c, p, T1, T2)
-    se = _omori_se(t, T1, T2, K, c, p, fix_c is not None)
+    se = _omori_se(t, T1, T2, K, c, p, fix_c is not None or at_bound)
     return {"K": K, "c": c, "p": p, "sK": se[0], "sc": se[1], "sp": se[2], "n": n, "T1": T1, "T2": T2,
-            "logL": -best.fun}
+            "logL": -best.fun, "c_at_bound": bool(at_bound)}
 
 
 def _omori_loglik(t, T1, T2, K, c, p):
@@ -312,14 +332,23 @@ def _omori_se(t, T1, T2, K, c, p, fixed_c: bool):
             ei = np.zeros(3); ej = np.zeros(3)
             ei[i] = h[i]; ej[j] = h[j]
             H[a, b] = (f(x + ei + ej) - f(x + ei - ej) - f(x - ei + ej) + f(x - ei - ej)) / (4 * h[i] * h[j])
-    try:
-        cov = np.linalg.inv(-H)
-        se = np.sqrt(np.clip(np.diag(cov), 0, None))
-    except np.linalg.LinAlgError:
-        se = np.full(len(free), np.nan)
     out = np.full(3, np.nan)
-    out[free] = se
+    cov = _inv_cov(-H)
+    if cov is not None:
+        out[free] = np.sqrt(np.diag(cov))
     return out
+
+
+def _inv_cov(info):
+    """Inverse of an observed-information matrix, or None when it is not finite and positive definite."""
+    if not np.isfinite(info).all():
+        return None
+    try:
+        np.linalg.cholesky(info)
+        cov = np.linalg.inv(info)
+    except np.linalg.LinAlgError:
+        return None
+    return cov if np.isfinite(cov).all() and (np.diag(cov) > 0).all() else None
 
 
 def rj_a_from_K(K: float, b: float, mag_main: float, mmin: float):
@@ -360,11 +389,18 @@ def mc_helmstetter(t, mag_main: float, mcat: float, F: float = 1.0, G: float = 4
 
 
 def omori_fit_mct(t, m, T1: float, T2: float, mag_main: float, mcat: float, b: float,
-                  F: float = 1.0, G: float = 4.5, H: float = 0.75, fix_c: float | None = None, dm: float = 0.1):
+                  F: float = 1.0, G: float = 4.5, H: float = 0.75, fix_c: float | None = None, dm: float = 0.1,
+                  c_min: float = C_MIN_DAYS):
     """Omori-Utsu MLE that keeps the early incomplete part of a sequence (Page et al. 2016 style).
 
     Only events with M >= Mc(t) are used; the expected rate of such events is
-    K (t+c)^-p 10^(-b (Mc(t) - Mcat)), K being the rate of M >= Mcat events. Returns the same dict as omori_fit."""
+    K (t+c)^-p 10^(-b (Mc(t) - Mcat)), K being the rate of M >= Mcat events. c is searched in [c_min, max(T2, 1)]
+    days (see omori_fit); `c_at_bound` marks a fit whose c ended at c_min.
+
+    Standard errors: (p, log c) from the observed information of the profile likelihood; K = n / A(p, c) with n
+    Poisson, so var(log K) = 1/n + g' Cov(p, log c) g, g = d log A / d(p, log c) (the K-K element of the inverse
+    full information; the old K/sqrt(n) left out the covariance with p and c and was about half the true scatter).
+    Non-finite or non-positive-definite information gives NaN errors. Returns the same dict as omori_fit."""
     t = np.asarray(t, float)
     m = bin_mag(m, dm)
     mct = mc_helmstetter(t, mag_main, mcat, F, G, H)
@@ -385,32 +421,48 @@ def omori_fit_mct(t, m, T1: float, T2: float, mag_main: float, mcat: float, b: f
         A = integral(c, p)
         return -(n * np.log(n / A) - n - p * np.sum(np.log(ts + c)) + np.sum(np.log(wi)))
 
-    starts = [[1.1]] if fix_c is not None else [[1.1, np.log(0.01)], [1.0, np.log(0.1)], [1.2, np.log(0.001)]]
-    best = min((minimize(nll, s, method="Nelder-Mead", options={"xatol": 1e-7, "fatol": 1e-9, "maxiter": 20000})
-                for s in starts), key=lambda r: r.fun)
-    p = best.x[0]
+    lo, hi = _c_bounds(T2, c_min)
+    if fix_c is not None:
+        starts, bounds = [[1.1]], [P_BOUNDS]
+    else:
+        starts = [[1.1, max(np.log(0.01), lo)], [1.0, max(np.log(0.1), lo)], [1.2, max(np.log(0.001), lo)]]
+        bounds = [P_BOUNDS, (lo, hi)]
+    best = min((minimize(nll, s, method="Nelder-Mead", bounds=bounds,
+                         options={"xatol": 1e-7, "fatol": 1e-9, "maxiter": 20000}) for s in starts),
+               key=lambda r: r.fun)
+    p = float(best.x[0])
     c = fix_c if fix_c is not None else float(np.exp(best.x[1]))
+    at_bound = fix_c is None and best.x[1] - lo < 1e-3
     K = n / integral(c, p)
 
-    # standard errors from a numerical Hessian of the profile likelihood in (p[, log c]), K from Poisson count
+    # observed information of the profile likelihood in (p[, log c]); c at its bound -> p alone, c fixed there
+    k = 1 if (fix_c is not None or at_bound) else 2
+    x = np.array([p, np.log(c)])[:k]
+
     def f(v):
-        return -nll(v)
-    x = best.x.copy()
-    k = x.size
+        return -nll(np.r_[v, np.log(c)] if (k == 1 and fix_c is None) else v)
+
+    def log_a(v):
+        return np.log(integral(c if k == 1 else np.exp(v[1]), v[0]))
+
     h = 1e-3
     Hm = np.zeros((k, k))
+    g = np.zeros(k)
     for i in range(k):
+        ei = np.zeros(k); ei[i] = h
+        g[i] = (log_a(x + ei) - log_a(x - ei)) / (2 * h)
         for j in range(k):
-            ei = np.zeros(k); ej = np.zeros(k); ei[i] = h; ej[j] = h
+            ej = np.zeros(k); ej[j] = h
             Hm[i, j] = (f(x + ei + ej) - f(x + ei - ej) - f(x - ei + ej) + f(x - ei - ej)) / (4 * h * h)
-    try:
-        cov = np.linalg.inv(-Hm)
+    cov = _inv_cov(-Hm)
+    if cov is None:
+        sp = sc = sK = np.nan
+    else:
         sp = float(np.sqrt(cov[0, 0]))
         sc = float(c * np.sqrt(cov[1, 1])) if k > 1 else np.nan
-    except np.linalg.LinAlgError:
-        sp = sc = np.nan
-    return {"K": K, "c": c, "p": p, "sK": K / np.sqrt(n), "sc": sc, "sp": sp, "n": n, "T1": T1, "T2": T2,
-            "logL": -best.fun}
+        sK = float(K * np.sqrt(1.0 / n + g @ cov @ g))
+    return {"K": K, "c": c, "p": p, "sK": sK, "sc": sc, "sp": sp, "n": n, "T1": T1, "T2": T2,
+            "logL": -best.fun, "c_at_bound": bool(at_bound)}
 
 
 # ----------------------------------------------------------------------------------------------- atlas additions

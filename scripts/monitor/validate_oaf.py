@@ -35,9 +35,15 @@ sys.path.insert(0, str(HERE.parent))
 import monitorlib as ml  # noqa: E402
 import seislib as sl  # noqa: E402
 from build_monitor import comcat_csv, iso  # noqa: E402
+from common import jdump  # noqa: E402
 from fetch import COMCAT, cache_get  # noqa: E402
 
 ROOT = HERE.parents[1]
+
+
+def rnd(x, n):
+    """Rounded float, or None when the value is missing or not finite (a fit without a standard error)."""
+    return None if x is None or not np.isfinite(x) else round(float(x), n)
 
 
 def event_detail(eid):
@@ -63,12 +69,12 @@ def refit(ev_t0, mag_main, par, t_end):
         return res
     ffix = sl.omori_fit_mct(t, m, 0.0, T2, mag_main, mcat, b, F, G, H, fix_c=par["c"])
     a_fix = sl.rj_a_from_K(ffix["K"], b, mag_main, mcat)
-    res["fixed_c"] = {"a": round(a_fix, 3), "sa": round(1 / (math.log(10) * math.sqrt(n)), 3),
-                      "p": round(ffix["p"], 3), "sp": round(ffix["sp"], 3)}
+    res["fixed_c"] = {"a": rnd(a_fix, 3), "sa": rnd(1 / (math.log(10) * math.sqrt(n)), 3),
+                      "p": rnd(ffix["p"], 3), "sp": rnd(ffix["sp"], 3)}
     ffree = sl.omori_fit_mct(t, m, 0.0, T2, mag_main, mcat, b, F, G, H)
-    res["free_c"] = {"a": round(sl.rj_a_from_K(ffree["K"], b, mag_main, mcat), 3), "p": round(ffree["p"], 3),
-                     "sp": round(ffree["sp"], 3), "c": round(ffree["c"], 4),
-                     "sc": None if not np.isfinite(ffree["sc"]) else round(ffree["sc"], 4)}
+    res["free_c"] = {"a": rnd(sl.rj_a_from_K(ffree["K"], b, mag_main, mcat), 3), "p": rnd(ffree["p"], 3),
+                     "sp": rnd(ffree["sp"], 3), "c": rnd(ffree["c"], 4), "sc": rnd(ffree["sc"], 4),
+                     "c_at_bound": ffree["c_at_bound"]}
     return res
 
 
@@ -97,7 +103,7 @@ def main():
         rows.append(row)
         print(json.dumps(row)[:600])
     out = ROOT / "results" / "monitor_oaf_validation.json"
-    out.write_text(json.dumps({"cutoff": iso(end), "method": __doc__.split("Usage")[0].strip(), "rows": rows}, indent=1))
+    jdump({"cutoff": iso(end), "method": __doc__.split("Usage")[0].strip(), "rows": rows}, out, indent=1)
 
     print("\n| Mainshock | USGS model | Data to (days) | n | USGS a | ours a | USGS p | ours p | USGS c | ours c (free) |")
     print("|---|---|---|---|---|---|---|---|---|---|")
@@ -107,7 +113,7 @@ def main():
         ua = f"{u['a']}" + (f" ± {u['aSigma']}" if "aSigma" in u else f" (ams {u['ams']})" if "ams" in u else "")
         up = f"{u['p']}" + (f" ± {u['pSigma']}" if u.get("pSigma") else "")
         oa = f"{fx['a']} ± {fx['sa']}" if fx else "–"
-        op = f"{fx['p']} ± {fx['sp']}" if fx else "–"
+        op = (f"{fx['p']}" + (f" ± {fx['sp']}" if fx.get("sp") is not None else "")) if fx else "–"
         oc = f"{fr['c']}" + (f" ± {fr['sc']}" if fr.get("sc") else "") if fr else "–"
         print(f"| M {x['mag']} {x['place']} | {x['model']} | {x['days_after']} | {o['n_used']} | {ua} | {oa} | {up} | "
               f"{op} | {u['c']} | {oc} |")

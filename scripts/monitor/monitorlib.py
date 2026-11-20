@@ -161,8 +161,9 @@ def omori_fit(t, m, T2, mag_main, mcat, b):
     out = {"n": int(f["n"]), "K": f["K"], "c": f["c"], "p": f["p"], "sK": sK, "sc": sc, "sp": sp,
            "p_lo": f["p"] - 1.96 * sp if np.isfinite(sp) else None,
            "p_hi": f["p"] + 1.96 * sp if np.isfinite(sp) else None,
-           "K_lo": max(0.0, f["K"] - 1.96 * sK), "K_hi": f["K"] + 1.96 * sK,
-           "c_resolved": bool(f["c"] >= 1e-3 and np.isfinite(sc))}
+           "K_lo": max(0.0, f["K"] - 1.96 * sK) if np.isfinite(sK) else None,
+           "K_hi": f["K"] + 1.96 * sK if np.isfinite(sK) else None,
+           "c_resolved": bool(f["c"] >= 1e-3 and np.isfinite(sc)), "c_at_bound": f["c_at_bound"]}
     if out["c_resolved"]:
         s = sc / f["c"]
         out["c_lo"], out["c_hi"] = f["c"] * math.exp(-1.96 * s), f["c"] * math.exp(1.96 * s)

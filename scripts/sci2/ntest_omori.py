@@ -36,6 +36,7 @@ import build_monitor as bm  # noqa: E402
 import monitorlib as ml  # noqa: E402
 import sci2lib as s2  # noqa: E402
 import seislib as sl  # noqa: E402
+from common import jdump  # noqa: E402
 from fetch import TooMany  # noqa: E402
 
 SEQUENCES = ["ci38457511", "us6000m0xl", "ak0219neiszm", "us6000qw60"]   # Ridgecrest, Noto, Chignik, Kamchatka
@@ -140,8 +141,7 @@ def main():
                "with_background_rejected": sum(r["with_background_rejected_5pct"] for r in ok),
                "over_predicted": sum(r["ratio_obs_expected"] < 1 for r in ok),
                "ratio_median": float(np.median([r["ratio_obs_expected"] for r in ok]))}
-    OUT.write_text(json.dumps({"method": __doc__.split("Output")[0].strip(), "summary": summary, "rows": rows},
-                              indent=1))
+    jdump({"method": __doc__.split("Output")[0].strip(), "summary": summary, "rows": rows}, OUT, indent=1)
     print(summary)
 
 

@@ -100,27 +100,30 @@ def decimal_year(t: pd.Series) -> np.ndarray:
     return (t.year + (t - start) / (end - start)).to_numpy(float)
 
 
-def jdump(obj, path: Path, indent=None):
-    def conv(o):
-        if isinstance(o, np.floating):
-            return None if not np.isfinite(o) else float(o)
-        if isinstance(o, np.integer):
-            return int(o)
-        if isinstance(o, np.ndarray):
-            return o.tolist()
-        if isinstance(o, np.bool_):
-            return bool(o)
-        return str(o)
+def _json_clean(o):
+    """NaN / inf -> None everywhere (also inside numpy scalars and arrays), so the output is valid JSON."""
+    if isinstance(o, (float, np.floating)):
+        return float(o) if np.isfinite(o) else None
+    if isinstance(o, (np.integer, np.bool_)):
+        return o.item()
+    if isinstance(o, np.ndarray):
+        return _json_clean(o.tolist())
+    if isinstance(o, dict):
+        return {k: _json_clean(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [_json_clean(v) for v in o]
+    return o
 
-    def clean(o):
-        if isinstance(o, float) and not np.isfinite(o):
-            return None
-        if isinstance(o, dict):
-            return {k: clean(v) for k, v in o.items()}
-        if isinstance(o, (list, tuple)):
-            return [clean(v) for v in o]
-        return o
-    path.write_text(json.dumps(clean(obj), indent=indent, default=conv, separators=None if indent else (",", ":")))
+
+def jdumps(obj, indent=None) -> str:
+    """JSON text with NaN / inf written as null; allow_nan=False makes any value that slipped through an error
+    instead of the invalid token NaN."""
+    return json.dumps(_json_clean(obj), indent=indent, default=str, allow_nan=False,
+                      separators=None if indent else (",", ":"))
+
+
+def jdump(obj, path: Path, indent=None):
+    path.write_text(jdumps(obj, indent))
 
 
 def b_sample_mask(magerr, max_err=B_MAGERR_MAX) -> np.ndarray:

@@ -105,3 +105,30 @@ def test_mc_lilliefors_res_equal_step_finds_true_mc():
         m = sl.synth_gr(2000, 1.0, 2.1, 0.1, rng=seed)
         mc, table = sl.mc_lilliefors(m, res=0.1, step=0.1, rng=seed)
         assert mc == 2.1, table[:2]
+
+
+def test_omori_mct_sk_includes_parameter_covariance():
+    # K / sqrt(n) ignored the covariance of K with p and c (about half the true scatter); the new sK must match the
+    # spread of K between realisations (audit fix)
+    r = np.random.default_rng(3)
+    Ks, sKs, old = [], [], []
+    for _ in range(40):
+        t = sl.synth_omori(60.0, 0.05, 1.05, 0.0, 365.0, rng=r.integers(1e9))
+        m = sl.synth_gr(t.size, 1.0, 4.5, rng=r.integers(1e9))
+        keep = m >= sl.mc_helmstetter(t, 8.0, 4.5) - 0.05 + 1e-9
+        f = sl.omori_fit_mct(t[keep], m[keep], 0.0, 365.0, 8.0, 4.5, 1.0)
+        Ks.append(f["K"]); sKs.append(f["sK"]); old.append(f["K"] / np.sqrt(f["n"]))
+    ratio = np.std(Ks, ddof=1) / np.mean(sKs)
+    assert 0.75 < ratio < 1.35, ratio
+    assert np.mean(sKs) > 1.5 * np.mean(old)   # well above the old Poisson-only value
+
+
+def test_omori_c_is_bounded_and_errors_finite_or_flagged():
+    # true c far below the bound: the old unconstrained search returned c ~ 1e-15 with a singular Hessian
+    for s in range(3):
+        t = sl.synth_omori(20.0, 1e-7, 1.05, 0.0, 365.0, rng=s)
+        m = sl.synth_gr(t.size, 1.0, 4.5, rng=s + 10)
+        for f in (sl.omori_fit_mct(t, m, 0.0, 365.0, 7.0, 4.5, 1.0), sl.omori_fit(t, 0.0, 365.0)):
+            assert f["c"] >= sl.C_MIN_DAYS * (1 - 1e-9), f["c"]
+            assert f["c_at_bound"] and not np.isfinite(f["sc"])
+            assert np.isfinite(f["sp"]) and f["sp"] > 0 and np.isfinite(f["sK"]) and f["sK"] > 0, f

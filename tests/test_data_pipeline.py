@@ -91,3 +91,14 @@ def test_bump_release(tmp_path):
     assert json.loads(f.read_text()) == {"version": "0.3.0", "data_cutoff_utc": "2027-01-01"}
     with pytest.raises(SystemExit):
         br.main([], f)                                                 # no cut-off and patch: refused
+
+
+def test_jdump_writes_null_for_nan_everywhere(tmp_path):
+    import common
+    obj = {"a": float("nan"), "b": np.float64("inf"), "c": np.array([1.0, np.nan]), "d": [np.float32(2.5), None],
+           "e": {"f": np.int64(3), "g": np.bool_(True)}}
+    f = tmp_path / "x.json"
+    common.jdump(obj, f)
+    txt = f.read_text()
+    assert "NaN" not in txt and "Infinity" not in txt
+    assert json.loads(txt) == {"a": None, "b": None, "c": [1.0, None], "d": [2.5, None], "e": {"f": 3, "g": True}}

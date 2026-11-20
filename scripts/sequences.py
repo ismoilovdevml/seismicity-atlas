@@ -12,6 +12,8 @@ Quality   : A = n >= 100, sigma_p <= 0.10, 0.5 <= p <= 2, no other event >= Mm -
             B = n >= 50, sigma_p <= 0.20, 0.5 <= p <= 2.5; else C. 'contaminated' marks a second large event.
             c_resolved is False when c < 0.001 day or has no standard error: with a teleseismic catalogue
             (Mcat ~4.7) the earliest hours are missing and c is then not constrained; K and p remain usable.
+            c is searched in [1e-4 day, 365 days]; c_at_bound marks a fit that ended at 1e-4 day (sc null, the
+            errors of K and p are then those for c fixed there). sK includes the covariance of K with p and c.
 """
 from __future__ import annotations
 
@@ -83,7 +85,8 @@ def main():
                "contaminated": bool((m >= Mm - 0.5).any())}
         if (m >= mcat - 1e-9).sum() >= 20:
             f = sl.omori_fit_mct(t, m, 0.0, 365.0, Mm, mcat, b)
-            rec.update({k: float(f[k]) for k in ("K", "c", "p", "sK", "sc", "sp")}, n_fit=int(f["n"]))
+            rec.update({k: float(f[k]) for k in ("K", "c", "p", "sK", "sc", "sp")}, n_fit=int(f["n"]),
+                       c_at_bound=f["c_at_bound"])
             okp = np.isfinite(f["sp"])
             rec["c_resolved"] = bool(f["c"] >= 1e-3 and np.isfinite(f["sc"]))
             if (f["n"] >= 100 and okp and f["sp"] <= 0.10 and 0.5 <= f["p"] <= 2 and not rec["contaminated"]):
