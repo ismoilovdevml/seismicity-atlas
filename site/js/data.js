@@ -1,4 +1,5 @@
 // Data loading with a cache, readable errors and byte sizes from the manifest.
+import { t } from './i18n/index.js';
 
 const cache = new Map();
 
@@ -6,12 +7,12 @@ export function getJSON(path) {
   if (!cache.has(path)) {
     const p = fetch(`data/${path}`)
       .then((r) => {
-        if (!r.ok) throw new Error(`data/${path} could not be loaded (HTTP ${r.status}).`);
+        if (!r.ok) throw new Error(t('data.errHttp', { path, status: r.status }));
         return r.json();
       })
       .catch((e) => {
         cache.delete(path);
-        if (e instanceof TypeError) throw new Error(`data/${path} could not be loaded (network error).`);
+        if (e instanceof TypeError) throw new Error(t('data.errNet', { path }));
         throw e;
       });
     cache.set(path, p);

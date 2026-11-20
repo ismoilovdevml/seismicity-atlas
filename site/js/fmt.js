@@ -19,7 +19,7 @@ export const b2 = (v) => (isNum(v) ? v.toFixed(2) : '–');
 export const b3 = (v) => (isNum(v) ? v.toFixed(3) : '–');
 export const mag = (v) => (isNum(v) ? neg(v.toFixed(1)) : '–');
 export const int = (v) => (isNum(v) ? group(Math.round(v)) : '–');
-export const km = (v) => (isNum(v) ? group(Math.round(v)) + ' km' : '–');
+export const km = (v) => (isNum(v) ? `${group(Math.round(v))} ${t('unit.km')}` : '–');
 export const signed = (v, d = 2) => (isNum(v) ? (v > 0 ? '+' : v < 0 ? MINUS : '±') + Math.abs(v).toFixed(d) : '–');
 export const fixed = (v, d) => (isNum(v) ? neg(v.toFixed(d)) : '–');
 

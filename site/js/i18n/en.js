@@ -1,5 +1,7 @@
 // English interface strings (the default and the fallback for every other language).
 // {name} placeholders are filled by t(key, {name: value}). Keep scientific terms (b-value, Mc) as they are.
+// A value may also be a function of the variables, for plural and ordinal forms (./plural.js).
+import { plural, ordinalEn } from './plural.js';
 
 export default {
   // ---- comparison
@@ -598,7 +600,7 @@ export default {
   "mon.bWithheld": "withheld: 95 % interval {w} wide (quality {q})",
   "mon.bpos": "b-positive",
   "mon.prod": "Productivity",
-  "mon.prodVal": "{r} × the regional mean [{lo}, {hi}]; {pct}th percentile of the region",
+  "mon.prodVal": ({ r, lo, hi, pct }) => `${r} × the regional mean [${lo}, ${hi}]; ${ordinalEn(pct)} percentile of the region`,
   "mon.link": "Link to this sequence",
   "mon.meta": "{date}, depth {d} km, {loc}",
   "mon.age": "{n} days of data",
@@ -706,6 +708,13 @@ export default {
   'learn.h1': 'Learn',
   'learn.intro': 'Short explanations of every number and label on the map: what it means in plain words, a real example from the current data, an interactive diagram, and the technical details.',
   'learn.indexFoot': 'Each page reads its examples from the same data files as the map, so the numbers follow the monthly update.',
+  // ---- units, data errors, chart tooltips, static-page social card
+  'unit.km': 'km',
+  'unit.nmyr': 'N m/yr',
+  'chart.noValue': 'no value',
+  'data.errHttp': 'data/{path} could not be loaded (HTTP {status}).',
+  'data.errNet': 'data/{path} could not be loaded (network error).',
+  'seo.ogAlt': 'Globe of the western Pacific with Gutenberg-Richter b-value cells from blue (low) to orange (high), next to the atlas title.',
   'learn.group.magnitudes': 'Magnitudes',
   'learn.group.completeness': 'Completeness & b-value',
   'learn.group.uncertainty': 'Uncertainty & quality',
@@ -870,7 +879,7 @@ export default {
   "cs.sum.busy": "From 2003 to 2018, while gas was produced at a high rate, the field had about {n} earthquakes of magnitude {mc} or more per month.",
   "cs.sum.peak": "Production peaked at {v} billion cubic metres in {y}. It was restricted from early 2014 and stopped on 1 October 2023.",
   "cs.sum.restr": "In the first five years of restrictions (2014–2018) the earthquake rate did not fall: {r1} per year against {r0} per year before, although production fell from about {p0} to {p1} billion cubic metres per year.",
-  "cs.sum.after": "Since production stopped, the rate has fallen to about {r} per year, roughly one such earthquake every {k} months. It has not stopped.",
+  "cs.sum.after": ({ r, k }) => `Since production stopped, the rate has fallen to about ${r} per year, roughly one such earthquake every ${plural('en', k, { one: 'month', other: `${k} months` })}. It has not stopped.`,
   "cs.sum.largest": "The largest earthquake was magnitude {m} near Huizinge in {y}. Later ones reached {later}.",
   "cs.sum.ml": "ML {m} on {d}",
   "cs.sum.and": " and ",

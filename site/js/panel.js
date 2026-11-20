@@ -243,7 +243,7 @@ function agreementSection(p, ctx) {
   row(t('agree.dmw'), p.c_dmw !== undefined ? f.signed(p.c_dmw) : '–', enough && Math.abs(p.c_dmw) > CC_RULES.dmw);
   row(t('agree.dmb'), p.c_dmb !== undefined ? f.signed(p.c_dmb) : '–');
   row(t('agree.dloc'), p.c_dloc !== undefined ? f.km(p.c_dloc) : '–', enough && p.c_dloc > CC_RULES.dlocKm);
-  row(t('agree.ddep'), p.c_ddep !== undefined ? `${f.signed(p.c_ddep, 1)} km` : '–');
+  row(t('agree.ddep'), p.c_ddep !== undefined ? `${f.signed(p.c_ddep, 1)} ${t('unit.km')}` : '–');
   row(t('agree.only'), t('agree.onlyVal', { g: f.int(p.c_gonly), c: f.int(p.c_conly), n: f.int(p.c_n) }), enough && p.c_n > 0 && (p.c_gonly + p.c_conly) / p.c_n > CC_RULES.unmatchedShare);
   row(t('agree.rate'), t('agree.rateVal', { v: f.sig2(p.rate_m6) }));
   sec.append(dl);

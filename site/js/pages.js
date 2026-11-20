@@ -299,7 +299,7 @@ export function renderAbout(root, ctx) {
   const man = ctx.manifest;
   const out = [];
   out.push(h('h1', { text: t('nav.about') }));
-  out.push(h('p', { class: 'notice' }, h('strong', { text: `${t('about.notice')} ` }), man.disclaimer, ` ${t('about.hazard')} `, h('a', { href: 'https://maps.openquake.org/map/global-seismic-hazard-map/', target: '_blank', rel: 'noopener', text: 'GEM Global Seismic Hazard Map' }), ` ${t('about.linkOnly')}`, ' ', infoButton('not-a-forecast')));
+  out.push(h('p', { class: 'notice' }, h('strong', { text: `${t('about.notice')} ` }), `${t('disc.long')}${t('disc.strong')}`, ` ${t('about.hazard')} `, h('a', { href: 'https://maps.openquake.org/map/global-seismic-hazard-map/', target: '_blank', rel: 'noopener', text: 'GEM Global Seismic Hazard Map' }), ` ${t('about.linkOnly')}`, ' ', infoButton('not-a-forecast')));
   out.push(h('p', { class: 'prose as-is', id: 'about-asis', text: t('about.asIs') }));
   out.push(h('p', { class: 'lede', text: t('about.lede') }));
 

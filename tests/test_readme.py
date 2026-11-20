@@ -4,8 +4,9 @@
 - Every interval quoted in the validation table appears in the validation table of site/data/global.json.
 - Every image the README uses exists, every screenshot in docs/img/readme/ is used, and none is over 400 KB.
 - No old-style site screenshot (docs/img/site-*.png) is left without a reference in README.md or docs/.
-- The version is the same in scripts/release.json and site/data/manifest.json (CITATION.cff is set by hand on each
-  release, docs/release.md).
+- The version is the same in scripts/release.json, site/data/manifest.json, CITATION.cff, pyproject.toml and
+  src/seisatlas/__init__.py (the package may add a documentation-only .postN); scripts/bump_release.py writes all of
+  them, so the PyPI version check in publish-pypi.yml cannot break after a monthly update.
 """
 import json
 import re
@@ -54,3 +55,40 @@ def test_version_is_consistent():
     rel = json.loads((ROOT / "scripts" / "release.json").read_text())["version"]
     man = json.loads((ROOT / "site" / "data" / "manifest.json").read_text())["version"]
     assert rel == man, (rel, man)
+
+
+def _versions():
+    import tomllib
+
+    py = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["version"]
+    init = re.search(r'^__version__ = "([^"]+)"$', (ROOT / "src" / "seisatlas" / "__init__.py").read_text(), re.M).group(1)
+    cff = re.search(r'^version: "([^"]+)"$', (ROOT / "CITATION.cff").read_text(), re.M).group(1)
+    return py, init, cff
+
+
+def test_package_and_citation_versions_follow_release():
+    rel = json.loads((ROOT / "scripts" / "release.json").read_text())["version"]
+    py, init, cff = _versions()
+    assert re.fullmatch(r"\d+\.\d+\.\d+(\.post\d+)?", py), py
+    assert py.split(".post")[0] == rel, ("pyproject.toml", py, rel)
+    assert init == py, ("src/seisatlas/__init__.py", init, py)
+    assert cff == rel, ("CITATION.cff", cff, rel)
+
+
+def test_bump_release_updates_every_version_file(tmp_path):
+    """The monthly bump writes release.json, pyproject.toml, __init__.py and CITATION.cff together (on copies)."""
+    import shutil
+
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import bump_release as br
+
+    for rel in ("scripts/release.json", *br.VERSION_FILES):
+        (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(ROOT / rel, tmp_path / rel)
+    old = json.loads((ROOT / "scripts" / "release.json").read_text())
+    new = br.main(["--cutoff", "2999-01-01"], tmp_path / "scripts" / "release.json", root=tmp_path)
+    assert new == br.bump(old["version"], "patch")
+    cff = (tmp_path / "CITATION.cff").read_text()
+    assert f'version: "{new}"' in cff and re.search(r'^date-released: "\d{4}-\d{2}-\d{2}"$', cff, re.M)
+    assert f'version = "{new}"' in (tmp_path / "pyproject.toml").read_text()       # .postN dropped
+    assert f'__version__ = "{new}"' in (tmp_path / "src/seisatlas/__init__.py").read_text()

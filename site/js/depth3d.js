@@ -308,7 +308,7 @@ function sceneData() {
     colors: cols, depthClass, ticks: depthTicks(c.maxDepth),
     theme: { surface: cssVar('--surface'), ink: cssVar('--ink'), ink3: cssVar('--ink-3'), rule: cssVar('--rule-strong'), ocean: cssVar('--ocean'), coast: cssVar('--coast'), plate: cssVar('--plate'), bg: cssVar('--bg') },
     getBase: () => Promise.all([getJSON('coastline.geojson'), getJSON('plates.geojson')]),
-    labels: { north: t('d3.north'), split: t('d3.split'), km: 'km' },
+    labels: { north: t('d3.north'), split: t('d3.split'), km: t('unit.km') },
     fmtTip: tipText,
   };
 }
@@ -482,7 +482,7 @@ function renderStats() {
       h('caption', { class: 'sr-only', text: t('d3.binsH') }),
       h('thead', {}, h('tr', {}, h('th', { scope: 'col', text: t('d3.binCol') }), h('th', { scope: 'col', text: t('d3.countCol') }), h('th', { scope: 'col', class: 'sr-only', text: '' }))),
       h('tbody', {}, counts.map((n, i) => h('tr', { class: i === 2 ? 'split-before' : null },
-        h('th', { scope: 'row', class: 'mono', text: `${binLabel(i)} km` }),
+        h('th', { scope: 'row', class: 'mono', text: `${binLabel(i)} ${t('unit.km')}` }),
         h('td', { class: 'mono num', text: f.int(n) }),
         h('td', { class: 'bar' }, h('span', { style: `width:${(n / max) * 100}%;background:${cols[i]}` })))))),
     h('p', { class: 'd3-split-line' }, h('strong', { text: t('depth.sh.label') }), ` ${f.int(sh)} · `, h('strong', { text: t('depth.dp.label') }), ` ${f.int(dp)}`));

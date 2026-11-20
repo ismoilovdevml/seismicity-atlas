@@ -81,11 +81,22 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         run: python -I -m pytest -q -p no:cacheprovider tests/test_monitor.py
 
+      # Browser binaries are cached per Playwright version; the system libraries still come from apt.
+      - name: Cache the Playwright browser
+        if: steps.gate.outputs.run == 'true'
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-1.65.1-chromium
+
       - name: Browser tests of the Ongoing view (Chromium)
         if: steps.gate.outputs.run == 'true'
+        env:
+          PW_CACHED: ${{ steps.pw-cache.outputs.cache-hit }}
         run: |
           python -m pip install playwright==1.65.1 pytest==9.2.0
-          python -m playwright install --with-deps chromium
+          if [ "$PW_CACHED" = "true" ]; then python -m playwright install-deps chromium; else python -m playwright install --with-deps chromium; fi
           python -m pytest -q -p no:cacheprovider tests/e2e/test_monitor.py
 
       - name: Commit and push

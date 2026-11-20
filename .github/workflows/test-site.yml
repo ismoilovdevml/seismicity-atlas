@@ -18,6 +18,9 @@ on:
 permissions:
   contents: read
 
+env:
+  PLAYWRIGHT_VERSION: "1.65.1"
+
 concurrency:
   group: test-site-${{ github.ref }}
   cancel-in-progress: true
@@ -40,10 +43,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: .github/workflows/test-site.yml
       - name: Install Playwright and pytest
-        run: python -m pip install playwright==1.65.1 pytest==9.2.0
+        run: python -m pip install playwright==${{ env.PLAYWRIGHT_VERSION }} pytest==9.2.0
+      # Browser binaries (~150 MB) are cached per Playwright version; the system libraries still come from apt.
+      - name: Cache the Playwright browser
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ env.PLAYWRIGHT_VERSION }}-${{ matrix.browser }}
       - name: Install the browser
+        if: steps.pw-cache.outputs.cache-hit != 'true'
         run: python -m playwright install --with-deps ${{ matrix.browser }}
+      - name: Install the browser's system libraries (browser restored from cache)
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: python -m playwright install-deps ${{ matrix.browser }}
       - name: Run the browser tests
         env:
           E2E_BROWSERS: ${{ matrix.browser }}
