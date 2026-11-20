@@ -18,9 +18,11 @@ permissions:
   pages: write
   id-token: write
 
+# Never cancel a running deploy half-way (a cancelled wrangler upload or Pages deployment can leave the live site
+# partly updated); a newer run waits for the current one instead.
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   # Build and deploy are separate jobs, as in GitHub's Pages starter workflow. With both steps in one job the
@@ -37,7 +39,8 @@ jobs:
 
   # seismicityatlas.org is served by Cloudflare Pages (project seismicity-atlas) since 2026-11-18: GitHub Pages was
   # very slow from Central Asia (cells.geojson 1.5 MB: 49-51 s against 1.8-2.2 s). GitHub Pages stays as a mirror.
-  # Needs the repository secret CLOUDFLARE_API_TOKEN (Account > Cloudflare Pages > Edit); skipped without it.
+  # Needs the repository secret CLOUDFLARE_API_TOKEN (Account > Cloudflare Pages > Edit). Without it the job fails, so
+  # a stale live site cannot go unnoticed.
   cloudflare:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
@@ -52,8 +55,13 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: 95c89337261f10f37ac1310191b2ebb7
         run: |
-          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then echo "::warning::CLOUDFLARE_API_TOKEN not set: Cloudflare Pages (the live site) was NOT updated"; exit 0; fi
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then echo "::error::CLOUDFLARE_API_TOKEN not set: Cloudflare Pages (the live site) was NOT updated"; exit 1; fi
           npx --yes wrangler@4.164.0 pages deploy site --project-name seismicity-atlas --branch main --commit-hash "$GITHUB_SHA" --commit-message "$(git log -1 --format=%s | head -c 200)"
+      # Ping IndexNow (Bing, Yandex, ...) with the sitemap URLs whose lastmod is today: pages seo_pages.mjs regenerated
+      # and the home page after a data update (its lastmod is the data cut-off). Best effort: never fails the deploy.
+      - name: Notify IndexNow of pages changed today
+        continue-on-error: true
+        run: scripts/indexnow.sh --since "$(date -u +%F)"
 
   deploy:
     needs: build
