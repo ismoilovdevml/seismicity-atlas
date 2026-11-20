@@ -259,7 +259,7 @@ def main():
     # ---- (a) global per period: b(floor + k) direct vs every event, b-positive, Mc-Lilliefors
     rng = np.random.default_rng(RNG + 1)   # one stream per section: sections do not shift each other
     glob = {}
-    for (a, z), key in zip(PERIODS, ("1976-2003", "2004-2021")):
+    for (a, z), key in zip(PERIODS, [f"{a_}-{z_}" for a_, z_ in PERIODS]):
         ps = (yr >= a) & (yr <= z)
         f0 = fl_direct["sh"][key]["floor"]
         rows = []

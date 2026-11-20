@@ -38,14 +38,14 @@ def main(argv=None, path: Path = RELEASE) -> str:
     if a.cutoff is None:
         if a.part == "patch":
             ap.error("a method-only bump (no --cutoff) needs --part minor or --part major")
-        rel = {"version": bump(rel["version"], a.part), "data_cutoff_utc": rel["data_cutoff_utc"]}
+        rel = {**rel, "version": bump(rel["version"], a.part)}
         path.write_text(json.dumps(rel, indent=1) + "\n")
         print(rel["version"])
         return rel["version"]
     if a.cutoff <= date.fromisoformat(rel["data_cutoff_utc"]):
         print(rel["version"])
         return rel["version"]
-    rel = {"version": bump(rel["version"], a.part), "data_cutoff_utc": a.cutoff.isoformat()}
+    rel = {**rel, "version": bump(rel["version"], a.part), "data_cutoff_utc": a.cutoff.isoformat()}
     path.write_text(json.dumps(rel, indent=1) + "\n")
     print(rel["version"])
     return rel["version"]

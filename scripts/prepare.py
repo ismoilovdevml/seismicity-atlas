@@ -24,7 +24,8 @@ from scipy.spatial import cKDTree
 
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
 import seislib as sl  # noqa: E402
-from common import AUX, DEPTH_SPLIT, H3_RES, MW_TYPES, PROC, RES, WORK, decimal_year, jdump  # noqa: E402
+from common import (AUX, COMCAT_MINMAG, DEPTH_SPLIT, H3_RES, ISCGEM_LAST_YEAR, MW_TYPES, PROC, RES, WORK,  # noqa: E402
+                    decimal_year, jdump)
 
 
 def standardise(df: pd.DataFrame, src: str) -> pd.DataFrame:
@@ -92,8 +93,15 @@ def boundary_class(lat, lon, steps, max_km=200.0):
 def main():
     g = standardise(pd.read_csv(PROC / "iscgem.csv", low_memory=False), "iscgem")
     c = standardise(pd.read_csv(PROC / "comcat_m45.csv", low_memory=False), "comcat")
+    late = g[g.year > ISCGEM_LAST_YEAR]
+    if len(late):   # a newer ISC-GEM release: every ISC-GEM period ends at iscgem_last_year, so stop instead of cutting
+        raise SystemExit(f"ISC-GEM holds {len(late)} events after {ISCGEM_LAST_YEAR} (to {g.time.max()}): set "
+                         "iscgem_last_year in scripts/release.json to its last complete year")
     info = {"iscgem_n": len(g), "comcat_n": len(c), "iscgem_span": [str(g.time.min()), str(g.time.max())],
             "comcat_span": [str(c.time.min()), str(c.time.max())]}
+    below = c.mag < COMCAT_MINMAG - 1e-9      # the query is M >= 4.5, but ComCat has served smaller events
+    c = c[~below].reset_index(drop=True)
+    info["comcat_dropped_below_minmag"] = {"n": int(below.sum()), "minmag": COMCAT_MINMAG}
     c = c[np.isfinite(c["depth"])].reset_index(drop=True)
     info["comcat_dropped_no_depth"] = info["comcat_n"] - len(c)
 
@@ -118,7 +126,7 @@ def main():
 
     # ------------------------------------------------------------------ mb -> Mw proxy
     def covered_bins(types):
-        cov = c[(c.year <= 2021) & c.magtype.isin(types)].copy()
+        cov = c[(c.year <= ISCGEM_LAST_YEAR) & c.magtype.isin(types)].copy()
         cov["b"] = sl.bin_mag(cov["mag"])
         frac = cov.groupby("b")["match"].apply(lambda s: (s >= 0).mean())
         cnt = cov.groupby("b").size()

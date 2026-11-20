@@ -93,6 +93,29 @@ def test_bump_release(tmp_path):
         br.main([], f)                                                 # no cut-off and patch: refused
 
 
+def test_iscgem_period_comes_from_release_json(tmp_path):
+    import atlas
+    import bump_release as br
+    import common
+    rel = json.loads((HERE.parents[0] / "scripts" / "release.json").read_text())
+    assert common.ISCGEM_LAST_YEAR == rel["iscgem_last_year"] == 2021        # the current catalogue: unchanged
+    assert common.ISCGEM_END == "2022-01-01"
+    assert atlas.Y1 == common.ISCGEM_LAST_YEAR and atlas.PERIODS[-1] == (2004, common.ISCGEM_LAST_YEAR)
+    assert atlas.Y1 - atlas.RATE_Y0 + 1 == 58                                # the old hard-coded 58.0 years
+    f = tmp_path / "release.json"
+    f.write_text(json.dumps({"version": "0.1.0", "data_cutoff_utc": "2026-11-13", "iscgem_last_year": 2021}))
+    br.main(["--cutoff", "2026-12-01"], f)
+    assert json.loads(f.read_text())["iscgem_last_year"] == 2021           # bump keeps the other keys
+
+
+def test_fetch_drops_rows_below_the_query_minmag():
+    import pandas as pd
+    import fetch
+    df = pd.DataFrame({"id": ["a", "nc21364840", "b"], "mag": [4.5, 3.38, 5.1]})
+    assert fetch.drop_below_minmag(df, 4.5).id.tolist() == ["a", "b"]
+    assert len(fetch.drop_below_minmag(df, None)) == 3                      # ISC-GEM: no magnitude limit
+
+
 def test_jdump_writes_null_for_nan_everywhere(tmp_path):
     import common
     obj = {"a": float("nan"), "b": np.float64("inf"), "c": np.array([1.0, np.nan]), "d": [np.float32(2.5), None],

@@ -44,3 +44,19 @@ Each item: what was wrong, what changed, which outputs move after the rebuild.
   split in time after the M ≥ 3.5 retry.
 - **Monitor productivity wording.** The method text said "more"/"less" when the 95 % interval excludes the regional
   mean; the code (and docs/monitor.md) use the 25th–75th percentile band. The text now says what the code does.
+- **Deficit b sample.** The Tien Shan catalogue was cut at Mw ≥ 5.80 before `b_aki` binned it, so the lowest bin
+  (5.75–5.84) lost its 5.75–5.79 events, the mean magnitude rose and b came out low: 0.954 (n = 38) instead of
+  0.998 (n = 40) at the 2026-11-13 data. The b sample now keeps Mw ≥ 5.75; counts and moment bands keep Mw ≥ 5.8.
+  Outputs: `deficit/index.json` `b_whole_belt`, β and every Monte Carlo summary of the deficit layer.
+- **Deficit moment balance.** When even a corner at Mw 6.0 released more than the geodetic budget, the draw was
+  marked unbalanced and simulated with a corner of 10.5 (the opposite end). It is now simulated with 6.0 and counted
+  in the new `over`; `unbal` keeps only the draws that need a corner above 10.5. For β ≥ 1 (b ≥ 1.5) the tapered
+  G-R mean moment was NaN (`gammaincc` needs a positive order); it is now computed with the recurrence of the upper
+  incomplete gamma function. Outputs: `p_full`, `p_half`, `mc_bal`, `unbal`, new `over` in the deficit layer.
+- **ComCat minimum magnitude.** ComCat served an M 3.38 event (nc21364840) in the M ≥ 4.5 download; `fetch.py` and
+  `prepare.py` now drop rows below the query minimum. Outputs: three California cells (Mc(t) and FMD rows of their
+  detail files), ComCat counts by one event.
+- **ISC-GEM period from one setting.** The last ISC-GEM year (2021) was written into atlas.py, validate.py,
+  val_bt.py, val_chile.py, prepare.py and the deficit layer (also as 58.0 years and 2022-01-01). It is now
+  `iscgem_last_year` in `scripts/release.json`, and `prepare.py` stops when the catalogue holds later events
+  instead of cutting them silently. Outputs: none for the current data.

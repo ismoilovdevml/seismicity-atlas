@@ -33,6 +33,7 @@ import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import iscgem_official  # noqa: E402
+from common import COMCAT_MINMAG  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"
@@ -121,6 +122,17 @@ def comcat_chunk(t0, t1, minmag, catalog, refresh, frames):
     time.sleep(PAUSE_S)
 
 
+def drop_below_minmag(df, minmag, name="catalogue"):
+    """Rows below the query's minmagnitude. ComCat has served such events (nc21364840, M 3.38 ml, in the M >= 4.5
+    download), so the limit is checked again on the rows."""
+    if minmag is None:
+        return df
+    below = pd.to_numeric(df["mag"], errors="coerce") < minmag - 1e-9
+    if below.any():
+        print(f"{name}: dropped {int(below.sum())} events below M {minmag}: {df.loc[below, 'id'].tolist()[:10]}")
+    return df[~below]
+
+
 def fetch_catalog(name, start, end, minmag, chunk_days, catalog, refresh):
     frames: list = []
     for t0, t1 in chunks(start, end, chunk_days):
@@ -130,6 +142,7 @@ def fetch_catalog(name, start, end, minmag, chunk_days, catalog, refresh):
     df = df.drop_duplicates("id")
     print(f"{name}: event types {df['type'].value_counts().to_dict()}")
     df = df[df["type"] == "earthquake"][[c for c in KEEP if c in df.columns]]
+    df = drop_below_minmag(df, minmag, name)
     PROC.mkdir(parents=True, exist_ok=True)
     out = PROC / f"{name}.csv"
     df.sort_values("time").to_csv(out, index=False)
@@ -174,7 +187,7 @@ def main():
     if a.what in ("iscgem", "all"):
         fetch_iscgem(a.end, a.refresh, a.iscgem_source)
     if a.what in ("comcat", "all"):
-        fetch_catalog("comcat_m45", "1973-01-01", a.end, 4.5, 365.25, None, a.refresh)
+        fetch_catalog("comcat_m45", "1973-01-01", a.end, COMCAT_MINMAG, 365.25, None, a.refresh)
     if a.what in ("aux", "all"):
         fetch_aux(a.refresh)
 

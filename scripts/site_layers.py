@@ -14,7 +14,8 @@ from shapely.geometry import MultiLineString, mapping, shape
 from shapely.ops import linemerge
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import (AUX, CUTOFF, D_GCMT, D_INDEP, D_ISCGEM, D_NONE, PROC, RES, SITE, V_DIFFERS, V_MATCH,  # noqa: E402
+from common import (AUX, CUTOFF, D_GCMT, D_INDEP, D_ISCGEM, D_NONE, ISCGEM_LAST_YEAR, PROC, RES, SITE,  # noqa: E402
+                    V_DIFFERS, V_MATCH,
                     V_UNINF, VERSION, jdump, load_work, z_verdict)
 
 R = lambda x, n: None if x is None or not np.isfinite(x) else round(float(x), n)  # noqa: E731
@@ -171,7 +172,7 @@ def validation_table(v, seq):
         else:
             vd, z = z_verdict(r["b"], lo, hi, pub)
         data = D_NONE if (pub is None and name in ("Japan", "Chile")) else D_INDEP
-        row(f"Regional b, {name}, shallow, ISC-GEM 1976-2021",
+        row(f"Regional b, {name}, shallow, ISC-GEM 1976-{ISCGEM_LAST_YEAR}",
             f"{r['b']:.3f} [{lo:.3f}, {hi:.3f}] n={r['n_b']} q={r['quality']}",
             f"{pub:.2f}" if pub is not None else r["source"], vd, data, z)
     pb = v["plate_boundary_types"]
@@ -284,7 +285,7 @@ def main():
             {"name": "USGS Slab2 subduction zone geometry (Depth 3D view)", "url": "https://doi.org/10.5066/F7PV6JNV",
              "licence": "CC0 1.0", "citation": "Hayes et al. 2018 Science 362, 58-61, doi:10.1126/science.aat4723"}],
         "method": {"cells": "H3 resolution 2", "sample_radius_km": ag["sample_radius_km"],
-                   "b_catalogue": "ISC-GEM Mw 1976-2021", "b_sample": ag.get("b_sample", "all events"),
+                   "b_catalogue": f"ISC-GEM Mw 1976-{ISCGEM_LAST_YEAR}", "b_sample": ag.get("b_sample", "all events"),
                    "b_magerr_max": ag.get("b_magerr_max"), "floors": ag["floors"], "nboot": ag["nboot"],
                    "quality": {"A": "95 % CI width / b <= 0.30", "B": "<= 0.50", "C": "wider: b masked",
                                "insufficient": "< 50 events above threshold"},

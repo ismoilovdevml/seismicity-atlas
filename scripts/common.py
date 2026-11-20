@@ -23,9 +23,15 @@ _RELEASE = json.loads((Path(__file__).resolve().parent / "release.json").read_te
 CUTOFF = _RELEASE["data_cutoff_utc"]    # data cut-off date (UTC) used for the ComCat download
 CUTOFF_YEAR = int(CUTOFF[:4])
 VERSION = _RELEASE["version"]
+# Last complete year of the ISC-GEM catalogue in use (2021 for the ComCat mirror and ISC-GEM v12). Every period that
+# ends with the ISC-GEM data (b sample, rates, the ISC-GEM / ComCat hand-over of the deficit layer) is derived from
+# it; prepare.py stops when the catalogue holds later events, so a newer release is never cut silently.
+ISCGEM_LAST_YEAR = int(_RELEASE.get("iscgem_last_year", 2021))
+ISCGEM_END = f"{ISCGEM_LAST_YEAR + 1}-01-01"          # exclusive end (UTC) of the ISC-GEM period
 H3_RES = 2                      # display cells: H3 resolution 2 (mean area 86,802 km2)
 SAMPLE_R_KM = 300.0             # sampling radius around each cell centre for Mc / b
 DEPTH_SPLIT = 70.0              # km: shallow <= 70 < intermediate/deep
+COMCAT_MINMAG = 4.5             # ComCat download: minmagnitude of the query, re-checked on the rows (fetch, prepare)
 DM = 0.1
 MW_TYPES = {"mww", "mwc", "mwb", "mwr", "mw", "mwp", "mi", "mwd"}
 

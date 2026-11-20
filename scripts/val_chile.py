@@ -31,7 +31,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import seislib as sl  # noqa: E402
-from common import (D_GCMT, D_INDEP, D_NONE, RES, b_sample_label, b_sample_mask, jdump, load_work,  # noqa: E402
+from common import (D_GCMT, D_INDEP, D_NONE, ISCGEM_LAST_YEAR, RES, b_sample_label, b_sample_mask, jdump, load_work,  # noqa: E402
                     z_verdict)
 from validate import b_region, box  # noqa: E402
 
@@ -98,7 +98,7 @@ def table_rows(out):
 def main():
     g_all = load_work("iscgem")
     fl = json.loads((RES / "atlas_globals.json").read_text())["floors"]
-    a76 = g_all[(g_all.year >= 1976) & (g_all.year <= 2021)].reset_index(drop=True)
+    a76 = g_all[(g_all.year >= 1976) & (g_all.year <= ISCGEM_LAST_YEAR)].reset_index(drop=True)
     a_base = ~a76.deep & box(a76, *CHILE)
 
     # ---------------------------------------------------------------- magnitude type mix (every event)
@@ -114,7 +114,7 @@ def main():
 
     # every other variant: the atlas b sample
     g = g_all[b_sample_mask(g_all.magerr)]
-    g76 = g[(g.year >= 1976) & (g.year <= 2021)].reset_index(drop=True)
+    g76 = g[(g.year >= 1976) & (g.year <= ISCGEM_LAST_YEAR)].reset_index(drop=True)
     sh = ~g76.deep
     inbox = box(g76, *CHILE)
     base = sh & inbox
@@ -129,7 +129,7 @@ def main():
     # ---------------------------------------------------------------- completeness
     m = sl.bin_mag(s.mag.to_numpy())
     out["mc_box"] = {}
-    for a, b in ((1976, 2003), (2004, 2021)):
+    for a, b in ((1976, 2003), (2004, ISCGEM_LAST_YEAR)):
         mm = sl.bin_mag(s[(s.year >= a) & (s.year <= b)].mag.to_numpy())
         out["mc_box"][f"{a}-{b}"] = {"n": int(mm.size), "maxc02": float(sl.mc_maxc(mm, correction=0.2)),
                                      "mbs": float(sl.mc_mbs(mm)), "gft": float(sl.mc_gft(mm)[0])}
@@ -149,7 +149,7 @@ def main():
     seq["gk_mainshocks_only"] = atl(base & g76.mainshock)
     # b-positive on events above their period floor, time ordered
     st = s.sort_values("time")
-    flo = np.where(st.year <= 2003, fl["sh"]["1976-2003"]["floor"], fl["sh"]["2004-2021"]["floor"])
+    flo = np.where(st.year <= 2003, fl["sh"]["1976-2003"]["floor"], fl["sh"][f"2004-{ISCGEM_LAST_YEAR}"]["floor"])
     mt = sl.bin_mag(st.mag.to_numpy())
     keep = mt >= flo - 1e-9
     bp, sp, n = sl.b_positive(mt[keep])
