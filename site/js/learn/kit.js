@@ -108,9 +108,12 @@ export function figure(el, { title, caption, alt }) {
     const svg = drawFn(W);
     if (svg) plotEl.replaceChildren(svg);
   };
-  let ro = null;
+  let ro = null, seen = false;
   if (typeof ResizeObserver !== 'undefined') {
     ro = new ResizeObserver(() => {
+      // removed from the page (re-rendered or left): stop observing so the figure can be collected
+      if (plotEl.isConnected) seen = true;
+      else if (seen) { ro.disconnect(); return; }
       const W = Math.round(plotEl.clientWidth || 0);
       if (W && Math.abs(W - lastW) > 4) requestAnimationFrame(redraw);
     });
@@ -246,13 +249,8 @@ export function quantile(sorted, q) {
 
 export const median = (arr) => quantile([...arr].sort((a, b) => a - b), 0.5);
 
-/** Cumulative counts N(>= m) from non-cumulative [[m, n]] pairs (sorted by m). */
-export function cumulative(pairs) {
-  const out = [];
-  let acc = 0;
-  for (let i = pairs.length - 1; i >= 0; i--) { acc += pairs[i][1]; out.unshift([pairs[i][0], acc]); }
-  return out;
-}
+/** Cumulative counts N(>= m) from non-cumulative [[m, n]] pairs (sorted by m): the site-wide helper in util.js. */
+export { cumulativeFmd as cumulative } from '../util.js';
 
 /** MAXC: the bin with the most events (the first one on ties). */
 export function maxc(pairs) {

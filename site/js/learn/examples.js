@@ -10,6 +10,7 @@
 import { getJSON } from '../data.js';
 import * as f from '../fmt.js';
 import { maxc, median, cumulative } from './kit.js';
+import { distKm } from '../util.js';
 import { recordingRating, RATINGS } from '../places.js';
 
 const cellsP = () => getJSON('cells.geojson').then((g) => g.features.map((ft) => ft.properties));
@@ -68,11 +69,6 @@ const decYear = (iso) => {
   const a = Date.UTC(y, 0, 1), b = Date.UTC(y + 1, 0, 1);
   return y + (d.getTime() - a) / (b - a);
 };
-function distKm(lat1, lon1, lat2, lon2) {
-  const r = Math.PI / 180;
-  const a = Math.sin(((lat2 - lat1) * r) / 2) ** 2 + Math.cos(lat1 * r) * Math.cos(lat2 * r) * Math.sin(((lon2 - lon1) * r) / 2) ** 2;
-  return 2 * 6371 * Math.asin(Math.min(1, Math.sqrt(a)));
-}
 
 /** The largest later event within the sequence window (radius, 365 days) in the M >= 6 event layer. */
 function largestAftershock(s, ev) {

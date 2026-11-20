@@ -7,6 +7,7 @@ import { getJSON } from '../data.js';
 import { CONCEPTS, GROUPS, byId } from './registry.js';
 import { EXAMPLES } from './examples.js';
 import { REFS } from './refs.js';
+import { EXT } from '../util.js';
 
 const LANG_OK = ['en', 'uz', 'ru', 'es'];
 let shownKey = null;
@@ -64,6 +65,16 @@ async function content(code, id, tl) {
 function teardown() {
   for (const fn of cleanups) { try { fn(); } catch (e) { /* ignore */ } }
   cleanups = [];
+}
+
+/**
+ * Called by app.js when another view is shown: stop the diagram animations and observers, cancel a page still
+ * loading, and render afresh on the next visit.
+ */
+export function leaveLearn() {
+  token++;
+  teardown();
+  shownKey = null;
 }
 
 const backBtn = (back) => h('a', { class: 'lr-back', href: back || '#v=map', 'data-learn': 'back' },
@@ -133,8 +144,8 @@ export async function renderLearn(root, { topic, back }) {
       ...c.tech.map((s) => tmpl(/^\s*<(ul|ol|div|pre|table)/.test(s) ? 'div' : 'p', /^\s*<(ul|ol|div|pre|table)/.test(s) ? 'lr-block' : '', s))),
     refs.length ? h('section', { class: 'lr-sec lr-refs', 'aria-labelledby': 'lr-h-refs' },
       h('h2', { id: 'lr-h-refs', text: t('learn.refs') }),
-      h('ol', {}, refs.map((r) => h('li', {}, `${r.text} `, r.doi ? h('a', { href: `https://doi.org/${r.doi}`, target: '_blank', rel: 'noopener', text: `doi:${r.doi}` })
-        : r.url ? h('a', { href: r.url, target: '_blank', rel: 'noopener', text: r.urlLabel || r.url }) : null)))) : null,
+      h('ol', {}, refs.map((r) => h('li', {}, `${r.text} `, r.doi ? h('a', { href: `https://doi.org/${r.doi}`, ...EXT, text: `doi:${r.doi}` })
+        : r.url ? h('a', { href: r.url, ...EXT, text: r.urlLabel || r.url }) : null)))) : null,
     h('nav', { class: 'lr-pager', 'aria-label': t('learn.pager') },
       prev ? h('a', { class: 'lr-prev', rel: 'prev', href: `#v=learn&t=${prev.id}`, 'data-learn': 'prev' }, h('span', { class: 'lr-pager-k', text: t('learn.prev') }), h('span', { text: name(prev.id) })) : h('span'),
       h('a', { class: 'lr-all', href: '#v=learn', 'data-learn': 'index', text: t('learn.index') }),

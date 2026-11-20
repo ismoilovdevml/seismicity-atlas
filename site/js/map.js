@@ -8,6 +8,10 @@ import { getJSON, ruleNumber } from './data.js';
 import { t } from './i18n/index.js';
 import * as B from './basemap.js';
 import { infoButton } from './info.js';
+import { EXT, reduceMotion } from './util.js';
+
+// Web Mercator ends at about 85.05 degrees: a box reaching further makes fitBounds throw "Invalid LngLat".
+const clampLat = (lat) => Math.max(-85, Math.min(85, lat));
 
 // Concept explained by the legend title of each layer (docs/learn.md).
 const LEGEND_CONCEPT = { b: 'gutenberg-richter-b-value', q: 'quality-codes', mc: 'magnitude-of-completeness', cc: 'catalogue-consistency', rate: 'rate-m6' };
@@ -135,7 +139,7 @@ export function initMap(ctx, base) {
     map.on('load', () => {
       if (!map.hasImage('hatch')) map.addImage('hatch', hatchImage(), { pixelRatio: 2 });
       wire();
-      B.attach(map, C.state);
+      B.attach(map, C.state, { onTerrainError: C.onTerrainError });
       resolve(map);
     });
   });
@@ -146,19 +150,36 @@ function wire() {
     const c = map.getCenter();
     C.onView({ z: +map.getZoom().toFixed(2), lat: +c.lat.toFixed(2), lon: +c.lng.toFixed(2) });
   });
+  // Hover: at most one hit test per frame, however many mousemove events arrive (the queries and the tooltip layout
+  // are the costly part).
+  let moveEv = null, moveFrame = 0;
   map.on('mousemove', (e) => {
-    if (simple()) { simpleMove(e); return; }
-    const evHit = queryEvents(e.point);
-    const ov = evHit ? null : overlayAt(e.point);
-    if (ov) { setHover(null); showTip(e.point, ov.o.tip(ov.ft.properties)); map.getCanvas().style.cursor = 'pointer'; return; }
-    const cell = cellAt(e.point);
-    setHover(cell ? { source: cell.source, id: cell.id } : null);
-    if (evHit) showTip(e.point, eventTipNode(evHit.properties));
-    else if (cell && C.lookup(cell.properties.id)) showTip(e.point, cellTipNode(C.lookup(cell.properties.id)));
-    else hideTip();
-    map.getCanvas().style.cursor = evHit || cell ? 'pointer' : '';
+    moveEv = e;
+    if (!moveFrame) moveFrame = requestAnimationFrame(() => { moveFrame = 0; if (moveEv) hover(moveEv); });
   });
-  map.getCanvas().addEventListener('mouseleave', () => { setHover(null); hideTip(); });
+  map.getCanvas().addEventListener('mouseleave', () => { moveEv = null; setHover(null); hideTip(); });
+  wireClick();
+}
+
+function hover(e) {
+  if (simple()) { simpleMove(e); return; }
+  const evHit = queryEvents(e.point);
+  const ov = evHit ? null : overlayAt(e.point);
+  if (ov) { setHover(null); showTip(e.point, () => ov.o.tip(ov.ft.properties), `ov|${ov.ft.properties.id}`); setCursor('pointer'); return; }
+  const cell = cellAt(e.point);
+  setHover(cell ? { source: cell.source, id: cell.id } : null);
+  if (evHit) showTip(e.point, () => eventTipNode(evHit.properties), `ev|${evHit.properties.k}|${evHit.properties.i}`);
+  else if (cell && C.lookup(cell.properties.id)) showTip(e.point, () => cellTipNode(C.lookup(cell.properties.id)), `cell|${cell.properties.id}`);
+  else hideTip();
+  setCursor(evHit || cell ? 'pointer' : '');
+}
+
+function setCursor(c) {
+  const s = map.getCanvas().style;
+  if (s.cursor !== c) s.cursor = c;
+}
+
+function wireClick() {
   map.on('click', (e) => {
     hideTip();
     if (simple()) { const ll = e.lngLat.wrap(); C.onPlace(ll.lat, ll.lng); return; }
@@ -195,22 +216,29 @@ function setHover(hv) {
   if (hv) map.setFeatureState(hv, { hover: true });
 }
 
-function showTip(pt, node) {
-  const t = tip();
-  t.replaceChildren(node);
-  t.hidden = false;
+// The tooltip's content is rebuilt only when the thing under the pointer (or the state it is described in) changes;
+// moving within one cell only moves the box, using the size measured when the content was set.
+let tipKey = null, tipSize = null;
+function showTip(pt, make, key) {
+  const el = tip();
+  const st = C.state;
+  const k = `${key}|${st.l}|${st.m}|${st.d}|${st.k}|${document.documentElement.lang}`;
+  if (k !== tipKey || el.hidden) {
+    el.replaceChildren(make());
+    el.hidden = false;
+    tipKey = k;
+    tipSize = [el.offsetWidth, el.offsetHeight];
+  }
   const view = document.getElementById('map-area');
-  const off = 0;
   const W = view.clientWidth, H = view.clientHeight;
-  const tw = t.offsetWidth, th = t.offsetHeight;
-  let x = pt.x + off + 14, y = pt.y + 14;
-  if (x + tw > W - 8) x = pt.x + off - tw - 14;
+  const [tw, th] = tipSize;
+  let x = pt.x + 14, y = pt.y + 14;
+  if (x + tw > W - 8) x = pt.x - tw - 14;
   if (y + th > H - 8) y = pt.y - th - 14;
-  t.style.left = `${Math.max(off + 4, x)}px`;
-  t.style.top = `${Math.max(4, y)}px`;
+  el.style.transform = `translate(${Math.round(Math.max(4, x))}px, ${Math.round(Math.max(4, y))}px)`;
 }
 
-export function hideTip() { const t = tip(); if (t) t.hidden = true; }
+export function hideTip() { const t = tip(); if (t) t.hidden = true; tipKey = null; }
 
 // ---------- text for cells ----------
 
@@ -343,10 +371,10 @@ export function revealCell(lon, lat, panelId = 'panel') {
   const pt = map.project([lon, lat]);
   const panel = document.getElementById(panelId);
   if (innerWidth > 720) {
-    if (pt.x > box.clientWidth - 20 || pt.x < 20 || pt.y < 20 || pt.y > box.clientHeight - 20) map.easeTo({ center: [lon, lat], duration: 400 });
+    if (pt.x > box.clientWidth - 20 || pt.x < 20 || pt.y < 20 || pt.y > box.clientHeight - 20) map.easeTo({ center: [lon, lat], duration: reduceMotion() ? 0 : 400 });
   } else {
     const sh = panel.offsetHeight;
-    if (pt.y > box.clientHeight - sh - 20 || pt.y < 0) map.easeTo({ center: [lon, lat], offset: [0, -sh / 2], duration: 400 });
+    if (pt.y > box.clientHeight - sh - 20 || pt.y < 0) map.easeTo({ center: [lon, lat], offset: [0, -sh / 2], duration: reduceMotion() ? 0 : 400 });
   }
 }
 
@@ -355,19 +383,30 @@ export function resize() { if (map) map.resize(); }
 /** The global cells arrive after the map when the visitor opens the Scientist view from the Simple view. */
 export function setCells(fc) { if (map && map.getSource('cells')) map.getSource('cells').setData(fc); }
 
-export function flyTo(lon, lat, z) { if (map) map.flyTo({ center: [lon, lat], zoom: z, essential: true }); }
+/** Fly to a point; with reduced motion asked for, jump there (MapLibre's flyTo also respects it unless essential). */
+export function flyTo(lon, lat, z) {
+  if (!map) return;
+  if (reduceMotion()) map.jumpTo({ center: [lon, lat], zoom: z });
+  else map.flyTo({ center: [lon, lat], zoom: z });
+}
 
 // ---------- legend ----------
 
 function renderLegend(def) {
   const el = document.getElementById('legend');
   const st = C.state;
-  const counts = new Map();
   const feats = C.cells ? C.cells.features : [];
-  for (const ft of feats) {
-    const k = def.classify(ft.properties);
-    counts.set(k, (counts.get(k) || 0) + 1);
+  // cells per legend class: depends on the layer, its variant and the depth only
+  const ckey = `${st.l}|${st.m}|${st.d}|${feats.length}`;
+  if (legendCounts.key !== ckey) {
+    const counts = new Map();
+    for (const ft of feats) {
+      const k = def.classify(ft.properties);
+      counts.set(k, (counts.get(k) || 0) + 1);
+    }
+    legendCounts = { key: ckey, counts };
   }
+  const { counts } = legendCounts;
   const kids = [];
   const lgConcept = LEGEND_CONCEPT[st.l];
   kids.push(h('div', { class: 'lg-head' }, h('span', { class: 'lg-title' }, def.title, lgConcept && !def.none ? infoButton(lgConcept) : null), def.depthAware ? h('span', { class: 'lg-depth', text: t(`depth.${st.d}.label`) }) : h('span', { class: 'lg-depth', text: def.none ? '' : t('lg.allDepths') })));
@@ -417,10 +456,16 @@ function renderLegend(def) {
   for (const o of overlays) { const n = o.legend && !simple() ? o.legend() : null; if (n) extra.push(n); }
   if (extra.length) kids.push(h('div', { class: 'lg-extra' }, extra));
   el.classList.toggle('has-bar', !!def.bar);
+  // most calls (every slider step, every zoom) change nothing in the legend: keep the DOM then
+  const html = kids.map((k) => k.outerHTML).join('');
+  if (html === legendHtml && el.childElementCount === kids.length) return;
+  legendHtml = html;
   el.replaceChildren(...kids);
 }
+let legendCounts = { key: null, counts: null };
+let legendHtml = null;
 
-export function zoomBy(dz) { if (map) map.easeTo({ zoom: map.getZoom() + dz, duration: 250 }); }
+export function zoomBy(dz) { if (map) map.easeTo({ zoom: map.getZoom() + dz, duration: reduceMotion() ? 0 : 250 }); }
 
 // ---------- events ----------
 
@@ -444,17 +489,32 @@ function radiusExpr(k) {
   return e;
 }
 
+/**
+ * The events source: M6+ from events_m6.json, then M5-6 from events_m5.json once loaded. Each feature carries only
+ * what the map styles and filters read (m, d, y) and where its row is (k: file, i: row); the tooltip and popup look
+ * the rest up in the columns (eventRow). Fewer properties make the copy to MapLibre's worker cheaper.
+ */
 function eventsGeoJSON() {
-  const feats = [];
-  const add = (e, k, keep) => {
+  const n = events.e6.n + (events.e5 ? events.e5.n : 0);
+  const feats = new Array(n);
+  let j = 0;
+  const add = (e, k, below6) => {
+    const { lon, lat, mag, depth, year } = e;
     for (let i = 0; i < e.n; i++) {
-      if (keep && !keep(i)) continue;
-      feats.push({ type: 'Feature', geometry: { type: 'Point', coordinates: [e.lon[i], e.lat[i]] }, properties: { m: e.mag[i], d: e.depth[i], y: e.year[i], s: e.src[i], t: e.mt[i], k, i } });
+      if (below6 && mag[i] >= 6) continue;
+      feats[j++] = { type: 'Feature', geometry: { type: 'Point', coordinates: [lon[i], lat[i]] }, properties: { m: mag[i], d: depth[i], y: year[i], k, i } };
     }
   };
-  add(events.e6, 6);
-  if (events.e5) add(events.e5, 5, (i) => events.e5.mag[i] < 6);
+  add(events.e6, 6, false);
+  if (events.e5) add(events.e5, 5, true);
+  feats.length = j;
   return { type: 'FeatureCollection', features: feats };
+}
+
+/** Source and magnitude-type codes of an event feature, from the columns of its file. */
+function eventRow(p) {
+  const e = p.k === 6 ? events.e6 : events.e5;
+  return e ? { s: e.src[p.i], t: e.mt[p.i] } : { s: null, t: null };
 }
 
 export function preloadM6() {
@@ -466,10 +526,43 @@ export function preloadM6() {
   });
 }
 
+/**
+ * The M >= 5 event columns (events_m5.json, 7.5 MB). A worker (events-worker.js) downloads and parses the file and
+ * hands the columns over as typed arrays, so the page does not stall on the parse; without workers (or if the worker
+ * cannot start) the file is parsed here as before. Shared by the map, the place card and Depth 3D.
+ */
+let m5Data = null;
+export function loadM5Columns() {
+  if (!m5Data) {
+    m5Data = new Promise((resolve, reject) => {
+      let w;
+      try { w = new Worker(new URL('./events-worker.js', import.meta.url)); } catch (e) { reject(e); return; }
+      w.onmessage = (m) => {
+        w.terminate();
+        if (!m.data.ok) { reject(new Error(m.data.error)); return; }
+        const cols = m.data.cols;
+        if (typeof cols.idText === 'string') {
+          let ids = null;
+          Object.defineProperty(cols, 'id', { enumerable: true, get: () => ids || (ids = cols.idText.split('\n')) });
+        }
+        resolve(cols);
+      };
+      w.onerror = (e) => { e.preventDefault(); w.terminate(); reject(new Error(e.message || 'events worker failed')); };
+      w.postMessage({ url: new URL('data/events_m5.json', document.baseURI).href });
+    }).catch((e) => {
+      // a download error is reported as such; anything else (no worker support, a blocked worker) uses the old path
+      if (/could not be loaded/.test(e.message)) throw e;
+      console.warn('events worker unavailable, parsing on the main thread:', e);
+      return getJSON('events_m5.json');
+    }).catch((e) => { m5Data = null; throw e; });
+  }
+  return m5Data;
+}
+
 export function loadM5() {
   if (events.e5) return Promise.resolve(events.e5);
   if (!events.loading5) {
-    events.loading5 = getJSON('events_m5.json').then((e5) => {
+    events.loading5 = loadM5Columns().then((e5) => {
       events.e5 = e5;
       if (map.getSource('events')) map.getSource('events').setData(eventsGeoJSON());
       return e5;
@@ -507,13 +600,34 @@ export function eventFilterValues() {
   return { y0: st.y0 ?? events.years[0], y1: st.y1 ?? events.years[1], minM };
 }
 
+/**
+ * Events with y0 <= year < y1 + 1 and mag >= minM; the M5-6 rows of events_m5.json too when withM5. Remembered for
+ * the last few filters: the legend, the rail and the Simple view ask for the same count several times per change.
+ */
+const countMemo = new Map();
+export function countEvents(y0, y1, minM, withM5) {
+  const key = `${y0}|${y1}|${minM}|${withM5 && events.e5 ? 1 : 0}|${events.e6 ? events.e6.n : 0}`;
+  if (countMemo.has(key)) return countMemo.get(key);
+  let n = 0;
+  const count = (e, below6) => {
+    const { year, mag } = e;
+    for (let i = 0; i < e.n; i++) {
+      const m = mag[i];
+      if (below6 && m >= 6) continue;
+      if (m >= minM && year[i] >= y0 && year[i] < y1 + 1) n++;
+    }
+  };
+  if (events.e6) count(events.e6, false);
+  if (withM5 && events.e5) count(events.e5, true);
+  if (countMemo.size > 16) countMemo.clear();
+  countMemo.set(key, n);
+  return n;
+}
+
 function evCountText() {
   if (!events.e6) return '';
   const { y0, y1, minM } = eventFilterValues();
-  let n = 0;
-  const count = (e, keep) => { for (let i = 0; i < e.n; i++) if (e.year[i] >= y0 && e.year[i] < y1 + 1 && e.mag[i] >= minM && (!keep || keep(i))) n++; };
-  count(events.e6);
-  if (C.state.ev === 5 && events.e5) count(events.e5, (i) => events.e5.mag[i] < 6);
+  const n = countEvents(y0, y1, minM, C.state.ev === 5);
   return t('ev.count', { n: f.int(n), y0, y1, m: minM.toFixed(1) });
 }
 
@@ -535,7 +649,7 @@ function eventTipNode(p, foot) {
   const codes = (events.e6 || {}).codes || { src: {}, mt: {} };
   return h('div', {},
     h('div', { class: 'tt-main' }, h('strong', { text: `M ${f.mag(p.m)}` }), ` ${f.decYearDate(p.y)}`),
-    h('div', { class: 'tt-sub', text: t('ev.depthLine', { d: f.int(p.d), mt: codes.mt[String(p.t)] || '' }) }),
+    h('div', { class: 'tt-sub', text: t('ev.depthLine', { d: f.int(p.d), mt: codes.mt[String(eventRow(p).t)] || '' }) }),
     h('div', { class: 'tt-foot', text: foot || t('ev.clickLink') }));
 }
 
@@ -551,10 +665,10 @@ function openEventPopup(hit) {
       h('dt', { text: t('ev.date') }), h('dd', { text: t('ev.dateVal', { d: f.decYearDate(p.y) }) }),
       h('dt', { text: t('ev.depth') }), h('dd', { text: `${f.int(p.d)} ${t('unit.km')}` }),
       h('dt', { text: t('ev.location') }), h('dd', { text: f.latlon(e.lat[p.i], e.lon[p.i]) }),
-      h('dt', { text: t('ev.magnitude') }), h('dd', { text: codes.mt[String(p.t)] || '' }),
-      h('dt', { text: t('ev.in') }), h('dd', { text: codes.src[String(p.s)] || '' })),
+      h('dt', { text: t('ev.magnitude') }), h('dd', { text: codes.mt[String(eventRow(p).t)] || '' }),
+      h('dt', { text: t('ev.in') }), h('dd', { text: codes.src[String(eventRow(p).s)] || '' })),
     id
-      ? h('a', { href: `https://earthquake.usgs.gov/earthquakes/eventpage/${encodeURIComponent(id)}`, target: '_blank', rel: 'noopener', text: t('ev.usgs', { id }) })
+      ? h('a', { href: `https://earthquake.usgs.gov/earthquakes/eventpage/${encodeURIComponent(id)}`, ...EXT, text: t('ev.usgs', { id }) })
       : h('p', { class: 'muted', style: 'margin:0', text: t(p.k === 5 ? 'ev.noIdM5' : 'ev.noId') }));
   if (popup) popup.remove();
   popup = new maplibregl.Popup({ closeButton: true, maxWidth: '290px', focusAfterOpen: true })
@@ -604,11 +718,7 @@ function simpleFilter() {
 export function simpleCount() {
   if (!events.e6) return 0;
   const { y0, y1, minM } = simpleFilterValues();
-  let n = 0;
-  const count = (e, keep) => { for (let i = 0; i < e.n; i++) if (e.year[i] >= y0 && e.year[i] < y1 + 1 && e.mag[i] >= minM && (!keep || keep(i))) n++; };
-  count(events.e6);
-  if (minM < 6 && events.e5) count(events.e5, (i) => events.e5.mag[i] < 6);
-  return n;
+  return countEvents(y0, y1, minM, minM < 6);
 }
 
 export const getEvents = () => events;
@@ -686,12 +796,12 @@ export function setPlace(pl) {
 /** Fly to a place so its counting circle fits, leaving room for the place card. */
 export function showPlace(lat, lon, r) {
   if (!map) return;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = reduceMotion();
   const dLat = r / 111, dLon = r / (111 * Math.max(0.2, Math.cos((lat * Math.PI) / 180)));
   const wide = innerWidth > 720;
   const H = map.getContainer().clientHeight;
   const pad = wide ? { top: 80, bottom: 80, left: 80, right: 80 } : { top: 120, bottom: Math.round(H * 0.55), left: 30, right: 30 };
-  map.fitBounds([[lon - dLon * 3, lat - dLat * 3], [lon + dLon * 3, lat + dLat * 3]], { padding: pad, maxZoom: 6, duration: reduce ? 0 : 900 });
+  map.fitBounds([[lon - dLon * 3, clampLat(lat - dLat * 3)], [lon + dLon * 3, clampLat(lat + dLat * 3)]], { padding: pad, maxZoom: 6, duration: reduce ? 0 : 900 });
 }
 
 function simpleMove(e) {
@@ -701,7 +811,7 @@ function simpleMove(e) {
     const hits = map.queryRenderedFeatures([[e.point.x - r, e.point.y - r], [e.point.x + r, e.point.y + r]], { layers: ['sx-dots'] });
     return hits.length ? hits.reduce((a, b) => (b.properties.m > a.properties.m ? b : a)) : null;
   })() : null;
-  if (evHit) showTip(e.point, eventTipNode(evHit.properties, t('sx.tipClick')));
+  if (evHit) showTip(e.point, () => eventTipNode(evHit.properties, t('sx.tipClick')), `sx|${evHit.properties.k}|${evHit.properties.i}`);
   else hideTip();
   map.getCanvas().style.cursor = 'pointer';
 }
@@ -736,12 +846,12 @@ export function clearRegion() {
 
 export function fitBbox([w, s, e, n]) {
   if (!map) return;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = reduceMotion();
   // keep the region clear of the legend card (bottom left on desktop, top left on phones)
   const wide = innerWidth > 720;
   const legend = document.getElementById('legend');
   const lw = legend ? legend.offsetWidth + 32 : 40;
-  map.fitBounds([[w, s], [e, n]], { padding: { top: wide ? 40 : 60, bottom: 40, left: wide ? Math.min(lw, map.getContainer().clientWidth / 2) : 40, right: wide ? 80 : 40 }, maxZoom: 7, duration: reduce ? 0 : 900 });
+  map.fitBounds([[w, clampLat(s)], [e, clampLat(n)]], { padding: { top: wide ? 40 : 60, bottom: 40, left: wide ? Math.min(lw, map.getContainer().clientWidth / 2) : 40, right: wide ? 80 : 40 }, maxZoom: 7, duration: reduce ? 0 : 900 });
 }
 
 /** Regional cells always use the b-value classes and the same quality rules as the global b layer. */

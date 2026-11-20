@@ -6,15 +6,11 @@ import { h, forestChart } from './charts.js';
 import { qPill } from './panel.js';
 import { t } from './i18n/index.js';
 import { infoButton } from './info.js';
+import { distKm } from './util.js';
 
 const hasB = (p, d) => p && (p[`${d}_q`] === 'A' || p[`${d}_q`] === 'B') && f.isNum(p[`${d}_b`]);
 
-export function distanceKm(a, b) {
-  const R = 6371.0088, rad = Math.PI / 180;
-  const dLat = (b.lat - a.lat) * rad, dLon = (b.lon - a.lon) * rad;
-  const s = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
-}
+export const distanceKm = (a, b) => distKm(a.lat, a.lon, b.lat, b.lon);
 
 /**
  * {kind: 'missing'|'overlap'|'separate', ...}. Pure: depends only on the two cells' intervals.

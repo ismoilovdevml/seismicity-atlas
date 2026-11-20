@@ -1137,4 +1137,9 @@ export default {
   "an.w.unstable": "Chegara 0.2 va 0.4 ga oshirilganda b oʻzgaradi: namuna toʻliq boʻlmasligi yoki Mc dan yuqorida eksponensial boʻlmasligi mumkin.",
   "an.w.small": "Chegaradan yuqorida faqat {n} ta hodisa; kichik namunada b eng katta hodisalarga sezgir boʻladi.",
   "an.w.mcTime": "Yillik Mc {lo} dan {hi} gacha oʻzgaradi: toʻliqlik vaqt bilan oʻzgargan. Davr boʻyicha chegaralar bering yoki vaqt oraligʻini qisqartiring; aks holda yagona Mc b ni buzadi.",
+  "rail.close": "Xarita sozlamalarini yopish",
+  "map.north": "Xaritani shimolga qaytarish",
+  "bm.terrainError": "3D relyefni yuklab boʻlmadi: AWS Terrain Tiles balandlik plitkalari kelmadi. U oʻchirildi; keyinroq qayta urinib koʻring.",
+  "sx.n5": "M5+ zilzilalar",
+  "sx.noneHere5": "{y0}–{y1} yillarda {km} km ichida magnitudasi 5 yoki undan katta zilzila qayd etilmagan. Kichikroqlari boʻlgan boʻlishi mumkin va bu kuchli zilzila boʻlmaydi degani emas.",
 };

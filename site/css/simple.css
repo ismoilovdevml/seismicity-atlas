@@ -103,7 +103,6 @@
   display: flex; flex-direction: column; min-height: 0;
 }
 .sx-card:focus { outline: none; }
-.sx-card .panel-grip { display: none; }
 .sx-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 20px 22px 10px; }
 .sx-card-head h2 { margin: 0; font-size: 22px; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; }
 .sx-card-head .meta { margin: 4px 0 0; font-size: 13.5px; color: var(--ink-3); }
@@ -186,8 +185,7 @@ body[data-tour='search'] .sx-search input { outline: 2px solid var(--accent); ou
     position: absolute; z-index: 26; grid-column: auto; grid-row: auto; left: 0; right: 0; bottom: 0; width: auto; max-height: 62%; border: 0;
     border-radius: 16px 16px 0 0; box-shadow: 0 -6px 20px rgba(22, 25, 29, 0.14);
   }
-  .sx-card .panel-grip { display: block; align-self: center; width: 40px; height: 4px; border-radius: 2px; background: var(--rule-strong); margin-top: 8px; flex: none; }
-  .sx-card-head { padding: 8px 16px 6px; }
+  .sx-card-head { padding: 14px 16px 6px; }
   .sx-card-head h2 { font-size: 19px; }
   .sx-card-head .icon-btn { width: 44px; height: 44px; }
   .sx-card-body { padding: 4px 16px 20px; gap: 14px; }

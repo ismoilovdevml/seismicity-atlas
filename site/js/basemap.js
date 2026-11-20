@@ -7,6 +7,7 @@ import { getJSON } from './data.js';
 import { h } from './charts.js';
 import { t } from './i18n/index.js';
 import { defineKeys, commit, intIn } from './hashx.js';
+import { reduceMotion } from './util.js';
 
 defineKeys([
   { key: 'rl', def: 1, parse: intIn(0, 1) },
@@ -86,12 +87,52 @@ function reliefPaint() {
 }
 function waterLine() { return cssVar('--water-line') || (isDark() ? '#3f4c57' : '#a7b5bf'); }
 
-export function attach(m, st) {
+let onTerrainError = null;
+export function attach(m, st, opts = {}) {
   map = m;
   state = st;
+  onTerrainError = opts.onTerrainError || null;
   mountControls();
   mountAttribution();
+  mountNorth();
+  watchTerrainTiles();
   relabel();
+}
+
+// ---------- fallback when the outside elevation tiles fail ----------
+
+// AWS Terrain Tiles are the only outside source. When several of their tiles fail and none has loaded (offline,
+// blocked, the service down), 3D terrain is switched off and the hint says why, instead of a tilted, empty map.
+let demOk = false, demErrors = 0, terrainFailed = false;
+function watchTerrainTiles() {
+  map.on('data', (e) => { if ((e.sourceId === 'dem' || e.sourceId === 'dem-shade') && e.tile) demOk = true; });
+  map.on('error', (e) => {
+    if (!(e.sourceId === 'dem' || e.sourceId === 'dem-shade')) return;
+    demErrors++;
+    if (demOk || demErrors < 3 || !state || !state.tr) return;
+    terrainFailed = true;
+    state.tr = 0;
+    apply();
+    commit();
+    if (onTerrainError) onTerrainError();
+  });
+}
+
+// ---------- north arrow: shown while the map is rotated (3D terrain lets it turn) ----------
+
+function mountNorth() {
+  if ($('north-btn')) return;
+  const btn = h('button', { type: 'button', class: 'map-btn', id: 'north-btn', hidden: true });
+  btn.insertAdjacentHTML('afterbegin', '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l4 9h-8z" fill="currentColor" stroke="none"/><path d="M8 12l4 9 4-9" fill="none"/></svg>');
+  document.querySelector('.map-buttons').append(btn);
+  btn.addEventListener('click', () => map.easeTo({ bearing: 0, duration: reduceMotion() ? 0 : 300 }));
+  const sync = () => {
+    const b = map.getBearing();
+    btn.hidden = Math.abs(b) < 0.5;
+    btn.firstElementChild.style.transform = `rotate(${-b}deg)`;
+  };
+  map.on('rotate', sync);
+  sync();
 }
 
 function $(id) { return document.getElementById(id); }
@@ -128,9 +169,10 @@ function mountAttribution() {
 export function relabel() {
   if (!$('bm-group')) return;
   $('bm-title').textContent = t('bm.group');
+  if ($('north-btn')) { $('north-btn').setAttribute('aria-label', t('map.north')); $('north-btn').title = t('map.north'); }
   $('lbl-relief').textContent = t('bm.relief');
   $('lbl-terrain').textContent = t('bm.terrain');
-  $('bm-hint').textContent = t(state && state.tr ? 'bm.terrainOnHint' : 'bm.hint');
+  $('bm-hint').textContent = hintText();
   if ($('attrib-terrain-short')) {
     $('attrib-terrain-short').textContent = t('bm.terrainAttrib');
     $('attrib-terrain-more').textContent = t('bm.terrainAttribMore');
@@ -182,12 +224,19 @@ export function apply() {
   map.setLayoutProperty('rivers', 'visibility', vis(rl));
   if (tr !== terrainOn) setTerrain(tr);
   $('attrib-terrain').hidden = !tr;
-  $('bm-hint').textContent = t(tr ? 'bm.terrainOnHint' : 'bm.hint');
+  if (tr) terrainFailed = false;
+  $('bm-hint').textContent = hintText();
+}
+
+function hintText() {
+  if (terrainFailed) return t('bm.terrainError');
+  return t(state && state.tr ? 'bm.terrainOnHint' : 'bm.hint');
 }
 
 function setTerrain(on) {
   terrainOn = on;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (on) demErrors = 0;
+  const reduce = reduceMotion();
   if (on) {
     map.setTerrain({ source: 'dem', exaggeration: TERRAIN_EXAGGERATION });
     map.dragRotate.enable();

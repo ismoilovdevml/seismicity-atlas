@@ -1,13 +1,5 @@
-/* Case studies view (cases.js) and the seismic-deficit panel (deficit.js). Tokens from app.css. */
-
-/* b classes as tokens, the same six steps as layers.js B_LIGHT (Crameri vik) and B_DARK */
-:root { --df-ok: #2a78d6; --df-def: #eb6834; --b-0: #001261; --b-1: #05528a; --b-2: #5d9cbb; --b-3: #cf8c66; --b-4: #a74310; --b-5: #590008; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) { --df-ok: #3987e5; --df-def: #d95926; --b-0: #4a7cc0; --b-1: #7ea3d3; --b-2: #b4c9e2; --b-3: #ebc08f; --b-4: #de9550; --b-5: #c06a30; }
-}
-:root[data-theme='dark'] { --df-ok: #3987e5; --df-def: #d95926; --b-0: #4a7cc0; --b-1: #7ea3d3; --b-2: #b4c9e2; --b-3: #ebc08f; --b-4: #de9550; --b-5: #c06a30; }
-.bc0 { --bc: var(--b-0); } .bc1 { --bc: var(--b-1); } .bc2 { --bc: var(--b-2); }
-.bc3 { --bc: var(--b-3); } .bc4 { --bc: var(--b-4); } .bc5 { --bc: var(--b-5); }
+/* Case studies view (cases.js); loaded when the view first opens (app.js). Tokens (b classes) and the seismic-deficit
+   panel and legend, which are on the map, are in app.css. */
 
 .cs-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
 .cs-tabs a { font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--rule); color: var(--ink-3); text-decoration: none; }
@@ -31,7 +23,7 @@
 .cs-ms .mono { font-family: var(--mono); font-size: 12px; }
 .cs-ms-kind { color: var(--ink-3); }
 .cs-corr { font-size: 14px; max-width: 72ch; margin-top: 8px !important; }
-.cs-btable td.muted, .cs-btable td.muted .detail { color: var(--ink-3); opacity: 0.75; }
+.cs-btable td.muted, .cs-btable td.muted .detail { color: var(--ink-3); font-style: italic; } /* no opacity: 6.3:1 light, 7.1:1 dark */
 .cs-vtable td:nth-child(2) { min-width: 200px; }
 .cs-tally { margin: 0 0 8px; }
 
@@ -58,40 +50,9 @@
 .cs-map-legend .sw.outline { background: var(--land); border: 1.2px solid var(--ink-3); }
 .cs-map-cap { margin-top: 8px !important; }
 
-/* seismic-deficit panel and legend */
-.df-panel { display: flex; flex-direction: column; gap: 14px; }
-.df-head { padding: 14px 16px; border-radius: 10px; border: 1px solid var(--v-ok-bd); background: var(--v-ok-bg); }
-.df-head strong { color: var(--v-ok-fg); font-size: 15px; }
-.df-head p { margin: 4px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
-.df-zone { border: 1px solid var(--rule); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
-.df-zone.few { background: var(--surface-2); }
-.df-zone h3 { margin: 0; font-size: 15px; }
-.df-ratio { font-family: var(--mono); font-size: 18px; color: var(--ink); }
-.df-zone p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
-.df-zone .df-few { color: var(--v-na-fg); }
-.df-caveats { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.5; color: var(--ink-2); display: grid; gap: 4px; }
-.df-src { font-size: 12px; color: var(--ink-3); overflow-wrap: anywhere; }
-.lg-df { display: flex; flex-direction: column; gap: 4px; }
-.lg-df strong { color: var(--ink); font-size: 12.5px; }
-.lg-df .lg-rows { margin: 2px 0; }
-.sw-dfok { background: var(--df-ok); }
-.sw-dfdef { background: var(--df-def); }
-
 @media (max-width: 720px) {
   .cs-summary { padding: 16px; }
   .cs-points li { font-size: 15px; }
   .cs-map-row { grid-template-columns: minmax(0, 1fr); }
   .cs-seg label { padding: 0 8px; font-size: 12.5px; }
 }
-
-.df-opts { margin: 6px 0 0 26px; display: flex; flex-direction: column; gap: 6px; }
-.df-row { display: flex; align-items: center; gap: 6px; }
-.df-h { margin: 0 0 6px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
-.df-zone-links { display: flex; flex-wrap: wrap; gap: 6px; }
-.df-zone-links [aria-pressed='true'] { border-color: var(--accent); color: var(--accent); }
-.df-head.some { border-color: var(--v-na-bd); background: var(--v-na-bg); }
-.df-head.some strong { color: var(--v-na-fg); }
-.df-facts { font-size: 12.5px; grid-template-columns: minmax(0, 1fr); gap: 2px 0; }
-.df-facts dd { margin-bottom: 6px; overflow-wrap: anywhere; }
-.df-disclaimer { font-size: 13px; }
-.lg-df .df-headline { font-weight: 600; color: var(--v-ok-fg); }

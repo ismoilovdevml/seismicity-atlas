@@ -5,9 +5,6 @@ import { getJSON, mb } from './data.js';
 import * as M from './map.js';
 import { renderPanel, renderCellList } from './panel.js';
 import { renderCompare } from './compare.js';
-import { renderSequences, renderMethods, renderAbout } from './pages.js';
-import { renderMonitor, focusSequence } from './monitor.js';
-import { renderCases } from './cases.js';
 import { initDeficit, renderDeficitPanel, relabelDeficit } from './deficit.js';
 import { SUBS, layerName, subLabel } from './layers.js';
 import * as f from './fmt.js';
@@ -15,8 +12,21 @@ import { h } from './charts.js';
 import { t, setLang, LANGS } from './i18n/index.js';
 import { readExtras, writeExtras, setCommit } from './hashx.js';
 import { placeRailInfo } from './info-rail.js';
-import * as D from './depth3d.js';
+import './view-keys.js'; // URL keys of the views below that load on demand
+import { loadCss, reduceMotion } from './util.js';
 import { initSimple, syncSimple, relabelSimple, startTour, openPlace, loadM5 as simpleLoadM5 } from './simple.js';
+
+// Views that are not visible at start load their code (and style sheet) on first use.
+const lazyMods = {};
+const lazy = (name) => lazyMods[name] || (lazyMods[name] = {
+  pages: () => import('./pages.js'),
+  monitor: () => import('./monitor.js'),
+  cases: () => import('./cases.js'),
+  depth: () => import('./depth3d.js'),
+  learn: () => import('./learn/view.js'),
+  analyze: () => import('./analyze/view.js'),
+}[name]().catch((e) => { delete lazyMods[name]; throw e; }));
+const VIEW_CSS = { depth: 'css/terrain3d.css', learn: 'css/learn.css', analyze: 'css/analyze.css', cases: 'css/cases.css' };
 
 const VIEWS = ['map', 'sequences', 'monitor', 'cases', 'methods', 'about', 'depth', 'learn', 'analyze'];
 const LAYERS = ['b', 'q', 'mc', 'cc', 'rate', 'none'];
@@ -139,21 +149,40 @@ function hashOf(s) {
 }
 
 let writing = false;
+let appliedHash = null; // the hash the state was last read from or written to
 function commit(push = false) {
   const hs = hashOf(state);
+  appliedHash = hs;
   if (hs === location.hash) return;
   writing = true;
   history[push ? 'pushState' : 'replaceState'](null, '', hs);
   writing = false;
 }
 
+// A link click fires both popstate and hashchange; Back between pushState entries may fire only popstate. Both call
+// applyHash, which skips a hash it has already applied, so the map updates once.
 window.addEventListener('hashchange', () => { if (!writing) applyHash(); });
 window.addEventListener('popstate', () => applyHash());
 
+// Keys of a plain navigation link (the header, the brand, "About the data", Learn links). Such a link changes the view
+// only: the map state (position, layer, selected cell, filters, regional catalogue, place card) is kept, so going to
+// a page and back returns to the same map.
+const NAV_KEYS = new Set(['v', 'lang', 'mode', 't', 's', 'cs']);
+const PAGE_KEYS = ['v', 'lang', 'mode', 't', 's', 'cs'];
+// Views hidden from the Simple view's menu: a Simple visitor there is sent to the map.
+const PRO_VIEWS = ['sequences', 'methods'];
+
 async function applyHash() {
+  if (location.hash === appliedHash) return;
+  appliedHash = location.hash;
   // Navigation links such as "#v=about" carry no language: keep the one in use.
   const s = parseHash(state.lang, state.mode, state.g);
   const hp = new URLSearchParams(location.hash.replace(/^#/, ''));
+  const navOnly = [...hp.keys()].every((k) => NAV_KEYS.has(k));
+  if (navOnly) {
+    for (const k of Object.keys(state)) if (!PAGE_KEYS.includes(k)) s[k] = state[k];
+  }
+  if (s.mode === 'simple' && PRO_VIEWS.includes(s.v)) s.v = 'map';
   const hashHadLang = hp.has('lang') && hp.has('mode');
   const modeChanged = s.mode !== state.mode;
   const viewChanged = s.v !== state.v;
@@ -180,53 +209,67 @@ async function applyHash() {
   }
   syncSimple();
   if (state.v === 'cases' && caseChanged) { rendered.delete('cases'); showView('cases'); }
-  if (state.v === 'monitor' && seqChanged && rendered.has('monitor')) focusSequence(state.s);
+  if (state.v === 'monitor' && seqChanged && rendered.has('monitor')) lazy('monitor').then((m) => m.focusSequence(state.s)).catch(() => {});
   else if (viewChanged) window.scrollTo(0, 0);
-  // Put the language back into the URL so a reload keeps it.
-  if (!hashHadLang) commit();
+  // Put the language (and, after a navigation link, the kept map state) back into the URL so a reload keeps it.
+  if (!hashHadLang || navOnly) commit();
 }
 
 // ---------------------------------------------------------------- views
 
+let shownView = null;
 function showView(v) {
   for (const id of VIEWS) document.getElementById(`view-${id}`).hidden = id !== v;
   document.querySelectorAll('.nav a').forEach((a) => (a.dataset.view === v ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current')));
-  document.getElementById('nav').classList.remove('open');
-  document.getElementById('menu-btn').setAttribute('aria-expanded', 'false');
+  closeMenu();
   const site = t('title.site');
   document.title = v === 'map' ? `${site}: ${t('title.tagline')}` : `${t(`title.${v}`)} | ${site}`;
+  // Leaving a view: stop what it runs in the background (the WebGL scene, Learn animations).
+  if (shownView !== v) {
+    if (shownView === 'depth' && lazyMods.depth) lazyMods.depth.then((D) => { if (state.v !== 'depth') D.hide(); }).catch(() => {});
+    if (shownView === 'learn' && lazyMods.learn) lazyMods.learn.then((m) => { if (state.v !== 'learn' && m.leaveLearn) m.leaveLearn(); }).catch(() => {});
+    shownView = v;
+  }
   if (v === 'learn') { showLearn(); return; }
   if (v === 'analyze') { showAnalyze(); return; }
   if (!ctx.manifest) return;
   if (v === 'map') { M.resize(); return; }
   if (v === 'depth') {
     if (!ctx.cells) { ensureCells().then(() => { if (state.v === 'depth') showView('depth'); }).catch(() => {}); return; }
-    D.show(document.getElementById('depth-root'), { state, manifest: ctx.manifest, cells: ctx.cells });
+    withView('depth', (D) => D.show(document.getElementById('depth-root'), { state, manifest: ctx.manifest, cells: ctx.cells }));
     return;
   }
   if (rendered.has(v)) return;
   rendered.add(v);
   const pageCtx = { manifest: ctx.manifest, showOnMap, state };
-  if (v === 'sequences') renderSequences(document.getElementById('seq-root'), pageCtx);
-  if (v === 'monitor') renderMonitor(document.getElementById('monitor-root'), pageCtx);
-  if (v === 'cases') renderCases(document.getElementById('cases-root'), pageCtx);
-  if (v === 'methods') renderMethods(document.getElementById('methods-root'), pageCtx);
-  if (v === 'about') renderAbout(document.getElementById('about-root'), pageCtx);
+  const root = (id) => document.getElementById(id);
+  if (v === 'sequences') withView('pages', (m) => m.renderSequences(root('seq-root'), pageCtx), v);
+  if (v === 'monitor') withView('monitor', (m) => m.renderMonitor(root('monitor-root'), pageCtx), v);
+  if (v === 'cases') withView('cases', (m) => m.renderCases(root('cases-root'), pageCtx), v);
+  if (v === 'methods') withView('pages', (m) => m.renderMethods(root('methods-root'), pageCtx), v);
+  if (v === 'about') withView('pages', (m) => m.renderAbout(root('about-root'), pageCtx), v);
+}
+
+/**
+ * Load a view's module and style sheet, then run fn(module) if that view is still the one shown. view: the view whose
+ * style sheet to wait for (defaults to the module name). A failed load leaves the view to try again on the next visit.
+ */
+function withView(name, fn, view = name) {
+  const css = VIEW_CSS[view] ? loadCss(VIEW_CSS[view]) : null;
+  // left before it loaded: render on the next visit instead
+  Promise.all([lazy(name), css]).then(([m]) => { if (state.v === view) fn(m); else rendered.delete(view); })
+    .catch((e) => { rendered.delete(view); console.error(e); });
 }
 
 /** "Your catalogue" loads on demand; the file stays in the browser (js/analyze/view.js). */
 function showAnalyze() {
-  import('./analyze/view.js')
-    .then((m) => m.renderAnalyze($('analyze-root')))
-    .catch((e) => { console.error(e); });
+  withView('analyze', (m) => m.renderAnalyze($('analyze-root')));
 }
 
 let learnBack = null;
 /** The Learn pages load on demand, so the map's first load stays the same. */
 function showLearn() {
-  import('./learn/view.js')
-    .then((m) => m.renderLearn($('learn-root'), { topic: state.t, back: learnBack }))
-    .catch((e) => { console.error(e); });
+  withView('learn', (m) => m.renderLearn($('learn-root'), { topic: state.t, back: learnBack }));
 }
 
 function showOnMap(s) {
@@ -323,21 +366,22 @@ function wireControls() {
   $('chk-m5').addEventListener('change', (e) => { state.ev = e.target.checked ? 5 : (state.ev ? 6 : 0); state.mm = e.target.checked ? 5 : Math.max(6, state.mm); update(); ensureEvents(); });
   document.querySelectorAll('#chips [data-layer]').forEach((c) => c.addEventListener('click', () => { state.l = c.dataset.layer; state.m = ''; update(); }));
   $('chip-depth').addEventListener('click', () => { state.d = state.d === 'sh' ? 'dp' : 'sh'; update(); });
-  $('chip-more').addEventListener('click', () => {
-    const open = !$('controls').classList.contains('open');
-    $('controls').classList.toggle('open', open);
-    $('chip-more').setAttribute('aria-expanded', String(open));
-  });
-  const yr = () => {
+  $('chip-more').addEventListener('click', () => setRail(!$('controls').classList.contains('open')));
+  $('rail-close').addEventListener('click', () => { setRail(false); $('chip-more').focus({ preventScroll: true }); });
+  // Sliders fire an input event per step while dragged: the slider labels follow at once, the map, the counts and
+  // the URL once per frame.
+  const yr = (e) => {
     let y0 = +$('yr0').value, y1 = +$('yr1').value;
-    if (y0 > y1) { if (document.activeElement === $('yr0')) y1 = y0; else y0 = y1; }
+    if (y0 > y1) { if (e.target === $('yr0')) y1 = y0; else y0 = y1; }
     state.y0 = y0; state.y1 = y1;
+    $('yr0-out').textContent = String(y0);
+    $('yr1-out').textContent = String(y1);
     if (y0 === evYears[0] && y1 === evYears[1]) { state.y0 = null; state.y1 = null; }
-    update();
+    scheduleUpdate();
   };
   $('yr0').addEventListener('input', yr);
   $('yr1').addEventListener('input', yr);
-  $('mmin').addEventListener('input', (e) => { state.mm = +e.target.value; update(); });
+  $('mmin').addEventListener('input', (e) => { state.mm = +e.target.value; $('mmin-out').textContent = state.mm.toFixed(1); scheduleUpdate(); });
   $('menu-btn').addEventListener('click', () => {
     const open = !$('nav').classList.contains('open');
     $('nav').classList.toggle('open', open);
@@ -359,10 +403,35 @@ function wireControls() {
   });
   $('nav-theme').addEventListener('click', () => $('theme-btn').click());
   $('lang-select').addEventListener('change', async (e) => { state.lang = e.target.value; saveLang(state.lang); await applyLang(); commit(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('panel').hidden && state.v === 'map') closePanel(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if ($('nav').classList.contains('open')) { closeMenu(); $('menu-btn').focus({ preventScroll: true }); return; }
+    if ($('controls').classList.contains('open') && state.v === 'map') { setRail(false); $('chip-more').focus({ preventScroll: true }); return; }
+    if (!$('panel').hidden && state.v === 'map') closePanel();
+  });
+}
+
+/** The map controls drawer on phones (the rail is always shown on wider screens). */
+function setRail(open) {
+  $('controls').classList.toggle('open', open);
+  $('chip-more').setAttribute('aria-expanded', String(open));
+  if (open) $('rail-close').focus({ preventScroll: true });
+}
+
+function closeMenu() {
+  $('nav').classList.remove('open');
+  $('menu-btn').setAttribute('aria-expanded', 'false');
+}
+
+let updateFrame = 0;
+/** update() once in the next frame, however many slider steps arrive before it. */
+function scheduleUpdate() {
+  if (updateFrame) return;
+  updateFrame = requestAnimationFrame(() => { updateFrame = 0; update(); });
 }
 
 function update(push = false) {
+  if (updateFrame) { cancelAnimationFrame(updateFrame); updateFrame = 0; }
   syncControls();
   if (mapReady) M.applyLayers();
   syncPanel();
@@ -388,7 +457,12 @@ function applyMode() {
   const tag = $('brand-tag');
   tag.dataset.i18n = simple ? 'brand.tagSimple' : 'brand.tag';
   tag.textContent = t(tag.dataset.i18n);
-  if (simple) { $('panel').hidden = true; panelFor = null; M.hideTip(); } else ensureCells().catch(() => {});
+  if (simple) {
+    $('panel').hidden = true; panelFor = null; M.hideTip();
+    // the Simple view has no 3D terrain switch: leave it with a flat map it can control
+    if (state.tr) state.tr = 0;
+  } else ensureCells().catch(() => {});
+  fitHeader();
   if (mapReady) { M.applyLayers(); M.resize(); }
 }
 
@@ -436,6 +510,8 @@ function setMode(m) {
   saveMode(m); // an explicit choice, also when that mode is already shown (e.g. opened from a shared link)
   if (m === state.mode) return;
   state.mode = m;
+  // Sequences and Validation are not in the Simple view's menu: show the map instead of a page it cannot reach
+  if (m === 'simple' && PRO_VIEWS.includes(state.v)) { state.v = 'map'; showView('map'); }
   applyMode();
   update(true);
   if (m === 'pro' && state.c) syncPanel();
@@ -582,6 +658,7 @@ async function selectRegion(id, fly) {
   const meta = id ? regions.find((r) => r.id === id) : null;
   ctx.rById.clear();
   if (!meta) {
+    regionLoading = null; // a catalogue still loading must not appear after "None"
     state.r = null;
     if (mapReady) M.clearRegion();
     $('reg-status').textContent = t('reg.hint');
@@ -612,8 +689,14 @@ async function selectRegion(id, fly) {
 
 // ---------------------------------------------------------------- language
 
+// Language files load one after another, so a slow file chosen first can never replace the one chosen last.
+let langQueue = Promise.resolve();
+const loadLang = (code) => (langQueue = langQueue.then(() => setLang(code)).catch((e) => console.error(e)));
+
 async function applyLang() {
-  await setLang(state.lang);
+  const want = state.lang;
+  await loadLang(want);
+  if (want !== state.lang) return; // a newer choice is on its way and relabels everything itself
   setThemeLabel();
   if (ctx.manifest) $('brand-meta').textContent = t('meta.brand', { v: ctx.manifest.version, cutoff: ctx.manifest.data_cutoff_utc });
   if (regions.length) renderRegionOptions();
@@ -634,6 +717,33 @@ function setHexLine() {
   if (!ctx.cells || !ctx.manifest) return;
   const a = ctx.cells.features.reduce((s, ft) => s + ft.properties.area_km2, 0) / ctx.cells.features.length;
   $('pro-hex').textContent = t('pro.hex', { area: f.int(Math.round(a / 1000) * 1000), r: f.int(ctx.manifest.method.sample_radius_km) });
+}
+
+// ---------------------------------------------------------------- header fit
+
+/**
+ * The header links collapse into the menu button whenever they do not fit in one row next to the brand and the
+ * controls: the width that needs depends on the language (RU and UZ labels are long) and on the mode (Scientist has
+ * two more links), so it is measured rather than set by a breakpoint. Phones (<= 720 px) always use the menu.
+ */
+function fitHeader() {
+  const top = document.querySelector('.top');
+  if (!top) return;
+  if (innerWidth <= 720) { top.classList.remove('compact'); return; }
+  const was = top.classList.contains('compact');
+  top.classList.remove('compact');
+  const name = top.querySelector('.brand-name');
+  const over = top.scrollWidth > top.clientWidth + 1 || (name && name.scrollWidth > name.clientWidth + 1);
+  top.classList.toggle('compact', over);
+  if (was && !over) closeMenu();
+}
+
+let headerFrame = 0;
+function watchHeader() {
+  const later = () => { if (!headerFrame) headerFrame = requestAnimationFrame(() => { headerFrame = 0; fitHeader(); }); };
+  addEventListener('resize', later);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(later);
+  fitHeader();
 }
 
 // ---------------------------------------------------------------- theme
@@ -658,10 +768,34 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if
 
 // ---------------------------------------------------------------- start
 
+// MapLibre (1 MB) is a classic script; index.html preloads it, and it runs while the data below download.
+const MAPLIBRE_JS = 'vendor/maplibre-gl-5.24.0/maplibre-gl.js';
+function loadMaplibre() {
+  if (window.maplibregl) return Promise.resolve(window.maplibregl);
+  return new Promise((resolve, reject) => {
+    const sc = document.createElement('script');
+    sc.src = MAPLIBRE_JS;
+    sc.onload = () => (window.maplibregl ? resolve(window.maplibregl) : reject(new Error(`${MAPLIBRE_JS} did not load.`)));
+    sc.onerror = () => reject(new Error(`${MAPLIBRE_JS} could not be loaded (network error).`));
+    document.head.append(sc);
+  });
+}
+
 async function start() {
   Object.assign(state, parseHash());
+  if (state.mode === 'simple' && PRO_VIEWS.includes(state.v)) state.v = 'map';
   setCommit(commit);
-  await setLang(state.lang);
+  // Everything independent starts at once: the language file, the manifest, the base map, the map library and the
+  // M6 events; nothing waits for a download it does not need.
+  const langP = loadLang(state.lang);
+  const manifestP = getJSON('manifest.json');
+  const needCells = state.mode === 'pro' || state.v === 'depth';
+  if (needCells) ensureCells().catch(() => {});
+  for (const k of ['land.geojson', 'coastline.geojson', 'plates.geojson']) getJSON(k).catch(() => {});
+  const libP = loadMaplibre();
+  manifestP.catch(() => {});
+  libP.catch(() => {}); // both reported below, once awaited
+  await langP;
   wireControls();
   initSimple({ state, ctx, update, openExpert });
   applyMode();
@@ -669,13 +803,14 @@ async function start() {
   syncControls();
   showView(state.v);
   setThemeLabel();
+  watchHeader();
   const status = $('map-status');
   try {
-    ctx.manifest = await getJSON('manifest.json');
+    ctx.manifest = await manifestP;
     $('brand-meta').textContent = t('meta.brand', { v: ctx.manifest.version, cutoff: ctx.manifest.data_cutoff_utc });
+    fitHeader();
     $('stat-window').textContent = ctx.manifest.method.b_catalogue.replace('-', '–');
     // The Scientist view and Depth 3D wait for the cells; the Simple view starts without them.
-    const needCells = state.mode === 'pro' || state.v === 'depth';
     const files = [...(needCells ? ['cells.geojson'] : []), 'land.geojson', 'coastline.geojson', 'plates.geojson'];
     const total = files.reduce((s, k) => s + ctx.manifest.files[k].bytes, 0);
     let done = 0;
@@ -685,6 +820,9 @@ async function start() {
     setHexLine();
     syncEventControls();
     showView(state.v); // pages can render now that the manifest is here
+    // the M6 events (the Simple view's dots) download while the map library starts
+    getJSON('events_m6.json').catch(() => {});
+    await libP;
     await M.initMap({
       ...ctx,
       lookup,
@@ -693,6 +831,7 @@ async function start() {
       onSimpleZoom: () => syncSimple(),
       onView: (v) => { state.at = v; commit(); },
       onEventsLoaded: (ev) => { evYears = ev.years; syncEventControls(); if (mapReady) M.applyLayers(); syncSimple(); },
+      onTerrainError: () => { state.tr = 0; commit(); },
     }, { land, coast, plates });
     mapReady = true;
     status.hidden = true;

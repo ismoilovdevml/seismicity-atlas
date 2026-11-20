@@ -11,10 +11,10 @@ import { h, svgEl, xyChart, forestChart } from './charts.js';
 import { getJSON } from './data.js';
 import { t } from './i18n/index.js';
 import { infoButton } from './info.js';
-import { defineKeys, oneOf } from './hashx.js';
+import { CASES } from './view-keys.js';
+import { EXT, loadPage } from './util.js';
 
-export const CASES = ['groningen'];
-defineKeys([{ key: 'cs', def: 'groningen', parse: oneOf(CASES) }]);
+export { CASES };
 
 const DIR = 'induced/groningen';
 const B_BREAKS = [0.8, 0.9, 1.0, 1.1, 1.2]; // the b classes of the map (layers.js), colours in --b-0 … --b-5
@@ -22,22 +22,14 @@ const KNMI_DOI = '10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5';
 // Phase keys by start month (labels in the data are English; the site translates them).
 const PHASE = { '1991-01': 'pre', '2003-01': 'rise', '2014-01': 'restr', '2019-01': 'out', '2023-10': 'after' };
 
-const errorBox = (root, e, retry) => root.replaceChildren(h('p', { class: 'error', role: 'alert' }, `${e.message} `,
-  h('button', { class: 'small-btn', type: 'button', onclick: retry, text: t('common.retry') })));
-
 const decYear = (ym) => +ym.slice(0, 4) + (+ym.slice(5, 7) - 0.5) / 12;
 const phaseName = (p) => t(`cs.ph.${PHASE[p.start] || 'pre'}`);
 const bClass = (v) => { let i = 0; while (i < B_BREAKS.length && v >= B_BREAKS[i]) i++; return i; };
 const bInt = (o) => (o && f.isNum(o.b) ? f.interval(o.b, o.lo, o.hi) : '–');
 
 export function renderCases(root, ctx) {
-  const run = () => {
-    root.replaceChildren(h('div', { class: 'loading', role: 'status', text: t('common.loading', { what: t('cs.loadingWhat') }) }));
-    Promise.all(['index', 'rates', 'btime', 'bmap', 'validation'].map((n) => getJSON(`${DIR}/${n}.json`)))
-      .then(([idx, rates, btime, bmap, val]) => draw(root, { idx, rates, btime, bmap, val }, ctx))
-      .catch((e) => errorBox(root, e, run));
-  };
-  run();
+  loadPage(root, t('cs.loadingWhat'), () => Promise.all(['index', 'rates', 'btime', 'bmap', 'validation'].map((n) => getJSON(`${DIR}/${n}.json`))),
+    ([idx, rates, btime, bmap, val]) => draw(root, { idx, rates, btime, bmap, val }, ctx));
 }
 
 function draw(root, D, ctx) {
@@ -344,7 +336,7 @@ function sources(idx, kind) {
   const doiLink = (txt) => {
     const i = txt.indexOf(`doi:${KNMI_DOI}`);
     if (i < 0) return [txt];
-    return [txt.slice(0, i), h('a', { href: `https://doi.org/${KNMI_DOI}`, target: '_blank', rel: 'noopener', text: `doi:${KNMI_DOI}` }), txt.slice(i + KNMI_DOI.length + 4)];
+    return [txt.slice(0, i), h('a', { href: `https://doi.org/${KNMI_DOI}`, ...EXT, text: `doi:${KNMI_DOI}` }), txt.slice(i + KNMI_DOI.length + 4)];
   };
   if (kind === 'short') {
     return h('p', { class: 'cs-attrib' }, h('span', { class: 'lbl', text: `${t('cs.dataFrom')} ` }),

@@ -3,6 +3,7 @@
 // The numbers shown in the place card come only from these functions (docs/ux-notes.md, "v0.3 two-mode redesign").
 
 import { getJSON } from './data.js';
+import { distKm } from './util.js';
 
 // ---------------------------------------------------------------- gazetteer and search
 
@@ -91,15 +92,8 @@ export function nearestPlace(rows, lat, lon) {
 
 // ---------------------------------------------------------------- events around a point
 
-const R_EARTH = 6371.0;
-const rad = (d) => (d * Math.PI) / 180;
-
-/** Great-circle distance (haversine, spherical Earth of radius 6371 km). */
-export function distKm(lat1, lon1, lat2, lon2) {
-  const dlat = rad(lat2 - lat1), dlon = rad(lon2 - lon1);
-  const a = Math.sin(dlat / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dlon / 2) ** 2;
-  return 2 * R_EARTH * Math.asin(Math.min(1, Math.sqrt(a)));
-}
+// Great-circle distance (haversine, spherical Earth of radius 6371 km): util.js, re-exported for the places tests.
+export { distKm };
 
 export const DEPTH_CLASSES = [70, 300]; // km: shallow ≤ 70 < intermediate ≤ 300 < deep
 export const depthClass = (d) => (d <= DEPTH_CLASSES[0] ? 'sh' : d <= DEPTH_CLASSES[1] ? 'mid' : 'deep');
@@ -112,31 +106,38 @@ function medianOf(a) {
 }
 
 /**
- * Statistics of the M6+ events (events_m6.json columns) within radiusKm of a point, recorded in the years
- * y0..y1 inclusive (decimal year >= y0 and < y1 + 1).
- * Returns { n6, n7, largest, recent, medianDepth, depthClass } where largest and recent are
- * { m, y, d, lat, lon, id } (largest: highest magnitude, ties to the more recent; recent: latest time).
+ * Statistics of the events (events_m6.json columns) within radiusKm of a point, recorded in the years y0..y1
+ * inclusive (decimal year >= y0 and < y1 + 1), of magnitude minM or more (6 by default). With minM < 6, e5 (the
+ * events_m5.json columns) adds its events below M6, so the card counts what the map shows.
+ * Returns { n6, n7, n5, largest, recent, medianDepth, depthClass } where n5/n6/n7 count M >= 5/6/7 (n5 only with e5),
+ * and largest and recent are { m, y, d, lat, lon, id } (largest: highest magnitude, ties to the more recent; recent:
+ * latest time), both among the events counted.
  */
-export function placeStats(e, lat, lon, radiusKm, y0, y1) {
-  let n6 = 0, n7 = 0, largest = null, recent = null;
+export function placeStats(e, lat, lon, radiusKm, y0, y1, { minM = 6, e5 = null } = {}) {
+  let n5 = 0, n6 = 0, n7 = 0, largest = null, recent = null;
   const depths = [];
   const dLat = radiusKm / 111.0 + 0.1;
-  for (let i = 0; i < e.n; i++) {
-    if (Math.abs(e.lat[i] - lat) > dLat) continue;
-    const y = e.year[i];
-    if (y < y0 || y >= y1 + 1) continue;
-    const m = e.mag[i];
-    if (m < 6) continue;
-    if (distKm(lat, lon, e.lat[i], e.lon[i]) > radiusKm) continue;
-    n6++;
-    if (m >= 7) n7++;
-    depths.push(e.depth[i]);
-    const ev = { m, y, d: e.depth[i], lat: e.lat[i], lon: e.lon[i], id: e.id ? e.id[i] : null };
-    if (!largest || m > largest.m || (m === largest.m && y > largest.y)) largest = ev;
-    if (!recent || y > recent.y) recent = ev;
-  }
+  const scan = (c, below6) => {
+    for (let i = 0; i < c.n; i++) {
+      if (Math.abs(c.lat[i] - lat) > dLat) continue;
+      const y = c.year[i];
+      if (y < y0 || y >= y1 + 1) continue;
+      const m = c.mag[i];
+      if (m < minM || (below6 && m >= 6)) continue;
+      if (distKm(lat, lon, c.lat[i], c.lon[i]) > radiusKm) continue;
+      n5++;
+      if (m >= 6) n6++;
+      if (m >= 7) n7++;
+      depths.push(c.depth[i]);
+      const ev = { m, y, d: c.depth[i], lat: c.lat[i], lon: c.lon[i], id: Array.isArray(c.id) ? c.id[i] : null };
+      if (!largest || m > largest.m || (m === largest.m && y > largest.y)) largest = ev;
+      if (!recent || y > recent.y) recent = ev;
+    }
+  };
+  scan(e, false);
+  if (minM < 6 && e5) scan(e5, true);
   const md = medianOf(depths);
-  return { n6, n7, largest, recent, medianDepth: md, depthClass: md === null ? null : depthClass(md) };
+  return { n5: minM < 6 && e5 ? n5 : null, n6, n7, largest, recent, medianDepth: md, depthClass: md === null ? null : depthClass(md) };
 }
 
 // ---------------------------------------------------------------- the cell under a point

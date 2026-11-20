@@ -1,20 +1,5 @@
-/* Relief and water tokens, the terrain credits box, and the "Depth 3D" view. Uses the tokens of app.css. */
-
-:root { --water-line: #a7b5bf; --d3-stage: #fbfaf7; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) { --water-line: #3f4c57; --d3-stage: #15181b; }
-}
-:root[data-theme='dark'] { --water-line: #3f4c57; --d3-stage: #15181b; }
-
-/* ---------- terrain credits on the map ---------- */
-.attrib-terrain {
-  position: absolute; right: 12px; bottom: 30px; z-index: 3; max-width: min(460px, calc(100% - 24px));
-  font-size: 11px; line-height: 1.45; color: var(--ink-4); background: color-mix(in srgb, var(--surface) 92%, transparent);
-  padding: 4px 8px; border-radius: 6px; border: 1px solid var(--rule);
-}
-.attrib-terrain .link-btn { font-size: 11px; margin: 0; padding: 0; }
-.attrib-terrain ul { margin: 4px 0 0; padding-left: 16px; max-height: 180px; overflow-y: auto; }
-@media (max-width: 720px) { .attrib-terrain { right: 6px; bottom: 22px; font-size: 10px; } }
+/* The "Depth 3D" view; loaded when the view first opens (app.js). Uses the tokens of app.css, where the relief and
+   water tokens and the terrain credits box live (they are on the map). */
 
 /* ---------- depth view ---------- */
 .depth-view .d3-root { max-width: 1400px; margin: 0 auto; padding: 24px 24px 56px; display: flex; flex-direction: column; gap: 16px; }

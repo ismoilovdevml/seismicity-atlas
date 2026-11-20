@@ -7,18 +7,26 @@ import { getJSON } from './data.js';
 
 const CAT = { fmd_iscgem: 'ISC-GEM Mw', fmd_comcat: 'ComCat as served' };
 
-const cell = (v) => {
+/**
+ * One CSV field (RFC 4180): quoted when it holds a quote, comma, CR, LF or #. A text field that a spreadsheet would
+ * read as a formula (starting with = + - @, a tab or CR) gets a leading apostrophe; numbers are written as they are.
+ */
+export const cell = (v) => {
   if (v === null || v === undefined) return '';
-  const s = String(v);
-  return /[",\n#]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  let s = String(v);
+  if (typeof v === 'string' && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  return /[",\r\n#]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 };
+
+// Values from data files inside a # comment line: a line break would end the comment early.
+const oneLine = (v) => String(v ?? '').replace(/[\r\n]+/g, ' ');
 
 /** Pure: build the CSV text. props = cell properties, det = parsed detail file or null. */
 export function cellCsv(props, det, meta) {
   const lines = [];
   lines.push(`# Global Seismicity Atlas, version ${meta.version}, data cut-off ${meta.cutoff}`);
-  lines.push(`# Cell ${props.id}${meta.region ? `, regional catalogue ${meta.region.catalogue} (${meta.region.licence})` : ''}`);
-  lines.push(`# Licence: ${meta.licence}. Cite the atlas and the source catalogues.`);
+  lines.push(`# Cell ${props.id}${meta.region ? `, regional catalogue ${oneLine(meta.region.catalogue)} (${oneLine(meta.region.licence)})` : ''}`);
+  lines.push(`# Licence: ${oneLine(meta.licence)}. Cite the atlas and the source catalogues.`);
   lines.push('# Field definitions: https://github.com/ismoilovdevml/seismicity-atlas/blob/main/docs/data-schema.md');
   if (!det) lines.push(`# No frequency-magnitude rows: ${meta.detailError ? 'the cell detail file could not be loaded' : 'this cell has no detail file'}.`);
   lines.push('section,depth,catalogue,name,magnitude,value');

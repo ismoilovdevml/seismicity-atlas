@@ -1137,4 +1137,9 @@ export default {
   "an.w.unstable": "b cambia al subir el umbral 0.2 y 0.4: la muestra puede estar incompleta o no ser exponencial por encima de Mc.",
   "an.w.small": "Solo {n} eventos sobre el umbral; en muestras pequeñas b depende de los eventos mayores.",
   "an.w.mcTime": "La Mc anual varía de {lo} a {hi}: la completitud cambió con el tiempo. Indique umbrales por periodo o un intervalo más corto; si no, una sola Mc sesga b.",
+  "rail.close": "Cerrar los controles del mapa",
+  "map.north": "Orientar el mapa al norte",
+  "bm.terrainError": "No se pudo cargar el terreno 3D: no llegaron las teselas de elevación de AWS Terrain Tiles. Se ha desactivado; inténtelo más tarde.",
+  "sx.n5": "terremotos M5+",
+  "sx.noneHere5": "En {y0}–{y1} no se registró ningún terremoto de magnitud 5 o más a menos de {km} km. Pudo haber otros más pequeños, y esto no significa que no pueda ocurrir ninguno.",
 };

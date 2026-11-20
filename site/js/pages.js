@@ -5,20 +5,14 @@ import { h, xyChart, forestChart, padDomain } from './charts.js';
 import { getJSON, mb } from './data.js';
 import { t } from './i18n/index.js';
 import { infoButton, infoKey } from './info.js';
-
-const errorBox = (root, e, retry) => root.replaceChildren(h('p', { class: 'error', role: 'alert' }, `${e.message} `, h('button', { class: 'small-btn', type: 'button', onclick: retry, text: t('common.retry') })));
-const loading = (root, what) => root.replaceChildren(h('div', { class: 'loading', role: 'status', text: t('common.loading', { what }) }));
+import { EXT, extLink, loadPage } from './util.js';
 
 // ---------------------------------------------------------------- sequences
 
 const qText = (q) => (q === 'insufficient' ? t('q.insufficient') : t('q.quality', { q }));
 
 export function renderSequences(root, ctx) {
-  const run = () => {
-    loading(root, t('seq.loadingWhat'));
-    getJSON('sequences.json').then((data) => drawSequences(root, data, ctx)).catch((e) => errorBox(root, e, run));
-  };
-  run();
+  loadPage(root, t('seq.loadingWhat'), () => getJSON('sequences.json'), (data) => drawSequences(root, data, ctx));
 }
 
 function drawSequences(root, data, ctx) {
@@ -71,7 +65,7 @@ function seqItem(s, ctx) {
   par(t('seq.nFit'), f.int(s.n_fit));
   par('Mcat', f.mag(s.mcat));
   par(t('seq.radius'), f.km(s.radius_km));
-  const head = h('div', { class: 'seq-head' }, h('h3', { text: s.place }), h('span', { class: 'seq-mag', text: `M ${f.mag(s.mag)}` }));
+  const head = h('div', { class: 'seq-head' }, h('h2', { text: s.place }), h('span', { class: 'seq-mag', text: `M ${f.mag(s.mag)}` }));
   const meta = h('p', { class: 'seq-meta', text: t('seq.meta', { date: f.isoDate(s.time), d: f.int(s.depth), loc: f.latlon(s.lat, s.lon) }) });
   const li = h('li', { class: 'seq' }, head, meta, h('div', { class: 'badges' }, badges), params);
   if (s.rate_counts && s.rate_bins_days) li.append(omoriChart(s));
@@ -143,11 +137,7 @@ function verdictEl(text) {
 }
 
 export function renderMethods(root, ctx) {
-  const run = () => {
-    loading(root, t('val.loadingWhat'));
-    Promise.all([getJSON('global.json'), getJSON('sequences.json')]).then(([g, sq]) => drawMethods(root, g, sq, ctx.manifest)).catch((e) => errorBox(root, e, run));
-  };
-  run();
+  loadPage(root, t('val.loadingWhat'), () => Promise.all([getJSON('global.json'), getJSON('sequences.json')]), ([g, sq]) => drawMethods(root, g, sq, ctx.manifest));
 }
 
 function drawMethods(root, g, sq, man) {
@@ -226,8 +216,8 @@ function drawMethods(root, g, sq, man) {
     t('lim.3'), t('lim.4'), t('lim.5'), t('lim.6'), t('lim.7'),
   ].map((x) => h('li', { text: x }))));
   out.push(h('p', { class: 'hint' }, t('val.repo'),
-    h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/blob/main/docs/method.md', target: '_blank', rel: 'noopener', text: 'docs/method.md' }), ', ',
-    h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/blob/main/docs/validation.md', target: '_blank', rel: 'noopener', text: 'docs/validation.md' }), '.'));
+    h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/blob/main/docs/method.md', ...EXT, text: 'docs/method.md' }), ', ',
+    h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/blob/main/docs/validation.md', ...EXT, text: 'docs/validation.md' }), '.'));
   root.replaceChildren(...out);
 }
 
@@ -299,7 +289,7 @@ export function renderAbout(root, ctx) {
   const man = ctx.manifest;
   const out = [];
   out.push(h('h1', { text: t('nav.about') }));
-  out.push(h('p', { class: 'notice' }, h('strong', { text: `${t('about.notice')} ` }), `${t('disc.long')}${t('disc.strong')}`, ` ${t('about.hazard')} `, h('a', { href: 'https://maps.openquake.org/map/global-seismic-hazard-map/', target: '_blank', rel: 'noopener', text: 'GEM Global Seismic Hazard Map' }), ` ${t('about.linkOnly')}`, ' ', infoButton('not-a-forecast')));
+  out.push(h('p', { class: 'notice' }, h('strong', { text: `${t('about.notice')} ` }), `${t('disc.long')}${t('disc.strong')}`, ` ${t('about.hazard')} `, h('a', { href: 'https://maps.openquake.org/map/global-seismic-hazard-map/', ...EXT, text: 'GEM Global Seismic Hazard Map' }), ` ${t('about.linkOnly')}`, ' ', infoButton('not-a-forecast')));
   out.push(h('p', { class: 'prose as-is', id: 'about-asis', text: t('about.asIs') }));
   out.push(h('p', { class: 'lede', text: t('about.lede') }));
 
@@ -318,9 +308,9 @@ export function renderAbout(root, ctx) {
   out.push(h('ul', { class: 'src-list prose' }, man.sources.map((s) => h('li', {},
     h('strong', { text: s.name }), h('br'),
     s.attribution ? `${s.attribution}. ` : '',
-    `${t('about.licence')}: `, s.licence_url ? h('a', { href: s.licence_url, target: '_blank', rel: 'noopener', text: s.licence }) : s.licence, '. ',
+    `${t('about.licence')}: `, extLink(s.licence_url, s.licence), '. ',
     s.citation ? `${t('about.cite')}: ${s.citation}. ` : '', s.access ? `${t('about.access')}: ${s.access}. ` : '', s.query ? `${t('about.query')}: ${s.query}. ` : '',
-    h('a', { href: s.url, target: '_blank', rel: 'noopener', text: s.url })))));
+    extLink(s.url, s.url)))));
   out.push(h('ul', { class: 'prose' },
     h('li', {}, h('strong', { text: `${t('about.dataLic')}: ` }), `${man.licence.data}. ${t('about.shareAlike')}`,
       (man.licence.exceptions || []).length ? h('span', {}, ` ${t('about.exceptions')}: `, man.licence.exceptions.join('; '), '.') : null),
@@ -329,7 +319,7 @@ export function renderAbout(root, ctx) {
       `MapLibre GL JS 5.24.0, BSD 3-Clause (${t('about.vendored')}, `, h('a', { href: 'vendor/maplibre-gl-5.24.0/LICENSE.txt', text: t('about.licenceLink') }), '); ',
       `three.js 0.170.0, MIT (${t('about.vendored')}, `, h('a', { href: 'vendor/three-0.170.0/LICENSE', text: t('about.licenceLink') }), ').'),
     h('li', {}, h('strong', { text: `${t('about.colours')}: ` }), 'Crameri, F. (2023), Scientific colour maps 8.0.1, MIT, ',
-      h('a', { href: 'https://doi.org/10.5281/zenodo.8409685', target: '_blank', rel: 'noopener', text: 'doi:10.5281/zenodo.8409685' }), `. ${t('about.coloursUse')}`),
+      h('a', { href: 'https://doi.org/10.5281/zenodo.8409685', ...EXT, text: 'doi:10.5281/zenodo.8409685' }), `. ${t('about.coloursUse')}`),
     h('li', {}, h('strong', { text: `${t('about.terrainH')}: ` }), t('about.terrainTxt'), ' ', h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/blob/main/docs/basemap.md', text: 'docs/basemap.md' })),
     h('li', {}, h('strong', { text: `${t('about.fonts')}: ` }), `Inter, IBM Plex Mono, SIL Open Font License 1.1 (${t('about.vendored')}; `, h('a', { href: 'vendor/fonts/OFL-Inter.txt', text: 'Inter' }), ', ', h('a', { href: 'vendor/fonts/OFL-IBMPlexMono.txt', text: 'IBM Plex Mono' }), ').'),
     h('li', {}, h('strong', { text: `${t('about.notRedist')}: ` }), t('about.notRedistTxt'))));
@@ -337,7 +327,7 @@ export function renderAbout(root, ctx) {
   out.push(h('h2', { text: t('about.citeH') }));
   out.push(h('p', { class: 'cite', text: `Global Seismicity Atlas, version ${man.version}, data cut-off ${man.data_cutoff_utc}. Data licensed CC BY-SA 4.0. Derived from the ISC-GEM Global Instrumental Earthquake Catalogue (${(man.sources[0] || {}).citation || ''}) and USGS ComCat.` }));
   out.push(h('p', { class: 'cite' }, 'Ismoilov, O. (2026). A reproducible global atlas of earthquake-catalogue completeness and b-value with uncertainty. EarthArXiv preprint (not peer reviewed). ',
-    h('a', { href: 'https://doi.org/10.31223/X5X23M', target: '_blank', rel: 'noopener', text: 'doi:10.31223/X5X23M' })));
+    h('a', { href: 'https://doi.org/10.31223/X5X23M', ...EXT, text: 'doi:10.31223/X5X23M' })));
   out.push(h('p', { class: 'prose', text: t('about.citeAlso') }));
 
   out.push(h('h2', { text: t('about.downloadH') }));
@@ -348,15 +338,15 @@ export function renderAbout(root, ctx) {
     h('li', {}, `cells/<H3 id>.json: ${t('about.cellFiles', { n: f.int(man.cell_detail_files.count), size: mb(man.cell_detail_files.bytes) })}`),
     h('li', {}, t('about.csv'))));
   out.push(h('p', { class: 'prose' }, `${t('about.fields')}: `,
-    h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/blob/main/docs/data-schema.md', target: '_blank', rel: 'noopener', text: 'docs/data-schema.md' }),
+    h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/blob/main/docs/data-schema.md', ...EXT, text: 'docs/data-schema.md' }),
     ` ${t('about.inRepo')}`));
 
   out.push(h('h2', { id: 'about-privacy-h', text: t('about.privacyH') }));
   out.push(h('p', { class: 'prose', id: 'about-privacy' }, `${t('about.privacy')} ${t('about.privacyHost')} `,
-    h('a', { href: 'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement', target: '_blank', rel: 'noopener', text: t('about.privacyLink') }),
+    h('a', { href: 'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement', ...EXT, text: t('about.privacyLink') }),
     `. ${t('about.privacyTerrain')}`));
   out.push(h('h2', { id: 'about-a11y-h', text: t('about.a11yH') }));
   out.push(h('p', { class: 'prose', id: 'about-a11y' }, `${t('about.a11y')} ${t('about.a11yReport')} `,
-    h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/issues', target: '_blank', rel: 'noopener', text: 'github.com/ismoilovdevml/seismicity-atlas/issues' })));
+    h('a', { href: 'https://github.com/ismoilovdevml/seismicity-atlas/issues', ...EXT, text: 'github.com/ismoilovdevml/seismicity-atlas/issues' })));
   root.replaceChildren(...out);
 }
