@@ -29,10 +29,11 @@
 # Security headers for every response. The CSP lists what the site loads: its own files, the inline start-up script
 # of index.html (by hash; tests/e2e/test_headers.py checks the hash), inline style attributes (set by the scripts and
 # the static Learn pages), blob: workers and URLs (MapLibre, the event worker, CSV downloads), data: images, and the
-# only outside source, the AWS Terrain Tiles of the optional 3D terrain.
+# only outside sources: the AWS Terrain Tiles of the optional 3D terrain and the Cloudflare Web Analytics beacon
+# (injected by Cloudflare Pages: script from static.cloudflareinsights.com, reports to cloudflareinsights.com).
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), browsing-topics=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-/zQsfeCmUn/gTKfNviBKYXJhWsAi5/Xe+/fqDY+Q3Gw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' blob: https://s3.amazonaws.com; worker-src 'self' blob:; child-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-/zQsfeCmUn/gTKfNviBKYXJhWsAi5/Xe+/fqDY+Q3Gw=' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' blob: https://s3.amazonaws.com https://cloudflareinsights.com; worker-src 'self' blob:; child-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
