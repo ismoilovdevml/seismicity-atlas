@@ -3,11 +3,14 @@
 Selection : ComCat events M >= 7.5 since 1990-01-01, largest first; an event is skipped if it lies inside the
             space-time window of a larger selected mainshock. The first 40 independent mainshocks are kept.
 Window    : epicentral radius R = max(100 km, L), L = 10^(-2.44 + 0.59 M) (Wells & Coppersmith 1994, all types);
-            time 0-365 days after the mainshock.
+            depth within 100 km of the mainshock depth (since 0.6.0; monitorlib.depth_window); time 0-365 days
+            after the mainshock.
 Mcat      : MAXC + 0.2 of the sequence events in days 10-365 (never below 4.5).
 Fit       : omori_fit_mct (seislib): Omori-Utsu MLE with the time-dependent completeness
             Mc(t) = max(Mcat, Mm - 4.5 - 0.75 log10 t) (Helmstetter et al. 2006; Page et al. 2016), b = b-positive of
-            the sequence (1.0 if it cannot be estimated).
+            the sequence events at or above Mcat (1.0 if it cannot be estimated).
+Synthetic : the check removes the early events with the fit's own selection rule (binned M >= Mc(t) - 0.05);
+            before 0.6.0 it removed M < Mc(t), a stricter cut than the fit assumes, which biased p upwards.
 Quality   : A = n >= 100, sigma_p <= 0.10, 0.5 <= p <= 2, no other event >= Mm - 0.5 in the window;
             B = n >= 50, sigma_p <= 0.20, 0.5 <= p <= 2.5; else C. 'contaminated' marks a second large event.
             c_resolved is False when c < 0.001 day or has no standard error: with a teleseismic catalogue
@@ -24,21 +27,24 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "monitor"))
+import monitorlib as mon  # noqa: E402
 import seislib as sl  # noqa: E402
 from common import RES, SITE, jdump, load_work  # noqa: E402
 
 N_SEQ = 40
+N_SYNTH = 100     # synthetic sequences in the recovery check (20 before 0.6.0)
 
 
 def synthetic_check(rng=3):
     """Teleseismic-like synthetic: K, c, p known, magnitudes GR b=1 above 4.5, early part lost below Mc(t)."""
     rows = []
     r = np.random.default_rng(rng)
-    for s in range(20):
+    for s in range(N_SYNTH):
         p_true, c_true, K = 1.05, 0.05, 60.0
         t = sl.synth_omori(K, c_true, p_true, 0.0, 365.0, rng=r.integers(1e9))
         m = sl.synth_gr(t.size, 1.0, 4.5, rng=r.integers(1e9))
-        keep = m >= sl.mc_helmstetter(t, 8.0, 4.5) - 1e-9
+        keep = m >= sl.mc_helmstetter(t, 8.0, 4.5) - 0.05 + 1e-9   # the fit's selection (omori_fit_mct)
         f = sl.omori_fit_mct(t[keep], m[keep], 0.0, 365.0, 8.0, 4.5, 1.0)
         rows.append((f["p"], f["sp"], f["c"], f["n"]))
     a = np.array(rows)
@@ -51,7 +57,7 @@ def main():
     c = load_work("comcat")
     c = c[c.time >= pd.Timestamp("1990-01-01", tz="UTC")].reset_index(drop=True)
     tday = ((c.time - c.time.min()).dt.total_seconds() / 86400).to_numpy()
-    lat, lon, mag = c.lat.to_numpy(), c.lon.to_numpy(), c.mag.to_numpy()
+    lat, lon, mag, depth = c.lat.to_numpy(), c.lon.to_numpy(), c.mag.to_numpy(), c.depth.to_numpy(float)
     cand = np.where(mag >= 7.5)[0]
     cand = cand[np.argsort(-mag[cand], kind="stable")]
     chosen = []
@@ -72,11 +78,12 @@ def main():
         R = max(100.0, 10 ** (-2.44 + 0.59 * Mm))
         dt = tday - tday[i]
         d = sl.haversine_km(lat[i], lon[i], lat, lon)
-        sel = (dt > 0) & (dt <= 365) & (d <= R)
+        sel = (dt > 0) & (dt <= 365) & (d <= R) & mon.depth_window(depth, float(depth[i]))
         t, m = dt[sel], mag[sel]
         late = m[t >= 10]
         mcat = max(4.5, float(sl.mc_maxc(late, correction=0.2))) if late.size >= 20 else 4.5
-        bp = sl.b_positive(m[np.argsort(t)])
+        mo = sl.bin_mag(m[np.argsort(t)])
+        bp = sl.b_positive(mo[mo >= mcat - 0.05 + 1e-9])
         b = float(bp[0]) if np.isfinite(bp[0]) and bp[2] >= 50 else 1.0
         rec = {"id": c.id.iat[i], "time": c.time.iat[i].isoformat(), "lat": round(float(lat[i]), 3),
                "lon": round(float(lon[i]), 3), "depth": float(c.depth.iat[i]), "mag": Mm, "magtype": c.magtype.iat[i],

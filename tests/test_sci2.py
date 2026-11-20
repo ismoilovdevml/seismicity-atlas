@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+import pytest
 from scipy import stats
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -98,11 +99,39 @@ def test_zw_reference_and_gating():
     ref = ml.zw_reference_ratios()
     idx = [x[0] for x in ref]
     assert 16 not in idx and 25 not in idx and 18 not in idx and 23 not in idx  # M8.0 window, Mc>4.5, <100 events
-    tohoku_free = [x for x in ref if x[0] == 10][0]
-    want = 3298 / (0.04 * math.exp(2.3 * 4.5) * (1 - (1 + 4 * 365.25 / 0.03) ** (1 - 1.21)))
-    assert abs(tohoku_free[3] - want) < 1e-9
+    tohoku = [x for x in ref if x[0] == 10][0]
+    full = 0.04 * math.exp(2.3 * 4.5) * (1 - (1 + 4 * 365.25 / 0.03) ** (1 - 1.21))   # no Mc(t) term
+    # the reference expected count is above Mc(t), as for our sequences (audit fix): at M 9.0 it is 1.75 times
+    # smaller than the count above 4.5, so the reference ratio is 1.75 times larger than before 0.6.0
+    assert abs(tohoku[3] / (3298 / full) - 1.75) < 0.01, tohoku[3] / (3298 / full)
+    assert abs(tohoku[3] - 3298 / ml.zw_direct_count_mct(9.0, 4 * 365.25, 4.5)) < 1e-9
+    # with Mcat = 4.5 the per-sequence and reference expected counts are the same function
+    t, m = zw_synth(9.0, 4.5, 4 * 365.25, 1.0, 5)
+    r = ml.zw2020_productivity(t, m, 4 * 365.25, 9.0, 4.5, "SZ-GENERIC", 25.0)
+    assert abs(r["direct_count_zw"] - ml.zw_direct_count_mct(9.0, 4 * 365.25, 4.5)) < 1e-9
     assert 1 - ml.zw_omori_fraction(1e30) < 1e-5 and ml.zw_omori_fraction(0.0) == 0.0
     assert ml.zw2020_productivity(np.array([1.0]), np.array([5.0]), 10.0, 7.5, 4.5, "ANSR-SHALCON", 10.0) == \
         {"applicable": False, "reason": "not a subduction-zone regime"}
     r = ml.zw2020_productivity(np.array([1.0, 2.0]), np.array([5.0, 5.1]), 10.0, 7.5, 4.5, "SZ-GENERIC", 150.0)
     assert r["class"] == "insufficient" and r["in_calibration_range"] is False
+
+
+# ----------------------------------------------------------------------------------------------- N-test background
+def test_ntest_background_excludes_earlier_sequences_and_foreshocks():
+    import pandas as pd
+    import ntest_omori as nt
+    r = np.random.default_rng(8)
+    t_main = pd.Timestamp("2021-07-29", tz="UTC")
+    nb = 60                                   # independent background over the year, spread over 4 x 4 degrees
+    days = np.r_[r.uniform(-360, -40, nb), -200.0, -200.0 + sl.synth_omori(40, 0.05, 1.1, 0, 150, rng=9)[:600],
+                 -r.uniform(0, 10, 15)]       # + an M7.8 at day -200 with its aftershocks, + 15 foreshocks
+    n_seq = days.size - nb - 1 - 15
+    lat = np.r_[r.uniform(54, 58, nb), 55.0, 55.0 + r.normal(0, 0.15, n_seq), 56.0 + r.normal(0, 0.05, 15)]
+    lon = np.r_[r.uniform(-160, -156, nb), -158.0, -158.0 + r.normal(0, 0.15, n_seq), -157.0 + r.normal(0, 0.05, 15)]
+    mag = np.r_[np.full(nb, 3.0), 7.8, np.full(n_seq, 3.0), np.full(15, 3.0)]
+    pre = pd.DataFrame({"time": t_main + pd.to_timedelta(days, unit="D"), "latitude": lat, "longitude": lon, "mag": mag})
+    bm = nt.background_mags(pre, t_main)
+    # the background (less what falls inside the M7.8 window: Gardner-Knopoff removes that too) and the M7.8 itself,
+    # not its 600 aftershocks or the foreshocks; before 0.6.0 all 676 events counted
+    assert 0.6 * nb <= bm.size <= nb + 1 and 7.8 in bm, (bm.size, len(pre))
+    assert nt.background_count(bm, 3.0, 335.0) == pytest.approx(float(bm.size))

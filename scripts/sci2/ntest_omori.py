@@ -5,23 +5,28 @@ the rest of the first year, match the number of events that were later recorded?
 the model description on held-out data, not a forecast; nothing here is shown on the site.
 
 For each completed sequence (mainshock more than 365 days before the data end) and learning span L:
-- data and rules exactly as the monitor (scripts/monitor): ComCat M >= 2.5 within R of the epicentre, Mcat from
-  the learning data (MAXC + 0.2 after min(10 days, L/2)), Mc(t) of Helmstetter et al. (2006), Omori-Utsu MLE
-  above Mc(t) with b from b-positive (>= 50 differences) or 1.0;
+- data and rules exactly as the monitor (scripts/monitor): ComCat M >= 2.5 within R of the epicentre and within
+  100 km of the mainshock depth, Mcat from the learning data (MAXC + 0.2 after min(10 days, L/2)), Mc(t) of
+  Helmstetter et al. (2006), Omori-Utsu MLE above Mc(t) with b from b-positive above Mcat (>= 50 differences)
+  or 1.0;
 - the expected count above Mc(t) in (L, 365 days] is the integral of the fitted rate;
 - Poisson N-test (pyCSEP definition): delta1 = P(N >= n_obs), delta2 = P(N <= n_obs); a value below 0.025 rejects
   at the 5 % level (two-sided: too few / too many expected);
-- the same test with parameter uncertainty: a Poisson mixture over 200 bootstrap refits of the learning data
-  (skipped when fewer than 100 refits converge);
-- a diagnostic variant that adds a constant background: the rate of events above Mcat in the same circle in the
-  year before the mainshock (the Omori model itself has no background term).
+- the same test with parameter uncertainty: a Poisson mixture over NBOOT bootstrap refits of the learning data
+  (skipped when fewer than half converge). Each replicate draws its size from Poisson(n) (Poisson bootstrap), so
+  the refitted K carries the count uncertainty of the learning data; resampling exactly n events (before 0.6.0)
+  kept the count fixed and left that part out;
+- a diagnostic variant that adds a constant background: the rate of independent events above Mcat in the same
+  circle and depth window in the year before the mainshock, after Gardner-Knopoff declustering of that year, and
+  without the mainshock and the FORESHOCK_DAYS before it (the Omori model itself has no background term). Before
+  0.6.0 every event of that year counted, so earlier sequences entered the "background" (2021 Chignik: 2,074
+  events, mostly the 2020 M7.8 and M7.6 sequences, against 821 events observed after day 3).
 
 Output: results/sci2_ntest.json
 Usage: python -I scripts/sci2/ntest_omori.py
 """
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
@@ -32,17 +37,18 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 for p in (HERE, ROOT / "scripts", ROOT / "scripts" / "monitor"):
     sys.path.insert(0, str(p))
+import atlaslib as al  # noqa: E402
 import build_monitor as bm  # noqa: E402
 import monitorlib as ml  # noqa: E402
 import sci2lib as s2  # noqa: E402
 import seislib as sl  # noqa: E402
 from common import jdump  # noqa: E402
-from fetch import TooMany  # noqa: E402
 
 SEQUENCES = ["ci38457511", "us6000m0xl", "ak0219neiszm", "us6000qw60"]   # Ridgecrest, Noto, Chignik, Kamchatka
 LEARN_DAYS = [3.0, 10.0, 30.0]
 T_END = 365.0
-NBOOT = 200
+NBOOT = al.NBOOT          # refits per test (200 before 0.6.0)
+FORESHOCK_DAYS = 30.0     # days before the mainshock left out of the background year
 RNG = 20261114
 OUT = ROOT / "results" / "sci2_ntest.json"
 
@@ -57,25 +63,43 @@ def load(eid):
     q = {"latitude": round(float(ms.latitude), 4), "longitude": round(float(ms.longitude), 4),
          "maxradiuskm": round(R, 1), "starttime": ms.time.strftime("%Y-%m-%dT%H:%M:%S"),
          "endtime": end.strftime("%Y-%m-%dT%H:%M:%S"), "minmagnitude": bm.QUERY_MINMAG}
-    try:
-        ev = bm.comcat_csv(q)
-    except TooMany:
-        q["minmagnitude"] = 3.5
-        ev = bm.comcat_csv(q)
+    ev = bm.sequence_events(q)
     ev = ev[ev.id != ms.id]
     t = ((ev.time - ms.time).dt.total_seconds() / 86400).to_numpy()
-    k = (t > 0) & (t <= T_END)
-    # the year before the mainshock, same circle: background level (not part of the Omori model)
+    zmain = float(ms.depth) if pd.notna(ms.depth) else None
+    k = (t > 0) & (t <= T_END) & ml.depth_window(ev.depth.to_numpy(float), zmain)
+    # the year before the mainshock, same circle and depth window: background level (not part of the Omori model)
     qb = dict(q, starttime=(ms.time - pd.Timedelta(days=365)).strftime("%Y-%m-%dT%H:%M:%S"),
               endtime=ms.time.strftime("%Y-%m-%dT%H:%M:%S"))
-    pre = sl.bin_mag(bm.comcat_csv(qb).mag.to_numpy(float), ml.DM)
+    pre = bm.comcat_csv(qb)
+    pre = pre[(pre.id != ms.id) & (pre.time < ms.time) & ml.depth_window(pre.depth.to_numpy(float), zmain)]
     return ms, Mm, R, q["minmagnitude"], t[k], sl.bin_mag(ev.mag.to_numpy(float)[k], ml.DM), pre
+
+
+def background_mags(pre, t_main, foreshock_days=FORESHOCK_DAYS):
+    """Magnitudes (binned) of the independent events of the background year: events in the foreshock_days before
+    the mainshock are dropped, the rest is declustered with Gardner-Knopoff windows (seislib.decluster_gk), so
+    the aftershocks of earlier sequences do not count as background."""
+    if len(pre) == 0:
+        return np.array([])
+    days = ((pre.time - t_main).dt.total_seconds() / 86400).to_numpy()
+    keep = days < -foreshock_days
+    p = pre[keep]
+    if len(p) == 0:
+        return np.array([])
+    ind = sl.decluster_gk(days[keep], p.latitude.to_numpy(float), p.longitude.to_numpy(float), p.mag.to_numpy(float))
+    return sl.bin_mag(p.mag.to_numpy(float)[ind], ml.DM)
+
+
+def background_count(pre_m, mcat, test_days, year_days=365.0 - FORESHOCK_DAYS):
+    """Expected background events above Mcat in a window of test_days from the independent-event rate."""
+    return float((pre_m >= mcat - ml.DM / 2 + 1e-9).sum()) * test_days / year_days
 
 
 def fit_learning(t, m, L, Mm, floor):
     tl, mlrn = t[t <= L], m[t <= L]
     mcat, how = ml.estimate_mcat(tl, mlrn, L, floor)
-    bp = ml.b_positive_seq(tl, mlrn)
+    bp = ml.b_positive_seq(tl, mlrn, mcat)
     b = bp["b"] if bp["b"] is not None else 1.0
     f = ml.omori_fit(tl, mlrn, L, Mm, mcat, b)
     return f, mcat, how, b
@@ -91,6 +115,7 @@ def main():
     rows = []
     for eid in SEQUENCES:
         ms, Mm, R, qmin, t, m, pre = load(eid)
+        pre_m = background_mags(pre, ms.time)
         for L in LEARN_DAYS:
             f, mcat, how, b = fit_learning(t, m, L, Mm, qmin + 0.2)
             if f.get("quality") == "insufficient":
@@ -100,19 +125,20 @@ def main():
             n_obs = int((above & (t > L) & (t <= T_END)).sum())
             lam = expected_test(f, L, Mm, mcat, b)
             d1, d2 = s2.n_test_poisson(lam, n_obs)
-            # parameter uncertainty: bootstrap the learning events and refit (Mcat and b held at the learning values)
+            # parameter uncertainty: Poisson bootstrap of the learning events (size ~ Poisson(n)) and refit (Mcat
+            # and b held at the learning values)
             tl, mlrn = t[t <= L], m[t <= L]
             lams = []
             for _ in range(NBOOT):
-                k = rng.integers(0, tl.size, tl.size)
+                k = rng.integers(0, tl.size, rng.poisson(tl.size))
                 fb = ml.omori_fit(tl[k], mlrn[k], L, Mm, mcat, b)
                 if fb.get("quality") != "insufficient" and np.isfinite(fb["p"]):
                     lams.append(expected_test(fb, L, Mm, mcat, b))
             lams = np.array(lams)
             lams = lams[np.isfinite(lams)]
-            bg = float((pre >= mcat - 1e-9).sum()) * (T_END - L) / 365.0
+            bg = background_count(pre_m, mcat, T_END - L)
             db1, db2 = s2.n_test_poisson(lam + bg, n_obs)
-            m1, m2 = s2.n_test_mixture(lams, n_obs) if lams.size >= 100 else (float("nan"), float("nan"))
+            m1, m2 = s2.n_test_mixture(lams, n_obs) if lams.size >= NBOOT // 2 else (float("nan"), float("nan"))
             rows.append({
                 "id": eid, "place": ms.place, "time": bm.iso(ms.time), "mag": Mm, "depth": float(ms.depth),
                 "radius_km": round(R, 1), "query_minmag": qmin, "learn_days": L, "test_window_days": [L, T_END],
@@ -124,8 +150,11 @@ def main():
                 "boot_n": int(lams.size), "boot_expected_p2_5_p50_p97_5": [round(float(x), 1) for x in
                                                                           np.percentile(lams, [2.5, 50, 97.5])]
                 if lams.size else None,
-                "mixture_delta1": m1, "mixture_delta2": m2, "mixture_rejected_5pct": bool(lams.size >= 100 and min(m1, m2) < 0.025),
-                "pre_year_events_above_mcat": int((pre >= mcat - 1e-9).sum()), "background_test": round(bg, 1),
+                "mixture_delta1": m1, "mixture_delta2": m2,
+                "mixture_rejected_5pct": bool(lams.size >= NBOOT // 2 and min(m1, m2) < 0.025),
+                "pre_year_events_above_mcat": int((sl.bin_mag(pre.mag.to_numpy(float), ml.DM) >= mcat - 1e-9).sum()),
+                "pre_year_independent_above_mcat": int((pre_m >= mcat - 1e-9).sum()),
+                "background_test": round(bg, 1),
                 "ratio_obs_to_expected_plus_background": round(n_obs / (lam + bg), 3),
                 "with_background_delta1": db1, "with_background_delta2": db2,
                 "with_background_rejected_5pct": bool(min(db1, db2) < 0.025)})
@@ -137,7 +166,7 @@ def main():
     ok = [r for r in rows if "n_obs_test" in r]
     summary = {"tests": len(ok), "poisson_rejected": sum(r["poisson_rejected_5pct"] for r in ok),
                "mixture_rejected": sum(r["mixture_rejected_5pct"] for r in ok),
-               "mixture_tests": sum(r["boot_n"] >= 100 for r in ok),
+               "mixture_tests": sum(r["boot_n"] >= NBOOT // 2 for r in ok),
                "with_background_rejected": sum(r["with_background_rejected_5pct"] for r in ok),
                "over_predicted": sum(r["ratio_obs_expected"] < 1 for r in ok),
                "ratio_median": float(np.median([r["ratio_obs_expected"] for r in ok]))}

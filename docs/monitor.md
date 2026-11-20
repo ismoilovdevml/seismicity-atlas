@@ -22,8 +22,10 @@ Numbers below are from the build with data cut-off **2026-11-13 00:00 UTC**.
   - Example: the 2026-06-24 Venezuela M 7.2 came 33 s before the M 7.5, about 150 km away. It is listed inside
     the M 7.5 sequence, not as a sequence of its own.
 - **Window.** The atlas rule: radius R = max(100 km, 10^(−2.44 + 0.59 M)) (Wells & Coppersmith 1994, as in
-  `scripts/sequences.py`), from the mainshock to the cut-off. One ComCat query per sequence, M ≥ 2.5, as served
-  (mixed magnitude types).
+  `scripts/sequences.py`), depth within 100 km of the mainshock depth (since 0.6.0: the circle alone let shallow
+  background into the sequences of deep mainshocks), from the mainshock to the cut-off. One ComCat query per
+  sequence, M ≥ 2.5, as served (mixed magnitude types); above ComCat's 20,000-event limit the query is repeated at
+  M ≥ 3.5 and, if still too large, split in time.
 - **Overlaps.** Another M ≥ 6.5 event after the mainshock whose own circle intersects this one is listed; its
   aftershocks may be counted here. A second event within 0.5 units of the mainshock (inside the window or
   overlapping it) sets `contaminated`, which bars Omori quality A.
@@ -35,10 +37,10 @@ Numbers below are from the build with data cut-off **2026-11-13 00:00 UTC**.
 | Counts | all events, events ≥ Mcat, events in the last 7 days; daily counts; cumulative counts on a grid (1 h, 6 h, 12 h, then every day to the cut-off) |
 | Mcat | MAXC + 0.2 of the events after min(10 days, half the sequence age); 4.5 when fewer than 30 such events |
 | Mc(t) | max(Mcat, Mm − 4.5 − 0.75 log₁₀ t), t in days (Helmstetter et al. 2006; the F, G, H of Page et al. 2016 and the USGS) |
-| Omori-Utsu K, c, p | MLE on events above Mc(t), with the expected rate K (t + c)^−p 10^(−b (Mc(t) − Mcat)) (`seislib.omori_fit_mct`, the same fit as the Sequences page); b = sequence b-positive if ≥ 50 differences, else 1.0; 95 % intervals from the observed information (c on a log scale) |
+| Omori-Utsu K, c, p | MLE on events above Mc(t), with the expected rate K (t + c)^−p 10^(−b (Mc(t) − Mcat)) (`seislib.omori_fit_mct`, the same fit as the Sequences page); b = sequence b-positive if ≥ 50 differences, else 1.0; 95 % intervals from the observed information (c on a log scale; K with its covariance with p and c since 0.6.0); c ≥ 10⁻⁴ day, `c_at_bound` when the fit ends there |
 | Omori quality | as on the Sequences page: A = n ≥ 100, σp ≤ 0.10, 0.5 ≤ p ≤ 2, not contaminated; B = n ≥ 50, σp ≤ 0.20, 0.5 ≤ p ≤ 2.5; C otherwise; insufficient below 20 events above Mc(t) |
 | b | Aki-Utsu with each event's own threshold Mc(t) (`seislib.b_varmc`); 1000 bootstrap resamples of the sequence with Mcat re-estimated in each (200 before 0.5.0); shown only for A (95 % interval width / b ≤ 0.30) or B (≤ 0.50) with ≥ 50 events, as on the map |
-| b-positive | van der Elst (2021), differences ≥ 0.2, ± 1.96 σ, shown with ≥ 50 differences |
+| b-positive | van der Elst (2021), differences ≥ 0.2 of the events ≥ Mcat (since 0.6.0; before, every event ≥ 2.5), ± 1.96 σ, shown with ≥ 50 differences |
 | Largest aftershock | its magnitude and day, and ΔM = Mm − Mmax; Båth's law gives about 1.2 |
 | Productivity | see §3 |
 | Cumulative chart | observed count above Mc(t) and the fitted expected count, both from the mainshock to the cut-off only |
@@ -218,7 +220,9 @@ For our sequence:
 2. ratio = n / D, with n our count above Mc(t) (as for Page et al.); 95 % interval from the Poisson error of n and
    the standard error of K0 (0.02 on 0.04, delta method on log₁₀), so the interval is wide (about ×2.7 each side);
 3. our n contains secondary aftershocks and background events, so the ratio is normally above 1. The reference is
-   the same ratio for their own Case 3 sequences: their Table 2 count divided by D over their window, for the 14
+   the same ratio for their own Case 3 sequences: their Table 2 count divided by D over their window (with Mc(t) and
+   Mcat = 4.5, since 0.6.0: their NEIC counts miss the same early small aftershocks; before, D had no Mc(t) term
+   there, which made the reference ratios 1.12 / 1.34 / 1.75 times too low at M 8.0 / 8.5 / 9.0), for the 14
    sequences with Mc ≤ 4.5, ≥ 100 events and a window defined in their Table 1 (the two M 8.0 events fall between
    their magnitude classes). Reference ratios: median **2.89**, range **1.22–10.41**;
 4. `class` = "within" / "above" / "below" the reference range (point estimate), `ref_percentile` its position;
