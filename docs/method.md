@@ -29,11 +29,11 @@ does not depend on cell shape.
 
 | Radius | Shallow cells with b shown | Common cells with the 300 km run | Median \|Δb\| vs 300 km |
 |---|---|---|---|
-| 200 km | 78 | 77 | 0.044 |
-| 300 km | 172 | – | – |
-| 400 km | 329 | 172 | 0.040 |
+| 200 km | 57 | 57 | 0.034 |
+| 300 km | 136 | – | – |
+| 400 km | 245 | 136 | 0.033 |
 
-Release 0.5.0 (relative-width mask, 1000 replicates). Where b is shown, it changes by about 0.04 (median) between
+Release 0.6.0 (relative-width mask, 1000 replicates). Where b is shown, it changes by about 0.03 (median) between
 radii. The radius mainly decides how many cells
 reach the sample size.
 
@@ -54,8 +54,8 @@ reach the sample size.
 - **Ms proxy.** Ms uses Scordilis' bilinear slopes, 0.67 (Ms ≤ 6.1) and 0.99 (above), with intercepts from our
   pairs: 2.058 (1,084 pairs) and 0.073 (471 pairs).
 - **Test of the proxy (2004–2021, shallow, global).** At cutoffs 5.0–5.2, b from ComCat on the Mw proxy is
-  1.35–1.40, while ISC-GEM gives 1.05–1.09 for the same years (`docs/img/val_b_cutoff.png`). The two agree only
-  from 5.6 up: 1.077 vs 1.059. Any proxy slope rescales b directly (b_proxy = b_mb / slope).
+  1.36–1.42, while ISC-GEM gives 1.03–1.07 for the same years (`docs/img/val_b_cutoff.png`). The two agree only
+  from 5.6 up: 1.080 vs 1.075. Any proxy slope rescales b directly (b_proxy = b_mb / slope).
   - Conclusion: **no b-value is computed from mb-converted magnitudes.** The proxy is used only to put ComCat-only
     events on a common scale in the event layer (code `mt` = 2).
 
@@ -122,27 +122,29 @@ uncertainty, (c) a Tinti–Mulargia correction for magnitude error.
   magnitudes only. The direct sample is the same population, and it is what ISC-GEM itself prefers.
 - (c) does not fit the problem. Tinti & Mulargia (1985, BSSA 75(6)) show that Gaussian errors of constant size
   shift the a-value but leave b unbiased; the size-dependent correction moves a magnitude by only βσ²/2, about
-  0.05–0.18 for σ = 0.2–0.4. The proxies alone give b = 1.736 [1.633, 1.850] (`results/val_literature.json`,
+  0.05–0.18 for σ = 0.2–0.4. The proxies alone give b = 1.841 [1.730, 1.967] (`results/val_literature.json`,
   1982–2008, m ≥ 5.6), far more than noise explains. The excess comes from *which* events got proxies (GCMT
   missed them; mostly near the threshold) and from regression conversion, which biases b (Castellaro, Mulargia &
   Kagan 2006, GJI 165, 913). We did not separate the two parts.
 - (b) has no standard estimator to point to and would need its own validation; it was not adopted.
 
 **Cost.** 7,049 of 56,585 events of 1976–2021 (12.5 %) leave the b sample. The direct sample is less complete at
-small magnitudes in 1976–2003, so the shallow floors rise by 0.1 (§3). Shown shallow cells fell from 204 to 170 in
-v0.2 (with the absolute-width mask of that release; 172 since the relative mask of 0.5.0, §4).
+small magnitudes in 1976–2003, so its shallow floor for that period is higher: 6.3, against 5.7 for every event
+(0.6.0 binning, §3). Shown shallow cells fell from 204 to 170 in v0.2 (with the absolute-width mask of that
+release; 172 with the relative mask of 0.5.0 and 136 in 0.6.0, §4).
 
-**b-positive after the change (resolved, `bpositive.md`).** In the 77 shallow cells with b and b-positive in
-both versions, b fell by a median 0.022 while b-positive moved by +0.002. b-positive now lies inside the b
-interval in 65 % of shown cells (88 % in v0.1). The floors are not the cause:
-- raising them moves b by the same amount with or without the proxies;
-- Mc-Lilliefors gives 5.8 for the direct sample of 1976–2003.
+**b-positive after the change (resolved, `bpositive.md`).** In v0.2, in the 77 shallow cells with b and
+b-positive in both versions, b fell by a median 0.022 while b-positive moved by +0.002, and b-positive lay inside
+the b interval in 65 % of shown cells (88 % in v0.1). In 0.6.0 the share is 88 % again. The floors are not the
+cause:
+- raising them raises b with or without the proxies;
+- Mc-Lilliefors gives 5.8 for the direct sample of 1976–2003, below the 0.6.0 floor of 6.3.
 
-The left-out proxies are mostly early aftershocks (52 % of above-floor events in the first day after a larger
+The left-out proxies are mostly early aftershocks (49 % of above-floor events in the first day after a larger
 event, 4.4 % later). Leaving them out makes the direct sample transiently incomplete. On the same cells and
-floors, Aki-Utsu b falls by 0.024 and shuffled (order-free) b-positive by 0.026. b-positive in time order falls
-by only 0.011, because it is built to ignore transient incompleteness. No change to floors or estimator was
-justified.
+floors (0.6.0), b changes by −0.002 and shuffled (order-free) b-positive by −0.017; b-positive in time order by
+only −0.005, because it is built to ignore transient incompleteness (until 0.5.0: −0.024, −0.026 and −0.011). No
+change to floors or estimator was justified by this.
 
 **Official file.** With the official CSV (`scripts/iscgem_official.py`), the per-event source column would be the
 exact selector. The reader does not use it yet, because the current header could not be checked.
@@ -158,8 +160,11 @@ exact selector. The reader does not use it yet, because the current header could
 
   | Depth | 1976–2003 | 2004–2021 |
   |---|---|---|
-  | ≤ 70 km | **5.8** (MAXC 5.4, MBS 5.8, GFT 5.3; v0.1 5.7) | **5.3** (MAXC 5.2, MBS 5.3, GFT 5.0; v0.1 5.2) |
-  | > 70 km | **5.4** (MAXC 5.4, MBS 5.3, GFT 5.2; v0.1 5.4) | **5.2** (MAXC 5.2, MBS 5.1, GFT 5.0; v0.1 5.4) |
+  | ≤ 70 km | **6.3** (MAXC 5.5, MBS 6.3, GFT 5.3; 0.5.0 5.8; v0.1 5.7) | **5.2** (MAXC 5.2, MBS 5.0, GFT 5.0; 0.5.0 5.3; v0.1 5.2) |
+  | > 70 km | **5.5** (MAXC 5.5, MBS 5.3, GFT 5.2; 0.5.0 5.4; v0.1 5.4) | **5.3** (MAXC 5.3, MBS 5.1, GFT 5.0; 0.5.0 5.2; v0.1 5.4) |
+
+  The shallow 1976–2003 floor rose from 5.8 to 6.3 in 0.6.0 with the equal-width magnitude bins (ties rounded up,
+  `changes-0.6.md`): MBS now gives 6.3; the 5.8 of 0.5.0 came from the uneven tie binning.
 
 - **Per-event threshold.** Each event's threshold is max(cell Mc, floor of its period). Cell Mc is the MAXC + 0.2
   of the sample in the circle. A cell can therefore raise the threshold where the network was worse than
@@ -212,14 +217,14 @@ exact selector. The reader does not use it yet, because the current header could
 
   | True b | Shown, absolute rule | Mean shown b, absolute rule | Shown, relative rule | Mean shown b, relative rule |
   |---|---|---|---|---|
-  | 0.8 | 97.5 % | 0.810 | 77.0 % | 0.817 |
-  | 1.0 | 64.5 % | 0.972 | 73.0 % | 1.013 |
-  | 1.25 | 14.5 % | 1.109 | 73.5 % | 1.261 |
-  | 1.5 | 2.0 % | 1.242 | 74.0 % | 1.493 |
+  | 0.8 | 97.0 % | 0.812 | 74.5 % | 0.820 |
+  | 1.0 | 63.0 % | 0.974 | 70.0 % | 1.015 |
+  | 1.25 | 11.5 % | 1.093 | 68.5 % | 1.271 |
+  | 1.5 | 1.0 % | 1.191 | 69.0 % | 1.506 |
 
   The relative width is about 3.92 / √n whatever b is, so at a fixed number of events above the threshold the
-  share shown no longer depends on b, and the shown means are unbiased within the Aki-Utsu small-sample bias
-  (about b / n). **Remaining dependence:** at a fixed number of events above the *true* completeness, a high-b
+  share shown no longer depends on b, and the shown means are unbiased within the small-sample bias of the
+  maximum-likelihood b (about b / n). **Remaining dependence:** at a fixed number of events above the *true* completeness, a high-b
   cell still passes less often, because the MAXC + 0.2 threshold removes a larger share of its events. In the
   validation synthetic cells with 100 events above the true Mc, the median number above the threshold was 70.5
   for b < 1.05 and 41.5 for b ≥ 1.05 (one period; 75 and 41 with two periods), so 47 % and 4 % of them were shown
@@ -230,7 +235,7 @@ exact selector. The reader does not use it yet, because the current header could
   counts unchanged; the rest is the relative mask. Deeper cells have b below 1, so for them the relative rule is
   stricter than the old absolute one.
 - **Cutoff stability flag.** `*_unstable` is true when b at threshold + 0.2 and at + 0.4 both fall outside the
-  interval, on the same side. It is true for 2.9 % of shown shallow cells (4.7 % in 0.4.0).
+  interval, on the same side. It is true for 0.7 % of shown shallow cells (2.9 % in 0.5.0, 4.7 % in 0.4.0).
 - **Finite-sample bias.** Marzocchi et al. (2020) show that b from small samples is biased and correlates with
   the largest event in the sample, so apparent spatial b contrasts need significance checks. Adjacent cells
   overlap and are not independent. The site should compare two places only through their intervals.
@@ -240,28 +245,29 @@ exact selector. The reader does not use it yet, because the current header could
 b-positive (van der Elst 2021) is computed on successive positive magnitude differences ≥ 0.2, using events
 above the period floor in time order. It is insensitive to the short-term incompleteness after large events.
 
-- Shown cells: the median of b⁺ − b is +0.046 (v0.1, all events: +0.029).
-- b⁺ falls inside the bootstrap interval of b in 67.5 % of cells (0.4.0: 64.9 %; v0.1: 87.8 %; `results/validation.json`,
-  `cells_summary`). For iid Gutenberg-Richter data with the same cell sizes and floors, the share would be about
-  96 % and the median b⁺ − b +0.005 to +0.008. The excess has two parts, both in `bpositive.md`:
-  - Time order (v0.2 only). The direct-Mw sample misses early aftershocks, and b⁺ partly corrects for that.
-  - Order-free (already in v0.1). It is 4–6 times larger outside subduction zones, which fits a magnitude
-    distribution that bends at large M.
+- Shown cells: the median of b⁺ − b is +0.041 (v0.1, all events: +0.029).
+- b⁺ falls inside the bootstrap interval of b in 88.0 % of cells (0.5.0: 67.5 %; 0.4.0: 64.9 %; v0.1: 87.8 %;
+  `results/validation.json`, `cells_summary`). For iid Gutenberg-Richter data with the same cell sizes and floors,
+  the share would be about 97 % and the median b⁺ − b +0.002 to +0.005. The excess has two parts, both in
+  `bpositive.md`:
+  - Time order (since v0.2). The direct-Mw sample misses early aftershocks, and b⁺ partly corrects for that.
+  - Order-free (already in v0.1). It is larger outside subduction zones (about 4 times with every event, 2.5 times
+    on the direct sample), which fits a magnitude distribution that bends at large M.
 - Read a b⁺ well above b as a sign of aftershock gaps or a bending distribution, not of a wrong Mc.
 
 ## 6. Shallow vs deeper events, and declustering
 
 - **Depth classes.** ≤ 70 km and > 70 km are mapped separately (`sh_*`, `dp_*`). The two populations have
-  different b: globally, 1976–2021, direct Mw, b = 1.035 [1.018, 1.052] shallow (n = 15,725) and
-  0.936 [0.911, 0.961] deeper (n = 4,976). (v0.1, every event: 1.043 and 0.969.)
+  different b: globally, 1976–2021, direct Mw, b = 1.054 [1.036, 1.073] shallow (n = 12,985) and
+  0.924 [0.900, 0.955] deeper (n = 4,008). (v0.1, every event: 1.043 and 0.969.)
   - For the comparison with Michael (2014) we used his 60 km split.
 - **Declustering is not applied to the main b.** Gardner-Knopoff windows (as in ZMAP and OpenQuake), run within
   each depth class separately since 0.6.0 (the windows are epicentral, so on the whole catalogue a deep event
   removed shallow events above it), mark 51 % of
   ISC-GEM events as dependent. At M ≥ 6.5 the windows last years, so for a global M ≥ 5 catalogue they remove
   much more than aftershocks.
-  - Global shallow b falls from 1.035 to 0.887 [0.867, 0.907].
-  - Across shown cells, the median declustered-minus-full difference is −0.205.
+  - Global shallow b falls from 1.054 to 0.900 [0.878, 0.921].
+  - Across shown cells, the median declustered-minus-full difference is −0.222.
 
   A declustered b therefore mostly reflects the window choice. The declustered b is still published per cell
   (`*_bdecl`, with its interval) so the effect can be seen, but the map shows the full catalogue.
@@ -291,29 +297,30 @@ Mainshocks are ComCat M ≥ 7.5 since 1990, largest first. An event inside the s
 mainshock is skipped; for example, the 2005 Nias M 8.6 falls inside the 2004 Sumatra window. 40 sequences are
 kept.
 
-- **Space-time window.** Radius max(100 km, L), with L = 10^(−2.44 + 0.59 M) km (Wells & Coppersmith 1994), and
-  0–365 days after the mainshock.
+- **Space-time window.** Radius max(100 km, L), with L = 10^(−2.44 + 0.59 M) km (Wells & Coppersmith 1994),
+  depth within 100 km of the mainshock depth (since 0.6.0), and 0–365 days after the mainshock.
 - **Catalogue completeness Mcat.** MAXC + 0.2 of days 10–365, never below 4.5.
 - **Fit.** Omori-Utsu MLE that keeps the early part of the sequence by modelling the time-dependent completeness
   Mc(t) = max(Mcat, Mm − 4.5 − 0.75 log₁₀ t) (Helmstetter et al. 2006; Page et al. 2016). The b used in that
-  model is the sequence's b-positive.
+  model is the sequence's b-positive above Mcat. c is searched in [10⁻⁴ day, 365 days].
 - **Quality codes.**
   - `A`: n ≥ 100, σp ≤ 0.10, 0.5 ≤ p ≤ 2, and no second event within 0.5 units of the mainshock.
   - `B`: n ≥ 50, σp ≤ 0.20.
   - `C`: otherwise.
-  - Result: 17 A, 10 B, 8 C, 5 insufficient (mostly deep mainshocks with few aftershocks).
-- **`c_resolved`.** False for 7 of the 35 fits, where c < 0.001 day. A teleseismic catalogue misses the first hours, so c
+  - Result: 17 A, 11 B, 7 C, 5 insufficient (mostly deep mainshocks with few aftershocks).
+- **`c_resolved`.** False for 6 of the 35 fits, where c < 0.001 day (4 of them end at the lower bound,
+  `c_at_bound`). A teleseismic catalogue misses the first hours, so c
   is not constrained there; p and K remain usable.
-- **Synthetic check.** 20 teleseismic-like sequences (Mm 8, Mcat 4.5, true p 1.05, with Mc(t) losses) give mean
-  p 1.063, between-run SD 0.025 and mean σp 0.028.
+- **Synthetic check.** 100 teleseismic-like sequences (Mm 8, Mcat 4.5, true p 1.05, with Mc(t) losses) give mean
+  p 1.054, between-run SD 0.026 and mean σp 0.027.
 
 ## 10. Limitations
 
 1. **Catalogue cut-off.** The ComCat mirror of ISC-GEM ends in 2021. The b-map ignores 2022–2026 because only
    ComCat covers those years and its magnitudes are mixed (§2).
-2. **Large footprint.** b and Mc are teleseismic-scale quantities (Mw ≥ 5.2–5.7) averaged over 300 km. They are
+2. **Large footprint.** b and Mc are teleseismic-scale quantities (Mw ≥ 5.2–6.3) averaged over 300 km. They are
    not comparable to b-values from local networks at M 1–3, and they cannot resolve asperity-scale structure.
-3. **Few trusted cells.** Only 172 shallow and 71 deeper cells pass the quality gate (0.5.0). Most of the world shows
+3. **Few trusted cells.** Only 136 shallow and 66 deeper cells pass the quality gate (0.6.0). Most of the world shows
    "insufficient". This is the honest result for a global M ≥ 5 catalogue, not missing work.
 4. **Overlapping circles.** Neighbouring cells share events, so a smooth-looking pattern is partly
    autocorrelation.

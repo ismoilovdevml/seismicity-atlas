@@ -19,7 +19,7 @@ ISC-GEM Mw (`compare` block in the JSON). Three numbers are reported:
 
 - **TGR**: 1.5 × β of a tapered Gutenberg-Richter fit (maximum likelihood, β and corner moment free; Kagan 2002).
   This is the like-for-like estimator for the Kagan values, and the verdict uses it.
-- **Aki**: the atlas estimator at the published threshold (Aki-Utsu, 0.1 bins, bootstrap 95 %).
+- **Aki**: the atlas estimator at the published threshold (maximum likelihood for binned magnitudes since 0.6.0, Aki-Utsu before; 0.1 bins, bootstrap 95 %).
 - Since v0.2, TGR and Aki use the atlas b sample: direct Mw only (ISC-GEM magnitude uncertainty 0.10; checked
   against GCMT magnitudes in ComCat, see `method.md` §2.1). **v0.1, all events** gives the TGR on every event for
   comparison.
@@ -41,59 +41,59 @@ Caveats that apply to all Kagan entries:
 
 ## Results
 
-| # | Entry | Published (as printed) | b-equivalent | N pub / ours | Ours: TGR (0.5.0) | Ours: Aki (0.5.0) | v0.1, all events: TGR | Verdict 0.5.0 (z rule; data: same, GCMT-based) |
+| # | Entry | Published (as printed) | b-equivalent | N pub / ours | Ours: TGR (0.6.0) | Ours: Aki (0.6.0) | v0.1, all events: TGR | Verdict 0.6.0 (z rule; data: same, GCMT-based) |
 |---|---|---|---|---|---|---|---|---|
-| 1 | `kj2013_fe01_alaska_aleutian` | beta 0.65 ±0.04 | 0.975 ± 0.06 | 280 / 259 | 0.915 [0.809, 1.042] | 0.937 [0.842, 1.048] | 0.990 [0.865, 1.133] | match (approximate region) (z -0.70) |
-| 2 | `kj2013_fe05_mexico_guatemala` | beta 0.6 ±0.06 | 0.900 ± 0.09 | 164 / 121 | 0.795 [0.649, 0.963] | 0.857 [0.737, 1.018] | 0.819 [0.660, 1.021] | match (approximate region) (z -0.88) |
-| 3 | `kj2013_fe06_central_america` | beta 0.68 ±0.06 | 1.020 ± 0.09 | 161 / 121 | 1.025 [0.855, 1.241] | 1.064 [0.913, 1.246] | 1.038 [0.880, 1.283] | match (approximate region) (z +0.04) |
-| 4 | `kj2013_fe08_andean_south_america` | beta 0.57 ±0.04 | 0.855 ± 0.06 | 286 / 307 | 0.903 [0.801, 1.010] | 0.903 [0.816, 1.014] | 0.970 [0.866, 1.073] | match (approximate region) (z +0.60) |
-| 5 | `kj2013_fe12_kermadec_tonga_samoa` | beta 0.8 ±0.04 | 1.200 ± 0.06 | 439 / 464 | 1.212 [1.096, 1.327] | 1.184 [1.088, 1.291] | 1.259 [1.156, 1.389] | match (approximate region) (z +0.14) |
-| 6 | `kj2013_fe18_guam_japan` | beta 0.86 ±0.10 | 1.290 ± 0.15 | 88 / 88 | 1.259 [0.973, 1.596] | 1.290 [1.055, 1.631] | 1.285 [0.993, 1.651] | match (approximate region) (z -0.14) |
-| 7 | `kj2013_fe19_japan_kamchatka` | beta 0.62 ±0.04 | 0.930 ± 0.06 | 425 / 362 | 0.993 [0.888, 1.111] | 0.983 [0.894, 1.084] | 1.072 [0.969, 1.201] | match (approximate region) (z +0.76) |
-| 8 | `kj2013_tohoku_box` | beta 0.64 ±0.07 | 0.960 ± 0.11 | 109 / 93 | 1.023 [0.786, 1.264] | 1.055 [0.889, 1.287] | 1.082 [0.860, 1.333] | match (z +0.39) |
-| 9 | `kj2013_fe24_sunda_arc` | beta 0.65 ±0.04 | 0.975 ± 0.06 | 278 / 124 | 1.018 [0.851, 1.219] | 1.078 [0.917, 1.285] | 1.077 [0.901, 1.253] | match (approximate region) (z +0.39) |
-| 10 | `kj2013_fe46_andaman_sumatra` | beta 0.71 ±0.07 | 1.065 ± 0.11 | 143 / 195 | 0.921 [0.789, 1.079] | 0.918 [0.802, 1.073] | 1.010 [0.868, 1.151] | match (approximate region) (z -1.12) |
-| 11 | `kj2013_all_18_subduction_zones` | beta 0.65 ±0.01 | 0.975 ± 0.01 | 4217 / 2460 | 0.977 [0.938, 1.020] | 0.978 [0.941, 1.016] | 1.034 [0.996, 1.073] | match (approximate region) (z +0.08) |
-| 12 | `kagan2010_global_mt56` | beta 0.6773 | 1.016 ± 0.00 | 7369 / 6522 | 1.035 [1.010, 1.058] | 1.006 [0.983, 1.028] | 1.087 [1.063, 1.110] | consistent, uninformative (no published uncertainty) |
-| 13 | `kagan2010_trenches_mt56` | beta 0.6463 | 0.969 ± 0.00 | 4805 / 3029 | 0.992 [0.958, 1.028] | 0.975 [0.943, 1.007] | 1.053 [1.013, 1.094] | consistent, uninformative (no published uncertainty) (approximate region) |
-| 14 | `kagan2010_global_declustered_mt56` | beta 0.648 | 0.972 ± 0.00 | 5841 / 3700 | 0.903 [0.872, 0.929] | 0.879 [0.854, 0.906] | 0.934 [0.902, 0.962] | differs (approximate region) |
-| 15 | `birdkagan2004_pb2002_class_range` | beta per class, Table 5: 0.53 (OCB) to 0.92 (OSR normal faulting), with 95 % ranges | 0.80–1.38 | – | beta SUB 0.66 (z +0.78), CCB 0.64 (z +0.36), OCB 0.63 (z +1.21), CTF 0.69 (z +0.53), OTF 0.79 (z +0.94), CRB 0.69 (z +0.58), OSR 0.98 (z +0.70) | – | beta range 0.65–1.02 | match (approximate); per class against the closest Table 5 subcatalog |
-| 16 | `petruccelli2018_gcmt_mc_map` | Mc 5.4–5.5 (most of the map) | – | – | MAXC+0.2 5.4 [5.4, 5.4], MBS 5.8, GFT 5.2 (n=29683) | – | MAXC+0.2 5.4, MBS 5.6, GFT 5.2 (n=34012) | consistent, uninformative (no published uncertainty) |
+| 1 | `kj2013_fe01_alaska_aleutian` | beta 0.65 ±0.04 | 0.975 ± 0.06 | 280 / 259 | 0.915 [0.809, 1.042] | 0.930 [0.836, 1.041] | 0.990 [0.873, 1.120] | match (approximate region) (z -0.70) |
+| 2 | `kj2013_fe05_mexico_guatemala` | beta 0.6 ±0.06 | 0.900 ± 0.09 | 164 / 121 | 0.795 [0.649, 0.963] | 0.853 [0.734, 1.012] | 0.819 [0.663, 0.979] | match (approximate region) (z -0.88) |
+| 3 | `kj2013_fe06_central_america` | beta 0.68 ±0.06 | 1.020 ± 0.09 | 161 / 121 | 1.025 [0.855, 1.241] | 1.062 [0.909, 1.244] | 1.038 [0.862, 1.256] | match (approximate region) (z +0.04) |
+| 4 | `kj2013_fe08_andean_south_america` | beta 0.57 ±0.04 | 0.855 ± 0.06 | 286 / 307 | 0.903 [0.801, 1.010] | 0.895 [0.809, 1.004] | 0.970 [0.866, 1.080] | match (approximate region) (z +0.60) |
+| 5 | `kj2013_fe12_kermadec_tonga_samoa` | beta 0.8 ±0.04 | 1.200 ± 0.06 | 439 / 464 | 1.212 [1.096, 1.327] | 1.175 [1.080, 1.282] | 1.259 [1.149, 1.380] | match (approximate region) (z +0.14) |
+| 6 | `kj2013_fe18_guam_japan` | beta 0.86 ±0.10 | 1.290 ± 0.15 | 88 / 88 | 1.259 [0.973, 1.596] | 1.285 [1.048, 1.638] | 1.285 [0.999, 1.658] | match (approximate region) (z -0.14) |
+| 7 | `kj2013_fe19_japan_kamchatka` | beta 0.62 ±0.04 | 0.930 ± 0.06 | 425 / 362 | 0.993 [0.888, 1.111] | 0.973 [0.883, 1.071] | 1.072 [0.962, 1.194] | match (approximate region) (z +0.76) |
+| 8 | `kj2013_tohoku_box` | beta 0.64 ±0.07 | 0.960 ± 0.11 | 109 / 93 | 1.023 [0.786, 1.264] | 1.038 [0.880, 1.263] | 1.082 [0.853, 1.329] | match (z +0.39) |
+| 9 | `kj2013_fe24_sunda_arc` | beta 0.65 ±0.04 | 0.975 ± 0.06 | 278 / 124 | 1.018 [0.851, 1.219] | 1.078 [0.917, 1.284] | 1.077 [0.899, 1.258] | match (approximate region) (z +0.39) |
+| 10 | `kj2013_fe46_andaman_sumatra` | beta 0.71 ±0.07 | 1.065 ± 0.11 | 143 / 195 | 0.921 [0.789, 1.079] | 0.909 [0.797, 1.059] | 1.010 [0.870, 1.162] | match (approximate region) (z -1.12) |
+| 11 | `kj2013_all_18_subduction_zones` | beta 0.65 ±0.01 | 0.975 ± 0.01 | 4217 / 2459 | 0.977 [0.938, 1.016] | 0.970 [0.937, 1.007] | 1.034 [0.997, 1.071] | match (approximate region) (z +0.08) |
+| 12 | `kagan2010_global_mt56` | beta 0.6773 | 1.016 ± 0.00 | 7369 / 6522 | 1.035 [1.010, 1.058] | 1.018 [0.996, 1.042] | 1.087 [1.062, 1.112] | consistent, uninformative (no published uncertainty) |
+| 13 | `kagan2010_trenches_mt56` | beta 0.6463 | 0.969 ± 0.00 | 4805 / 3028 | 0.992 [0.957, 1.030] | 0.983 [0.949, 1.017] | 1.053 [1.017, 1.092] | consistent, uninformative (no published uncertainty) (approximate region) |
+| 14 | `kagan2010_global_declustered_mt56` | beta 0.648 | 0.972 ± 0.00 | 5841 / 3782 | 0.907 [0.875, 0.932] | 0.892 [0.866, 0.918] | 0.937 [0.904, 0.964] | differs (approximate region) |
+| 15 | `birdkagan2004_pb2002_class_range` | beta per class, Table 5: 0.53 (OCB) to 0.92 (OSR normal faulting), with 95 % ranges | 0.80–1.38 | – | beta SUB 0.66 (z +0.79), CCB 0.64 (z +0.36), OCB 0.63 (z +1.21), CTF 0.69 (z +0.53), OTF 0.79 (z +0.94), CRB 0.69 (z +0.58), OSR 0.98 (z +0.70) | – | beta range 0.65–1.02 | match (approximate); per class against the closest Table 5 subcatalog |
+| 16 | `petruccelli2018_gcmt_mc_map` | Mc 5.4–5.5 (most of the map) | – | – | MAXC+0.2 5.3 [5.3, 5.4], MBS 5.6, GFT 5.2 (n=29683) | – | MAXC+0.2 5.4, MBS 5.6, GFT 5.2 (n=34012) | consistent, uninformative (no published uncertainty) |
 
-Verdicts of 0.5.0 (`common.z_verdict`, `validation.md` "How a comparison is judged"): z with both uncertainties where the source prints one; Kagan (2010) Table 2 and Petruccelli (2018) print none, so their rows can only be "consistent, uninformative" or "differs" (until 0.4.0 the Kagan 2010 rows used a zero published uncertainty). Every entry is GCMT-based, the same moments as most ISC-GEM direct Mw, so a match checks the code, not the result. The b-equivalent "± 0.00" of rows 12–14 means "no uncertainty printed".
+Verdicts of 0.6.0 (`common.z_verdict`, `validation.md` "How a comparison is judged"): z with both uncertainties where the source prints one; Kagan (2010) Table 2 and Petruccelli (2018) print none, so their rows can only be "consistent, uninformative" or "differs" (until 0.4.0 the Kagan 2010 rows used a zero published uncertainty). Every entry is GCMT-based, the same moments as most ISC-GEM direct Mw, so a match checks the code, not the result. The b-equivalent "± 0.00" of rows 12–14 means "no uncertainty printed".
 
 **Summary.** 16 entries from four sources: Kagan & Jackson 2013 (11 entries), Kagan 2010 (3), Bird & Kagan 2004 (1)
 and Petruccelli 2018 (1).
 
-- **Regional values (1–10): all ten match** (0.5.0, |z| ≤ 1.12). The intervals are wide (n ≈ 90–500), so this test is weak. For each
+- **Regional values (1–10): all ten match** (0.6.0, |z| ≤ 1.12). The intervals are wide (n ≈ 90–500), so this test is weak. For each
   region, ours is within about 0.15 of the published b, in both directions.
 - **Aggregate values (11–13).** Entry 11 matches (z +0.08). Entries 12 and 13 have no printed uncertainty, so
   since 0.5.0 they are only "consistent, uninformative"; in v0.2–0.4.0 they were called "match" with se_pub = 0,
   and in v0.1 (every event) they differed. With the proxy magnitudes, ISC-GEM gave b higher by 0.06–0.08. On the
-  direct-Mw sample (0.5.0 intervals):
+  direct-Mw sample (0.6.0 intervals):
   - global 1.035 [1.010, 1.058] against 1.016;
-  - trenches 0.992 [0.958, 1.028] against 0.969;
-  - all subduction zones 0.977 [0.938, 1.020] against 0.975 ± 0.015.
+  - trenches 0.992 [0.957, 1.030] against 0.969;
+  - all subduction zones 0.977 [0.938, 1.016] against 0.975 ± 0.015.
 
   The events with larger magnitude uncertainty are concentrated near the threshold. In the global 1982–2008 set
   (`magerr_diagnostic_global_1982_2008`) they are 14.6 % of events at Mw 5.6–6.0 and about 1 % from Mw 7.0 up.
-  - On their own they give Aki b = 1.736 [1.633, 1.850] (n = 995).
-  - The rest give 1.006 [0.983, 1.028] (n = 7,138).
+  - On their own they give Aki b = 1.841 [1.730, 1.967] (n = 1,083).
+  - The rest give 1.018 [0.996, 1.042] (n = 7,297).
 
   So these events steepen the distribution. Since v0.2 the atlas leaves them out of every b (`method.md` §2.1).
-- **Declustered (14): differs** (0.972 outside [0.872, 0.929]; no printed uncertainty). Our Gardner-Knopoff declustering gives a lower b (0.903; v0.1 0.934) than Kagan's own
+- **Declustered (14): differs** (0.972 outside [0.875, 0.932]; no printed uncertainty). Our Gardner-Knopoff declustering gives a lower b (0.907; v0.1 0.934) than Kagan's own
   declustering (0.972). The two methods remove different events, so this is not a like-for-like comparison.
 - **β by class (15): match (approximate), per class against Table 5.**
   - Until 2026-11-15 this entry compared only our range of point values (0.63–0.98) with the abstract range of best
     fits (0.53–0.92) and called the OSR top end a mismatch. With Table 5 read, it uses the same z rule as the other
     entries, class by class; every class has |z| ≤ 1.96.
-  - OSR: ours 0.98 [0.84, 1.12] against OSR normal faulting 0.92 [0.60, 0.99] (z +0.70) and OSR other 0.82
+  - OSR: ours 0.98 [0.84, 1.13] against OSR normal faulting 0.92 [0.60, 0.99] (z +0.70) and OSR other 0.82
     [0.49, 0.99] (z +1.39). The published OSR intervals are asymmetric and reach 0.99.
   - Bird & Kagan split OSR by mechanism and OTF by spreading rate; we do not, so those two classes are compared with
     the closest of their subcatalogs. Our OTF (0.79 [0.73, 0.86]) matches OTF fast (0.73, z +0.94) but not OTF
     medium (0.65, z +2.18) or OTF slow (0.64, z +2.90). They also exclude orogens; we do not.
-- **Mc (16): consistent, uninformative** (0.5.0; "match" before). For 1980–2016 at 0–50 km, the global MAXC+0.2 is
-  5.4 [5.4, 5.4]. Petruccelli reports 5.4–5.5 across
+- **Mc (16): consistent, uninformative** (since 0.5.0; "match" before). For 1980–2016 at 0–50 km, the global MAXC+0.2 is
+  5.3 [5.3, 5.4]. Petruccelli reports 5.4–5.5 across
   most of the GCMT Mc map.
 
 ## Entries in detail

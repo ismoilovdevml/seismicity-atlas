@@ -94,18 +94,17 @@ naive sum over 1904–present is biased low, and the synthetic test shows the bi
   the upper bounds long.
 - `r_obs_x1` is the same ratio with the single largest event of the zone removed. It shows how much one earthquake
   decides the result.
-- Events below Mw 5.8 are omitted. Under the tapered G-R below, they would add about 2–6 % of the moment (corner
-  magnitude 8.5 to 7.75, b = 0.954).
+- Events below Mw 5.8 are omitted. Under the tapered G-R below, they would add about 3–8 % of the moment (corner
+  magnitude 8.5 to 7.75, b = 1.00).
 
 **(b) Long-term, tapered Gutenberg-Richter (Kagan 2002).** Ṁs = α6 E[M0 | TGR], where E[M0] = Mt + Mt^β e^(Mt/Mc)
 Mc^(1−β) Γ(1−β, Mt/Mc) and Mt is the moment at Mw 6.0. The inputs are:
 
 - α6 is the rate of Mw ≥ 6.0 events since 1964 in the zone, drawn from its Jeffreys posterior Gamma(n + ½, T).
 - β = 2b/3, with b from all events in the Mw 5.8 bin and above (Mw ≥ 5.75, binned to 0.1) in the whole outline,
-  1976 to cut-off. That gives b = 0.954 ± 0.127 (n = 38, bootstrap 95 % [0.750, 1.260]) in 0.5.0, where the sample
-  was cut at Mw ≥ 5.80 before binning, so the 5.8 bin lost its 5.75–5.79 events and b came out low (the 0.6.0
-  rebuild gives about 1.00, n = 40). The bootstrap distribution is sampled, and the sub-zones are too small for
-  their own b.
+  1976 to cut-off. That gives b = 1.003 ± 0.137 (n = 40, bootstrap 95 % [0.792, 1.358]). In 0.5.0 the sample was
+  cut at Mw ≥ 5.80 before binning, so the 5.8 bin lost its 5.75–5.79 events and b came out low (0.954, n = 38).
+  The bootstrap distribution is sampled, and the sub-zones are too small for their own b.
 - The corner magnitude is uniform in 7.75–8.5. This range is an assumption. It is anchored on ISC-GEM's two largest
   events (1906 Mw 7.95 and 1911 Mw 8.02) and on Molnar & Ghose (2000), whose abstract mentions "two of comparable
   magnitude in the Nineteenth Century" to the M ≥ 8 events. Bird & Kagan (2004) give a corner magnitude for
@@ -145,26 +144,26 @@ not by itself indicate a deficit. `p_half` shows how the test changes at χ = 0.
 
 | Region | Models | n (Mw ≥ 6, 1964–) | Ṁg | Ṁs observed | r_obs | r_obs, largest removed | r_tgr | p_full | mc_bal |
 |---|---|---|---|---|---|---|---|---|---|
-| Tien Shan 69–92 °E | 5 | 31 | 2.14e19 [1.52e19, 2.85e19] | 3.03e19 | 1.42 [0.91, 8.99] | 0.90 | 0.93 [0.33, 2.89] | 0.81 | 8.15 |
-| West 69–76 °E | ou2026 | 12 | 6.6e18 [4.9e18, 8.5e18] | 6.08e18 | 0.92 [0.52, 15.7] | 0.56 | 1.18 [0.37, 3.90] | 0.66 | 7.98 |
-| Central 76–82 °E | 5 | 15 | 8.3e18 [6.0e18, 1.1e19] | 1.29e19 | 1.56 [0.58, 5.72] | 0.23 | 1.18 [0.38, 3.76] | 0.85 | 7.98 |
-| East 82–92 °E | 4 (Chang) | 4 (`few`) | 4.0e18 [2.9e18, 5.2e18] | 1.14e19 | 2.87 [1.21, 20.2] | 0.70 | 0.67 [0.16, 2.66] | 0.94 | 8.42 |
+| Tien Shan 69–92 °E | 5 | 31 | 2.14e19 [1.53e19, 2.84e19] | 3.03e19 | 1.42 [0.91, 9.29] | 0.90 | 0.78 [0.26, 2.50] | 0.83 | 8.29 |
+| West 69–76 °E | ou2026 | 12 | 6.6e18 [4.9e18, 8.5e18] | 6.08e18 | 0.92 [0.53, 15.5] | 0.56 | 1.00 [0.30, 3.29] | 0.69 | 8.10 |
+| Central 76–82 °E | 5 | 15 | 8.3e18 [6.0e18, 1.1e19] | 1.29e19 | 1.55 [0.57, 5.67] | 0.23 | 0.98 [0.31, 3.29] | 0.85 | 8.10 |
+| East 82–92 °E | 4 (Chang) | 4 (`few`) | 4.0e18 [2.9e18, 5.2e18] | 1.14e19 | 2.86 [1.19, 20.5] | 0.69 | 0.56 [0.13, 2.28] | 0.94 | 8.55 |
 
 What this shows:
 
-- **No region shows a detectable deficit.** `p_full` is 0.66–0.94, so under full coupling most simulated
+- **No region shows a detectable deficit.** `p_full` is 0.69–0.94, so under full coupling most simulated
   120-year catalogues release *less* than observed. For the whole belt, the 95 % interval of the corner magnitude
-  needed to balance the geodetic budget is 7.61–9.48 (median 8.15). This range includes the largest observed
+  needed to balance the geodetic budget is 7.68–9.78 (median 8.29). This range includes the largest observed
   events.
 - **The observed ratio is decided by one or two earthquakes.** In the central region, removing the 1911 Chon-Kemin
-  event takes r_obs from 1.56 to 0.23. In the east, removing the 1906 Manas event takes it from 2.87 to 0.70.
-- **The geodetic models agree.** For the whole belt, the per-model median Ṁg ranges from 1.88e19 (ou2026) to
-  2.30e19 (chang_gpsgridder). The parameter ranges (μ, H) dominate the geodetic interval.
+  event takes r_obs from 1.55 to 0.23. In the east, removing the 1906 Manas event takes it from 2.86 to 0.69.
+- **The geodetic models agree.** For the whole belt, the per-model median Ṁg ranges from 1.87e19 (ou2026) to
+  2.31e19 (chang_gpsgridder). The parameter ranges (μ, H) dominate the geodetic interval.
 - **ISC-GEM magnitudes of the early great earthquakes dominate.** See the Molnar & Ghose comparison below. With
-  their moments for seven events, the whole-belt r_obs is 0.71 [0.54, 1.01].
-- H3 cells (`cells.geojson`, 10 cells overlapping the outline by ≥ 25 %): `p_full` ranges from 0.16 to 0.97. The
+  their moments for seven events, the whole-belt r_obs is 0.72 [0.54, 1.01].
+- H3 cells (`cells.geojson`, 10 cells overlapping the outline by ≥ 25 %): `p_full` ranges from 0.18 to 0.98. The
   lowest is cell `8220c7fffffffff` (41.2 °N, 80.7 °E, which holds the 2024 Wushi Mw 7.0), with r_obs 0.17
-  [0.11, 0.33] and p_full 0.16. That is not significant either. Two cells have r_obs = 0 because their only large
+  [0.11, 0.33] and p_full 0.18. That is not significant either. Two cells have r_obs = 0 because their only large
   events (1914 Mw 7.42; 1937 Mw 6.4) predate the complete period of their band. Seven of the 10 cells are `few`.
 
 Figures: `docs/img/deficit-map.png` (mean strain rate, outline, cells, Mw ≥ 6.5),
@@ -201,7 +200,7 @@ arithmetic gives **14.5 mm/yr**. The difference is almost entirely in the early 
 | 1992-08-19 Suusamyr | 0.8 ± 0.2 | 7.20 | 7.20 ± 0.10 | 0.79 |
 
 The modern events agree. The 1906 Manas event differs by a factor of 8 in moment. The atlas therefore reports both
-versions: r_obs with ISC-GEM (1.42) and with the Molnar & Ghose moments (0.71). Our geodetic rate expressed as
+versions: r_obs with ISC-GEM (1.42) and with the Molnar & Ghose moments (0.72). Our geodetic rate expressed as
 Kostrov shortening over the outline's along-strike length (1,870 km) is 9.6 mm/yr (8.2–10.1 across models). That is
 a belt-wide average, consistent with the "∼20 mm/yr of north–south crustal shortening" in the west that Chang et
 al. (2025) and Abdrakhmatov et al. (1996) report, decreasing eastward ("∼70%" of strain west of 82 °E).
@@ -272,6 +271,6 @@ Feature properties (regions and cells):
 | `over` | 0–1 | fraction of draws where a corner at 6.0 already exceeds the budget (since 0.6.0) |
 
 Display guidance (implemented in v0.3.1 by `site/js/deficit.js`, the Scientist-view layer and its panel): show `r_obs` with its interval and `p_full` together, as in "observed / geodetic
-= 1.4 (0.9–9.0); full-coupling catalogues release less than this 81 % of the time". Grey out `few`. Put the
+= 1.4 (0.9–9.3); full-coupling catalogues release less than this 83 % of the time". Grey out `few`. Put the
 disclaimer from `index.json` next to the layer. Never colour a cell red for a "deficit" without `p_full` < 0.05,
 which no zone currently reaches.

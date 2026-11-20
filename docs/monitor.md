@@ -70,6 +70,9 @@ b-values of the map (method §2), and the card says so.
 
 ## 4. Sequences at the 2026-11-13 cut-off
 
+This table comes from the monitor build before 0.6.0 (no depth window, b-positive and the Omori b over every
+event ≥ 2.5, c unbounded); it has not been rebuilt with the 0.6.0 code at this cut-off.
+
 | Mainshock (UTC date, M, place) | Region | Days | Events M ≥ 2.5 | ≥ Mcat | Omori p [95 %] | q | b [95 %] | q | Largest aftershock (ΔM) | Productivity, ratio to regional mean |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 2026-10-22 M 7.0 Nagqu, China | ANSR-DEEPCON | 21 | 42 | 23 (4.5) | 1.02 [0.72, 1.32] | C | (23 events) | insufficient | 5.9 (1.1) | typical, 1.4 [0.9, 2.1] |
@@ -117,7 +120,7 @@ which is why the USGS keeps it generic.
 | 2026 M 7.7 Panama | ETAS, Bayesian combination | day 30.9 | 61 | −2.57 (ams −2.26) | −2.261 ± 0.056 | 1.15 | 1.159 ± 0.055 | p matches; our a equals their ams |
 | 2026 M 7.8 Ende, Indonesia | ETAS, Bayesian combination | day 86.8 | 87 | −2.28 (ams −2.01) | −2.44 ± 0.047 | 0.96 | 0.886 ± 0.040 | p close (−0.07, 1.8 σ); a lower than ams by 0.43 |
 | 2026 M 7.5 Venezuela | ETAS, Bayesian combination | day 137.8 | 18 | −2.65 (ams −2.87) | −2.904 ± 0.102 | 1.03 | 0.986 ± 0.102 | p within 1 σ; a close to ams; few events |
-| 2026 M 7.4 Colombia (116 km deep) | ETAS, Bayesian combination | day 91.2 | 18 | −2.13 (ams −2.28) | −3.36 ± 0.10 | 0.98 | 0.13 ± 0.25 | **mismatch**: 18 events cannot constrain p; the USGS value comes mostly from its prior (and its c = 1.0 day is at the edge) |
+| 2026 M 7.4 Colombia (116 km deep) | ETAS, Bayesian combination | day 91.2 | 18 | −2.13 (ams −2.28) | −3.48 ± 0.10 | 0.98 | 0.05 ± 0.26 | **mismatch**: 18 events cannot constrain p; the USGS value comes mostly from its prior (and its c = 1.0 day is at the edge) |
 | 2026 M 6.5 Alaska (98 km deep) | RJ, Bayesian combination | day 56.0 | 3 | −3.31 ± 0.21 | – | 0.88 | – | **not testable**: 3 events |
 
 Reading the comparison honestly:
@@ -224,28 +227,29 @@ For our sequence:
    Mcat = 4.5, since 0.6.0: their NEIC counts miss the same early small aftershocks; before, D had no Mc(t) term
    there, which made the reference ratios 1.12 / 1.34 / 1.75 times too low at M 8.0 / 8.5 / 9.0), for the 14
    sequences with Mc ≤ 4.5, ≥ 100 events and a window defined in their Table 1 (the two M 8.0 events fall between
-   their magnitude classes). Reference ratios: median **2.89**, range **1.22–10.41**;
+   their magnitude classes). Reference ratios: median **3.42**, range **1.50–10.75**;
 4. `class` = "within" / "above" / "below" the reference range (point estimate), `ref_percentile` its position;
    `in_calibration_range` is false outside M 7.5–9.0 or for depth ≥ 100 km.
 
-**Results at the 2026-11-14 12:00 UTC cut-off** (same data as §4; Colombia has too few events):
+**Results at the 2026-11-14 12:00 UTC cut-off** (same data as §4; Colombia has too few events). n, D and the ratios
+are from that build (before the 0.6.0 depth window); the percentiles are against the 0.6.0 reference ratios:
 
 | Mainshock | M, depth | In range | n | D | Ratio [95 %] | Percentile of the reference | Page et al. label, ratio |
 |---|---|---|---|---|---|---|---|
-| Panama | 7.7, 10 km | yes | 111 | 45.8 | 2.42 [0.89, 6.57] | 36 | more, 2.8 |
-| Ende, Indonesia | 7.8, 10 km | yes | 239 | 59.8 | 3.99 [1.49, 10.73] | 64 | more, 2.7 |
-| Puerto Madero, Mexico | 7.3, 22 km | no (M) | 116 | 25.4 | 4.57 [1.69, 12.38] | 64 | more, 4.5 |
-| Kablalan, Philippines | 7.8, 57 km | yes | 196 | 49.6 | 3.95 [1.47, 10.63] | 64 | more, 3.7 |
-| Miyako, Japan | 7.4, 25 km | no (M) | 108 | 32.4 | 3.33 [1.23, 9.03] | 64 | more, 3.0 |
-| Bitung, Indonesia | 7.4, 35 km | no (M) | 124 | 20.8 | 5.95 [2.20, 16.11] | 86 | more, 5.1 |
+| Panama | 7.7, 10 km | yes | 111 | 45.8 | 2.42 [0.89, 6.57] | 21 | more, 2.8 |
+| Ende, Indonesia | 7.8, 10 km | yes | 239 | 59.8 | 3.99 [1.49, 10.73] | 57 | more, 2.7 |
+| Puerto Madero, Mexico | 7.3, 22 km | no (M) | 116 | 25.4 | 4.57 [1.69, 12.38] | 57 | more, 4.5 |
+| Kablalan, Philippines | 7.8, 57 km | yes | 196 | 49.6 | 3.95 [1.47, 10.63] | 57 | more, 3.7 |
+| Miyako, Japan | 7.4, 25 km | no (M) | 108 | 32.4 | 3.33 [1.23, 9.03] | 43 | more, 3.0 |
+| Bitung, Indonesia | 7.4, 35 km | no (M) | 124 | 20.8 | 5.95 [2.20, 16.11] | 71 | more, 5.1 |
 | Luganville, Vanuatu | 7.3, 121 km | no | 21 | 13.3 | 1.58 [0.54, 4.61] | 7 | typical, 1.4 |
 | Neiafu, Tonga | 7.5, 234 km | no (depth) | 35 | 40.6 | 0.86 [0.31, 2.42] | 0 (below) | typical, 0.8 |
-| Aomori, Japan | 7.6, 41 km | yes | 116 | 51.2 | 2.27 [0.84, 6.14] | 29 | typical, 1.2 |
+| Aomori, Japan | 7.6, 41 km | yes | 116 | 51.2 | 2.27 [0.84, 6.14] | 21 | typical, 1.2 |
 
 Reading:
 
 - All seven shallow subduction sequences lie **inside the range** of the Zhang & Werner sequences (percentiles
-  29–86); only the 234 km deep Tonga event falls below, and it is outside their calibration (depth < 100 km).
+  21–71); only the 234 km deep Tonga event falls below, and it is outside their calibration (depth < 100 km).
 - Against Page et al. (2016) six of the same sequences are "more productive". Against the ETAS-based reference
   they are ordinary. This supports §7, item 3: the "more productive" labels at least partly reflect the reference
   (generic RJ parameters, window rule, magnitude types), not unusual sequences.

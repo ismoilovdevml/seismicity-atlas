@@ -176,18 +176,19 @@ keeps only the concepts a non-specialist meets on that screen. Search, the contr
 
 `recordingRating(cell, globalMc)` in `site/js/places.js` reads the **shallow (≤ 70 km)** statistics of the cell that
 contains the place (point in hexagon, trying the longitude ± 360° for cells that cross the antimeridian; the nearest
-cell centre if no hexagon contains it). `globalMc` is `manifest.json` `global.b_shallow_1976_2021.mc` (5.2 in v0.2.0).
+cell centre if no hexagon contains it). `globalMc` is `manifest.json` `global.b_shallow_1976_2021.mc` (5.3 in 0.6.0; 5.2 in v0.2.0).
 The rules are checked in this order:
 
 | Rating | Card word | Condition |
 |---|---|---|
 | `few` | Too little data | `sh_q` is `insufficient` (fewer than 50 events above Mc, `method.quality.insufficient`) |
 | `limited` | Limited | `sh_q` is `C`, or `c_flag` is `check` (ISC-GEM and ComCat disagree) |
-| `vgood` | Very good | `sh_q` is `A`, `c_flag` is `ok` and `sh_mc` ≤ global shallow Mc + 0.2 (5.4 in v0.2.0) |
+| `vgood` | Very good | `sh_q` is `A`, `c_flag` is `ok` and `sh_mc` ≤ global shallow Mc + 0.2 (5.5 in 0.6.0; 5.4 in v0.2.0) |
 | `good` | Good | every other `A` or `B` cell (B, or A with `c_flag` `few` or a higher Mc) |
 
 In v0.2.0 this gives, over 2,598 cells: 56 Very good, 114 Good, 54 Limited, 2,374 Too little data (computed by the
-browser test from `cells.geojson`; no cell has `c_flag` `check` and quality A or B). The cutoff-stability flag
+browser test from `cells.geojson`; no cell has `c_flag` `check` and quality A or B). In 0.6.0 (`rating.json`): 32 Very good, 104 Good, 62 Limited,
+2,400 Too little data. The cutoff-stability flag
 (`sh_unstable`) and the deeper statistics are not used; the Scientist view shows them. The card prints the three
 inputs under the word ("quality B, Mc 5.2, ISC-GEM and ComCat agree"), and its (i) opens the Learn page with the same
 table. The rating describes the global catalogue at a few hundred kilometres, not local networks, and is not a hazard

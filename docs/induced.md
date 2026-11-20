@@ -65,7 +65,7 @@ effect of the caps.
 
 | Input | Access | Licence (quoted) | Redistributed here |
 |---|---|---|---|
-| **KNMI earthquake catalogue**: origin time, epicentre, local magnitude, event type | FDSN event service `https://rdsa.knmi.nl/fdsnws/event/1/query`, `format=text`, yearly requests, box 52.90–53.70 N, 6.20–7.40 E, 1986-01-01 to 2026-11-01 | rdsa.knmi.nl: "Creative Commons Attribution 4.0 International (CC BY 4.0)" is the default, with the request of "citing the Royal Netherlands Meteorological Institute (KNMI) and including the DOI of the network(s)". Network DOI 10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5 ("Netherlands Seismic and Acoustic Network", DataCite rights: CC BY 4.0). The portal also says the data "cannot be reused in unaltered form for commercial use". | Derived aggregates only: monthly counts, b-values and maps. For the 16 events of ML ≥ 3.0, `rates.json` keeps origin time, ML and the KNMI id (no locations), used by the plain-language summary; because the portal restricts unaltered commercial reuse of event rows, epicentres are not published. The event table itself is **not** published; scripts download it again. |
+| **KNMI earthquake catalogue**: origin time, epicentre, local magnitude, event type | FDSN event service `https://rdsa.knmi.nl/fdsnws/event/1/query`, `format=text`, yearly requests, box 52.90–53.70 N, 6.20–7.40 E, 1986-01-01 to 2026-11-01 | rdsa.knmi.nl: "Creative Commons Attribution 4.0 International (CC BY 4.0)" is the default, with the request of "citing the Royal Netherlands Meteorological Institute (KNMI) and including the DOI of the network(s)". Network DOI 10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5 ("Netherlands Seismic and Acoustic Network", DataCite rights: CC BY 4.0). The portal also says the data "cannot be reused in unaltered form for commercial use". | Derived aggregates only: monthly counts, b-values and maps. For the 13 events of ML ≥ 3.0, `rates.json` keeps origin time, ML and the KNMI id (no locations), used by the plain-language summary; because the portal restricts unaltered commercial reuse of event rows, epicentres are not published. The event table itself is **not** published; scripts download it again. |
 | **NLOG production figures**: Groningen field, gas, "Produced", monthly, 2003–2024 | `POST https://www.nlog.nl/nlog-mapviewer-api/rest/prodfigures/field`, the JSON service behind the NLOG datacenter ("Production and injection data are made available on the datacenter page") | NLOG disclaimer: "Users are permitted to copy, to download and to disclose in any way, to distribute or to simplify the information provided on this website […] Users are also permitted to copy, duplicate, process or edit the information and/or layout, provided NLOG.NL is quoted as the source." | Monthly and annual totals, attributed "Source: NLOG.NL" |
 | **NLOG field outline**: `FIELD_CODE = 'GRO'` | ArcGIS REST `https://www.nlog.nl/standalone/rest/services/nlog_gdn/gdw_ng_field_utm_v1/MapServer/0`, `outSR=4326`, GeoJSON | same NLOG terms | The outline, rounded to 1e-4° |
 
@@ -139,7 +139,7 @@ binned to 0.1 for every estimate.
 - **b by phase.** Three estimators are used on the region's events in each phase:
   1. the atlas estimator `atlaslib.cell_b`: Mc = MAXC + 0.2, a 95 % bootstrap interval in which Mc is
      re-estimated in every replicate, and the A/B/C/insufficient quality gate (a b-value needs at least 50 events);
-  2. Aki-Utsu at a fixed ML 1.5 with a percentile bootstrap (`inducedlib.b_fixed`);
+  2. maximum likelihood for binned magnitudes at a fixed ML 1.5 with a percentile bootstrap (`inducedlib.b_fixed`);
   3. b-positive (`atlaslib.cell_bpos`; van der Elst 2021) on events with ML ≥ 0.5, with magnitude differences
      ≥ 0.2 and at least 50 differences.
 - **b in time:** b-positive in moving windows of 200 events (step 5) for the north and south sub-fields, which are
@@ -150,8 +150,8 @@ binned to 0.1 for every estimate.
   map stores both b-positive (≥ 50 differences, as in Gulia & Wiemer 2026) and the atlas `cell_b`. The per-event
   floor for `cell_b` is the field-wide MAXC + 0.2 of the period. Periods: 1991–2013, 2014–Oct 2026, and 2014–2022
   (used for validation).
-- **Random seed:** 20261114. Bootstraps use 1,000 replicates for phase b and validation, and 200 for maps and
-  moving windows.
+- **Random seed:** 20261114. Every published interval uses 1,000 bootstrap replicates (`atlaslib.NBOOT`): phase b,
+  validation, maps and moving windows (maps and moving windows used 200 before 0.6.0).
 
 ## Results
 
@@ -161,7 +161,7 @@ binned to 0.1 for every estimate.
 
 | Phase | Events | Rate per year (95 %) | Mean production (10⁹ m³/yr) |
 |---|---|---|---|
-| 1991–2002 | 46 | 3.8 (2.8–5.1) | no public monthly data |
+| 1991–2002 | 47 | 3.9 (2.9–5.2) | no public monthly data |
 | 2003–2013 | 182 | 16.5 (14.2–19.1) | 39.7 |
 | 2014–2018 | 86 | 17.2 (13.8–21.2) | 28.1 |
 | 2019–Sep 2023 | 58 | 12.2 (9.3–15.8) | 7.6 |
@@ -187,11 +187,11 @@ that the b-value is computed from.
 
 | Phase | Atlas MAXC+0.2: Mc | Atlas MAXC+0.2: b | Fixed ML 1.5 | b-positive (ML ≥ 0.5) |
 |---|---|---|---|---|
-| 1991–2002 | 1.3 | 1.00 (0.77–1.49), n 70, quality C | 1.07 (0.86–1.40), n 46, insufficient | 1.11 (0.86–1.36), n 54 |
-| 2003–2013 | 1.4 | 0.93 (0.79–1.04), n 218, A | 0.97 (0.84–1.12), n 182 | 0.99 (0.86–1.12), n 229 |
-| 2014–2018 | 0.7 | 0.76 (0.71–0.97), n 351, B | 0.97 (0.81–1.18), n 86 | 0.92 (0.79–1.04), n 184 |
-| 2019–Sep 2023 | 0.8 | 0.74 (0.63–0.86), n 188, B | 0.79 (0.64–0.97), n 58 | 0.84 (0.69–0.99), n 112 |
-| after shut-in | 0.6 | 0.63 (0.53–1.02), n 64, C | 0.88 (0.60–1.45), n 18, insufficient | not enough differences (31) |
+| 1991–2002 | 1.3 | 1.02 (0.78–1.44), n 72, quality C | 1.09 (0.86–1.42), n 47, insufficient | 1.12 (0.87–1.37), n 54 |
+| 2003–2013 | 1.4 | 0.94 (0.79–1.04), n 218, A | 0.98 (0.85–1.13), n 182 | 0.99 (0.86–1.12), n 229 |
+| 2014–2018 | 0.7 | 0.76 (0.71–0.97), n 351, B | 0.97 (0.80–1.22), n 86 | 0.92 (0.79–1.05), n 184 |
+| 2019–Sep 2023 | 0.8 | 0.74 (0.64–0.87), n 188, B | 0.79 (0.65–0.98), n 58 | 0.84 (0.69–1.00), n 112 |
+| after shut-in | 0.6 | 0.63 (0.52–1.03), n 64, C | 0.88 (0.58–1.49), n 18, insufficient | not enough differences (31) |
 
 All three estimators fall from about 1.0 before 2014 to about 0.75–0.85 in 2019–2023. After 2014 the atlas
 estimator (Mc 0.7–0.8) gives lower values than the estimator with a fixed ML 1.5. This Mc dependence is listed
@@ -201,8 +201,8 @@ The moving b-positive series show the north lower than the south throughout:
 
 | Sub-field | 2012 to mid-2015 (window range) | Window ending closest to mid-2022 |
 |---|---|---|
-| North | 0.71–0.92 | 0.75 (0.62–0.90) |
-| South | 0.99–1.35 | 1.05 (0.86–1.30) |
+| North | 0.71–0.93 | 0.75 (0.62–0.91) |
+| South | 1.00–1.36 | 1.06 (0.86–1.31) |
 
 ![b-positive maps](img/induced-groningen-b-map.png)
 
@@ -220,20 +220,20 @@ semicolon, n, the number of events (or magnitude differences) used.
 | Source | Quantity | Published | Ours | Verdict |
 |---|---|---|---|---|
 | Kraaijpoel et al. 2022 | events with unrounded ML ≥ 1.45, 1995–2021, field outline | 336 | 332 | **matches** (−1.2 %; the NLOG outline is used here, the paper used the NAM 2021 outline) |
-| Kraaijpoel et al. 2022 | field b, same sample ("MLE for the constant b-value is 0.96") | 0.96 | 0.949 (0.857–1.054); unbinned MLE 0.956 | **consistent** |
-| Dost et al. 2017 | b 2003–2017 | 0.93 ± 0.03 | 0.919 (0.804–1.007), Mc 1.4; n 281 | **consistent** |
-| Dost et al. 2017 | b 2004–2010 | 0.91 ± 0.06 | 0.917 (0.743–1.099), Mc 1.4; n 89 | **consistent** |
-| Dost et al. 2017 | b 2010–2013 | 1.06 ± 0.07 | 0.915 (0.792–1.351), Mc 1.1; n 127 | **consistent** |
-| Dost et al. 2017 | b 2013–2015 | 0.88 ± 0.06 | 0.879 (0.692–1.054), Mc 1.1; n 121 | **consistent** |
-| Dost et al. 2017 | b 2015–2017 | 0.93 ± 0.06 | 0.815 (0.691–0.974), Mc 0.8; n 115 | **consistent** |
-| Dost et al. 2017 | b 1996–2003 | 1.06 ± 0.07 | 1.16, Mc 1.8; n 13 | **not testable** (fewer than 50 events above the atlas Mc) |
-| Gulia & Wiemer 2026 | south sub-field, 2012 to mid-2015 ("ranging between 1.0 and 1.3") | 1.0–1.3 | 1.21 (0.94–1.48); n 91 | **consistent** |
-| Gulia & Wiemer 2026 | north sub-field, 2012 to mid-2015 ("minor b-value fluctuations around 0.8") | ≈ 0.8 | pooled: 39 differences, below 50; moving windows 0.71–0.92 | **not testable** (KNMI data alone are too sparse) |
-| Gulia & Wiemer 2026 | north around 2022 ("converge towards comparable values (0.9 around 2022)") | ≈ 0.9 | 0.746 (0.616–0.903), window 2015.8–2022.5 | **consistent** (interval only; see note) |
-| Gulia & Wiemer 2026 | south around 2022 | ≈ 0.9 | 1.051 (0.859–1.295), window 2017.4–2022.3 | **consistent** (interval only; see note) |
-| Gulia & Wiemer 2026 | b-positive map 2014–2022 ("values typically in the range 0.8–1.0") | 0.8–1.0 | median 0.681, inter-quartile range 0.625–0.749, over 75 mapped nodes | **differs** |
-| Gulia 2023, as quoted by Gulia & Wiemer 2026 | field after 2014 ("around ~0.7–0.8") | 0.7–0.8 | 0.785 (0.712–0.912), Mc 0.8; n 482 | **consistent** |
-| Sirorattanakul et al. 2024, as quoted by Gulia & Wiemer 2026 | field 2015–2022 ("b ≈ 0.86") | 0.86 | 0.799 (0.718–0.890), Mc 0.8; b-positive 0.878 (0.774–0.982) | **consistent** (different catalogue: context only) |
+| Kraaijpoel et al. 2022 | field b, same sample ("MLE for the constant b-value is 0.96") | 0.96 | 0.952 (0.858–1.062); unbinned MLE 0.956 | **consistent** |
+| Dost et al. 2017 | b 2003–2017 | 0.93 ± 0.03 | 0.922 (0.811–1.014), Mc 1.4; n 281 | **consistent** |
+| Dost et al. 2017 | b 2004–2010 | 0.91 ± 0.06 | 0.920 (0.756–1.125), Mc 1.4; n 89 | **consistent** |
+| Dost et al. 2017 | b 2010–2013 | 1.06 ± 0.07 | 0.919 (0.803–1.387), Mc 1.1; n 127 | **consistent** |
+| Dost et al. 2017 | b 2013–2015 | 0.88 ± 0.06 | 0.883 (0.666–1.071), Mc 1.1; n 121 | **consistent** |
+| Dost et al. 2017 | b 2015–2017 | 0.93 ± 0.06 | 0.818 (0.696–0.957), Mc 0.8; n 115 | **consistent** |
+| Dost et al. 2017 | b 1996–2003 | 1.06 ± 0.07 | 1.17, Mc 1.8; n 13 | **not testable** (fewer than 50 events above the atlas Mc) |
+| Gulia & Wiemer 2026 | south sub-field, 2012 to mid-2015 ("ranging between 1.0 and 1.3") | 1.0–1.3 | 1.22 (0.94–1.49); n 91 | **consistent** |
+| Gulia & Wiemer 2026 | north sub-field, 2012 to mid-2015 ("minor b-value fluctuations around 0.8") | ≈ 0.8 | pooled: 39 differences, below 50; moving windows 0.71–0.93 | **not testable** (KNMI data alone are too sparse) |
+| Gulia & Wiemer 2026 | north around 2022 ("converge towards comparable values (0.9 around 2022)") | ≈ 0.9 | 0.747 (0.621–0.906), window 2015.8–2022.5 | **consistent** (interval only; see note) |
+| Gulia & Wiemer 2026 | south around 2022 | ≈ 0.9 | 1.056 (0.856–1.309), window 2017.4–2022.3 | **consistent** (interval only; see note) |
+| Gulia & Wiemer 2026 | b-positive map 2014–2022 ("values typically in the range 0.8–1.0") | 0.8–1.0 | median 0.682, inter-quartile range 0.626–0.750, over 75 mapped nodes | **differs** |
+| Gulia 2023, as quoted by Gulia & Wiemer 2026 | field after 2014 ("around ~0.7–0.8") | 0.7–0.8 | 0.788 (0.711–0.917), Mc 0.8; n 482 | **consistent** |
+| Sirorattanakul et al. 2024, as quoted by Gulia & Wiemer 2026 | field 2015–2022 ("b ≈ 0.86") | 0.86 | 0.801 (0.719–0.891), Mc 0.8; b-positive 0.881 (0.777–0.986) | **consistent** (different catalogue: context only) |
 
 ![Validation](img/induced-groningen-validation.png)
 
@@ -253,27 +253,27 @@ semicolon, n, the number of events (or magnitude differences) used.
 
   | Interval | Ours at Mc 1.2 | Dost et al. 2017 |
   |---|---|---|
-  | 2004–2010 | 0.914 | 0.91 |
-  | 2010–2013 | 0.987 | 1.06 |
-  | 2013–2015 | 0.892 | 0.88 |
-  | 2015–2017 | 0.919 | 0.93 |
-  | 2003–2017 | 0.908 | 0.93 |
+  | 2004–2010 | 0.917 | 0.91 |
+  | 2010–2013 | 0.991 | 1.06 |
+  | 2013–2015 | 0.895 | 0.88 |
+  | 2015–2017 | 0.923 | 0.93 |
+  | 2003–2017 | 0.912 | 0.93 |
 
   This is a sensitivity check, not a fit. The result is reported with the atlas MAXC + 0.2 estimator.
 - **Gulia & Wiemer (2026) used a composite catalogue:** KNMI before 2015 and the deep-learning catalogue of
   Sirorattanakul et al. (2024) for 2015–2022, which they describe as "almost double the number of events recorded
   in the standard KNMI catalogue". Our KNMI-only analysis therefore cannot test every claim:
   - **North vs south.** We reproduce lower north than south b before 2015. Around 2022 our point estimates are
-    0.75 (north) and 1.05 (south). That is not convergence, even though both intervals include 0.9.
+    0.75 (north) and 1.06 (south). That is not convergence, even though both intervals include 0.9.
   - **The map comparison differs.** With a 5-km radius and only KNMI events, just 75 of 1,316 nodes reach
     50 differences, and these are the densest, lowest-b nodes of the central field. A wider radius maps more of
     the field and moves the median into the published range:
 
     | Radius | Mapped nodes | Median b-positive |
     |---|---|---|
-    | 5 km | 75 | 0.681 |
-    | 7 km | 300 | 0.783 |
-    | 10 km | 645 | 0.811 |
+    | 5 km | 75 | 0.682 |
+    | 7 km | 300 | 0.785 |
+    | 10 km | 645 | 0.813 |
 
     Most likely the difference comes from coverage and selection, not from a different estimator. This is not
     proven.
@@ -352,7 +352,7 @@ version bump.
 | `phases[]` | `label`, `start`, `end` (end is exclusive), `years`, `n_ge15`, `rate_per_yr`, `rate_lo`, `rate_hi` (Poisson 95 %), `prod_bcm_per_yr`. |
 | `correlation` | `spearman_rho`, `p`, `lag1_rho`, `lag1_p`, `years`, `n_years`. |
 | `milestones[]` | `date`, `label`, `short`, `kind` (`event` or `policy`). |
-| `events_ge3` | Columnar: `time`, `ml`, `id` (the KNMI event id), for the 16 events of ML ≥ 3.0. No locations (see the licence row above). |
+| `events_ge3` | Columnar: `time`, `ml`, `id` (the KNMI event id), for the 13 events of ML ≥ 3.0. No locations (see the licence row above). |
 | `mc` | 1.5 |
 
 ### `btime.json` fields
@@ -381,7 +381,7 @@ version bump.
 
 - Show the KNMI attribution with the network DOI.
 - Show "Source: NLOG.NL" next to any production curve or the outline.
-- Do not offer a download of single KNMI events. `rates.json` keeps only time, ML and id of the 16 events of
+- Do not offer a download of single KNMI events. `rates.json` keeps only time, ML and id of the 13 events of
   ML ≥ 3.0, without locations; the portal's "cannot be reused in unaltered form for commercial use" clause applies
   to these rows.
 
