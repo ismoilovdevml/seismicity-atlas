@@ -105,3 +105,40 @@ def test_cli_writes_reports(tmp_path, capsys):
     bad = tmp_path / "bad.csv"
     bad.write_text("a,b\n1,2\n")
     assert main(["report", str(bad)]) == 2
+
+
+def test_reader_joins_date_with_time_of_day(tmp_path):
+    """date,time columns: the time-of-day column is joined with the date (it used to get today's date)."""
+    csv = tmp_path / "dt.csv"
+    csv.write_text("date,time,mag\n2001-03-04,12:00:00,3.1\n2005-06-07,01:02:03,4.2\n")
+    cat = sa.read_catalog(csv)
+    assert cat.columns_used["time"] == "date + time"
+    assert list(cat.events["time"]) == [pd.Timestamp("2001-03-04 12:00:00"), pd.Timestamp("2005-06-07 01:02:03")]
+    only = sa.read_catalog(pd.DataFrame({"time": ["12:00:00", "13:00"], "mag": [3.0, 3.1]}))
+    assert not only.has_time and "time" not in only.columns_used  # a time of day alone is not a time
+
+
+def test_missing_magnitude_type_is_not_a_type():
+    df = synth(1000)
+    df["magType"] = ["ml" if i % 4 else ("" if i % 8 else None) for i in range(len(df))]
+    res = sa.analyze(sa.read_catalog(df), nboot=100)
+    assert res["magnitude_types"] == {"ml": 750}
+    assert not any("Mixed" in w for w in res["warnings"])
+    assert len(sa.read_catalog(df, mag_type="ml")) == 750
+
+
+def test_fmd_line_is_clipped_at_one_event_and_anchored_at_the_threshold():
+    from seisatlas.report import fit_segment
+
+    df = pd.concat([synth(400, b=1.0, seed=6), synth(1, seed=9).assign(mag=7.9)])
+    res = sa.analyze(sa.read_catalog(df), nboot=100)
+    t, n0, m2, n2 = fit_segment(res)
+    b = res["b"]["b"]
+    assert t == res["b"]["threshold"] == res["mc"]["maxc02"] and n0 == res["b"]["n_above_threshold"]
+    assert m2 < 7.9 and n2 == pytest.approx(1.0)  # ends where N = 1, not pinned at (Mmax, 1)
+    assert (np.log10(n2) - np.log10(n0)) / (m2 - t) == pytest.approx(-b)
+    assert 'class="fit"' in sa.to_html(res)
+    hi = sa.analyze(sa.read_catalog(synth(3000, seed=5)), nboot=100, floor=3.5)
+    t, n0, _, _ = fit_segment(hi)
+    assert hi["mc"]["maxc02"] < 3.5 and t == hi["b"]["threshold"] == 3.5
+    assert n0 == hi["b"]["n_above_threshold"]  # the count above the floor, plotted at the floor

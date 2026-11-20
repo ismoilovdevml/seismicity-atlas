@@ -61,6 +61,28 @@ def to_json(res: dict) -> str:
     return json.dumps(res, indent=1, ensure_ascii=False)
 
 
+def fit_segment(res: dict):
+    """End points (m1, n1, m2, n2) of the Gutenberg-Richter line drawn on the FMD plot, or None.
+
+    The line starts at the threshold used for b (res["b"]["threshold"], the highest per-event max(Mc, floor_i)) with
+    the cumulative count of events at or above it, falls with slope -b, and ends at the largest magnitude or where it
+    reaches N = 1, whichever comes first (a log axis cannot show N < 1)."""
+    f, b = res.get("fmd"), res.get("b") or {}
+    bb = b.get("b")
+    if not f or not f["mag"] or bb is None or not bb > 0:
+        return None
+    t = b.get("threshold")
+    if t is None:
+        t = (res.get("mc") or {}).get("maxc02")
+    if t is None:
+        return None
+    n0 = sum(c for m_, c in zip(f["mag"], f["count"]) if m_ >= t - 1e-9)
+    if n0 < 1:
+        return None
+    m2 = min(max(f["mag"]), t + math.log10(n0) / bb)
+    return t, n0, m2, n0 * 10 ** (-bb * (m2 - t))
+
+
 def fmd_svg(res: dict, width: int = 560, height: int = 340) -> str:
     """Cumulative (dots) and per-bin (bars) counts on a log axis, the Mc line and the b-value line."""
     f = res.get("fmd")
@@ -93,11 +115,11 @@ def fmd_svg(res: dict, width: int = 560, height: int = 340) -> str:
                      f'stroke="var(--accent,#c0392b)" stroke-dasharray="4 3"/>'
                      f'<text x="{X(mc) + 4:.1f}" y="{pad_t + 12}" font-size="11" fill="var(--accent,#c0392b)">'
                      f'Mc {mc:.1f}</text>')
-        if b.get("b") is not None and b.get("n_above_threshold"):
-            n0, bb = b["n_above_threshold"], b["b"]
-            xa, xb = mc, max(mags)
-            parts.append(f'<line x1="{X(xa):.1f}" y1="{Y(n0):.1f}" x2="{X(xb):.1f}" '
-                         f'y2="{Y(n0 * 10 ** (-bb * (xb - xa))):.1f}" stroke="var(--accent,#c0392b)"/>')
+        seg = fit_segment(res)
+        if seg:
+            xa, na, xb, nb = seg
+            parts.append(f'<line class="fit" x1="{X(xa):.1f}" y1="{Y(na):.1f}" x2="{X(xb):.1f}" y2="{Y(nb):.1f}" '
+                         f'stroke="var(--accent,#c0392b)"/>')
     for m_ in range(math.ceil(x0), math.floor(x1) + 1):
         parts.append(f'<text x="{X(m_):.1f}" y="{height - pad_b + 16}" font-size="11" text-anchor="middle" '
                      f'fill="var(--muted,#555)">{m_}</text>')

@@ -12,6 +12,7 @@ Method (as in the atlas, docs/method.md):
 - Quality: A if (hi - lo) / b <= 0.30, B if <= 0.50, C if wider (b withheld), insufficient below 50 events above the
   threshold. The width is relative because the standard error of b grows with b.
 - b-positive (van der Elst 2021) on time-ordered events above the threshold, as a robustness column.
+- res["b"]["threshold"] is the highest per-event threshold max(Mc, floor_i); without floors it equals Mc.
 The result describes the catalogue. It is not a forecast and not a hazard assessment.
 """
 from __future__ import annotations
@@ -93,7 +94,10 @@ def analyze(cat: Catalog, *, dm: float = 0.1, nboot: int = al.NBOOT, seed: int =
         gft = sl.mc_gft(m, dm)
         res["mc"].update(mbs=_f(sl.mc_mbs(m, dm), 1), gft=_f(gft[0], 1), gft_fit_percent=_f(gft[1], 1))
     q = cb.get("quality", "insufficient")
-    res["b"] = {"quality": q, "n_above_threshold": int(cb.get("n_b", 0)),
+    # highest per-event threshold max(Mc, floor_i) (= Mc without floors): where the FMD plot anchors the b line
+    thr_max = (float(np.max(np.maximum(cb["mc"], sl.bin_mag(np.where(np.isfinite(flo), flo, -9.0), dm))))
+               if "mc" in cb else None)
+    res["b"] = {"quality": q, "n_above_threshold": int(cb.get("n_b", 0)), "threshold": _f(thr_max, 6),
                 "b": _f(cb.get("b_raw")), "b_lo": _f(cb.get("b_lo_raw")), "b_hi": _f(cb.get("b_hi_raw")),
                 "relative_width": _f(cb.get("b_relw")), "b_sigma_shi_bolt": _f(cb.get("b_sigma_shibolt")),
                 "b_threshold_plus_0.2": _f(cb.get("b_plus02")), "b_threshold_plus_0.4": _f(cb.get("b_plus04")),

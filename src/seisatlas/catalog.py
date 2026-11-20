@@ -3,14 +3,16 @@
 Recognised column names (case-insensitive; the first match wins):
 
     magnitude  mag, magnitude, mw, ml, m
-    time       time, datetime, origin_time, origintime, date_time, or date + time
+    time       time, datetime, origin_time, origintime, date_time; a time-of-day column (12:00:00) is joined
+               with a date column (date, origin_date, event_date)
     latitude   latitude, lat
     longitude  longitude, lon, long, lng
     depth      depth, depth_km, dep
     mag type   magtype, mag_type, magnitude_type, type
 
 Only the magnitude is required. USGS ComCat, EMSC and ISC CSV exports and most national-network exports use
-these names. Rows without a magnitude, or with a magnitude outside -3..10, are dropped and counted.
+these names. Rows without a magnitude, or with a magnitude outside -3..10, are dropped and counted. A time-of-day
+column without a date column is not used as time (it would put every event on one day).
 """
 from __future__ import annotations
 
@@ -28,7 +30,10 @@ ALIASES = {
     "depth": ("depth", "depth_km", "dep"),
     "magtype": ("magtype", "mag_type", "magnitude_type", "type"),
 }
+DATE_ALIASES = ("date", "origin_date", "event_date")
 MAG_RANGE = (-3.0, 10.0)
+# hh:mm[:ss[.fff]] with an optional zone: a time of day without a date (pd.to_datetime would give it today's date)
+TIME_OF_DAY = r"\d{1,2}:\d{2}(?::\d{2}(?:\.\d*)?)?\s*(?:[zZ]|[+-]\d{2}:?\d{2})?"
 
 
 @dataclass
@@ -59,6 +64,13 @@ def _pick(cols: dict, names) -> str | None:
     return None
 
 
+def _time_of_day_only(col: pd.Series) -> bool:
+    """True when every non-empty value is a time of day without a date."""
+    v = col.dropna().astype(str).str.strip()
+    v = v[v != ""]
+    return bool(len(v)) and bool(v.str.fullmatch(TIME_OF_DAY).all())
+
+
 def read_catalog(src, *, mag_type: str | None = None) -> Catalog:
     """Read a CSV path or a DataFrame. `mag_type` keeps only events of that magnitude type (needs a type column)."""
     if isinstance(src, pd.DataFrame):
@@ -76,9 +88,15 @@ def read_catalog(src, *, mag_type: str | None = None) -> Catalog:
     if "mag" not in used:
         raise ValueError(f"no magnitude column found; expected one of {ALIASES['mag']}, got {list(raw.columns)}")
     ev = pd.DataFrame({std: raw[c] for std, c in used.items()})
-    if "time" not in used and "date" in cols and "time" in cols:
-        used["time"] = f"{cols['date']} + {cols['time']}"
-        ev["time"] = raw[cols["date"]].astype(str) + " " + raw[cols["time"]].astype(str)
+    if "time" in used and _time_of_day_only(raw[used["time"]]):
+        tc, dc = used["time"], _pick(cols, DATE_ALIASES)
+        if dc is None:
+            del used["time"]
+            ev = ev.drop(columns="time")
+        else:
+            used["time"] = f"{dc} + {tc}"
+            hhmm = raw[tc].astype(str).str.strip().str.replace(r"^(\d):", r"0\1:", regex=True)
+            ev["time"] = (raw[dc].astype(str).str.strip() + " " + hhmm).where(raw[dc].notna() & raw[tc].notna())
     dropped = {}
     ev["mag"] = pd.to_numeric(ev["mag"], errors="coerce")
     bad = ev["mag"].isna() | (ev["mag"] < MAG_RANGE[0]) | (ev["mag"] > MAG_RANGE[1])
@@ -97,9 +115,11 @@ def read_catalog(src, *, mag_type: str | None = None) -> Catalog:
                 dropped["unparsed_time_kept_without_time"] = int(t.isna().sum())
             ev["time"] = t.dt.tz_localize(None)
     if "magtype" in ev:
-        ev["magtype"] = ev["magtype"].astype(str).str.strip().str.lower()
+        # missing types stay missing (astype(str) would turn NaN into the type "nan" on pandas 2)
+        mt = ev["magtype"].map(lambda v: None if pd.isna(v) else str(v).strip().lower() or None).astype(object)
+        ev["magtype"] = mt
         if mag_type is not None:
-            keep = ev["magtype"] == mag_type.strip().lower()
+            keep = (mt == mag_type.strip().lower()).to_numpy(bool)
             dropped["other_magnitude_types"] = int((~keep).sum())
             ev = ev[keep]
     elif mag_type is not None:

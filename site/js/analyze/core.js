@@ -9,6 +9,29 @@ export const Q_A = 0.30;
 export const Q_B = 0.50;
 const LOG10E = Math.LOG10E;
 
+/** An input problem the page can explain: `code` names an `an.err.<code>` message, `params` fill it in. The English
+ * `message` is what the Python package says in the same case. Codes and params survive postMessage via errorInfo. */
+export class CatalogError extends Error {
+  constructor(code, message, params = {}) {
+    super(message);
+    this.name = 'CatalogError';
+    this.code = code;
+    this.params = params;
+  }
+}
+
+/** Plain object for an error (postMessage drops the own fields of an Error). */
+export const errorInfo = (err) => ({ code: (err && err.code) || null, params: (err && err.params) || {},
+  message: String((err && err.message) || err) });
+
+/** Smallest and largest value without spreading into Math.min (which overflows the call stack for ~10^5 values). */
+export function minMax(arr) {
+  let lo = Infinity;
+  let hi = -Infinity;
+  for (const v of arr) { if (v < lo) lo = v; if (v > hi) hi = v; }
+  return [lo, hi];
+}
+
 /** numpy.rint: round half to even. */
 export function rint(x) {
   const f = Math.floor(x);
@@ -87,7 +110,7 @@ export function quality(n, lo, hi, b) {
 }
 
 /** atlaslib.cell_b: b with threshold max(MAXC + 0.2, floor_i) and a bootstrap that re-estimates Mc. */
-export function cellB(m, floor, { nboot = NBOOT, seed = 20261116, dm = 0.1, nminMc = 30 } = {}) {
+export function cellB(m, floor, { nboot = NBOOT, seed = 20261116, dm = 0.1, nminMc = 30, onProgress = null } = {}) {
   const N = m.length;
   const mb = Float64Array.from(m, (v) => binMag(v, dm));
   const fl = Float64Array.from(floor, (v) => binMag(v, dm));
@@ -102,7 +125,9 @@ export function cellB(m, floor, { nboot = NBOOT, seed = 20261116, dm = 0.1, nmin
   const mm = new Float64Array(N);
   const ff = new Float64Array(N);
   const th = new Float64Array(N);
+  const step = Math.max(1, Math.floor(nboot / 20));
   for (let r = 0; r < nboot; r++) {
+    if (onProgress && r % step === 0) onProgress(r / nboot);
     for (let i = 0; i < N; i++) { const j = Math.floor(R() * N); mm[i] = mb[j]; ff[i] = fl[j]; }
     const mcr = maxc(mm, dm);
     mcb[r] = mcr;
@@ -143,6 +168,24 @@ export function bPositive(mOrdered, thr, dm = 0.1, dmc = 0.2) {
   return [b, 2.3 * b * b * Math.sqrt(ss / (n * (n - 1))), n];
 }
 
+/** report.fit_segment: [m1, n1, m2, n2] of the Gutenberg-Richter line on the FMD plot, or null. It starts at the
+ * threshold used for b (the highest per-event max(Mc, floor_i)) with the cumulative count there and ends at the largest
+ * magnitude or where it reaches N = 1, whichever comes first (a log axis cannot show N < 1). */
+export function fitSegment(res) {
+  const f = res.fmd;
+  const b = res.b || {};
+  const bb = b.b;
+  if (!f || !f.mag.length || bb == null || !(bb > 0)) return null;
+  let t = b.threshold;
+  if (t == null) t = res.mc ? res.mc.maxc02 : null;
+  if (t == null) return null;
+  let n0 = 0;
+  for (let i = 0; i < f.mag.length; i++) if (f.mag[i] >= t - 1e-9) n0 += f.count[i];
+  if (n0 < 1) return null;
+  const m2 = Math.min(minMax(f.mag)[1], t + Math.log10(n0) / bb);
+  return [t, n0, m2, n0 * 10 ** (-bb * (m2 - t))];
+}
+
 /** seislib.fmd: bins from min to max, counts and cumulative counts. */
 export function fmd(m, dm = 0.1) {
   const mb = Array.from(m, (v) => binMag(v, dm));
@@ -168,6 +211,23 @@ const ALIASES = {
   depth: ['depth', 'depth_km', 'dep'],
   magtype: ['magtype', 'mag_type', 'magnitude_type', 'type'],
 };
+const DATE_ALIASES = ['date', 'origin_date', 'event_date'];
+// catalog.TIME_OF_DAY: a time of day without a date; it is joined with a date column, or not used as time
+const TIME_OF_DAY = /^\d{1,2}:\d{2}(?::\d{2}(?:\.\d*)?)?\s*(?:[zZ]|[+-]\d{2}:?\d{2})?$/;
+const NUMBER = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/;
+
+/** Strict number as pandas.to_numeric(errors="coerce"): "5.2abc", "3,1" and "" are NaN (parseFloat would read 5.2, 3). */
+export function toNumber(v) {
+  const s = String(v == null ? '' : v).trim();
+  return NUMBER.test(s) ? Number(s) : NaN;
+}
+
+/** Date-time text -> ms since 1970 (UTC unless a zone is given), NaN if unparsed. */
+function parseTime(raw) {
+  const s = String(raw).trim();
+  if (!s) return NaN;
+  return Date.parse(/[zZ]|[+-]\d\d:?\d\d$/.test(s) || !/\d[ T]\d/.test(s) ? s : `${s.replace(' ', 'T')}Z`);
+}
 
 /** Split CSV text into rows of fields (quotes, doubled quotes, CRLF); delimiter , ; or tab, guessed from the header. */
 export function parseCsv(text) {
@@ -201,37 +261,51 @@ export function parseCsv(text) {
 /** Rows -> events sorted by time: {mag, time (ms or NaN), latitude, longitude, depth, magtype}. */
 export function readCatalog(text, { magType = null } = {}) {
   const rows = parseCsv(text);
-  if (rows.length < 2) throw new Error('The file has no data rows.');
+  if (rows.length < 2) throw new CatalogError('noRows', 'the file has no data rows');
   const header = rows[0].map((h) => h.trim().toLowerCase());
   const col = {};
   for (const [std, names] of Object.entries(ALIASES)) {
     const j = names.map((n) => header.indexOf(n)).find((x) => x >= 0);
     if (j !== undefined) col[std] = j;
   }
-  if (col.mag === undefined) throw new Error(`No magnitude column found (expected one of: ${ALIASES.mag.join(', ')}).`);
-  const dateJ = header.indexOf('date');
-  const timeJ = header.indexOf('time');
-  const combine = col.time === undefined && dateJ >= 0 && timeJ >= 0;
+  if (col.mag === undefined) {
+    throw new CatalogError('noMag', `no magnitude column found; expected one of ${ALIASES.mag.join(', ')}`,
+      { cols: ALIASES.mag.join(', ') });
+  }
+  if (magType && col.magtype === undefined) {
+    throw new CatalogError('noTypeCol', 'mag_type given but the catalogue has no magnitude-type column');
+  }
+  const names = Object.fromEntries(Object.entries(col).map(([k, j]) => [k, rows[0][j]]));
+  // a time-of-day column (12:00:00) is joined with a date column; without one it is not a time (as catalog.py)
+  let dateJ = -1;
+  if (col.time !== undefined) {
+    const vals = rows.slice(1).map((r) => String(r[col.time] ?? '').trim()).filter((v) => v !== '');
+    if (vals.length && vals.every((v) => TIME_OF_DAY.test(v))) {
+      dateJ = DATE_ALIASES.map((n) => header.indexOf(n)).find((x) => x >= 0) ?? -1;
+      if (dateJ < 0) { delete col.time; delete names.time; } else names.time = `${rows[0][dateJ]} + ${rows[0][col.time]}`;
+    }
+  }
   const dropped = { bad_magnitude: 0, other_magnitude_types: 0 };
   const ev = [];
-  const num = (r, k) => (col[k] === undefined ? NaN : parseFloat(r[col[k]]));
+  const num = (r, k) => (col[k] === undefined ? NaN : toNumber(r[col[k]]));
+  const want = magType ? magType.trim().toLowerCase() : null;
   for (const r of rows.slice(1)) {
-    const mag = parseFloat(r[col.mag]);
+    const mag = toNumber(r[col.mag]);
     if (!Number.isFinite(mag) || mag < -3 || mag > 10) { dropped.bad_magnitude++; continue; }
-    const mt = col.magtype === undefined ? null : String(r[col.magtype] || '').trim().toLowerCase();
-    if (magType && mt !== magType.trim().toLowerCase()) { dropped.other_magnitude_types++; continue; }
+    const mt = col.magtype === undefined ? null : String(r[col.magtype] ?? '').trim().toLowerCase() || null;
+    if (want && mt !== want) { dropped.other_magnitude_types++; continue; }
     let ts = NaN;
-    const raw = combine ? `${r[dateJ]}T${r[timeJ]}` : col.time !== undefined ? r[col.time] : null;
-    if (raw) {
-      const s = String(raw).trim();
-      ts = Date.parse(/[zZ]|[+-]\d\d:?\d\d$/.test(s) || !/\d[ T]\d/.test(s) ? s : `${s.replace(' ', 'T')}Z`);
-    }
+    if (col.time !== undefined && dateJ >= 0) {
+      const d = String(r[dateJ] ?? '').trim();
+      const tm = String(r[col.time] ?? '').trim().replace(/^(\d):/, '0$1:');
+      if (d && tm) ts = parseTime(`${d} ${tm}`);
+    } else if (col.time !== undefined) ts = parseTime(r[col.time] ?? '');
     ev.push({ mag, time: ts, latitude: num(r, 'latitude'), longitude: num(r, 'longitude'), depth: num(r, 'depth'), magtype: mt });
   }
-  if (magType && col.magtype === undefined) throw new Error('A magnitude type was chosen, but the file has no magnitude-type column.');
   const hasTime = ev.some((e) => Number.isFinite(e.time));
-  if (hasTime) ev.sort((a, b) => (Number.isFinite(a.time) ? a.time : Infinity) - (Number.isFinite(b.time) ? b.time : Infinity));
-  return { events: ev, dropped, columns: Object.fromEntries(Object.entries(col).map(([k, j]) => [k, rows[0][j]])), hasTime };
+  if (hasTime) ev.sort((x, y) => (Number.isFinite(x.time) ? x.time : Infinity) - (Number.isFinite(y.time) ? y.time : Infinity));
+  return { events: ev, dropped, columns: names, hasTime,
+    hasLocation: col.latitude !== undefined && col.longitude !== undefined, hasDepth: col.depth !== undefined };
 }
 
 const toRad = (d) => d * Math.PI / 180;
@@ -240,18 +314,28 @@ export function haversineKm(lat1, lon1, lat2, lon2) {
   return 2 * 6371.0 * Math.asin(Math.sqrt(Math.min(Math.max(a, 0), 1)));
 }
 
-/** Keep events inside a circle, a depth range and a time window (unset limits are ignored). */
-export function select(events, { lat = null, lon = null, radiusKm = null, depthMin = null, depthMax = null, start = null, end = null } = {}) {
+/** catalog.select: keep events inside a circle, a depth range and a time window (unset limits are ignored). A limit
+ * on a column the file does not have is an error, as in Python, not a silently empty selection. Returns a catalogue. */
+export function select(cat, { lat = null, lon = null, radiusKm = null, depthMin = null, depthMax = null, start = null, end = null } = {}) {
+  if (radiusKm != null && (lat == null || lon == null)) {
+    throw new CatalogError('circle', 'radius_km needs lat, lon and a catalogue with latitude and longitude');
+  }
+  if (radiusKm != null && !cat.hasLocation) {
+    throw new CatalogError('noLocation', 'radius_km needs lat, lon and a catalogue with latitude and longitude');
+  }
+  if ((depthMin != null || depthMax != null) && !cat.hasDepth) throw new CatalogError('noDepth', 'a depth limit needs a depth column');
+  if ((start || end) && !cat.hasTime) throw new CatalogError('noTime', 'a time window needs a time column');
   const t0 = start ? Date.parse(`${start}T00:00:00Z`) : null;
   const t1 = end ? Date.parse(`${end}T00:00:00Z`) : null;
-  return events.filter((e) => {
-    if (radiusKm != null && lat != null && lon != null && !(haversineKm(lat, lon, e.latitude, e.longitude) <= radiusKm)) return false;
+  const events = cat.events.filter((e) => {
+    if (radiusKm != null && !(haversineKm(lat, lon, e.latitude, e.longitude) <= radiusKm)) return false;
     if (depthMin != null && !(e.depth >= depthMin)) return false;
     if (depthMax != null && !(e.depth <= depthMax)) return false;
     if (t0 != null && !(e.time >= t0)) return false;
     if (t1 != null && !(e.time < t1)) return false;
     return true;
   });
+  return { ...cat, events, hasTime: events.some((e) => Number.isFinite(e.time)) };
 }
 
 // ---------------------------------------------------------------- analysis (as seisatlas.analyze)
@@ -259,22 +343,26 @@ export function select(events, { lat = null, lon = null, radiusKm = null, depthM
 const fx = (x, nd = 3) => (Number.isFinite(x) ? +x.toFixed(nd) : null);
 
 /** floorPeriods: [[y0, y1, floor], ...] by calendar year (UTC). */
-export function analyze(events, { dm = 0.1, nboot = NBOOT, seed = 20261116, floor = null, floorPeriods = null } = {}) {
+export function analyze(events, { dm = 0.1, nboot = NBOOT, seed = 20261116, floor = null, floorPeriods = null, onProgress = null } = {}) {
   const res = { n_events: events.length, warnings: [], settings: { dm, nboot, seed, floor, floorPeriods } };
   const W = res.warnings;
   if (!events.length) { W.push({ k: 'none' }); return res; }
   const m = events.map((e) => e.mag);
-  res.magnitude_range = [Math.min(...m), Math.max(...m)];
+  res.magnitude_range = minMax(m);
   const hasTime = events.some((e) => Number.isFinite(e.time));
   if (hasTime) {
-    const ts = events.map((e) => e.time).filter(Number.isFinite);
-    res.time_range = [new Date(Math.min(...ts)).toISOString().slice(0, 10), new Date(Math.max(...ts)).toISOString().slice(0, 10)];
+    const [ta, tb] = minMax(events.map((e) => e.time).filter(Number.isFinite));
+    res.time_range = [new Date(ta).toISOString().slice(0, 10), new Date(tb).toISOString().slice(0, 10)];
   }
-  const types = {};
-  for (const e of events) if (e.magtype) types[e.magtype] = (types[e.magtype] || 0) + 1;
-  if (Object.keys(types).length) {
-    res.magnitude_types = types;
-    const major = Object.entries(types).filter(([, v]) => v / events.length >= 0.05);
+  if (floorPeriods && floorPeriods.length && !hasTime) throw new CatalogError('floorTime', 'floor_periods needs a time column');
+  // as analysis.py: a missing type is not a type; shares are of the events that have one, largest first
+  const counts = {};
+  let typed = 0;
+  for (const e of events) if (e.magtype) { counts[e.magtype] = (counts[e.magtype] || 0) + 1; typed++; }
+  const sorted = Object.entries(counts).sort((x, y) => y[1] - x[1]);
+  if (sorted.length) {
+    res.magnitude_types = Object.fromEntries(sorted);
+    const major = sorted.filter(([, v]) => v / typed >= 0.05);
     if (major.length > 1) W.push({ k: 'mixed', types: major });
   }
   const fl = events.map((e) => {
@@ -285,11 +373,13 @@ export function analyze(events, { dm = 0.1, nboot = NBOOT, seed = 20261116, floo
     }
     return f;
   });
-  const cb = cellB(m, fl, { nboot, seed, dm });
+  const cb = cellB(m, fl, { nboot, seed, dm, onProgress });
   res.mc = { maxc02: fx(cb.mc, 1), maxc02_lo: fx(cb.mc_lo, 1), maxc02_hi: fx(cb.mc_hi, 1) };
   const q = cb.quality;
-  res.b = { quality: q, n_above_threshold: cb.n_b || 0, b: fx(cb.b), b_lo: fx(cb.lo), b_hi: fx(cb.hi),
-    relative_width: fx(cb.relw), b_plus02: fx(cb.b_plus02), b_plus04: fx(cb.b_plus04), cutoff_unstable: !!cb.unstable,
+  // the same keys as analysis.py
+  res.b = { quality: q, n_above_threshold: cb.n_b || 0, threshold: cb.thr ? fx(minMax(cb.thr)[1], 6) : null,
+    b: fx(cb.b), b_lo: fx(cb.lo), b_hi: fx(cb.hi), relative_width: fx(cb.relw), b_sigma_shi_bolt: fx(cb.sigma),
+    'b_threshold_plus_0.2': fx(cb.b_plus02), 'b_threshold_plus_0.4': fx(cb.b_plus04), cutoff_unstable: !!cb.unstable,
     shown: q === 'A' || q === 'B' };
   if (q === 'insufficient') { W.push({ k: 'few', n: NMIN_B }); Object.assign(res.b, { b: null, b_lo: null, b_hi: null }); }
   else if (q === 'C') W.push({ k: 'wide' });
@@ -314,8 +404,23 @@ export function analyze(events, { dm = 0.1, nboot = NBOOT, seed = 20261116, floo
       }
     }
     const mcs = res.mc_by_year.map((r) => r.mc_maxc02).filter((v) => v != null);
-    if (mcs.length >= 3 && Math.max(...mcs) - Math.min(...mcs) >= 0.3 - 1e-9 && !floorPeriods) W.push({ k: 'mc_time', lo: Math.min(...mcs), hi: Math.max(...mcs) });
+    const [lo, hi] = minMax(mcs);
+    if (mcs.length >= 3 && hi - lo >= 0.3 - 1e-9 && !floorPeriods) W.push({ k: 'mc_time', lo, hi });
   }
   res.fmd = fmd(m, dm);
   return res;
+}
+
+/** One page job, the same in the worker (worker.js) and on the main thread when no worker can start.
+ * kind 'read': {n, columns, types}; kind 'analyze': {res, n}, after the selection in `opts`. */
+export function runJob(kind, text, opts = {}, onProgress = null) {
+  if (kind === 'read') {
+    const cat = readCatalog(text);
+    const types = {};
+    for (const e of cat.events) if (e.magtype) types[e.magtype] = (types[e.magtype] || 0) + 1;
+    return { n: cat.events.length, columns: cat.columns, types };
+  }
+  const cat = select(readCatalog(text, { magType: opts.magType || null }), opts);
+  const res = analyze(cat.events, { nboot: opts.nboot, floor: opts.floor, floorPeriods: opts.floorPeriods, onProgress });
+  return { res, n: cat.events.length };
 }

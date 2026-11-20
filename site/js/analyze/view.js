@@ -1,9 +1,10 @@
 // "Your catalogue": Mc and b-value of a CSV file the visitor chooses, computed in the browser with core.js.
 // The file is read with FileReader and never sent anywhere. Loaded on demand (like the Learn pages).
+// Reading and the bootstrap run in a module Web Worker (worker.js); if no worker can start, on the main thread.
 
 import { h } from '../charts.js';
 import { t } from '../i18n/index.js';
-import { readCatalog, select, analyze, NBOOT } from './core.js';
+import { NBOOT, runJob, errorInfo, fitSegment, minMax } from './core.js';
 
 let file = null;      // { name, text }
 let last = null;      // { res, opts }
@@ -11,6 +12,67 @@ let root = null;
 
 const num = (v) => (v === '' || v == null || !Number.isFinite(+v) ? null : +v);
 const fmt = (x, nd = 3) => (x == null ? '–' : (+x).toFixed(nd));
+
+// ---------------------------------------------------------------- worker, with a main-thread fallback
+
+let worker = null;
+let noWorker = typeof Worker === 'undefined';
+let seq = 0;
+const pending = new Map();   // id -> {resolve, reject, onProgress, local}
+
+function getWorker() {
+  if (noWorker) return null;
+  if (worker) return worker;
+  try {
+    // relative to this module, so it works at / (Cloudflare Pages) and under /seismicity-atlas/ (GitHub Pages)
+    worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
+  } catch (e) {
+    noWorker = true;
+    return null;
+  }
+  worker.onmessage = ({ data }) => {
+    const job = pending.get(data.id);
+    if (!job) return;
+    if ('progress' in data) { if (job.onProgress) job.onProgress(data.progress); return; }
+    pending.delete(data.id);
+    if (data.ok) job.resolve(data.out); else job.reject(data.error);
+  };
+  // A module worker that cannot load (old browser, blocked script) fails here: finish every job on the main thread.
+  worker.onerror = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    noWorker = true;
+    worker.terminate();
+    worker = null;
+    const jobs = [...pending.values()];
+    pending.clear();
+    for (const job of jobs) job.local();
+  };
+  return worker;
+}
+
+/** Run a core.js job ('read' or 'analyze') in the worker; errors arrive as {code, params, message}. */
+function job(kind, text, opts, onProgress) {
+  return new Promise((resolve, reject) => {
+    const local = () => setTimeout(() => {
+      try { resolve(runJob(kind, text, opts, null)); } catch (err) { reject(errorInfo(err)); }
+    }, 30);
+    const w = getWorker();
+    if (!w) { local(); return; }
+    const id = ++seq;
+    pending.set(id, { resolve, reject, onProgress, local });
+    w.postMessage({ id, kind, text, opts });
+  });
+}
+
+/** Error from core.js (a code with params, translated) or anything else (its message). */
+function errText(err) {
+  if (err && err.code) {
+    const key = `an.err.${err.code}`;
+    const s = t(key, err.params || {});
+    if (s !== key) return s;
+  }
+  return t('an.err.failed', { msg: (err && err.message) || String(err) });
+}
 
 function periods(text) {
   const out = [];
@@ -37,7 +99,7 @@ function fmdSvg(res) {
   if (!f || !f.mag.length) return null;
   const W = 560, H = 320, L = 50, R = 14, T = 12, B = 38;
   const x0 = f.mag[0] - 0.05, x1 = f.mag[f.mag.length - 1] + 0.05;
-  const ymax = Math.log10(Math.max(...f.cumulative)) + 0.2;
+  const ymax = Math.log10(minMax(f.cumulative)[1]) + 0.2;
   const X = (m) => L + ((m - x0) / (x1 - x0)) * (W - L - R);
   const Y = (n) => T + (1 - Math.log10(Math.max(n, 1)) / ymax) * (H - T - B);
   const ns = 'http://www.w3.org/2000/svg';
@@ -54,10 +116,8 @@ function fmdSvg(res) {
   if (mc != null) {
     svg.append(el('line', { x1: X(mc), x2: X(mc), y1: T, y2: H - B, class: 'an-mc' }));
     const tx = el('text', { x: X(mc) + 4, y: T + 12, class: 'an-mc-t' }); tx.textContent = `Mc ${mc.toFixed(1)}`; svg.append(tx);
-    if (res.b && res.b.b != null) {
-      const n0 = res.b.n_above_threshold, xb = f.mag[f.mag.length - 1];
-      svg.append(el('line', { x1: X(mc), y1: Y(n0), x2: X(xb), y2: Y(n0 * 10 ** (-res.b.b * (xb - mc))), class: 'an-fit' }));
-    }
+    const seg = fitSegment(res);
+    if (seg) svg.append(el('line', { x1: X(seg[0]), y1: Y(seg[1]), x2: X(seg[2]), y2: Y(seg[3]), class: 'an-fit' }));
   }
   for (let m = Math.ceil(x0); m <= Math.floor(x1); m++) {
     const tx = el('text', { x: X(m), y: H - B + 16, 'text-anchor': 'middle', class: 'an-tick' }); tx.textContent = String(m); svg.append(tx);
@@ -94,7 +154,7 @@ function resultView(res, opts) {
     res.mc ? ['Mc (MAXC + 0.2) [95 %]', `${fmt(res.mc.maxc02, 1)} [${fmt(res.mc.maxc02_lo, 1)}, ${fmt(res.mc.maxc02_hi, 1)}]`] : null,
     [t('an.bRow'), b.b == null ? t(`an.q.${b.quality || 'insufficient'}`)
       : `${fmt(b.b)} [${fmt(b.b_lo)}, ${fmt(b.b_hi)}] · ${t('an.quality')} ${b.quality} · n = ${b.n_above_threshold}${b.shown ? '' : ` · ${t('an.withheld')}`}`],
-    b.b != null ? [t('an.cutoff'), `${fmt(b.b_plus02)} / ${fmt(b.b_plus04)}`] : null,
+    b.b != null ? [t('an.cutoff'), `${fmt(b['b_threshold_plus_0.2'])} / ${fmt(b['b_threshold_plus_0.4'])}`] : null,
     res.b_positive && res.b_positive.b != null ? ['b-positive [95 %]', `${fmt(res.b_positive.b)} [${fmt(res.b_positive.b_lo)}, ${fmt(res.b_positive.b_hi)}] · ${res.b_positive.n_differences}`] : null,
     res.magnitude_types ? [t('an.types'), Object.entries(res.magnitude_types).map(([k, v]) => `${k}: ${v}`).join(', ')] : null,
   ].filter(Boolean);
@@ -134,13 +194,13 @@ export function renderAnalyze(el) {
   const fillTypes = () => {
     typeSel.replaceChildren(h('option', { value: '', text: t('an.allTypes') }));
     if (!file) return;
-    try {
-      const cat = readCatalog(file.text);
-      const types = {};
-      for (const e of cat.events) if (e.magtype) types[e.magtype] = (types[e.magtype] || 0) + 1;
-      for (const [k, v] of Object.entries(types).sort((a, b) => b[1] - a[1])) typeSel.append(h('option', { value: k, text: `${k} (${v})` }));
-      status.textContent = t('an.loaded', { name: file.name, n: cat.events.length, cols: Object.keys(cat.columns).join(', ') });
-    } catch (e) { status.textContent = e.message; }
+    const f = file;
+    status.textContent = t('an.reading', { name: f.name });
+    job('read', f.text, {}).then((out) => {
+      if (f !== file) return;
+      for (const [k, v] of Object.entries(out.types).sort((a, b) => b[1] - a[1])) typeSel.append(h('option', { value: k, text: `${k} (${v})` }));
+      status.textContent = t('an.loaded', { name: f.name, n: out.n, cols: Object.keys(out.columns).join(', ') });
+    }, (err) => { if (f === file) status.textContent = errText(err); });
   };
   const load = (f) => {
     if (!f) return;
@@ -183,16 +243,17 @@ export function renderAnalyze(el) {
     } catch (err) { status.textContent = err.message; return; }
     status.textContent = t('an.computing');
     result.replaceChildren();
-    setTimeout(() => {
-      try {
-        const cat = readCatalog(file.text, { magType: opts.magType });
-        const ev = select(cat.events, opts);
-        const res = analyze(ev, { nboot: opts.nboot, floor: opts.floor, floorPeriods: opts.floorPeriods });
+    const run = form.querySelector('button[type=submit]');
+    run.disabled = true;
+    form.setAttribute('aria-busy', 'true');
+    const done = () => { run.disabled = false; form.removeAttribute('aria-busy'); };
+    job('analyze', file.text, opts, (p) => { status.textContent = t('an.progress', { p: Math.round(p * 100) }); })
+      .then(({ res, n }) => {
+        done();
         last = { res, opts };
         result.replaceChildren(resultView(res, opts));
-        status.textContent = t('an.done', { n: ev.length });
-      } catch (err) { status.textContent = err.message; }
-    }, 30);
+        status.textContent = t('an.done', { n });
+      }, (err) => { done(); status.textContent = errText(err); });
   });
 
   el.append(
