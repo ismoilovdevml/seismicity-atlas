@@ -71,7 +71,7 @@ def annual_mc(years, mags, year_bins, nmin: int = 30):
 
 
 # ------------------------------------------------------------------------------------------------ b-values
-def b_fixed(m, mc: float, nboot: int = 1000, rng=None) -> dict:
+def b_fixed(m, mc: float, nboot: int = al.NBOOT, rng=None) -> dict:
     """Aki-Utsu b at a fixed completeness (binned magnitudes >= mc), 95 % percentile bootstrap interval,
     plus the Shi-Bolt standard error. Used where the literature fixes Mc (e.g. ML 1.5 at Groningen)."""
     rng = np.random.default_rng(rng)
@@ -87,7 +87,7 @@ def b_fixed(m, mc: float, nboot: int = 1000, rng=None) -> dict:
     return {"mc": mc, "n": int(n), "b": float(b), "lo": float(lo), "hi": float(hi), "sigma_shibolt": float(sig)}
 
 
-def moving_bpos(t_years, m, floor: float, window: int = 200, step: int = 10, nboot: int = 200, rng=None):
+def moving_bpos(t_years, m, floor: float, window: int = 200, step: int = 10, nboot: int = al.NBOOT, rng=None):
     """b-positive in moving windows of `window` consecutive events (above `floor`), time = last event of the
     window (Tormann et al. 2013 convention), with a bootstrap 95 % interval over the window's differences."""
     rng = np.random.default_rng(rng)
@@ -120,7 +120,7 @@ def grid_nodes(geom_rd, spacing_m: float = 1000.0, buffer_m: float = 0.0):
     return X[ok], Y[ok]
 
 
-def b_map(nx, ny, ex, ey, em, floor, bpos_floor: float, radius_m: float = 5000.0, nboot: int = 200, rng=0):
+def b_map(nx, ny, ex, ey, em, floor, bpos_floor: float, radius_m: float = 5000.0, nboot: int = al.NBOOT, rng=0):
     """Per node: atlas cell_b (MAXC+0.2 with a per-event floor, bootstrap CI, A/B/C quality) and atlas
     cell_bpos (b-positive, at least 50 positive differences, as in Gulia & Wiemer 2026) of the events within
     radius_m. ex, ey, em, floor are aligned arrays of the events ORDERED IN TIME (b-positive needs the order)."""

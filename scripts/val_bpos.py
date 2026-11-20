@@ -165,7 +165,7 @@ def per_cell(samples, cells_df, rng, lilliefors=False):
         m, f = sl.bin_mag(s["m"]), sl.bin_mag(s["f"])
         if m.size < 30:
             continue
-        r = al.cell_b(m, f, nboot=200, rng=rng)
+        r = al.cell_b(m, f, nboot=al.NBOOT, rng=rng)       # the atlas's own interval (200 before 0.6.0)
         rp = al.cell_bpos(m, f)
         thr = np.maximum(float(sl.mc_maxc_fast(m)), f)
         row = {"h3": h, "pb": cells_df.loc[h, "pb_class"], "q": r.get("quality"), "b": r.get("b_raw", np.nan),
@@ -350,7 +350,7 @@ def main():
                 f = sl.bin_mag(samp[h]["f"])
                 f = f[sl.bin_mag(samp[h]["m"]) >= f - 1e-9]
                 m = np.round((f - 0.05 + rng.exponential(LOG10E, f.size)) / resol) * resol   # b = 1
-                r = al.cell_b(m, f, nboot=200, rng=rng)
+                r = al.cell_b(m, f, nboot=al.NBOOT, rng=rng)
                 rp = al.cell_bpos(m, f)
                 if r.get("quality") in ("A", "B") and np.isfinite(rp["bpos"]):
                     rows.append((r["b"], r["b_lo"], r["b_hi"], rp["bpos"]))

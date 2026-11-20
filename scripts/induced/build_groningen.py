@@ -27,7 +27,7 @@ WORK = common.ROOT / "data" / "work" / "induced"
 OUT = common.SITE / "induced" / "groningen"
 IMG = common.IMG
 SEED = 20261114
-NBOOT = 1000
+NBOOT = al.NBOOT             # one bootstrap size for every published interval (atlaslib)
 
 REGION_BUFFER_M = 2000.0     # study region = NLOG field outline + 2 km (reproduces Dost et al. 2017 event counts)
 MC_RATE = 1.5                # ML; the network design level, "Until 2014 Mc = 1.5 was adopted" (Dost et al. 2017)
@@ -72,6 +72,12 @@ def load():
     return ev, pr, geom, gj
 
 
+def at_least(ev, ml: float):
+    """Events with the reported ML >= ml. Not the 0.1 bin (column mb): bin 3.0 also holds ML 2.95-2.99, which made
+    "16 events of ML >= 3.0" out of 14 before 0.6.0."""
+    return ev[ev.mag.to_numpy(float) >= ml - 1e-9]
+
+
 def poisson_ci(k, T):
     lo = stats.chi2.ppf(0.025, 2 * k) / 2 if k > 0 else 0.0
     hi = stats.chi2.ppf(0.975, 2 * (k + 1)) / 2
@@ -105,7 +111,7 @@ def rates(ev, pr):
                    "rate_lo": lo, "rate_hi": hi,
                    "prod_bcm_per_yr": float(pp.sum() / T) if pp.notna().all() else None,
                    "prod_note": None if pp.notna().all() else "NLOG monthly figures start in 2003"})
-    big = reg[reg.mb >= 3.0][["time", "lat", "lon", "mag", "id"]]
+    big = at_least(reg, 3.0)[["time", "lat", "lon", "mag", "id"]]
     return monthly, ann, ph, {"spearman_rho": rho, "p": p, "years": "2003-2024", "lag1_rho": rho1, "lag1_p": p1,
                               "n_years": int(len(both))}, big
 
@@ -131,7 +137,7 @@ def b_time(ev, rng):
     for name, sel in (("field", np.ones(len(reg), bool)), ("north", reg.y.values >= NS_SPLIT_RD_Y),
                       ("south", reg.y.values < NS_SPLIT_RD_Y)):
         s = reg[sel]
-        moving[name] = il.moving_bpos(s.yr.values, s.mag.values, BPOS_FLOOR, MOVING_WINDOW, step=5, nboot=200,
+        moving[name] = il.moving_bpos(s.yr.values, s.mag.values, BPOS_FLOOR, MOVING_WINDOW, step=5, nboot=NBOOT,
                                       rng=rng)
     return phases, moving
 
@@ -364,7 +370,7 @@ def fig_bmap(maps, geom, ev):
                 xx, yy = r.xy
                 ax.plot(np.array(xx) / 1e3, np.array(yy) / 1e3, color=common.INK, lw=0.6)
         ax.axhline(NS_SPLIT_RD_Y / 1e3, color=common.INK2, lw=0.7, ls=":")
-        h = ev[(ev.mb >= 3.0) & ev.in_region]
+        h = at_least(ev[ev.in_region], 3.0)
         y0, y1 = [(a, b) for a, b, l in MAP_PERIODS if l == lab][0]
         h = h[(h.yr >= y0) & (h.yr < y1)]
         ax.scatter(h.x / 1e3, h.y / 1e3, marker="*", s=40, color=common.INK, lw=0, label="ML ≥ 3.0")

@@ -223,7 +223,32 @@ def validation_counts(t):
     return out
 
 
+def file_hashes(site=SITE):
+    """bytes and sha256 of every top-level site/data/*.json and *.geojson except manifest.json itself."""
+    out = {}
+    for f in sorted(site.glob("*.json")) + sorted(site.glob("*.geojson")):
+        if f.name == "manifest.json":
+            continue
+        b = f.read_bytes()
+        out[f.name] = {"bytes": len(b), "sha256": hashlib.sha256(b).hexdigest()}
+    return out
+
+
+def rehash_manifest(site=SITE):
+    """Rewrite only the `files` checksums of manifest.json from the files on disk. run_all.sh calls this after the
+    last writer of a top-level file (build_rating.py rewrites rating.json after this script has hashed it)."""
+    path = site / "manifest.json"
+    man = json.loads(path.read_text())
+    man["files"] = file_hashes(site)
+    jdump(man, path, indent=1)
+    return man
+
+
 def main():
+    if "--rehash" in sys.argv[1:]:
+        rehash_manifest()
+        print("manifest.json: checksums refreshed")
+        return
     cells = load_work("cells")
     g, c = load_work("iscgem"), load_work("comcat")
     v = json.loads((RES / "validation.json").read_text())
@@ -248,12 +273,7 @@ def main():
            "floors": ag["floors"], "validation_table": vt, "validation_counts": validation_counts(vt)}, SITE / "global.json")
     jdump(vt, RES / "validation_table.json", indent=1)
 
-    files = {}
-    for f in sorted(SITE.glob("*.json")) + sorted(SITE.glob("*.geojson")):
-        if f.name == "manifest.json":
-            continue
-        b = f.read_bytes()
-        files[f.name] = {"bytes": len(b), "sha256": hashlib.sha256(b).hexdigest()}
+    files = file_hashes()
     det = list((SITE / "cells").glob("*.json"))
     manifest = {
         "name": "Global Seismicity Atlas", "version": VERSION,

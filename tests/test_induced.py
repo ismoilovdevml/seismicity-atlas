@@ -122,3 +122,25 @@ def test_published_groningen_contract():
                 assert (v is None) or (lo is not None and hi is not None and lo <= v <= hi)
     val = json.loads((SITE / "validation.json").read_text())["rows"]
     assert all(r["verdict"] in ("consistent", "differs", "matches", "not testable") for r in val)
+
+
+def test_ml_ge_3_uses_reported_magnitudes_not_bins():
+    import build_groningen as bg
+    ev = pd.DataFrame({"mag": [2.94, 2.95, 2.99, 3.0, 3.01, 3.6]})
+    ev["mb"] = sl.bin_mag(ev.mag.values)
+    assert bg.at_least(ev, 3.0).mag.tolist() == [3.0, 3.01, 3.6]          # 2.95 and 2.99 are in bin 3.0, not >= 3.0
+
+
+def test_one_bootstrap_size_everywhere():
+    import inspect
+
+    import atlaslib as al
+    import build_groningen as bg
+    sys.path.insert(0, str(ROOT / "scripts" / "regional"))
+    sys.path.insert(0, str(ROOT / "scripts" / "monitor"))
+    import build_regional as br
+    import monitorlib as ml
+    import regionlib as rl
+    defaults = [inspect.signature(f).parameters["nboot"].default for f in
+                (rl.cell_b_tv, rl.b_region, il.b_fixed, il.moving_bpos, il.b_map, al.cell_b)]
+    assert set(defaults) == {al.NBOOT} and bg.NBOOT == br.NBOOT == ml.NBOOT == al.NBOOT == 1000

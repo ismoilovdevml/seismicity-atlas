@@ -80,3 +80,16 @@ Each item: what was wrong, what changed, which outputs move after the rebuild.
   `regional/nz/cells.geojson` geometry.
 - **Regional magnitude type case.** The SoCal filter compared magnitude types case-sensitively and dropped 4 events
   served as `Ml`. The comparison is now case-insensitive. Outputs: SoCal counts by 4 events.
+- **One bootstrap size.** 0.5.0 moved the published intervals to 1000 replicates, but the regional `summary.json`
+  region-wide b, the b-positive diagnosis (`val_bpos.py`, per cell and in the iid null), the Groningen moving
+  b-positive and the N-test still used 200. Every one now takes `atlaslib.NBOOT`. Outputs: interval ends of
+  `regional/*/summary.json` `region_b`, `results/val_bpos.json`, `induced/groningen` moving b-positive,
+  `results/sci2_ntest.json`.
+- **Groningen ML ≥ 3.0.** The list of ML ≥ 3.0 events used the 0.1 bin, which also holds ML 2.95 and 2.99: 16 events
+  instead of 14. It now uses the reported ML. Outputs: `induced/groningen/rates.json` `events_ge3` (14 events), the
+  stars of the map figure, the "16 events" in docs/induced.md (to be updated with the rebuild).
+- **Manifest checksums.** `site_layers.py` hashed `rating.json` before `build_rating.py` rewrote it, so a changed
+  rating left a stale checksum. `run_all.sh` now ends the site step with `site_layers.py --rehash`; a test checks
+  every checksum against the file on disk.
+- **Depth labels.** `release_diff.py` (and so docs/changes-0.5.md) labelled the depth classes "< 60 km" and
+  "60-300 km"; the atlas split is ≤ 70 km and > 70 km (to the deepest event, 693 km). Text only.

@@ -16,12 +16,13 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import atlaslib as al  # noqa: E402
 import seislib as sl  # noqa: E402
 
 DM = 0.1
 F_MC, G_MC, H_MC = 1.0, 4.5, 0.75   # Mc(t) = max(Mcat, F Mm - G - H log10 t), Helmstetter et al. 2006; Page et al. 2016
 MCAT_DEFAULT = 4.5                  # used when a sequence has too few events to estimate its completeness
-NBOOT = 1000                        # bootstrap replicates for b (200 before 0.5.0)
+NBOOT = al.NBOOT                    # bootstrap replicates for b: the atlas constant (200 before 0.5.0)
 DZ_KM = 100.0                       # aftershock depth window: |depth - mainshock depth| <= DZ_KM (since 0.6.0)
 LN10 = math.log(10)
 

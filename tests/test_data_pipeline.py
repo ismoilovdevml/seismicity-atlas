@@ -136,6 +136,30 @@ def test_declustered_b_withheld_unless_its_own_sample_passes_the_gate():
     assert p1["sh_bdecl"] == 0.9 and p1["sh_qdecl"] == "A"
 
 
+def test_manifest_checksums_match_the_published_files():
+    # build_rating.py rewrote rating.json after site_layers.py had hashed it; run_all.sh now rehashes last
+    import hashlib
+    site = HERE.parents[0] / "site" / "data"
+    man = json.loads((site / "manifest.json").read_text())
+    on_disk = {f.name for f in list(site.glob("*.json")) + list(site.glob("*.geojson"))} - {"manifest.json"}
+    assert set(man["files"]) == on_disk
+    for name, rec in man["files"].items():
+        b = (site / name).read_bytes()
+        assert rec["bytes"] == len(b) and rec["sha256"] == hashlib.sha256(b).hexdigest(), name
+
+
+def test_rehash_manifest_after_a_later_writer(tmp_path):
+    import site_layers as sly
+    (tmp_path / "rating.json").write_text('{"v": 1}')
+    (tmp_path / "manifest.json").write_text(json.dumps({"version": "x", "files": sly.file_hashes(tmp_path)}))
+    (tmp_path / "rating.json").write_text('{"v": 2}')                    # a writer after site_layers.py
+    man = sly.rehash_manifest(tmp_path)
+    assert man["version"] == "x" and man["files"] == sly.file_hashes(tmp_path)
+    assert json.loads((tmp_path / "manifest.json").read_text())["files"]["rating.json"]["bytes"] == 8
+    order = (HERE.parents[0] / "scripts" / "run_all.sh").read_text()
+    assert order.index("scripts/build_rating.py") < order.index("scripts/site_layers.py --rehash")
+
+
 def test_jdump_writes_null_for_nan_everywhere(tmp_path):
     import common
     obj = {"a": float("nan"), "b": np.float64("inf"), "c": np.array([1.0, np.nan]), "d": [np.float32(2.5), None],
