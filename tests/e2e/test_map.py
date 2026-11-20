@@ -6,7 +6,7 @@ import pytest
 
 from conftest import SITE, cell_point, jump, no_hscroll, rendered
 
-CELL_A = "820ccffffffffff"  # Aleutians, shallow, b shown (quality B since 0.5.0)
+CELL_A = "8222effffffffff"  # Aleutians, shallow, b shown (quality B in 0.6.0; 820cc... before)
 CELL_B = "820cdffffffffff"  # neighbour with a detail file (shallow quality C since 0.5.0)
 LAYERS = [("q", [None]), ("mc", ["ig", "cc", "cc0"]), ("cc", ["flag", "dmw", "dloc"]), ("rate", [None]), ("none", [None]),
           ("b", [None])]

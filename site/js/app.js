@@ -149,6 +149,7 @@ function hashOf(s) {
 }
 
 let writing = false;
+let applyingHash = false; // applyHash is moving the map: moveend must not write the old position back
 let appliedHash = null; // the hash the state was last read from or written to
 function commit(push = false) {
   const hs = hashOf(state);
@@ -195,13 +196,22 @@ async function applyHash() {
   if (s.v === 'learn' && state.v !== 'learn') learnBack = hashOf(state);
   Object.assign(state, s);
   if (langChanged) await applyLang();
-  if (modeChanged) applyMode();
-  syncControls();
-  showView(state.v);
+  // Showing the view (map resize) and the layer and projection calls can end a camera move (moveend), whose handler
+  // would write the old position into state.at and the URL before the new one is applied: keep the target and
+  // ignore those moves.
+  const target = atChanged && state.at ? { ...state.at } : null;
+  applyingHash = true;
+  try {
+    if (modeChanged) applyMode();
+    syncControls();
+    showView(state.v);
+    if (mapReady) {
+      M.applyLayers();
+      M.setProjection(!!state.g);
+    }
+  } finally { applyingHash = false; }
   if (mapReady) {
-    M.applyLayers();
-    M.setProjection(!!state.g);
-    if (atChanged && state.at) M.flyTo(state.at.lon, state.at.lat, state.at.z);
+    if (target) { state.at = target; M.flyTo(target.lon, target.lat, target.z); }
     if (state.ev) ensureEvents();
     if (regionChanged) selectRegion(state.r, false);
     if (state.mode === 'simple' && state.sm === 5) simpleLoadM5();
@@ -729,13 +739,17 @@ function setHexLine() {
 function fitHeader() {
   const top = document.querySelector('.top');
   if (!top) return;
-  if (innerWidth <= 720) { top.classList.remove('compact'); return; }
+  const LEVELS = ['hdr-short', 'hdr-mark', 'compact'];
   const was = top.classList.contains('compact');
-  top.classList.remove('compact');
+  top.classList.remove(...LEVELS);
+  if (innerWidth <= 720) return;
+  // Before the links go into the menu, the brand gives way: first "Global" and the tag line, then the whole name
+  // (the logo stays). Each step is measured, because the widths depend on the language and the mode.
   const name = top.querySelector('.brand-name');
-  const over = top.scrollWidth > top.clientWidth + 1 || (name && name.scrollWidth > name.clientWidth + 1);
-  top.classList.toggle('compact', over);
-  if (was && !over) closeMenu();
+  const over = () => top.scrollWidth > top.clientWidth + 1 || (name && name.getClientRects().length > 0 && name.scrollWidth > name.clientWidth + 1);
+  let i = 0;
+  while (over() && i < LEVELS.length) top.classList.add(LEVELS[i++]);
+  if (was && !top.classList.contains('compact')) closeMenu();
 }
 
 let headerFrame = 0;
@@ -743,6 +757,12 @@ function watchHeader() {
   const later = () => { if (!headerFrame) headerFrame = requestAnimationFrame(() => { headerFrame = 0; fitHeader(); }); };
   addEventListener('resize', later);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(later);
+  // Relabelled links (a language switch) and the mode's extra links change the widths: measure again.
+  const top = document.querySelector('.top');
+  if (top && 'MutationObserver' in window) {
+    new MutationObserver(later).observe(top, { childList: true, subtree: true, characterData: true });
+    new MutationObserver(later).observe(document.documentElement, { attributes: true, attributeFilter: ['data-mode', 'lang'] });
+  }
   fitHeader();
 }
 
@@ -829,7 +849,7 @@ async function start() {
       onSelect: selectCell,
       onPlace: (lat, lon) => openPlace(lat, lon),
       onSimpleZoom: () => syncSimple(),
-      onView: (v) => { state.at = v; commit(); },
+      onView: (v) => { if (applyingHash) return; state.at = v; commit(); },
       onEventsLoaded: (ev) => { evYears = ev.years; syncEventControls(); if (mapReady) M.applyLayers(); syncSimple(); },
       onTerrainError: () => { state.tr = 0; commit(); },
     }, { land, coast, plates });

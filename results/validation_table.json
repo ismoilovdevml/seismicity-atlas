@@ -1,7 +1,7 @@
 [
  {
   "test": "Global b, shallow < 60 km, 1918-2009, Michael's Mc(t)",
-  "ours": "1.078 [1.056, 1.101]",
+  "ours": "1.076 [1.054, 1.099]",
   "published": "1.05 (Michael 2014)",
   "verdict": "differs: published value outside our 95 % interval",
   "data": "same data (ISC-GEM itself)",
@@ -9,7 +9,7 @@
  },
  {
   "test": "Global b, depth >= 60 km, 1964-2009, Mc 5.7",
-  "ours": "0.997 [0.962, 1.033]",
+  "ours": "1.012 [0.975, 1.050]",
   "published": "0.99 (Michael 2014)",
   "verdict": "consistent, uninformative (no published uncertainty)",
   "data": "same data (ISC-GEM itself)",
@@ -17,15 +17,15 @@
  },
  {
   "test": "Mc, <60 km, 1900-1917 (MAXC+0.2 [95 %] / MBS)",
-  "ours": "6.5 [6.5, 7.0] / 6.8",
+  "ours": "6.6 [6.5, 7.0] / 7.0",
   "published": "7.7 (Michael 2014)",
-  "verdict": "differs: lower by 1.2 (newer catalogue release; Mc here reflects the ISC-GEM inclusion thresholds)",
+  "verdict": "differs: lower by 1.1 (newer catalogue release; Mc here reflects the ISC-GEM inclusion thresholds)",
   "data": "same data (ISC-GEM itself)",
   "z": null
  },
  {
   "test": "Mc, <60 km, 1918-1939 (MAXC+0.2 [95 %] / MBS)",
-  "ours": "6.0 [6.0, 6.2] / 6.1",
+  "ours": "6.0 [6.0, 6.2] / 6.2",
   "published": "7.0 (Michael 2014)",
   "verdict": "differs: lower by 1.0 (newer catalogue release; Mc here reflects the ISC-GEM inclusion thresholds)",
   "data": "same data (ISC-GEM itself)",
@@ -41,7 +41,7 @@
  },
  {
   "test": "Mc, <60 km, 1955-1963 (MAXC+0.2 [95 %] / MBS)",
-  "ours": "6.0 [6.0, 6.0] / 6.0",
+  "ours": "6.0 [6.0, 6.1] / 6.0",
   "published": "6.5 (Michael 2014)",
   "verdict": "differs: lower by 0.5 (newer catalogue release; Mc here reflects the ISC-GEM inclusion thresholds)",
   "data": "same data (ISC-GEM itself)",
@@ -49,9 +49,9 @@
  },
  {
   "test": "Mc, <60 km, 1964-1975 (MAXC+0.2 [95 %] / MBS)",
-  "ours": "5.7 [5.7, 5.8] / 5.7",
+  "ours": "5.8 [5.8, 5.8] / 5.6",
   "published": "6.0 (Michael 2014)",
-  "verdict": "differs: lower by 0.3 (newer catalogue release; Mc here reflects the ISC-GEM inclusion thresholds)",
+  "verdict": "differs: lower by 0.2 (newer catalogue release; Mc here reflects the ISC-GEM inclusion thresholds)",
   "data": "same data (ISC-GEM itself)",
   "z": null
  },
@@ -65,23 +65,23 @@
  },
  {
   "test": "Mc, <60 km, 2004-2009 (MAXC+0.2 [95 %] / MBS)",
-  "ours": "5.2 [5.2, 5.2] / 5.1",
+  "ours": "5.3 [5.2, 5.3] / 5.1",
   "published": "5.7 (Michael 2014)",
-  "verdict": "differs: lower by 0.5 (newer catalogue release; Mc here reflects the ISC-GEM inclusion thresholds)",
+  "verdict": "differs: lower by 0.4 (newer catalogue release; Mc here reflects the ISC-GEM inclusion thresholds)",
   "data": "same data (ISC-GEM itself)",
   "z": null
  },
  {
   "test": "Mc, >=60 km, 1900-1963 (MAXC+0.2 [95 %] / MBS)",
-  "ours": "6.4 [6.0, 6.5] / 6.3",
+  "ours": "6.3 [6.0, 6.6] / 6.5",
   "published": "7.1 (Michael 2014)",
-  "verdict": "differs: lower by 0.7 (newer catalogue release; Mc here reflects the ISC-GEM inclusion thresholds)",
+  "verdict": "differs: lower by 0.8 (newer catalogue release; Mc here reflects the ISC-GEM inclusion thresholds)",
   "data": "same data (ISC-GEM itself)",
   "z": null
  },
  {
   "test": "Mc, >=60 km, 1964-2009 (MAXC+0.2 [95 %] / MBS)",
-  "ours": "5.7 [5.4, 5.7] / 5.8",
+  "ours": "5.5 [5.4, 5.8] / 5.8",
   "published": "5.7 (Michael 2014)",
   "verdict": "consistent, uninformative (no published uncertainty)",
   "data": "same data (ISC-GEM itself)",
@@ -89,7 +89,7 @@
  },
  {
   "test": "Regional b, California, shallow, ISC-GEM 1976-2021",
-  "ours": "0.921 [0.746, 1.156] n=74 q=B",
+  "ours": "0.956 [0.748, 1.232] n=51 q=C",
   "published": "1.00",
   "verdict": "consistent, uninformative (no published uncertainty)",
   "data": "independent data",
@@ -97,7 +97,7 @@
  },
  {
   "test": "Regional b, Italy, shallow, ISC-GEM 1976-2021",
-  "ours": "1.130 [0.811, 1.598] n=29 q=insufficient",
+  "ours": "1.035 [0.691, 1.445] n=21 q=insufficient",
   "published": "1.00",
   "verdict": "not testable (n<50)",
   "data": "independent data",
@@ -105,7 +105,7 @@
  },
  {
   "test": "Regional b, Japan, shallow, ISC-GEM 1976-2021",
-  "ours": "0.942 [0.881, 1.014] n=747 q=A",
+  "ours": "0.904 [0.848, 0.983] n=711 q=A",
   "published": "no verified published number at Mw>=5.2 found; reported for reference only",
   "verdict": "reference only",
   "data": "no published value",
@@ -113,7 +113,7 @@
  },
  {
   "test": "Regional b, Chile, shallow, ISC-GEM 1976-2021",
-  "ours": "0.852 [0.783, 0.937] n=472 q=A",
+  "ours": "0.879 [0.795, 0.956] n=491 q=A",
   "published": "b ~1 from a 2018 national-catalogue study was a weak source; the GCMT reference (Andean S. America b 0.855 +-0.06, Kagan & Jackson 2013) and the sensitivity tests are in the Chile rows below (scripts/val_chile.py)",
   "verdict": "reference only",
   "data": "no published value",
@@ -121,7 +121,7 @@
  },
  {
   "test": "Regional b, Zagros, shallow, ISC-GEM 1976-2021",
-  "ours": "1.199 [0.961, 1.533] n=66 q=B",
+  "ours": "1.145 [0.897, 1.508] n=70 q=C",
   "published": "qualitative: Zagros has the highest b of the Iranian units (Iranian Plateau catalogue, J. Seismol. 2020)",
   "verdict": "reference only",
   "data": "independent data",
@@ -129,7 +129,7 @@
  },
  {
   "test": "Regional b, Makran, shallow, ISC-GEM 1976-2021",
-  "ours": "0.974 [0.549, 1.708] n=25 q=insufficient",
+  "ours": "0.512 [0.334, 1.384] n=6 q=insufficient",
   "published": "qualitative: Makran has the lowest b of the Iranian units (same source)",
   "verdict": "not testable (n<50)",
   "data": "independent data",
@@ -137,7 +137,7 @@
  },
  {
   "test": "Plate-boundary b, SUB",
-  "ours": "0.971 [0.949, 0.994]",
+  "ours": "0.979 [0.956, 1.005]",
   "published": "0.98 (beta 0.654 x 1.5, GCMT subduction, Kagan & Jackson)",
   "verdict": "consistent, uninformative (no published uncertainty)",
   "data": "same data (GCMT-based)",
@@ -145,7 +145,7 @@
  },
  {
   "test": "Plate-boundary b, OSR (spreading ridges)",
-  "ours": "1.480 [1.409, 1.562]",
+  "ours": "1.433 [1.369, 1.508]",
   "published": "1.2-1.65 (beta 0.8-1.1, Kagan 2002 via Kagan 2010)",
   "verdict": "consistent, uninformative (no published uncertainty)",
   "data": "same data (GCMT-based)",
@@ -153,7 +153,7 @@
  },
  {
   "test": "Ranking of b by boundary class",
-  "ours": "OSR > OTF > CTF > none > OCB > SUB > CRB > CCB",
+  "ours": "OSR > OTF > CTF > none > OCB > CRB > SUB > CCB",
   "published": "spreading highest (TRACE 2026, Kagan); thrust/convergent lowest (Schorlemmer 2005)",
   "verdict": "consistent, uninformative (no published uncertainty): qualitative ranking",
   "data": "same data (GCMT-based)",
@@ -161,47 +161,47 @@
  },
  {
   "test": "Subduction b, young vs old slabs",
-  "ours": "young 0.899 [0.832, 0.970], old 1.067 [1.019, 1.118]",
+  "ours": "young 0.935 [0.856, 1.003], old 1.051 [1.003, 1.106]",
   "published": "b increases with slab age (Nishikawa & Ide 2014, ANSS catalogue)",
-  "verdict": "consistent, uninformative (no published uncertainty): direction only; our two intervals do not overlap",
+  "verdict": "consistent, uninformative (no published uncertainty): direction only; our two intervals overlap",
   "data": "independent data",
   "z": null
  },
  {
-  "test": "Omori p recovery, synthetic teleseismic sequence (20 runs)",
-  "ours": "p 1.063 (sd 0.025, se of the mean 0.006, mean sigma 0.028)",
+  "test": "Omori p recovery, synthetic teleseismic sequence (100 runs)",
+  "ours": "p 1.054 (sd 0.026, se of the mean 0.003, mean sigma 0.027)",
   "published": "true p 1.05",
-  "verdict": "differs (z +2.31) (bias of the mean)",
+  "verdict": "match (z +1.68) (bias of the mean)",
   "data": "independent data",
-  "z": 2.3115656407705196
+  "z": 1.6768016885592416
  },
  {
   "test": "b recovery, synthetic cells, one period, 240 cells with 100-1000 events above Mc",
-  "ours": "mean error -0.010 (se 0.007); CI coverage 0.958",
+  "ours": "mean error -0.004 (se 0.007); CI coverage 0.971",
   "published": "true b (0.7-1.4)",
-  "verdict": "match (z -1.48) (bias of the mean)",
+  "verdict": "match (z -0.64) (bias of the mean)",
   "data": "independent data",
-  "z": -1.4802686030810956
+  "z": -0.6384624898654037
  },
  {
   "test": "b recovery, synthetic cells, two period, 240 cells with 100-1000 events above Mc",
-  "ours": "mean error -0.020 (se 0.007); CI coverage 0.950",
+  "ours": "mean error -0.016 (se 0.007); CI coverage 0.967",
   "published": "true b (0.7-1.4)",
-  "verdict": "differs (z -2.78) (bias of the mean)",
+  "verdict": "differs (z -2.23) (bias of the mean)",
   "data": "independent data",
-  "z": -2.7785869640277046
+  "z": -2.2268310151656565
  },
  {
   "test": "Chile b: spread over box, depth, period, sequence-removal and fixed-threshold variants",
-  "ours": "baseline 0.852 [0.783, 0.937] n=472; 29 variants 0.817-0.960",
+  "ours": "baseline 0.879 [0.795, 0.956] n=491; 29 variants 0.835-0.992",
   "published": "b ~1 (2018 national-catalogue study, weak source)",
-  "verdict": "robust: 0.82-0.96; the highest b is without all five large-sequence windows (internal sensitivity, not a comparison)",
+  "verdict": "robust: 0.84-0.99 (internal sensitivity, not a comparison)",
   "data": "no published value",
   "z": null
  },
  {
   "test": "Chile b without the five Mw >= 7.9 sequence windows (1985, 1995, 2010, 2014, 2015)",
-  "ours": "0.960 [0.869, 1.078] n=312",
+  "ours": "0.972 [0.868, 1.108] n=247",
   "published": "b ~1 (2018 national-catalogue study, weak source)",
   "verdict": "consistent, uninformative (no published uncertainty)",
   "data": "independent data",
@@ -209,103 +209,103 @@
  },
  {
   "test": "Chile box at Kagan & Jackson (2013) settings: 1977-2010, <= 70 km, m >= 5.8",
-  "ours": "0.871 [0.761, 1.015] n=182",
+  "ours": "0.863 [0.754, 1.005] n=182",
   "published": "Andean S. America (FE region 8) beta 0.57 +-0.04 -> b 0.855 +-0.06, GCMT",
-  "verdict": "match (z +0.18; FE region 8 is larger than the Chile box)",
+  "verdict": "match (z +0.09; FE region 8 is larger than the Chile box)",
   "data": "same data (GCMT-based)",
-  "z": 0.17557841044194844
+  "z": 0.09014011984136112
  },
  {
   "test": "Literature b: kj2013_fe01_alaska_aleutian (box [50, 65, 163, -140], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 0.915 [0.809, 1.042] n=259; Aki 0.937 [0.842, 1.048] n=290 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.990 [0.873, 1.120] n=291",
+  "ours": "TGR 0.915 [0.809, 1.042] n=259; Aki 0.930 [0.836, 1.041] n=290 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.990 [0.873, 1.120] n=291",
   "published": "beta 0.65 \u00b10.04 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z -0.70); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": -0.7049696452923638
+  "z": -0.7049689978393198
  },
  {
   "test": "Literature b: kj2013_fe05_mexico_guatemala (box [13, 22, -106, -90], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 0.795 [0.649, 0.963] n=121; Aki 0.857 [0.737, 1.018] n=138 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.819 [0.663, 0.979] n=125",
+  "ours": "TGR 0.795 [0.649, 0.963] n=121; Aki 0.853 [0.734, 1.012] n=138 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.819 [0.663, 0.979] n=125",
   "published": "beta 0.6 \u00b10.06 (b 0.900; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z -0.88); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": -0.875288291072691
+  "z": -0.8752881895956314
  },
  {
   "test": "Literature b: kj2013_fe06_central_america (box [7, 15, -92, -82], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 1.025 [0.855, 1.241] n=121; Aki 1.064 [0.913, 1.246] n=139 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.038 [0.862, 1.256] n=123",
+  "ours": "TGR 1.025 [0.855, 1.241] n=121; Aki 1.062 [0.909, 1.244] n=139 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.038 [0.862, 1.256] n=123",
   "published": "beta 0.68 \u00b10.06 (b 1.020; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z +0.04); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": 0.04126530426925778
+  "z": 0.04126479824167692
  },
  {
   "test": "Literature b: kj2013_fe08_andean_south_america (box [-56, 13, -82, -63], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 0.903 [0.801, 1.010] n=307; Aki 0.903 [0.816, 1.014] n=339 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.970 [0.866, 1.080] n=357",
+  "ours": "TGR 0.903 [0.801, 1.010] n=307; Aki 0.895 [0.809, 1.004] n=339 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.970 [0.866, 1.080] n=357",
   "published": "beta 0.57 \u00b10.04 (b 0.855; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z +0.60); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": 0.5971593129162748
+  "z": 0.5971592837427661
  },
  {
   "test": "Literature b: kj2013_fe12_kermadec_tonga_samoa (box [-38, -13, 175, -170], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 1.212 [1.096, 1.327] n=464; Aki 1.184 [1.088, 1.291] n=521 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.259 [1.149, 1.380] n=500",
+  "ours": "TGR 1.212 [1.096, 1.327] n=464; Aki 1.175 [1.080, 1.282] n=521 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.259 [1.149, 1.380] n=500",
   "published": "beta 0.8 \u00b10.04 (b 1.200; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z +0.14); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": 0.1389670337208669
+  "z": 0.1389674155350808
  },
  {
   "test": "Literature b: kj2013_fe18_guam_japan (box [12, 34, 138, 148], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 1.259 [0.973, 1.596] n=88; Aki 1.290 [1.055, 1.631] n=104 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.285 [0.999, 1.658] n=94",
+  "ours": "TGR 1.259 [0.973, 1.596] n=88; Aki 1.285 [1.048, 1.638] n=104 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.285 [0.999, 1.658] n=94",
   "published": "beta 0.86 \u00b10.10 (b 1.290; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z -0.14); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": -0.14014540350210952
+  "z": -0.1401451732489636
  },
  {
   "test": "Literature b: kj2013_fe19_japan_kamchatka (box [35, 60, 140, 165], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 0.993 [0.888, 1.111] n=362; Aki 0.983 [0.894, 1.084] n=399 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.072 [0.962, 1.194] n=435",
+  "ours": "TGR 0.993 [0.888, 1.111] n=362; Aki 0.973 [0.883, 1.071] n=399 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.072 [0.962, 1.194] n=435",
   "published": "beta 0.62 \u00b10.04 (b 0.930; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z +0.76); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": 0.7567217353121846
+  "z": 0.7567224180112
  },
  {
   "test": "Literature b: kj2013_tohoku_box (box [35, 40, 140, 146], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 1.023 [0.786, 1.264] n=93; Aki 1.055 [0.889, 1.287] n=104 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.082 [0.853, 1.329] n=105",
+  "ours": "TGR 1.023 [0.786, 1.264] n=93; Aki 1.038 [0.880, 1.263] n=104 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.082 [0.853, 1.329] n=105",
   "published": "beta 0.64 \u00b10.07 (b 0.960; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (z +0.39); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": 0.39054224047969327
+  "z": 0.3905419666916228
  },
  {
   "test": "Literature b: kj2013_fe24_sunda_arc (box [-12, -5, 100, 125], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 1.018 [0.851, 1.219] n=124; Aki 1.078 [0.917, 1.285] n=149 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.077 [0.899, 1.258] n=141",
+  "ours": "TGR 1.018 [0.851, 1.219] n=124; Aki 1.078 [0.917, 1.284] n=149 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.077 [0.899, 1.258] n=141",
   "published": "beta 0.65 \u00b10.04 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z +0.39); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": 0.3893798639658386
+  "z": 0.38937995913170126
  },
  {
   "test": "Literature b: kj2013_fe46_andaman_sumatra (box [-6, 15, 90, 102], 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 0.921 [0.789, 1.079] n=195; Aki 0.918 [0.802, 1.073] n=215 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.010 [0.870, 1.162] n=240",
+  "ours": "TGR 0.921 [0.789, 1.079] n=195; Aki 0.909 [0.797, 1.059] n=215 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.010 [0.870, 1.162] n=240",
   "published": "beta 0.71 \u00b10.07 (b 1.065; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z -1.12); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": -1.123118305202943
+  "z": -1.1231184639478313
  },
  {
   "test": "Literature b: kj2013_all_18_subduction_zones (PB2002 SUB, 1977-2010, <= 70 km, m >= 5.8)",
-  "ours": "TGR 0.977 [0.938, 1.020] n=2460; Aki 0.978 [0.941, 1.016] n=2747 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.034 [0.992, 1.071] n=2783",
+  "ours": "TGR 0.977 [0.938, 1.016] n=2459; Aki 0.970 [0.937, 1.007] n=2746 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.034 [0.997, 1.071] n=2782",
   "published": "beta 0.65 \u00b10.01 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z +0.08); all events: differs [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": 0.07898894278427349
+  "z": 0.0757314627013523
  },
  {
   "test": "Literature b: kagan2010_global_mt56 (global, 1982-2008, <= 70 km, m >= 5.6)",
-  "ours": "TGR 1.035 [1.010, 1.058] n=6522; Aki 1.006 [0.983, 1.028] n=7138 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.087 [1.062, 1.112] n=7358",
+  "ours": "TGR 1.035 [1.010, 1.058] n=6522; Aki 1.018 [0.996, 1.042] n=7297 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.087 [1.062, 1.112] n=7358",
   "published": "beta 0.6773 (b 1.016; Kagan, Y. Y. 2010, Table 2)",
   "verdict": "consistent, uninformative (no published uncertainty); all events: differs [needs human check]",
   "data": "same data (GCMT-based)",
@@ -313,7 +313,7 @@
  },
  {
   "test": "Literature b: kagan2010_trenches_mt56 (PB2002 SUB, 1982-2008, <= 70 km, m >= 5.6)",
-  "ours": "TGR 0.992 [0.958, 1.028] n=3029; Aki 0.975 [0.943, 1.007] n=3321 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.053 [1.017, 1.092] n=3513",
+  "ours": "TGR 0.992 [0.957, 1.030] n=3028; Aki 0.983 [0.949, 1.017] n=3381 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 1.053 [1.017, 1.092] n=3512",
   "published": "beta 0.6463 (b 0.969; Kagan, Y. Y. 2010, Table 2)",
   "verdict": "consistent, uninformative (no published uncertainty) (approximate region); all events: differs [needs human check]",
   "data": "same data (GCMT-based)",
@@ -321,7 +321,7 @@
  },
  {
   "test": "Literature b: kagan2010_global_declustered_mt56 (global, 1982-2008, <= 70 km, m >= 5.6, declustered)",
-  "ours": "TGR 0.903 [0.872, 0.929] n=3700; Aki 0.879 [0.854, 0.906] n=3992 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.934 [0.901, 0.961] n=3933",
+  "ours": "TGR 0.907 [0.875, 0.932] n=3782; Aki 0.892 [0.866, 0.918] n=4167 (Mw uncertainty <= 0.10 (direct Mw)); all events: TGR 0.937 [0.904, 0.964] n=4018",
   "published": "beta 0.648 (b 0.972; Kagan, Y. Y. 2010, Table 2)",
   "verdict": "differs (approximate region); all events: differs [needs human check]",
   "data": "same data (GCMT-based)",
@@ -329,7 +329,7 @@
  },
  {
   "test": "Literature beta by PB2002 class (1977-2002, <= 70 km, m >= 5.8, TGR)",
-  "ours": "beta SUB 0.66 (z +0.78), CCB 0.64 (z +0.36), OCB 0.63 (z +1.21), CTF 0.69 (z +0.53), OTF 0.79 (z +0.94), CRB 0.69 (z +0.58), OSR 0.98 (z +0.70)",
+  "ours": "beta SUB 0.66 (z +0.79), CCB 0.64 (z +0.36), OCB 0.63 (z +1.21), CTF 0.69 (z +0.53), OTF 0.79 (z +0.94), CRB 0.69 (z +0.58), OSR 0.98 (z +0.70)",
   "published": "Table 5 per-class beta with 95 % ranges, 0.53 (OCB) to 0.92 (OSR normal faulting) (Bird & Kagan 2004)",
   "verdict": "match (approximate); OSR and OTF against the closest of their subcatalogs [needs human check]",
   "data": "same data (GCMT-based)",
@@ -337,7 +337,7 @@
  },
  {
   "test": "Literature Mc: GCMT 1980-2016, 0-50 km (Petruccelli 2018 thesis)",
-  "ours": "global MAXC+0.2 5.4 [5.4, 5.4], MBS 5.8, GFT 5.2",
+  "ours": "global MAXC+0.2 5.3 [5.3, 5.4], MBS 5.6, GFT 5.2",
   "published": "most local Mc 5.4-5.5; 5.1-5.3 on ridges and Himalaya",
   "verdict": "consistent, uninformative (no published uncertainty) (global vs local map) [needs human check]",
   "data": "same data (GCMT-based)",
@@ -345,7 +345,7 @@
  },
  {
   "test": "b(t) retrospective: Sumatra band 92-100 E, 2000-2004 vs 2005-2009, ISC-GEM Mw",
-  "ours": "before 1.184 [0.657, 2.113] n=12 q=insufficient; after 1.026 [0.873, 1.162] n=280 q=A",
+  "ours": "before 1.313 [0.734, 2.693] n=12 q=insufficient; after 1.076 [0.899, 1.189] n=375 q=A",
   "published": "before 1.04, after 1.14 (ISC mb; Srivastava et al. 2021 preprint)",
   "verdict": "not testable: 2000_2004 window has q=insufficient (n=12) [needs human check]",
   "data": "independent data",
@@ -353,7 +353,7 @@
  },
  {
   "test": "b(t) retrospective: 40 sequences, pre 5 yr vs 30-365 d after (ISC-GEM Mw)",
-  "ours": "shown (A/B) per window {'pre_5y': 2, 'pre_1y': 0, 'post_0_30d': 1, 'post_30_365d': 2}; 1 pair(s) with both shown; median post - pre +0.015; 0 with separated intervals",
+  "ours": "shown (A/B) per window {'pre_5y': 2, 'pre_1y': 0, 'post_0_30d': 1, 'post_30_365d': 2}; 1 pair(s) with both shown; median post - pre +0.023; 0 with separated intervals",
   "published": "no published Mw >= 5 before/after comparison found",
   "verdict": "description only",
   "data": "no published value",

@@ -1,6 +1,6 @@
 {
  "note": "Regional layers use each network's own local magnitude and are never merged with the global cells. Not a forecast and not a hazard map.",
- "generated_utc": "2026-11-15T20:56:22Z",
+ "generated_utc": "2026-11-20T07:16:36Z",
  "regions": [
   {
    "id": "italy",
@@ -48,8 +48,8 @@
    "quality_counts": {
     "sh": {
      "insufficient": 255,
-     "A": 88,
-     "B": 54,
+     "A": 87,
+     "B": 55,
      "C": 11
     },
     "dp": {
@@ -66,7 +66,7 @@
    "cells": "regional/italy/cells.geojson",
    "cell_detail_dir": "regional/italy/cells/",
    "summary": "regional/italy/summary.json",
-   "bytes": 658269
+   "bytes": 659898
   },
   {
    "id": "nz",
@@ -128,7 +128,7 @@
    "cells": "regional/nz/cells.geojson",
    "cell_detail_dir": "regional/nz/cells/",
    "summary": "regional/nz/summary.json",
-   "bytes": 811044
+   "bytes": 811929
   },
   {
    "id": "socal",
@@ -175,14 +175,14 @@
    "magtype": "ML (Southern California Seismic Network local magnitude, ComCat catalog=ci)",
    "h3_res": 4,
    "radius_km": 30.0,
-   "n_events": 197088,
+   "n_events": 197092,
    "n_cells": 132,
    "quality_counts": {
     "sh": {
-     "A": 55,
-     "insufficient": 49,
-     "B": 16,
-     "C": 12
+     "A": 53,
+     "insufficient": 52,
+     "B": 18,
+     "C": 9
     }
    },
    "depth_classes": [
@@ -191,7 +191,7 @@
    "cells": "regional/socal/cells.geojson",
    "cell_detail_dir": "regional/socal/cells/",
    "summary": "regional/socal/summary.json",
-   "bytes": 312582
+   "bytes": 314044
   },
   {
    "id": "iceland",
@@ -235,9 +235,9 @@
    "quality_counts": {
     "sh": {
      "insufficient": 143,
-     "A": 107,
+     "A": 109,
      "B": 41,
-     "C": 35
+     "C": 33
     }
    },
    "depth_classes": [
@@ -246,13 +246,13 @@
    "cells": "regional/iceland/cells.geojson",
    "cell_detail_dir": "regional/iceland/cells/",
    "summary": "regional/iceland/summary.json",
-   "bytes": 610755
+   "bytes": 611244
   }
  ],
  "sha256": {
-  "italy": "bad9d870f6c4881c2519535b249447d12f070049fd8d64e419485a6740b50b2a",
-  "nz": "d0925ffee749a37ad8a132e963566b3b85bf0d95553a5585ff6ed5a15eebb4d7",
-  "socal": "f15361e1caea9324283d0e67c36706d596011a19f22145098e321b83fe40d634",
-  "iceland": "e304eb2a19b8623c4f9754f71d5de4582f1f6703d1a5e61b08d1b4ede33941a0"
+  "italy": "e80e3f57d76c4d2faba669cbf2fabf0971c8d53329e67fcc4a90b1224d00eb81",
+  "nz": "d6c8a140b38695b4854271eab53b246aca17682441c1eeb4b58280656b3050e0",
+  "socal": "565c5ca3fdbea9357811fcacbfd8b76a2d355bc0c501f42468092a82a1aca0e0",
+  "iceland": "ad4a0200b0aa53fb75cad8bb97a79cd171062ca5aac410949f6db8f738cc993c"
  }
 }

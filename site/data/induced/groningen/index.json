@@ -8,9 +8,9 @@
  "n_events_region": 1646,
  "statement": "Retrospective description of the published catalogue and production record. Not a forecast, not a hazard assessment.",
  "files": {
-  "bmap.json": 57590,
-  "btime.json": 19584,
-  "rates.json": 10717,
+  "bmap.json": 57679,
+  "btime.json": 19605,
+  "rates.json": 10589,
   "validation.json": 6893
  },
  "sources": [

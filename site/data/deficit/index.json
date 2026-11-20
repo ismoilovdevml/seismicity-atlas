@@ -1,8 +1,8 @@
 {
  "layer": "seismic deficit (pilot: Tien Shan)",
- "version": "0.2.0",
+ "version": "0.6.0",
  "data_cutoff_utc": "2026-11-13",
- "generated_utc": "2026-11-14T16:22:28Z",
+ "generated_utc": "2026-11-20T07:39:12Z",
  "disclaimer": "Not a forecast and not a hazard map. The ratio compares about 120 years of earthquakes with a few decades of geodetic strain; recurrence times of the largest Tien Shan earthquakes are centuries or longer, part of the strain may be released aseismically, and full seismic coupling is an assumption. A low ratio is not evidence that an earthquake is due.",
  "licence": {
   "data": "CC BY-SA 4.0 (derived from ISC-GEM CC BY-SA 3.0 and the strain-rate models CC BY 4.0)"
@@ -98,9 +98,9 @@
   ],
   "seismic_tgr": "alpha(Mw>=6.0 since 1964) x mean moment of a tapered G-R (Kagan 2002)",
   "b_whole_belt": {
-   "b": 0.954,
-   "sigma": 0.127,
-   "n": 38,
+   "b": 1.0,
+   "sigma": 0.137,
+   "n": 40,
    "mw_min": 5.8,
    "years": [
     1976,
@@ -160,24 +160,24 @@
    },
    "length_km": 1870.0,
    "u_seis_ours_mm_yr": {
-    "lo": 10.37659113468545,
-    "med": 13.273973097265156,
-    "hi": 17.868552121196114
+    "lo": 10.366397308213282,
+    "med": 13.27351253866144,
+    "hi": 17.885540242578184
    },
    "u_geod_ours_mm_yr": {
-    "lo": 8.220226090924369,
-    "med": 9.573096734086992,
-    "hi": 10.109934964779336
+    "lo": 8.220226090924344,
+    "med": 9.573096734086977,
+    "hi": 10.109934964779312
    },
    "r_obs_iscgem": {
-    "lo": 1.0641771362841839,
-    "med": 1.4132445138870031,
-    "hi": 1.9994314796321193
+    "lo": 1.0641454676706708,
+    "med": 1.4173405887370272,
+    "hi": 2.005995843168613
    },
    "r_obs_with_mg2000_moments": {
-    "lo": 0.5380025306428275,
-    "med": 0.7144760951575806,
-    "hi": 1.0108272008596813
+    "lo": 0.5379865203437606,
+    "med": 0.7165468957413164,
+    "hi": 1.014145862832654
    },
    "ms_obs_with_mg2000_moments": 1.53e+19
   }
@@ -201,22 +201,23 @@
    ],
    "ms_obs": 3.03e+19,
    "mg": 2.14e+19,
-   "mg_lo": 1.52e+19,
-   "mg_hi": 2.85e+19,
-   "ms_tgr": 1.98e+19,
-   "ms_tgr_lo": 7.23e+18,
-   "ms_tgr_hi": 5.86e+19,
+   "mg_lo": 1.53e+19,
+   "mg_hi": 2.84e+19,
+   "ms_tgr": 1.67e+19,
+   "ms_tgr_lo": 5.79e+18,
+   "ms_tgr_hi": 5.03e+19,
    "r_obs": 1.42,
    "r_obs_lo": 0.906,
-   "r_obs_hi": 8.99,
-   "r_tgr": 0.932,
-   "r_tgr_lo": 0.327,
-   "r_tgr_hi": 2.89,
+   "r_obs_hi": 9.29,
+   "r_tgr": 0.782,
+   "r_tgr_lo": 0.262,
+   "r_tgr_hi": 2.5,
    "r_obs_x1": 0.904,
-   "p_full": 0.81,
-   "p_half": 0.98,
-   "mc_bal": 8.15,
-   "unbal": 0.0065,
+   "p_full": 0.83,
+   "p_half": 0.97,
+   "mc_bal": 8.29,
+   "unbal": 0.025,
+   "over": 0.0,
    "cov_min": 0.78
   },
   {
@@ -232,23 +233,24 @@
     "ou2026"
    ],
    "ms_obs": 6.08e+18,
-   "mg": 6.6e+18,
-   "mg_lo": 4.92e+18,
+   "mg": 6.64e+18,
+   "mg_lo": 4.93e+18,
    "mg_hi": 8.48e+18,
-   "ms_tgr": 7.72e+18,
-   "ms_tgr_lo": 2.54e+18,
-   "ms_tgr_hi": 2.44e+19,
-   "r_obs": 0.921,
-   "r_obs_lo": 0.524,
-   "r_obs_hi": 15.7,
-   "r_tgr": 1.18,
-   "r_tgr_lo": 0.368,
-   "r_tgr_hi": 3.9,
-   "r_obs_x1": 0.563,
-   "p_full": 0.66,
+   "ms_tgr": 6.57e+18,
+   "ms_tgr_lo": 2.06e+18,
+   "ms_tgr_hi": 2.11e+19,
+   "r_obs": 0.916,
+   "r_obs_lo": 0.525,
+   "r_obs_hi": 15.5,
+   "r_tgr": 1.0,
+   "r_tgr_lo": 0.303,
+   "r_tgr_hi": 3.29,
+   "r_obs_x1": 0.56,
+   "p_full": 0.69,
    "p_half": 0.89,
-   "mc_bal": 7.98,
-   "unbal": 0.0075,
+   "mc_bal": 8.1,
+   "unbal": 0.02,
+   "over": 0.0,
    "cov_min": 0.75
   },
   {
@@ -268,23 +270,24 @@
     "ou2026"
    ],
    "ms_obs": 1.29e+19,
-   "mg": 8.27e+18,
-   "mg_lo": 6.02e+18,
-   "mg_hi": 1.1e+19,
-   "ms_tgr": 9.63e+18,
-   "ms_tgr_lo": 3.28e+18,
-   "ms_tgr_hi": 2.93e+19,
-   "r_obs": 1.56,
-   "r_obs_lo": 0.575,
-   "r_obs_hi": 5.72,
-   "r_tgr": 1.18,
-   "r_tgr_lo": 0.38,
-   "r_tgr_hi": 3.76,
+   "mg": 8.28e+18,
+   "mg_lo": 6.01e+18,
+   "mg_hi": 1.09e+19,
+   "ms_tgr": 8.07e+18,
+   "ms_tgr_lo": 2.64e+18,
+   "ms_tgr_hi": 2.55e+19,
+   "r_obs": 1.55,
+   "r_obs_lo": 0.565,
+   "r_obs_hi": 5.67,
+   "r_tgr": 0.983,
+   "r_tgr_lo": 0.305,
+   "r_tgr_hi": 3.29,
    "r_obs_x1": 0.229,
    "p_full": 0.85,
-   "p_half": 0.98,
-   "mc_bal": 7.98,
-   "unbal": 0.0037,
+   "p_half": 0.97,
+   "mc_bal": 8.1,
+   "unbal": 0.019,
+   "over": 0.0,
    "cov_min": 0.93
   },
   {
@@ -304,33 +307,34 @@
    ],
    "ms_obs": 1.14e+19,
    "mg": 3.97e+18,
-   "mg_lo": 2.94e+18,
+   "mg_lo": 2.93e+18,
    "mg_hi": 5.15e+18,
-   "ms_tgr": 2.61e+18,
-   "ms_tgr_lo": 6.24e+17,
-   "ms_tgr_hi": 1.01e+19,
-   "r_obs": 2.87,
-   "r_obs_lo": 1.21,
-   "r_obs_hi": 20.2,
-   "r_tgr": 0.666,
-   "r_tgr_lo": 0.155,
-   "r_tgr_hi": 2.66,
-   "r_obs_x1": 0.695,
+   "ms_tgr": 2.23e+18,
+   "ms_tgr_lo": 5.08e+17,
+   "ms_tgr_hi": 8.51e+18,
+   "r_obs": 2.86,
+   "r_obs_lo": 1.19,
+   "r_obs_hi": 20.5,
+   "r_tgr": 0.563,
+   "r_tgr_lo": 0.126,
+   "r_tgr_hi": 2.28,
+   "r_obs_x1": 0.694,
    "p_full": 0.94,
    "p_half": 0.98,
-   "mc_bal": 8.42,
-   "unbal": 0.02,
+   "mc_bal": 8.55,
+   "unbal": 0.058,
+   "over": 0.0,
    "cov_min": 0.98
   }
  ],
  "files": {
   "regions.geojson": {
    "what": "one polygon per region",
-   "bytes": 3055
+   "bytes": 3096
   },
   "cells.geojson": {
    "what": "one polygon per H3 resolution-2 cell",
-   "bytes": 7083
+   "bytes": 7194
   }
  }
 }

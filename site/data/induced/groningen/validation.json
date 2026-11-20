@@ -14,13 +14,13 @@
    "source": "Kraaijpoel et al. 2022",
    "quantity": "field b, ML>=1.45, 1995-2021",
    "published": 0.96,
-   "ours": 0.949,
-   "ours_lo": 0.857,
-   "ours_hi": 1.054,
+   "ours": 0.952,
+   "ours_lo": 0.858,
+   "ours_hi": 1.062,
    "n": 332,
    "ours_unbinned": 0.956,
    "verdict": "consistent",
-   "z": 0.214,
+   "z": 0.146,
    "note": "binned Aki-Utsu (atlas) and unbinned MLE (paper's choice) both shown"
   },
   {
@@ -31,18 +31,18 @@
    "published_sigma": 0.07,
    "published_n_all": 99,
    "ours_n_all": 89,
-   "ours": 1.164,
-   "ours_lo": 0.78,
-   "ours_hi": 1.835,
+   "ours": 1.171,
+   "ours_lo": 0.76,
+   "ours_hi": 1.837,
    "ours_mc": 1.8,
    "n": 13,
    "b_at_fixed_mc": {
-    "1.0": 0.776,
-    "1.2": 0.916,
-    "1.5": 1.186
+    "1.0": 0.783,
+    "1.2": 0.928,
+    "1.5": 1.183
    },
    "verdict": "not testable",
-   "z": 0.374,
+   "z": 0.392,
    "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
   },
   {
@@ -53,18 +53,18 @@
    "published_sigma": 0.03,
    "published_n_all": 887,
    "ours_n_all": 883,
-   "ours": 0.919,
-   "ours_lo": 0.804,
-   "ours_hi": 1.007,
+   "ours": 0.922,
+   "ours_lo": 0.811,
+   "ours_hi": 1.014,
    "ours_mc": 1.4,
    "n": 281,
    "b_at_fixed_mc": {
-    "1.0": 0.808,
-    "1.2": 0.908,
-    "1.5": 0.953
+    "1.0": 0.81,
+    "1.2": 0.912,
+    "1.5": 0.957
    },
    "verdict": "consistent",
-   "z": 0.19,
+   "z": 0.133,
    "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
   },
   {
@@ -75,18 +75,18 @@
    "published_sigma": 0.06,
    "published_n_all": 204,
    "ours_n_all": 200,
-   "ours": 0.917,
-   "ours_lo": 0.743,
-   "ours_hi": 1.099,
+   "ours": 0.92,
+   "ours_lo": 0.756,
+   "ours_hi": 1.125,
    "ours_mc": 1.4,
    "n": 89,
    "b_at_fixed_mc": {
-    "1.0": 0.759,
-    "1.2": 0.914,
-    "1.5": 0.959
+    "1.0": 0.76,
+    "1.2": 0.917,
+    "1.5": 0.963
    },
    "verdict": "consistent",
-   "z": 0.064,
+   "z": 0.094,
    "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
   },
   {
@@ -97,18 +97,18 @@
    "published_sigma": 0.07,
    "published_n_all": 210,
    "ours_n_all": 211,
-   "ours": 0.915,
-   "ours_lo": 0.792,
-   "ours_hi": 1.351,
+   "ours": 0.919,
+   "ours_lo": 0.803,
+   "ours_hi": 1.387,
    "ours_mc": 1.1,
    "n": 127,
    "b_at_fixed_mc": {
-    "1.0": 0.869,
-    "1.2": 0.987,
-    "1.5": 1.197
+    "1.0": 0.872,
+    "1.2": 0.991,
+    "1.5": 1.205
    },
    "verdict": "consistent",
-   "z": 0.91,
+   "z": 0.857,
    "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
   },
   {
@@ -119,18 +119,18 @@
    "published_sigma": 0.06,
    "published_n_all": 199,
    "ours_n_all": 200,
-   "ours": 0.879,
-   "ours_lo": 0.692,
-   "ours_hi": 1.054,
+   "ours": 0.883,
+   "ours_lo": 0.666,
+   "ours_hi": 1.071,
    "ours_mc": 1.1,
    "n": 121,
    "b_at_fixed_mc": {
-    "1.0": 0.824,
-    "1.2": 0.892,
-    "1.5": 0.778
+    "1.0": 0.827,
+    "1.2": 0.895,
+    "1.5": 0.78
    },
    "verdict": "consistent",
-   "z": 0.005,
+   "z": 0.021,
    "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
   },
   {
@@ -141,18 +141,18 @@
    "published_sigma": 0.06,
    "published_n_all": 227,
    "ours_n_all": 228,
-   "ours": 0.815,
-   "ours_lo": 0.691,
-   "ours_hi": 0.974,
+   "ours": 0.818,
+   "ours_lo": 0.696,
+   "ours_hi": 0.957,
    "ours_mc": 0.8,
    "n": 115,
    "b_at_fixed_mc": {
-    "1.0": 0.852,
-    "1.2": 0.919,
-    "1.5": 1.018
+    "1.0": 0.855,
+    "1.2": 0.923,
+    "1.5": 1.023
    },
    "verdict": "consistent",
-   "z": 1.221,
+   "z": 1.251,
    "note": "ours: atlas MAXC+0.2 estimator; the paper does not state its Mc"
   },
   {
@@ -165,8 +165,8 @@
    "ours_hi": null,
    "n": 39,
    "ours_moving_range": [
-    0.707,
-    0.92
+    0.709,
+    0.926
    ],
    "verdict": "not testable",
    "note": "ours: b-positive on KNMI only, ML>=0.5, all events of the interval pooled (needs >= 50 differences); moving 200-event windows ending in the interval give the range shown; paper: composite catalogue"
@@ -179,13 +179,13 @@
     1.0,
     1.3
    ],
-   "ours": 1.21,
-   "ours_lo": 0.939,
-   "ours_hi": 1.482,
+   "ours": 1.218,
+   "ours_lo": 0.943,
+   "ours_hi": 1.493,
    "n": 91,
    "ours_moving_range": [
-    0.991,
-    1.35
+    0.995,
+    1.361
    ],
    "verdict": "consistent",
    "note": "ours: b-positive on KNMI only, ML>=0.5, all events of the interval pooled (needs >= 50 differences); moving 200-event windows ending in the interval give the range shown; paper: composite catalogue"
@@ -195,9 +195,9 @@
    "source": "Gulia & Wiemer 2026",
    "quantity": "b north sub-field around 2022",
    "published": 0.9,
-   "ours": 0.746,
-   "ours_lo": 0.616,
-   "ours_hi": 0.903,
+   "ours": 0.747,
+   "ours_lo": 0.621,
+   "ours_hi": 0.906,
    "n": 83,
    "window_years": [
     2015.82,
@@ -211,9 +211,9 @@
    "source": "Gulia & Wiemer 2026",
    "quantity": "b south sub-field around 2022",
    "published": 0.9,
-   "ours": 1.051,
-   "ours_lo": 0.859,
-   "ours_hi": 1.295,
+   "ours": 1.056,
+   "ours_lo": 0.856,
+   "ours_hi": 1.309,
    "n": 76,
    "window_years": [
     2017.38,
@@ -230,19 +230,19 @@
     0.8,
     1.0
    ],
-   "ours": 0.681,
-   "ours_lo": 0.625,
-   "ours_hi": 0.749,
+   "ours": 0.682,
+   "ours_lo": 0.626,
+   "ours_hi": 0.75,
    "n": 75,
    "n_nodes": 1316,
    "radius_sensitivity": {
     "7km": {
      "n_nodes_mapped": 300,
-     "median": 0.7833579484961439
+     "median": 0.7854922779032463
     },
     "10km": {
      "n_nodes_mapped": 645,
-     "median": 0.8106830328860701
+     "median": 0.8130493967748037
     }
    },
    "verdict": "differs",
@@ -253,15 +253,15 @@
    "source": "Sirorattanakul et al. 2024 (quoted by Gulia & Wiemer 2026)",
    "quantity": "field b 2015-2022",
    "published": 0.86,
-   "ours": 0.799,
-   "ours_lo": 0.718,
-   "ours_hi": 0.89,
+   "ours": 0.801,
+   "ours_lo": 0.719,
+   "ours_hi": 0.891,
    "ours_mc": 0.8,
    "n": 409,
-   "ours_bpos": 0.878,
+   "ours_bpos": 0.881,
    "ours_bpos_ci": [
-    0.7744207113652708,
-    0.9819564811046959
+    0.776718806830847,
+    0.9856800776562267
    ],
    "verdict": "consistent",
    "note": "the published value comes from a different (deep-learning) catalogue: context, not a strict test"
@@ -274,9 +274,9 @@
     0.7,
     0.8
    ],
-   "ours": 0.785,
-   "ours_lo": 0.712,
-   "ours_hi": 0.912,
+   "ours": 0.788,
+   "ours_lo": 0.711,
+   "ours_hi": 0.917,
    "ours_mc": 0.8,
    "n": 482,
    "verdict": "consistent",

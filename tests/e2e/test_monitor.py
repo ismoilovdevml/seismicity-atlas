@@ -74,7 +74,7 @@ def test_deep_link_focuses_a_sequence(site):
     top = pg.evaluate("document.getElementById('mon-us6000rsy1').getBoundingClientRect().top")
     assert 0 <= top < 200, top
     # following another card's link updates the focus and keeps the language in the hash
-    pg.click("#mon-us6000u18k h3 a")
+    pg.click("#mon-us6000u18k h2 a")
     pg.wait_for_selector("#mon-us6000u18k.focus")
     assert pg.query_selector("#mon-us6000rsy1.focus") is None
     h = pg.evaluate("location.hash")

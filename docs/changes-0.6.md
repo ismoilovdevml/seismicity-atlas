@@ -109,3 +109,20 @@ Each item: what was wrong, what changed, which outputs move after the rebuild.
   §5: the floor is the static completeness; the cell Mc is raised by aftershock gaps, which b-positive is meant to
   tolerate); `analysis.py` and the browser use max(Mc, floor) because a user catalogue has no separate floor. The
   sequence b-positive (monitor, `sequences.py`) used no threshold at all; it now uses Mcat (see above).
+
+## Effect on the headline numbers (rebuild of 2026-11-20, cut-off 2026-11-13)
+
+| Output | 0.5.0 | 0.6.0 |
+|---|---|---|
+| Global b, shallow ≤ 70 km, 1976–2021 | 1.035 [1.018, 1.052], n = 15,725, Mc 5.2 | 1.054 [1.036, 1.073], n = 12,985, Mc 5.3 |
+| Global b, deeper > 70 km | 0.936 [0.911, 0.961], n = 4,976, Mc 5.4 | 0.924 [0.900, 0.955], n = 4,008, Mc 5.5 |
+| Shallow floor 1976–2003 / 2004–2021 | 5.8 / 5.3 | 6.3 / 5.2 |
+| Deeper floor 1976–2003 / 2004–2021 | 5.4 / 5.2 | 5.5 / 5.3 |
+| Cells with a shown b, shallow / deeper | 172 / 71 | 136 / 66 |
+| High-hazard cells (GEM PGA ≥ 0.35 g) without a b | 400 of 555 (72 %) | 429 of 555 (77 %) |
+| Validation, independent data | 1 match, 2 differ | 2 match, 1 differs |
+
+Why the shallow 1976–2003 floor rose: with the old tie rounding the bin counts were uneven (5.7: 947 events,
+5.8: 976) and b jumped at 5.8 (1.022 against 0.984 at 5.7), which met the b-stability criterion early. With even bins
+the counts fall smoothly and b rises steadily with the threshold up to 6.3 (0.966 at 5.5, 1.009 at 5.8, 1.061 at
+6.3), so the criterion is first met at 6.3. MAXC + 0.2 is 5.5. The floor is the larger of the two, as before.

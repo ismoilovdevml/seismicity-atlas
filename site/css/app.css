@@ -164,6 +164,8 @@ main { flex: 1 1 auto; position: relative; min-height: 0; }
 :root[data-mode='simple'] .pro-h1 { display: none; }
 
 /* header links that do not fit in one row fold into the menu button (app.js fitHeader) */
+.top.hdr-short .brand-long, .top.hdr-short .brand-tag, .top.hdr-short .version { display: none; }
+.top.hdr-mark .brand-text { display: none; }
 .top.compact .menu-btn { display: inline-flex; }
 .top.compact .nav {
   display: none; position: absolute; top: 100%; right: 12px; min-width: 240px; max-height: calc(100dvh - 80px); overflow-y: auto;

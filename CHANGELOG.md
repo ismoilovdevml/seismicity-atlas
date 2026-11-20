@@ -3,7 +3,41 @@
 Versions follow `scripts/release.json` (shown on the site from `site/data/manifest.json`). A patch is a data refresh
 with the same schema, a minor version a method, schema or website change; see [docs/release.md](docs/release.md).
 
-## 0.5.0 (prepared 2026-11-16, not yet released)
+## 0.6.0 (2026-11-20)
+
+Method, website and pipeline release after an external audit; same data cut-off (2026-11-13). Every method fix with
+the outputs it moves is in [docs/changes-0.6.md](docs/changes-0.6.md).
+
+- **b estimator and magnitude bins.** b is now the maximum-likelihood estimate for binned magnitudes
+  (Tinti & Mulargia 1987) instead of Aki–Utsu with the half-bin correction (bias −0.3 % at b = 1, −1 % at b = 1.5),
+  for b, b with per-event thresholds and b-positive alike. Magnitude ties (x.x5, 9 % of ISC-GEM Mw) now always round
+  up; before, they went to either side by float noise, the bins had unequal widths and b zigzagged with the
+  threshold. With even bins the b-stability Mc of shallow 1976–2003 events is 6.3 (5.8 before, an artefact of the
+  uneven bins). Global b: shallow 1.035 [1.018, 1.052] → 1.054 [1.036, 1.073], deeper 0.936 [0.911, 0.961] →
+  0.924 [0.900, 0.955]; cells with a shown b: shallow 172 → 136, deeper 71 → 66.
+- **Declustered b** is shown only when its own sample passes the quality gate (new `*_qdecl`); before, values
+  from 2–49 events were published. Declustering runs per depth layer (≤ 70 km, > 70 km), so deep events no longer
+  remove shallow ones.
+- **Fits and JSON**: Omori c bounded at 1e-4 day (fits at the bound flagged `c_at_bound`), K interval includes the
+  parameter covariance, every JSON writer refuses NaN (null instead); PB2002 midpoints across ±180° on the sphere;
+  NZ regional polygons no longer jump across the antimeridian; SoCal magnitude-type filter case-insensitive;
+  ComCat rows below the query magnitude dropped; manifest checksums written after the last writer.
+- **Monitor and N-test**: aftershocks within 100 km of the mainshock depth; b and b-positive above Mcat; Zhang &
+  Werner reference ratios above Mc(t); N-test background without earlier sequences; query falls back to higher
+  magnitude, then shorter time windows.
+- **Deficit (Tien Shan)**: the b sample keeps the whole lowest bin; draws whose budget is already exceeded are counted
+  (`over`); the tapered mean moment is finite for β ≥ 1.
+- **Your catalogue (browser and `seisatlas`)**: separate date and time columns are joined; the G-R line is anchored
+  at the threshold used and clipped at one event; no stack overflow on large files; the bootstrap runs in a Web
+  Worker; Python and browser give the same results and the same errors (4 languages).
+- **Website**: hidden views, their CSS and MapLibre load on demand; M5+ events parse in a worker; cache and security
+  headers (CSP, frame-ancestors, Permissions-Policy); the header gives way (brand, then menu) instead of clipping;
+  going to a page and back keeps the map; race and leak fixes; reduced motion respected; legends are not live
+  regions; Cyrillic and Latin Extended font subsets; translation fixes in uz/ru/es/en.
+- **CI**: all non-browser tests on every push; Cloudflare deploy fails without its token; version files
+  (release.json, pyproject, `__init__`, CITATION.cff) bumped together; `scripts/rebuild_all.sh` rebuilds every layer.
+
+## 0.5.0 (2026-11-16)
 
 Method release after a review; same data cut-off (2026-11-13). Every old → new number with its reason is in
 [docs/changes-0.5.md](docs/changes-0.5.md).

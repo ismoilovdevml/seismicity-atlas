@@ -219,7 +219,7 @@ def test_accessibility_structure(site):
     """Items 16 and 17: legends are not live regions; the Scientist map has an h1; list pages go h1 -> h2."""
     pg = site.open("#v=map&mode=pro")
     assert pg.get_attribute("#legend", "aria-live") is None and pg.get_attribute("#sx-legend", "aria-live") is None
-    assert pg.evaluate("() => [...document.querySelectorAll('#view-map h1')].filter((e) => getComputedStyle(e).display !== 'none').length") == 1
+    assert pg.evaluate("() => [...document.querySelectorAll('#view-map h1')].filter((e) => e.getClientRects().length > 0).length") == 1
     for view, root in (("sequences", "#seq-root"), ("monitor", "#monitor-root")):
         pg.click(f".nav a[data-view={view}]")
         pg.wait_for_selector(f"{root} .seq", timeout=30000)
@@ -235,6 +235,7 @@ def test_depth_section_has_a_data_table(site):
     pg = site.open("#v=depth&mode=pro&m3=xs", ready=False)
     pg.wait_for_selector(".d3-xs-table", timeout=60000)
     pg.click(".d3-xs-table summary")
+    pg.wait_for_selector(".d3-xs-table tbody tr")  # built on the (asynchronous) toggle event
     assert pg.locator(".d3-xs-table tbody tr").count() > 20
 
 
