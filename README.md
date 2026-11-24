@@ -60,7 +60,7 @@ independently confirmed.
 | b, California | 0.956 [0.748, 1.232] | ≈ 1.0 (Hutton et al. 2010, SCSN) | independent | consistent, uninformative (wide interval) |
 | b, Italy | 21 events above Mc | ≈ 1.0 | independent | not testable |
 | Synthetic cells, 100–1000 events, one period / two periods | mean error −0.004 / −0.016 (se 0.007) | true b | independent (synthetic) | match (z −0.64) / differs (z −2.23) |
-| Omori p, 20 synthetic sequences | 1.054 (se of the mean 0.003) | 1.05 | independent (synthetic) | match (z +1.68) |
+| Omori p, 100 synthetic sequences | 1.054 (se of the mean 0.003) | 1.05 | independent (synthetic) | match (z +1.68) |
 
 Verdict counts over the 45 rows of the site table: same data, GCMT-based 13 match, 6 consistent-uninformative,
 1 differs; same data, ISC-GEM itself 2 consistent-uninformative, 9 differs; independent data 2 match,
@@ -88,9 +88,9 @@ seisatlas report events.csv -o report.html
 seisatlas report events.csv --lat 38.3 --lon 142.4 --radius-km 300 --depth-max 70 --mag-type mw -o japan.html
 ```
 
-Check against the atlas: ISC-GEM, shallow, 1976–2021, every event with the atlas floors
-(`--floor-period 1976-2003:5.8 --floor-period 2004-2021:5.3`) gives b = 1.053 [1.036, 1.069], the "every event" value
-of the atlas. More in [src/seisatlas/README.md](src/seisatlas/README.md).
+Check against the atlas: ISC-GEM, shallow (≤ 70 km), 1976–2021, every event with the 0.6.0 atlas floors
+(`--floor-period 1976-2003:6.3 --floor-period 2004-2021:5.2`) gives b = 1.053 [1.034, 1.072] (n = 11,269 above the
+thresholds); the atlas, on direct Mw only, gives 1.054 [1.036, 1.073]. More in [src/seisatlas/README.md](src/seisatlas/README.md).
 
 ## What changed in v0.5.0
 
@@ -131,7 +131,7 @@ and the Groningen `rates.json` no longer carries epicentres.
   Poisson intervals, b by phase from three estimators, moving b-positive for the north and south, b maps by period and
   the comparison with published studies (15 rows). KNMI catalogue (doi:10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5)
   and NLOG.NL production; no event list is offered for download (`rates.json` keeps origin time, ML and KNMI id of
-  the 16 events of ML ≥ 3.0, without locations, for the plain-language summary). [docs/induced.md](docs/induced.md)
+  the 13 events of ML ≥ 3.0, without locations, for the plain-language summary). [docs/induced.md](docs/induced.md)
 - **Seismic-deficit layer, Tien Shan pilot** (Scientist view). Released seismic moment against the GNSS/InSAR moment
   rate at full coupling, per region or H3 cell. A ratio is never shown without its 95 % interval and p_full; zones with
   few events are greyed. Conclusion: **no detectable deficit beyond catalogue noise.** [docs/deficit.md](docs/deficit.md)
@@ -149,7 +149,8 @@ and a lighter first load. Full list: [CHANGELOG.md](CHANGELOG.md).
 
 ## Website
 
-`site/` is a static site (no build step) served by GitHub Pages. Views:
+`site/` is a static site (no build step) served by Cloudflare Pages at seismicityatlas.org, with a GitHub Pages
+mirror (`.github/workflows/pages.yml`). Views:
 
 - **Map, Simple view:** earthquakes M ≥ 5/6/7 as dots coloured by depth over a density shading, offline place search
   (Natural Earth, 7,342 places), a place card with counts, the largest and latest event and a recording rating.
@@ -251,7 +252,7 @@ validation table (with the paper, the magnitude type and the completeness used).
     the map and in [docs/basemap.md](docs/basemap.md)).
   - Groningen case study: Royal Netherlands Meteorological Institute (KNMI), Netherlands Seismic and Acoustic Network,
     doi:10.21944/e970fd34-23b9-3411-b366-e4f72877d2c5 (CC BY 4.0; derived aggregates, plus origin time, ML and KNMI id
-    of the 16 events of ML ≥ 3.0, without locations); production and field outline: Source: NLOG.NL.
+    of the 13 events of ML ≥ 3.0, without locations); production and field outline: Source: NLOG.NL.
   - Regional layers: INGV ISIDe (CC BY 4.0), GeoNet (CC BY 3.0 NZ), Icelandic Met Office (CC BY 4.0, with the download
     date) and the Southern California Seismic Network via ComCat (no licence stated; cite doi:10.7914/SN/CI and SCEDC,
     doi:10.7909/C3WD3xH1). Details in [docs/regional.md](docs/regional.md).

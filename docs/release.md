@@ -66,36 +66,15 @@ drift guard prints old → new for every number it checks.
 Permissions: `contents: write` only. No secrets are used. The job runs only in `ismoilovdevml/seismicity-atlas`, not
 in forks.
 
-### Deploying the update to GitHub Pages
+### Deploying the update (Cloudflare Pages, GitHub Pages mirror)
 
-A push made with the workflow's `GITHUB_TOKEN` does **not** start other workflows (GitHub rule: events triggered by
-`GITHUB_TOKEN` do not create new workflow runs, except `workflow_dispatch` and `repository_dispatch`). The
-`site/**` path filter in `pages.yml` matches `site/data/...`, but the push event from this workflow never reaches it.
-To deploy automatically, add a `workflow_run` trigger to `.github/workflows/pages.yml`:
-
-```yaml
-on:
-  push:
-    branches: [main]
-    paths:
-      - "site/**"
-      - ".github/workflows/pages.yml"
-  workflow_run:
-    workflows: ["Update data"]
-    types: [completed]
-  workflow_dispatch:
-```
-
-and guard its job so that a failed update does not redeploy:
-
-```yaml
-jobs:
-  deploy:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
-```
-
-`workflow_run` runs on the latest commit of the default branch, which then includes the data commit. Until this is
-added, run "Deploy site to GitHub Pages" by hand (Actions → Run workflow) after an update.
+seismicityatlas.org is served by Cloudflare Pages since 2026-11-18; GitHub Pages stays as a mirror. Both are deployed
+by `.github/workflows/pages.yml`. A push made with the workflow's `GITHUB_TOKEN` does **not** start other workflows
+(GitHub rule: events triggered by `GITHUB_TOKEN` do not create new workflow runs, except `workflow_dispatch` and
+`repository_dispatch`), so `pages.yml` also has a `workflow_run` trigger on "Update data" and "Update monitor"; its
+jobs run only when that workflow succeeded. `workflow_run` runs on the latest commit of the default branch, which then
+includes the data commit. The Cloudflare job needs the repository secret `CLOUDFLARE_API_TOKEN` and fails without it.
+To redeploy by hand: Actions → "Deploy site (Cloudflare Pages + GitHub Pages mirror)" → Run workflow.
 
 ### README: numbers and screenshots (since v0.3.1)
 
