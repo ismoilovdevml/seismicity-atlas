@@ -42,8 +42,14 @@ cut-off date). Steps:
 3. Re-downloads ComCat M ≥ 4.5 from 1973 to the cut-off (`fetch.py comcat --refresh`), because ComCat revises old
    events too. Requests go one year at a time, 1 s apart (about 55 requests, about 50 MB). A year that ComCat refuses
    (more than 20,000 events, HTTP 400) is split in half; a chunk that is still refused at 1 day stops the run. ISC-GEM
-   and the map layers come from the cache; they are downloaded only when the cache is empty.
-4. Saves the cache, then runs `scripts/run_all.sh`: the whole pipeline and the tests (`pytest`).
+   and the map layers come from the cache; they are downloaded only when the cache is empty. Only requests actually
+   sent are paused; cached responses are read without a pause. The two strain-rate models of the deficit layer
+   (fixed Zenodo records, md5-checked) also come from the cache and are converted with `gdal_translate`
+   (`scripts/deficit/fetch_deficit.py`; the job installs `gdal-bin`).
+4. Saves the cache, then runs `scripts/run_all.sh` (the global pipeline, without the regional layers), the deficit
+   layer (`build_deficit.py`, `figures_deficit.py`: it counts events to the cut-off and carries the version) and the
+   tests (`pytest`, with Node 22 for the JavaScript checks). Regional, Groningen and sci2 outputs are not rebuilt
+   monthly (`scripts/rebuild_all.sh` by hand); the ongoing-sequence monitor has its own 3-hourly workflow.
 5. Drift guard (`scripts/check_drift.py`) against the `site/data/` of the previous commit. The run fails when:
    - global b, deeper than 70 km, leaves 0.89–0.99 (0.969 in 0.1.0, 0.936 in 0.2.0, after the direct-Mw b sample);
    - global b, shallow, leaves 0.98–1.10 (1.043 in 0.1.0, 1.035 in 0.2.0);

@@ -1,9 +1,11 @@
 name: Update data
 
-# Monthly refresh of the ComCat part of the atlas. Re-downloads ComCat up to the new cut-off, rebuilds every output,
-# runs the tests and the drift guard, and commits site/data, docs/img, results, the version files (scripts/release.json,
-# pyproject.toml, src/seisatlas/__init__.py, CITATION.cff), the static SEO pages and README.md (its key-results table
-# is rewritten from the data by scripts/readme_numbers.py inside run_all.sh) to main.
+# Monthly refresh of the ComCat part of the atlas. Re-downloads ComCat up to the new cut-off, rebuilds the global
+# layers (run_all.sh) and the Tien Shan deficit layer, runs the tests and the drift guard, and commits site/data,
+# docs/img, results, the version files (scripts/release.json, pyproject.toml, src/seisatlas/__init__.py, CITATION.cff),
+# the static SEO pages and README.md (its key-results table is rewritten from the data by scripts/readme_numbers.py
+# inside run_all.sh) to main. Regional, Groningen and sci2 outputs are rebuilt by hand (scripts/rebuild_all.sh); the
+# ongoing-sequence monitor has its own workflow (update-monitor.yml).
 # Nothing is committed if any step fails. See docs/release.md.
 
 on:
@@ -41,8 +43,18 @@ jobs:
           python-version: "3.12"
           cache: pip
 
+      # node runs scripts/seo_pages.mjs below and the node-based tests in run_all.sh (test_i18n, test_analyze_js skip
+      # without it); same version as test-python.yml.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Install requirements
         run: python -m pip install -r requirements.txt
+
+      # gdal_translate converts the NetCDF-4 strain grids of the deficit layer (scripts/deficit/fetch_deficit.py)
+      - name: Install GDAL
+        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends gdal-bin
 
       - name: Restore download cache
         uses: actions/cache/restore@v4
@@ -76,18 +88,34 @@ jobs:
       - name: Fetch ComCat (fresh, yearly chunks, 1 s apart)
         run: python -I scripts/fetch.py comcat --refresh --end "$CUTOFF"
 
+      # Strain-rate models of the deficit layer: two fixed Zenodo records, md5-checked and kept in the download cache;
+      # converted to data/work/deficit/*.npz with gdal_translate.
+      - name: Fetch deficit strain models
+        run: python -I scripts/deficit/fetch_deficit.py
+
       - name: Save download cache
         uses: actions/cache/save@v4
         with:
           path: data/raw
           key: atlas-raw-${{ github.run_id }}
 
-      - name: Run pipeline and tests
+      - name: Run pipeline
         # Regional layers need per-event lookups (over an hour on a cold cache), so the monthly
         # global refresh keeps the committed regional output; rebuild regions by hand when needed.
         env:
           SKIP_REGIONAL: "1"
+          SKIP_TESTS: "1"
         run: PY=python ./scripts/run_all.sh
+
+      # The deficit layer counts ISC-GEM + ComCat events to the cut-off and carries the version, so it follows the
+      # monthly refresh. Strain models: two fixed Zenodo records (md5-checked, cached under data/raw/deficit).
+      - name: Deficit layer (Tien Shan)
+        run: |
+          python -I scripts/deficit/build_deficit.py
+          python -I scripts/deficit/figures_deficit.py
+
+      - name: Tests
+        run: python -I -m pytest -q -p no:cacheprovider tests --ignore=tests/e2e
 
       - name: Drift guard
         run: python -I scripts/check_drift.py --baseline "$RUNNER_TEMP/baseline" --new site/data
