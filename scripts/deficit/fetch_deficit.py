@@ -96,6 +96,24 @@ def _read_gmt_nc(path: Path):
     return lon, lat, z
 
 
+def grid_files():
+    """(inputs, outputs) of build_grids."""
+    ins = [RAW / "ou2026" / f for f in ("dvedx.nc", "dvndy.nc", "dxy.nc", "sec_inv.nc")]
+    ins += [RAW / "chang2025" / fn for fn in CHANG_MODELS.values()]
+    outs = [WORK / "strain_ou2026.npz"] + [WORK / f"strain_{name}.npz" for name in CHANG_MODELS]
+    return ins, outs
+
+
+def grids_up_to_date() -> bool:
+    """Every grid file exists and is newer than every raw input. The inputs are md5-checked Zenodo files that do not
+    change between releases, so a rebuild without gdal_translate (e.g. a build server with the grids copied into
+    data/work/deficit) can reuse them."""
+    ins, outs = grid_files()
+    if not all(p.exists() for p in ins + outs):
+        return False
+    return min(p.stat().st_mtime for p in outs) >= max(p.stat().st_mtime for p in ins)
+
+
 def build_grids():
     WORK.mkdir(parents=True, exist_ok=True)
     d = RAW / "ou2026"
@@ -134,5 +152,9 @@ def build_grids():
 
 
 if __name__ == "__main__":
-    fetch(refresh="--refresh" in sys.argv)
-    build_grids()
+    refresh = "--refresh" in sys.argv
+    fetch(refresh=refresh)
+    if not refresh and grids_up_to_date():
+        print("strain grids up to date in", WORK, "(--refresh rebuilds them)")
+    else:
+        build_grids()

@@ -2,7 +2,7 @@
 below the 'b ~ 1' reference.
 
 Every variant uses ISC-GEM Mw, shallow (<= 70 km), and either the atlas estimator (per-event threshold
-max(MAXC+0.2 of the sample, period floor), bootstrap 95 % interval, `atlaslib.cell_b`) or Aki-Utsu at a fixed
+max(MAXC+0.2 of the sample, period floor), bootstrap 95 % interval, `atlaslib.cell_b`) or the binned b MLE at a fixed
 threshold with a bootstrap percentile interval. Variants:
 
   b sample     : every variant below uses the atlas b sample (common.b_sample_mask: direct Mw only by default);
@@ -40,7 +40,7 @@ RNG = 31
 
 
 def b_fixed(m, thr, nboot=1000, rng=RNG):
-    """Aki-Utsu b at a fixed threshold with a bootstrap 95 % percentile interval."""
+    """Binned maximum-likelihood b (seislib.b_aki) at a fixed threshold with a bootstrap 95 % percentile interval."""
     m = sl.bin_mag(np.asarray(m, float))
     m = m[m >= thr - 1e-9]
     b, sig, n, _ = sl.b_aki(m, thr)

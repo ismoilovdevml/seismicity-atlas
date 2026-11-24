@@ -397,7 +397,7 @@ def main():
             "seismic_observed": "band-wise sum over each band's complete period (Michael 2014 ISC-GEM shallow)",
             "bands": [{"mw_lo": a, "mw_hi": None if c > 90 else c, "from": int(y)} for a, c, y in BANDS],
             "seismic_tgr": "alpha(Mw>=6.0 since 1964) x mean moment of a tapered G-R (Kagan 2002)",
-            "b_whole_belt": {"b": r3(b), "sigma": r3(bsig), "n": nb, "mw_min": B_MIN, "years": [1976, CUTOFF[:4]]},
+            "b_whole_belt": {"b": r3(b), "sigma": r3(bsig), "n": nb, "mw_min": B_MIN, "years": [1976, int(CUTOFF[:4])]},
             "corner_mw": list(MC_RANGE), "depth_max_km": 70, "monte_carlo_draws": N_MC, "catalogue_sims": N_SIM,
             "seed": SEED,
         },

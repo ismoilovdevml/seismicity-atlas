@@ -224,7 +224,7 @@ What these tests can and cannot show:
 | `d_q`, `d_ciw`, `d_ciwr`, `d_unstable` | quality code, absolute and relative interval width (also for `C`; `d_ciwr` since 0.5.0), cutoff-stability flag: same meaning as global |
 | `d_bpos`, `d_bpos_lo`, `d_bpos_hi` | b-positive ± 1.96 σ; only when `d_q` is `A` or `B` |
 | `d_bdecl`, `d_bdecl_lo`, `d_bdecl_hi` | b after Gardner-Knopoff declustering (per depth layer), bootstrap 95 %; only when `d_q` is `A` or `B` and the declustered sample's own `d_qdecl` is `A` or `B` (since 0.6.0) |
-| `d_qdecl` | quality code of the declustered sample, same rule as `d_q` (since 0.6.0) |
+| `d_qdecl` | quality code of the declustered sample, same rule as `d_q`; only when `d_q` is `A` or `B`, so a code `A`/`B` always comes with its `d_bdecl` (since 0.6.0; the first 0.6.0 data also gave it for a masked main b: Iceland `85074543fffffff` had `sh_q` C, `sh_qdecl` B and no `sh_bdecl`) |
 
 The global properties `n_iscgem`, `n_comcat`, `rate_m6`, `pb`, `d_mc_cc*` and `c_*` (ISC-GEM/ComCat comparison) have
 no regional equivalent and are absent.

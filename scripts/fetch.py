@@ -51,7 +51,7 @@ KEEP = ["time", "latitude", "longitude", "depth", "mag", "magType", "net", "id",
 
 
 MIN_CHUNK_DAYS = 1.0   # a chunk this short that still exceeds ComCat's 20,000-event limit is an error, not split
-PAUSE_S = 1.0          # pause between ComCat requests
+PAUSE_S = 1.0          # pause after every network request of cache_get (never after a cache hit)
 
 
 class TooMany(Exception):
@@ -70,6 +70,7 @@ def cache_get(url: str, params: dict | None, source: str, ext: str, refresh=Fals
     for attempt in range(retries):
         try:
             r = requests.get(full, headers={"User-Agent": UA}, timeout=timeout)
+            time.sleep(PAUSE_S)   # also before a refused (400) query is split and asked again
             if r.status_code == 400:
                 raise TooMany(r.text[:200])
             if r.status_code == 204:
@@ -119,7 +120,6 @@ def comcat_chunk(t0, t1, minmag, catalog, refresh, frames):
         return
     if body.strip():
         frames.append(pd.read_csv(io.BytesIO(body), dtype={"id": str, "net": str, "magType": str}))
-    time.sleep(PAUSE_S)
 
 
 def drop_below_minmag(df, minmag, name="catalogue"):

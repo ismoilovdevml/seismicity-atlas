@@ -47,7 +47,8 @@ def cells_layer(cells, detail_ids):
                       f"{d}_bdecl": R(g("b_decl"), 3) if showd else None,
                       f"{d}_bdecl_lo": R(g("b_decl_lo"), 3) if showd else None,
                       f"{d}_bdecl_hi": R(g("b_decl_hi"), 3) if showd else None,
-                      f"{d}_qdecl": qd if isinstance(qd, str) else None,
+                      # its code only next to a shown main b, so a code A/B never comes without its value
+                      f"{d}_qdecl": qd if show and isinstance(qd, str) else None,
                       f"{d}_mc_cc": R(g("mc_cc_2010"), 1), f"{d}_mc_cc0": R(g("mc_cc_pre1990"), 1)})
         n = int(r.cons_n_matched)
         dmw, dloc = r.cons_dmag_mw, r.cons_dloc_km

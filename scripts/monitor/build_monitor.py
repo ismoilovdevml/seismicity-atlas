@@ -16,9 +16,9 @@ Mc(t)     : max(Mcat, Mm - 4.5 - 0.75 log10 t) (Helmstetter et al. 2006; Page et
 Omori     : Omori-Utsu MLE above Mc(t) (seislib.omori_fit_mct), b = sequence b-positive if >= 50 differences, else 1.
             95 % intervals from the observed information (K with its covariance with p and c); c >= 1e-4 day;
             quality A/B/C as in the atlas sequence fits.
-b         : Aki-Utsu with the per-event threshold Mc(t); 1000 bootstrap resamples with Mcat re-estimated; shown only
-            for quality A (95 % interval width / b <= 0.30) or B (<= 0.50) with >= 50 events. b-positive (van der Elst 2021)
-            on the events at or above Mcat.
+b         : binned maximum likelihood (Tinti & Mulargia 1987) with the per-event threshold Mc(t); 1000 bootstrap
+            resamples with Mcat re-estimated; shown only for quality A (95 % interval width / b <= 0.30) or B (<= 0.50)
+            with >= 50 events. b-positive (van der Elst 2021) on the events at or above Mcat.
 ZW2020    : optional, subduction-zone regimes only: count above Mc(t) divided by the direct-aftershock count above
             Mc(t) of the Zhang & Werner (2020) Table 6 ETAS parameters over the same span, next to the same ratio
             (also above Mc(t)) for their own Case 3 sequences (descriptive; nothing is extrapolated past the cut-off).
@@ -38,7 +38,6 @@ import io
 import json
 import math
 import sys
-import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -50,7 +49,7 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent))
 import monitorlib as ml  # noqa: E402
 import seislib as sl  # noqa: E402
-from fetch import COMCAT, MIN_CHUNK_DAYS, PAUSE_S, TooMany, cache_get  # noqa: E402
+from fetch import COMCAT, MIN_CHUNK_DAYS, TooMany, cache_get  # noqa: E402
 
 ROOT = HERE.parents[1]
 OUT = ROOT / "site" / "data" / "monitor"
@@ -73,8 +72,7 @@ def iso(ts) -> str:
 
 def comcat_csv(params, refresh=False) -> pd.DataFrame:
     body = cache_get(COMCAT, {"format": "csv", "eventtype": "earthquake", "orderby": "time-asc", **params},
-                     "monitor", "csv", refresh)
-    time.sleep(PAUSE_S)
+                     "monitor", "csv", refresh)            # cache_get pauses after each network request
     if not body.strip():
         return pd.DataFrame(columns=["time", "latitude", "longitude", "depth", "mag", "magType", "id", "place"])
     df = pd.read_csv(io.BytesIO(body), dtype={"id": str, "magType": str, "place": str})

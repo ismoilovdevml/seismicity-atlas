@@ -77,6 +77,16 @@ def gor(x, y, eta=1.0):
     return float(np.mean(y) - b * np.mean(x)), float(b)
 
 
+def drop_unusable_comcat(c: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+    """Drop ComCat rows below the query magnitude, then rows without a depth; each dropped row is counted once."""
+    below = c.mag < COMCAT_MINMAG - 1e-9      # the query is M >= 4.5, but ComCat has served smaller events
+    c = c[~below].reset_index(drop=True)
+    no_depth = ~np.isfinite(c["depth"])       # counted after the magnitude cut, so no row is counted twice
+    c = c[~no_depth].reset_index(drop=True)
+    return c, {"comcat_dropped_below_minmag": {"n": int(below.sum()), "minmag": COMCAT_MINMAG},
+               "comcat_dropped_no_depth": int(no_depth.sum())}
+
+
 def boundary_class(lat, lon, steps, max_km=200.0):
     """Nearest PB2002 step (Bird 2003) to each epicentre; 'none' beyond max_km. Returns class, distance, age."""
     def xyz(la, lo):
@@ -99,11 +109,8 @@ def main():
                          "iscgem_last_year in scripts/release.json to its last complete year")
     info = {"iscgem_n": len(g), "comcat_n": len(c), "iscgem_span": [str(g.time.min()), str(g.time.max())],
             "comcat_span": [str(c.time.min()), str(c.time.max())]}
-    below = c.mag < COMCAT_MINMAG - 1e-9      # the query is M >= 4.5, but ComCat has served smaller events
-    c = c[~below].reset_index(drop=True)
-    info["comcat_dropped_below_minmag"] = {"n": int(below.sum()), "minmag": COMCAT_MINMAG}
-    c = c[np.isfinite(c["depth"])].reset_index(drop=True)
-    info["comcat_dropped_no_depth"] = info["comcat_n"] - len(c)
+    c, dropped = drop_unusable_comcat(c)
+    info.update(dropped)
 
     # ------------------------------------------------------------------ matching
     gm = g[(g.time >= c.time.min()) & (g.time <= c.time.max())].reset_index()

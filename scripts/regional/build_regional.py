@@ -66,6 +66,21 @@ def cell_polygon(h, nd=3):
     return h3_polygon(h, nd)       # shared with site_layers: continuous longitudes across the antimeridian
 
 
+def decl_props(pre, show, rd):
+    """Declustered b of one depth layer for the cell layer. The value needs the main b shown (quality A/B) and the
+    declustered sample's own quality A/B (n >= 50, relative width). Its quality code is published only next to a
+    shown main b: a code computed from a cell whose main b is masked read as "A/B" with no value (Iceland
+    85074543fffffff: sh_q C, sh_qdecl B, no sh_bdecl)."""
+    if not (rd and show):
+        return {}
+    q = rd.get("quality", "insufficient")
+    out = {pre + "qdecl": q}
+    if q in ("A", "B"):
+        out.update({pre + "bdecl": R(rd.get("b_raw", np.nan), 3), pre + "bdecl_lo": R(rd.get("b_lo_raw", np.nan), 3),
+                    pre + "bdecl_hi": R(rd.get("b_hi_raw", np.nan), 3)})
+    return out
+
+
 def fmd_pairs(m):
     if m.size == 0:
         return []
@@ -226,18 +241,12 @@ def build_region(rid):
                           pre + "ciwr": R(al.rel_width(r.get("b_raw", np.nan), r.get("b_lo_raw", np.nan),
                                                        r.get("b_hi_raw", np.nan)), 3),
                           pre + "unstable": bool(r.get("cutoff_unstable", False))})
-            # declustered b: shown only when its own sample passes the gate of the main b (n >= 50, width)
             showd = show and rd.get("quality") in ("A", "B")
-            if rd:
-                props[pre + "qdecl"] = rd.get("quality", "insufficient")
             if show:
                 props.update({pre + "bpos": R(rp.get("bpos", np.nan), 3),
                               pre + "bpos_lo": R(rp.get("bpos_lo", np.nan), 3),
                               pre + "bpos_hi": R(rp.get("bpos_hi", np.nan), 3)})
-            if showd:
-                props.update({pre + "bdecl": R(rd.get("b_raw", np.nan), 3),
-                              pre + "bdecl_lo": R(rd.get("b_lo_raw", np.nan), 3),
-                              pre + "bdecl_hi": R(rd.get("b_hi_raw", np.nan), 3)})
+            props.update(decl_props(pre, show, rd))
             if ii.size >= MIN_DETAIL:
                 stats = {kk: v for kk, v in r.items() if not kk.startswith("_") and kk != "thr_sorted_order"}
                 thr = rl.thresholds_time_order(r) if "_thr" in r else np.full(m.size, np.nan)
@@ -257,7 +266,7 @@ def build_region(rid):
                     "stats": {**stats, "b_decl": rd.get("b_raw") if showd else None,
                               "b_decl_lo": rd.get("b_lo_raw") if showd else None,
                               "b_decl_hi": rd.get("b_hi_raw") if showd else None, "n_decl": rd.get("n_b"),
-                              "q_decl": rd.get("quality"), **rp},
+                              "q_decl": rd.get("quality") if show else None, **rp},
                 }
         props["detail"] = any(d in det for d in sets)
         if props["detail"]:

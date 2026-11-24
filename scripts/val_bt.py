@@ -13,9 +13,9 @@ Catalogue  : ISC-GEM Mw, the atlas b sample (1976-2021, direct Mw only: common.b
 Threshold  : per event, thr_i = max(period/depth floor of the atlas, MAXC+0.2 of the window sample) and, after the
              mainshock, also Mc(t) = Mm - 4.5 - 0.75 log10(t days) (Helmstetter et al. 2006 form; its coefficients
              were derived for California and are an assumption at teleseismic scale).
-Estimator  : Aki-Utsu with per-event thresholds (seislib.b_varmc), bootstrap 95 % percentile interval with the
-             window Mc re-estimated in each replicate; b-positive (van der Elst 2021) on events above the floor as
-             an incompleteness-robust check. Quality codes as in the atlas (A/B shown, C and insufficient masked).
+Estimator  : binned maximum likelihood (Tinti & Mulargia 1987) with per-event thresholds (seislib.b_varmc),
+             bootstrap 95 % percentile interval with the window Mc re-estimated in each replicate; b-positive
+             (van der Elst 2021) on events above the floor as an incompleteness-robust check. Quality codes as in the atlas (A/B shown, C and insufficient masked).
 Validation : the 2004 Sumatra direction test against Srivastava et al. (2021, arXiv:2108.06557, ISC mb, 92-100 E):
              b 1.04 in the five years before 2004, 1.14 after. Our replication uses ISC-GEM Mw in the same longitude
              band (13 S-11 N), 2000-2004 vs 2005-2009. Only the direction can be compared (mb vs Mw).

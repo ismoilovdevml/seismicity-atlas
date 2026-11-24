@@ -10,7 +10,7 @@ Each item: what was wrong, what changed, which outputs move after the rebuild.
   (they use a resolution of 0.01, where the edge was already exact).
 - **Omori-Utsu c.** The search for c was unconstrained; without early data c ran to about 10⁻¹⁵ day with a singular
   Hessian and no standard errors (2004 Sumatra in `sequences.json`, c = 0 in some monitor files). c is now searched
-  in [10⁻⁴ day, max(T, 1 day)]; a fit that ends at the bound is flagged `c_at_bound`, its `sc` is null and the
+  in [10⁻⁴ day, max(T, 1 day)]; a fit that ends at either bound is flagged `c_at_bound`, its `sc` is null and the
   errors of K and p are those for c fixed there. Outputs: `sequences.json`, monitor files, `results/sci2_ntest.json`,
   `results/monitor_oaf_validation.json` (c, sc, sp, p of the affected sequences).
 - **Omori-Utsu K error.** `sK` was K/√n, which ignores the covariance of K with p and c. It is now
@@ -87,7 +87,7 @@ Each item: what was wrong, what changed, which outputs move after the rebuild.
   `results/sci2_ntest.json`.
 - **Groningen ML ≥ 3.0.** The list of ML ≥ 3.0 events used the 0.1 bin, which also holds ML 2.95, 2.99 and 2.995 (knmi2009iylo): 16 events
   instead of 13. It now uses the reported ML. Outputs: `induced/groningen/rates.json` `events_ge3` (13 events), the
-  stars of the map figure, the "16 events" in docs/induced.md (to be updated with the rebuild).
+  stars of the map figure, the count in docs/induced.md and README.md (13).
 - **Manifest checksums.** `site_layers.py` hashed `rating.json` before `build_rating.py` rewrote it, so a changed
   rating left a stale checksum. `run_all.sh` now ends the site step with `site_layers.py --rehash`; a test checks
   every checksum against the file on disk.
@@ -119,7 +119,7 @@ Each item: what was wrong, what changed, which outputs move after the rebuild.
 | Shallow floor 1976–2003 / 2004–2021 | 5.8 / 5.3 | 6.3 / 5.2 |
 | Deeper floor 1976–2003 / 2004–2021 | 5.4 / 5.2 | 5.5 / 5.3 |
 | Cells with a shown b, shallow / deeper | 172 / 71 | 136 / 66 |
-| High-hazard cells (GEM PGA ≥ 0.35 g) without a b | 400 of 555 (72 %) | 430 of 555 (77 %) |
+| High-hazard cells (GEM mean PGA ≥ 0.2 g) without a b | 400 of 555 (72 %) | 430 of 555 (77 %) |
 | Validation, independent data | 1 match, 2 differ | 2 match, 1 differs |
 
 Why the shallow 1976–2003 floor rose: with the old tie rounding the bin counts were uneven (5.7: 947 events,

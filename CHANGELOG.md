@@ -3,6 +3,20 @@
 Versions follow `scripts/release.json` (shown on the site from `site/data/manifest.json`). A patch is a data refresh
 with the same schema, a minor version a method, schema or website change; see [docs/release.md](docs/release.md).
 
+## Unreleased
+
+- **Declustered quality code** (`*_qdecl`, regional detail `stats.q_decl`) is given only next to a shown main b,
+  so a code A/B always comes with its `*_bdecl` (Iceland `85074543fffffff` had `sh_q` C, `sh_qdecl` B and no
+  `sh_bdecl`). Published layers patched in place (fields removed: global 73, regional 88 cell-layer and 88 detail
+  entries); checksums in `manifest.json` and `regional/index.json` refreshed.
+- **Deficit index**: `method.b_whole_belt.years` is `[1976, 2026]` (was `[1976, "2026"]`, int and string mixed).
+- **Pipeline**: `results/prepare.json` `comcat_dropped_no_depth` no longer also counts rows dropped below M 4.5 (the
+  0.6.0 value, 2, is unaffected: no row was below 4.5); `fetch.py` pauses only after a real request, not on a cache
+  hit; `fetch_deficit.py` reuses strain grids newer than their inputs (no `gdal_translate` needed then); the
+  Groningen shut-in phase note says the NLOG series ends in 2024-12 (was "figures start in 2003"; in the data with
+  the next Groningen rebuild).
+- **Monthly workflow** also rebuilds the deficit layer (installs `gdal-bin`) and pins Node 22.
+
 ## 0.6.0 (2026-11-20)
 
 Method, website and pipeline release after an external audit; same data cut-off (2026-11-13). Every method fix with
