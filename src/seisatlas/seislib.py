@@ -49,8 +49,8 @@ def haversine_km(lat1, lon1, lat2, lon2):
 
 # ----------------------------------------------------------------------------------------------- b-value
 def b_aki(m, mc: float, dm: float = 0.1):
-    """Maximum-likelihood b of binned magnitudes at or above the bin mc (b_from_excess), plus the Shi-Bolt (1982)
-    standard error. Returns (b, sigma_b, n, a) where a is log10 N(>=mc)."""
+    """Maximum-likelihood b of binned magnitudes at or above the bin mc (b_from_excess, Tinti & Mulargia 1987), plus
+    the Shi-Bolt (1982) standard error. Returns (b, sigma_b, n, a) where a is log10 N(>=mc)."""
     m = bin_mag(m, dm)
     m = m[m >= mc - dm / 2 + 1e-9]
     n = m.size
@@ -63,7 +63,7 @@ def b_aki(m, mc: float, dm: float = 0.1):
 
 
 def b_bootstrap(m, mc: float, dm: float = 0.1, nboot: int = 500, rng=None):
-    """Bootstrap standard deviation of the Aki-Utsu b-value."""
+    """Bootstrap standard deviation of the b-value of b_aki (binned maximum likelihood)."""
     rng = np.random.default_rng(rng)
     m = bin_mag(m, dm)
     m = m[m >= mc - dm / 2 + 1e-9]
@@ -135,10 +135,17 @@ def mc_gft(m, dm: float = 0.1, levels=(95, 90)):
 
 
 def mc_mbs(m, dm: float = 0.1, span: float = 0.5, nmin: int = 50):
-    """b-value stability (Cao & Gao 2002 with the Shi-Bolt criterion of Woessner & Wiemer 2005).
+    """b-value stability (Cao & Gao 2002 with the criterion of Woessner & Wiemer 2005).
 
-    First Mc at which |mean b over [Mc, Mc+span]| - b(Mc)| <= sigma_b(Mc)."""
+    First Mc at which |mean b over [Mc, Mc+span] - b(Mc)| <= sigma_b(Mc) (b_aki and its standard error). A candidate
+    needs at least nmin events at or above it and a finite b at every one of the span/dm + 1 thresholds of the
+    window: a window that runs past the data (b NaN with fewer than two events) is not stable, where nanmean used to
+    average only the finite values and let a candidate pass on its own b. NaN when no candidate passes, and for fewer
+    than nmin finite magnitudes (also an empty input, which used to raise)."""
     m = bin_mag(m, dm)
+    m = m[np.isfinite(m)]
+    if m.size < nmin:
+        return np.nan
     bins, _, _ = fmd(m, dm)
     m0 = mc_maxc(m, dm)
     trial = bins[(bins >= m0 - 0.3) & (bins <= m0 + 2.0)]
@@ -146,11 +153,12 @@ def mc_mbs(m, dm: float = 0.1, span: float = 0.5, nmin: int = 50):
     bvals = {float(t): b_aki(m, t, dm) for t in bin_mag(np.arange(trial.min(), trial.max() + span + dm, dm), dm)}
     for mc in trial:
         b, sig, n, _ = bvals[float(mc)]
-        if n < nmin or not np.isfinite(b):
+        if n < nmin or not np.isfinite(b) or not np.isfinite(sig):
             continue
-        ahead = [bvals.get(float(bin_mag(mc + i * dm, dm)), (np.nan,))[0] for i in range(k + 1)]
-        bave = np.nanmean(ahead)
-        if abs(bave - b) <= sig:
+        ahead = np.array([bvals.get(float(bin_mag(mc + i * dm, dm)), (np.nan,))[0] for i in range(k + 1)])
+        if not np.isfinite(ahead).all():
+            continue
+        if abs(ahead.mean() - b) <= sig:
             return float(mc)
     return np.nan
 
@@ -317,18 +325,44 @@ def _ou_starts(p0: float, logc0, lo: float, hi: float):
     return [[p0, float(np.clip(x, lo, hi))] for x in logc0]
 
 
+OMORI_NMIN = 2             # fewer events than this: no fit (callers apply their own, higher, minimum)
+
+
+def _c_bound(logc: float, lo: float, hi: float, fixed: bool):
+    """Which bound of the c search the fit ended at: "lower", "upper" or None (also None for a fixed c)."""
+    if fixed:
+        return None
+    if logc - lo < 1e-3:
+        return "lower"
+    if hi - logc < 1e-3:
+        return "upper"
+    return None
+
+
+def _omori_unfit(n: int, T1: float, T2: float):
+    """The omori_fit / omori_fit_mct result for too few events: every estimate NaN, fitted False."""
+    nan = float("nan")
+    return {"K": nan, "c": nan, "p": nan, "sK": nan, "sc": nan, "sp": nan, "n": int(n), "T1": T1, "T2": T2,
+            "logL": nan, "c_at_bound": False, "c_bound": None, "fitted": False}
+
+
 def omori_fit(t, T1: float, T2: float, c0: float = 0.05, p0: float = 1.1, fix_c: float | None = None,
               c_min: float = C_MIN_DAYS):
     """Maximum-likelihood Omori-Utsu fit, rate K/(t+c)^p on [T1, T2] (Ogata 1983). t in days after mainshock.
 
     K is profiled out analytically (K = n / integral). c is searched in [c_min, max(T2, 1)] days: without early
     data the likelihood keeps rising as c -> 0, the old unconstrained search then returned c ~ 1e-15 with a singular
-    Hessian. When c ends at c_min (`c_at_bound`), c is reported as not resolved (sc NaN) and the standard errors
-    of K and p are those for c fixed there. Returns dict with K, c, p, standard errors from the observed-information
-    matrix, n and log-likelihood."""
+    Hessian. When c ends at either bound (`c_at_bound`; `c_bound` says "lower" or "upper"), c is reported as not
+    resolved (sc NaN) and the standard errors of K and p are those for c fixed there: at a bound the likelihood is
+    not stationary in c and the full Hessian is meaningless or singular. An upper-bound c (a rate that hardly decays
+    within the window) was not flagged up to 0.6.0. Returns dict with K, c, p, standard errors from the
+    observed-information matrix, n, log-likelihood, c_at_bound, c_bound and fitted (False, every estimate NaN, for
+    fewer than OMORI_NMIN events)."""
     t = np.asarray(t, float)
     t = t[(t >= T1) & (t <= T2)]
     n = t.size
+    if n < OMORI_NMIN:
+        return _omori_unfit(n, T1, T2)
 
     def nll(theta):
         p = theta[0]
@@ -349,11 +383,11 @@ def omori_fit(t, T1: float, T2: float, c0: float = 0.05, p0: float = 1.1, fix_c:
                key=lambda r: r.fun)
     p = float(best.x[0])
     c = fix_c if fix_c is not None else float(np.exp(best.x[1]))
-    at_bound = fix_c is None and best.x[1] - lo < 1e-3
+    bound = _c_bound(best.x[-1], lo, hi, fix_c is not None)
     K = n / _ou_integral(c, p, T1, T2)
-    se = _omori_se(t, T1, T2, K, c, p, fix_c is not None or at_bound)
+    se = _omori_se(t, T1, T2, K, c, p, fix_c is not None or bound is not None)
     return {"K": K, "c": c, "p": p, "sK": se[0], "sc": se[1], "sp": se[2], "n": n, "T1": T1, "T2": T2,
-            "logL": -best.fun, "c_at_bound": bool(at_bound)}
+            "logL": -best.fun, "c_at_bound": bound is not None, "c_bound": bound, "fitted": True}
 
 
 def _omori_loglik(t, T1, T2, K, c, p):
@@ -438,19 +472,25 @@ def omori_fit_mct(t, m, T1: float, T2: float, mag_main: float, mcat: float, b: f
 
     Only events with M >= Mc(t) are used; the expected rate of such events is
     K (t+c)^-p 10^(-b (Mc(t) - Mcat)), K being the rate of M >= Mcat events. c is searched in [c_min, max(T2, 1)]
-    days (see omori_fit); `c_at_bound` marks a fit whose c ended at c_min.
+    days (see omori_fit); `c_at_bound` marks a fit whose c ended at either bound (`c_bound`: "lower" or "upper"),
+    sc is then NaN and the errors of K and p are those for c fixed there. The integral of the rate runs over
+    [T1, T2] (trapezoid on a log grid that starts at T1; up to 0.6.0 it started at 1e-6 day when T1 = 0).
 
     Standard errors: (p, log c) from the observed information of the profile likelihood; K = n / A(p, c) with n
     Poisson, so var(log K) = 1/n + g' Cov(p, log c) g, g = d log A / d(p, log c) (the K-K element of the inverse
     full information; the old K/sqrt(n) left out the covariance with p and c and was about half the true scatter).
-    Non-finite or non-positive-definite information gives NaN errors. Returns the same dict as omori_fit."""
+    Non-finite or non-positive-definite information gives NaN errors. Returns the same dict as omori_fit (fitted
+    False, every estimate NaN, for fewer than OMORI_NMIN selected events)."""
     t = np.asarray(t, float)
     m = bin_mag(m, dm)
     mct = mc_helmstetter(t, mag_main, mcat, F, G, H)
     sel = (t >= T1) & (t <= T2) & (m >= mct - dm / 2 + 1e-9)
     ts = t[sel]
     n = ts.size
-    grid = np.unique(np.r_[np.geomspace(max(T1, 1e-6), T2, 4000), T2])
+    if n < OMORI_NMIN:
+        return _omori_unfit(n, T1, T2)
+    # the log grid cannot start at 0: it starts at 1e-6 day and T1 itself is added, so [T1, 1e-6] is one trapezoid
+    grid = np.unique(np.r_[T1, np.geomspace(max(T1, 1e-6), T2, 4000), T2])
     w = 10 ** (-b * (mc_helmstetter(grid, mag_main, mcat, F, G, H) - mcat))
     wi = 10 ** (-b * (mc_helmstetter(ts, mag_main, mcat, F, G, H) - mcat))
 
@@ -475,11 +515,11 @@ def omori_fit_mct(t, m, T1: float, T2: float, mag_main: float, mcat: float, b: f
                key=lambda r: r.fun)
     p = float(best.x[0])
     c = fix_c if fix_c is not None else float(np.exp(best.x[1]))
-    at_bound = fix_c is None and best.x[1] - lo < 1e-3
+    bound = _c_bound(best.x[-1], lo, hi, fix_c is not None)
     K = n / integral(c, p)
 
-    # observed information of the profile likelihood in (p[, log c]); c at its bound -> p alone, c fixed there
-    k = 1 if (fix_c is not None or at_bound) else 2
+    # observed information of the profile likelihood in (p[, log c]); c at a bound -> p alone, c fixed there
+    k = 1 if (fix_c is not None or bound is not None) else 2
     x = np.array([p, np.log(c)])[:k]
 
     def f(v):
@@ -505,7 +545,7 @@ def omori_fit_mct(t, m, T1: float, T2: float, mag_main: float, mcat: float, b: f
         sc = float(c * np.sqrt(cov[1, 1])) if k > 1 else np.nan
         sK = float(K * np.sqrt(1.0 / n + g @ cov @ g))
     return {"K": K, "c": c, "p": p, "sK": sK, "sc": sc, "sp": sp, "n": n, "T1": T1, "T2": T2,
-            "logL": -best.fun, "c_at_bound": bool(at_bound)}
+            "logL": -best.fun, "c_at_bound": bound is not None, "c_bound": bound, "fitted": True}
 
 
 # ----------------------------------------------------------------------------------------------- atlas additions

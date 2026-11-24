@@ -25,8 +25,9 @@ type are used when present. USGS ComCat, EMSC and ISC exports work as downloaded
 ## Method
 
 - Mc = MAXC + 0.2; MBS and GFT are reported for comparison; Mc per year shows completeness changing in time.
-- b: Aki-Utsu maximum likelihood with the binning correction and a per-event threshold max(Mc, floor), so a
-  catalogue whose completeness changed can be analysed with per-period floors (`--floor-period 1976-2003:5.8`).
+- b: maximum likelihood for magnitudes binned to 0.1 (Tinti & Mulargia 1987, b = log10(1 + Δm / mean excess) / Δm;
+  the Aki-Utsu formula with the Δm/2 correction is its approximation) with a per-event threshold max(Mc, floor), so
+  a catalogue whose completeness changed can be analysed with per-period floors (`--floor-period 1976-2003:5.8`).
 - 95 % interval from 1000 bootstrap replicates that re-estimate Mc each time.
 - Quality A if (upper − lower) / b ≤ 0.30, B if ≤ 0.50, C if wider (b withheld), insufficient below 50 events above
   the threshold. The width is relative because the standard error of b grows with b; an absolute limit would favour
