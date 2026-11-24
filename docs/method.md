@@ -308,8 +308,8 @@ kept.
   - `B`: n ≥ 50, σp ≤ 0.20.
   - `C`: otherwise.
   - Result: 17 A, 11 B, 7 C, 5 insufficient (mostly deep mainshocks with few aftershocks).
-- **`c_resolved`.** False for 6 of the 35 fits, where c < 0.001 day (4 of them end at the lower bound,
-  `c_at_bound`). A teleseismic catalogue misses the first hours, so c
+- **`c_resolved`.** False for 6 of the 35 fits, where c < 0.001 day (4 of them end at the lower bound
+  10⁻⁴ day; `c_at_bound` flags a fit at either bound, 10⁻⁴ day or max(T, 1 day)). A teleseismic catalogue misses the first hours, so c
   is not constrained there; p and K remain usable.
 - **Synthetic check.** 100 teleseismic-like sequences (Mm 8, Mcat 4.5, true p 1.05, with Mc(t) losses) give mean
   p 1.054, between-run SD 0.026 and mean σp 0.027.

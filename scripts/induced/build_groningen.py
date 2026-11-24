@@ -202,7 +202,7 @@ def validation(ev, moving, maps, geom, rng):
     rows.append({"id": "K22-b", "source": "Kraaijpoel et al. 2022", "quantity": "field b, ML>=1.45, 1995-2021",
                  "published": 0.96, "ours": f["b"], "ours_lo": f["lo"], "ours_hi": f["hi"], "n": f["n"],
                  "ours_unbinned": b_unb, "verdict": v, "z": z,
-                 "note": "binned Aki-Utsu (atlas) and unbinned MLE (paper's choice) both shown"})
+                 "note": "binned MLE (atlas, Tinti & Mulargia 1987) and unbinned MLE (paper's choice) both shown"})
     # Dost et al. 2017: event counts (all magnitudes) and b per interval; Mc of the b-values is not stated
     for a, b, n, bp, sp in [("1996", "2003", 99, 1.06, 0.07), ("2003", "2017", 887, 0.93, 0.03),
                             ("2004", "2010", 204, 0.91, 0.06), ("2010", "2013", 210, 1.06, 0.07),
@@ -330,7 +330,7 @@ def fig_btime(phases, moving):
     lab = [p["label"].split(":")[0] for p in phases]
     xs = np.arange(len(phases))
     for off, key, col, name in ((-0.18, "atlas", common.C1, "atlas b (MAXC+0.2)"),
-                                (0.0, "mc15", common.C7, "Aki-Utsu, fixed ML 1.5"),
+                                (0.0, "mc15", common.C7, "binned MLE, fixed ML 1.5"),
                                 (0.18, "bpos", common.C2, "b-positive (ML ≥ 0.5)")):
         if key == "mc15":
             b = [p["mc15"]["b"] for p in phases]

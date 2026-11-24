@@ -260,7 +260,7 @@ No change to the floors, the b sample or the estimators.
   (§3). The only Mc-Lilliefors value above a floor (6.1 for 2004–2021) applies equally to every event, and it
   would cost about 89 % of the sample.
 - **Method.** The v0.2 drop comes from aftershocks that GCMT missed (§4). Blind windows, the standard remedy for
-  Aki-Utsu, do not close the gap. Bringing proxies back for early aftershocks only would reintroduce the proxy
+  a maximum-likelihood b, do not close the gap. Bringing proxies back for early aftershocks only would reintroduce the proxy
   magnitudes v0.2 removed on purpose. Per cell at the 0.6.0 floors, the direct-minus-every difference is −0.002
   in b and −0.005 in b-positive (time-order part +0.013), small against the median 95 % interval width of the
   cells with b-positive (0.30).

@@ -3,7 +3,7 @@
 Nothing here forecasts. Every function describes events that have already happened, between the mainshock and
 the data cut-off. Fitted curves are evaluated only up to the cut-off.
 
-Estimators are reused from scripts/seislib.py (Omori-Utsu MLE with time-dependent completeness, Aki-Utsu with a
+Estimators are reused from scripts/seislib.py (Omori-Utsu MLE with time-dependent completeness, binned b MLE with a
 per-event threshold, b-positive). This module adds the sequence selection, the per-sequence summary and the
 comparison with the generic regional parameters of Page et al. (2016).
 """
@@ -345,8 +345,8 @@ def b_quality(n, lo, hi, b):
 
 
 def b_bootstrap_seq(t, m, age_days, mag_main, floor, nboot=NBOOT, rng=0):
-    """Aki-Utsu b with the per-event threshold Mc(t) (seislib.b_varmc); 95 % percentile interval from `nboot`
-    resamples of the whole sequence, Mcat re-estimated in every replicate. Quality gate as for the map cells."""
+    """Binned maximum-likelihood b (Tinti & Mulargia 1987) with the per-event threshold Mc(t) (seislib.b_varmc);
+    95 % percentile interval from `nboot` resamples of the whole sequence, Mcat re-estimated in every replicate. Quality gate as for the map cells."""
     mcat, _ = estimate_mcat(t, m, age_days, floor)
     b, _, n = sl.b_varmc(m, mc_t(t, mag_main, mcat), DM)
     if n < 50 or not np.isfinite(b):

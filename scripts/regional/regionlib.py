@@ -6,7 +6,7 @@ change faster and differ more from place to place, so here the completeness is e
   Mc_p      = MAXC + 0.2 of the cell's events in period p, when the period holds >= NMIN_P events;
               otherwise max(MAXC + 0.2 of all the cell's events, regional floor of period p).
   thr_i     = Mc of the period of event i.
-  b         = Aki-Utsu with per-event thresholds (seislib.b_varmc).
+  b         = binned maximum likelihood (Tinti & Mulargia 1987) with per-event thresholds (seislib.b_varmc).
   interval  = 95 % percentile bootstrap, resampling events within each period (stratified), with every Mc_p
               re-estimated in every replicate, so the interval includes the Mc uncertainty.
   quality   = the same A / B / C / insufficient gate as the global layer (atlaslib.quality).

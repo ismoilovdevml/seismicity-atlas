@@ -15,8 +15,9 @@ Quality   : A = n >= 100, sigma_p <= 0.10, 0.5 <= p <= 2, no other event >= Mm -
             B = n >= 50, sigma_p <= 0.20, 0.5 <= p <= 2.5; else C. 'contaminated' marks a second large event.
             c_resolved is False when c < 0.001 day or has no standard error: with a teleseismic catalogue
             (Mcat ~4.7) the earliest hours are missing and c is then not constrained; K and p remain usable.
-            c is searched in [1e-4 day, 365 days]; c_at_bound marks a fit that ended at 1e-4 day (sc null, the
-            errors of K and p are then those for c fixed there). sK includes the covariance of K with p and c.
+            c is searched in [1e-4 day, 365 days]; c_at_bound marks a fit whose c ended at either bound (1e-4 day
+            or the upper bound max(T2, 1 day)); sc is then null and the errors of K and p are those for c fixed
+            there. sK includes the covariance of K with p and c.
 """
 from __future__ import annotations
 

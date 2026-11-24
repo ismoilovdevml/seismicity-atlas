@@ -490,7 +490,7 @@ def figures(plt, res, P):
     inj = res["synthetic_injection"]
     cases = ["complete", "stai", "static_ramp", "stai_and_ramp"]
     xx = np.arange(len(cases))
-    for j, (s_, col, nm) in enumerate((("b", C1, "b (Aki-Utsu)"), ("bpos", C3, "b-positive"),
+    for j, (s_, col, nm) in enumerate((("b", C1, "b (binned MLE)"), ("bpos", C3, "b-positive"),
                                        ("bpos_shuffled", MUTED, "b-positive, shuffled"))):
         ax[1].errorbar(xx + (j - 1) * 0.22, [inj[c][s_][0] for c in cases], [inj[c][s_][1] for c in cases],
                        fmt="o", color=col, capsize=3, label=nm)

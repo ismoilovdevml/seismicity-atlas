@@ -4,7 +4,8 @@ Each literature entry carries the exact quote it was taken from and a `compare` 
 the published setting on ISC-GEM: region (lat/lon box, PB2002 class, or global), period, depth limit, magnitude
 threshold and declustering. For every entry two numbers are computed on the same selection:
 
-  b_aki : the atlas b estimator at a fixed threshold (Aki-Utsu, 0.1 bins, bootstrap 95 % interval)
+  b_aki : the atlas b estimator at a fixed threshold (binned maximum likelihood, Tinti & Mulargia 1987; 0.1 bins,
+          bootstrap 95 % interval)
   b_tgr : 1.5 x beta of a tapered Gutenberg-Richter fit (maximum likelihood, beta and corner moment free,
           Kagan 2002), bootstrap 95 % interval. This is the like-for-like estimator for the Kagan / Bird values.
 

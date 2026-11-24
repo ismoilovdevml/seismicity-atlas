@@ -37,9 +37,9 @@ Numbers below are from the build with data cut-off **2026-11-13 00:00 UTC**.
 | Counts | all events, events ≥ Mcat, events in the last 7 days; daily counts; cumulative counts on a grid (1 h, 6 h, 12 h, then every day to the cut-off) |
 | Mcat | MAXC + 0.2 of the events after min(10 days, half the sequence age); 4.5 when fewer than 30 such events |
 | Mc(t) | max(Mcat, Mm − 4.5 − 0.75 log₁₀ t), t in days (Helmstetter et al. 2006; the F, G, H of Page et al. 2016 and the USGS) |
-| Omori-Utsu K, c, p | MLE on events above Mc(t), with the expected rate K (t + c)^−p 10^(−b (Mc(t) − Mcat)) (`seislib.omori_fit_mct`, the same fit as the Sequences page); b = sequence b-positive if ≥ 50 differences, else 1.0; 95 % intervals from the observed information (c on a log scale; K with its covariance with p and c since 0.6.0); c ≥ 10⁻⁴ day, `c_at_bound` when the fit ends there |
+| Omori-Utsu K, c, p | MLE on events above Mc(t), with the expected rate K (t + c)^−p 10^(−b (Mc(t) − Mcat)) (`seislib.omori_fit_mct`, the same fit as the Sequences page); b = sequence b-positive if ≥ 50 differences, else 1.0; 95 % intervals from the observed information (c on a log scale; K with its covariance with p and c since 0.6.0); c in [10⁻⁴ day, max(T, 1 day)], `c_at_bound` when the fit ends at either bound |
 | Omori quality | as on the Sequences page: A = n ≥ 100, σp ≤ 0.10, 0.5 ≤ p ≤ 2, not contaminated; B = n ≥ 50, σp ≤ 0.20, 0.5 ≤ p ≤ 2.5; C otherwise; insufficient below 20 events above Mc(t) |
-| b | Aki-Utsu with each event's own threshold Mc(t) (`seislib.b_varmc`); 1000 bootstrap resamples of the sequence with Mcat re-estimated in each (200 before 0.5.0); shown only for A (95 % interval width / b ≤ 0.30) or B (≤ 0.50) with ≥ 50 events, as on the map |
+| b | maximum likelihood for binned magnitudes (Tinti & Mulargia 1987; Aki-Utsu until 0.5.0) with each event's own threshold Mc(t) (`seislib.b_varmc`); 1000 bootstrap resamples of the sequence with Mcat re-estimated in each (200 before 0.5.0); shown only for A (95 % interval width / b ≤ 0.30) or B (≤ 0.50) with ≥ 50 events, as on the map |
 | b-positive | van der Elst (2021), differences ≥ 0.2 of the events ≥ Mcat (since 0.6.0; before, every event ≥ 2.5), ± 1.96 σ, shown with ≥ 50 differences |
 | Largest aftershock | its magnitude and day, and ΔM = Mm − Mmax; Båth's law gives about 1.2 |
 | Productivity | see §3 |
