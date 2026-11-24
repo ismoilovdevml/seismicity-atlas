@@ -171,3 +171,27 @@ def test_deficit_b_sample_keeps_the_whole_lowest_bin(tmp_path, monkeypatch):
     b_old = sl.b_aki(m[m >= 5.8 - 1e-9], 5.8)[0]
     b_new = sl.b_aki(m[m >= 5.75 - 1e-9], 5.8)[0]
     assert b_old < 0.96 and abs(b_new - 1.0) < 0.02, (b_old, b_new)
+
+
+def test_strain_grids_reused_only_when_newer_than_their_inputs(tmp_path, monkeypatch):
+    # build_grids ran on every call and stopped without gdal_translate even when the grids were already built
+    import os
+
+    import fetch_deficit as fd
+    monkeypatch.setattr(fd, "RAW", tmp_path / "raw")
+    monkeypatch.setattr(fd, "WORK", tmp_path / "work")
+    ins, outs = fd.grid_files()
+    assert not fd.grids_up_to_date()                                        # nothing there
+    for p in ins + outs:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(b"x")
+    for p in ins:
+        os.utime(p, (1000, 1000))
+    for p in outs:
+        os.utime(p, (2000, 2000))
+    assert fd.grids_up_to_date()
+    os.utime(ins[0], (3000, 3000))                                          # an input newer than the grids
+    assert not fd.grids_up_to_date()
+    os.utime(ins[0], (1000, 1000))
+    outs[-1].unlink()                                                       # a grid missing
+    assert not fd.grids_up_to_date()
