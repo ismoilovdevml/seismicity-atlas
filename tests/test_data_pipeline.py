@@ -173,6 +173,27 @@ def test_jdump_writes_null_for_nan_everywhere(tmp_path):
     assert json.loads(txt) == {"a": None, "b": None, "c": [1.0, None], "d": [2.5, None], "e": {"f": 3, "g": True}}
 
 
+def test_fetch_pauses_only_after_a_network_request(tmp_path, monkeypatch):
+    # comcat_chunk slept PAUSE_S after every chunk, also when the response came from the cache
+    import fetch
+
+    class Resp:
+        status_code, content = 200, b"time,mag\n"
+
+        def raise_for_status(self):
+            pass
+    calls, sleeps = [], []
+    monkeypatch.setattr(fetch, "RAW", tmp_path / "raw")
+    monkeypatch.setattr(fetch, "ROOT", tmp_path)
+    monkeypatch.setattr(fetch.requests, "get", lambda url, **kw: calls.append(url) or Resp())
+    monkeypatch.setattr(fetch.time, "sleep", sleeps.append)
+    frames = []
+    fetch.comcat_chunk("2020-01-01T00:00:00", "2020-02-01T00:00:00", 4.5, None, False, frames)
+    assert len(calls) == 1 and sleeps == [fetch.PAUSE_S]
+    fetch.comcat_chunk("2020-01-01T00:00:00", "2020-02-01T00:00:00", 4.5, None, False, frames)
+    assert len(calls) == 1 and sleeps == [fetch.PAUSE_S]                   # cache hit: no request, no pause
+
+
 def test_prepare_counts_each_dropped_comcat_row_once():
     # rows below M 4.5 were also counted as "no depth" (comcat_n - len(c) after both cuts)
     import pandas as pd

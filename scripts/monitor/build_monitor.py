@@ -38,7 +38,6 @@ import io
 import json
 import math
 import sys
-import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -50,7 +49,7 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent))
 import monitorlib as ml  # noqa: E402
 import seislib as sl  # noqa: E402
-from fetch import COMCAT, MIN_CHUNK_DAYS, PAUSE_S, TooMany, cache_get  # noqa: E402
+from fetch import COMCAT, MIN_CHUNK_DAYS, TooMany, cache_get  # noqa: E402
 
 ROOT = HERE.parents[1]
 OUT = ROOT / "site" / "data" / "monitor"
@@ -73,8 +72,7 @@ def iso(ts) -> str:
 
 def comcat_csv(params, refresh=False) -> pd.DataFrame:
     body = cache_get(COMCAT, {"format": "csv", "eventtype": "earthquake", "orderby": "time-asc", **params},
-                     "monitor", "csv", refresh)
-    time.sleep(PAUSE_S)
+                     "monitor", "csv", refresh)            # cache_get pauses after each network request
     if not body.strip():
         return pd.DataFrame(columns=["time", "latitude", "longitude", "depth", "mag", "magType", "id", "place"])
     df = pd.read_csv(io.BytesIO(body), dtype={"id": str, "magType": str, "place": str})
