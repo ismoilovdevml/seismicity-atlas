@@ -29,20 +29,42 @@ const ATLAS = 'Global Seismicity Atlas';
 const RELEASE = JSON.parse(readFileSync(join(ROOT, 'scripts', 'release.json'), 'utf8'));
 const OG_LOCALE = { en: 'en_US', uz: 'uz_UZ', ru: 'ru_RU', es: 'es_ES' };
 
+// The Learn texts name example values ({nboot}, {radius} …) that the app fills from site/data at run time
+// (site/js/learn/examples.js). The same loaders run here, reading site/data from disk instead of over HTTP, so the
+// static pages show the values the app shows. Only the bits of the browser they touch are stubbed.
+globalThis.document = { documentElement: {}, querySelectorAll: () => [] };
+globalThis.fetch = async (url) => {
+  if (!String(url).startsWith('data/')) throw new Error(`seo_pages: unexpected fetch ${url}`);
+  const body = readFileSync(join(SITE, url), 'utf8');
+  return { ok: true, status: 200, json: async () => JSON.parse(body) };
+};
+
 const imp = (p) => import(pathToFileURL(join(SITE, 'js', p)).href).then((m) => m);
 const { CONCEPTS } = await imp('learn/registry.js');
 const { REFS } = await imp('learn/refs.js');
+const { EXAMPLES } = await imp('learn/examples.js');
+const { setLang } = await imp('i18n/index.js');
 const I18N = {};
 const INDEX = {};
 const TEXT = {};
+const VARS = {};
 for (const l of LANGS) {
   I18N[l] = { ...(await imp('i18n/en.js')).default, ...(await imp(`i18n/${l}.js`)).default };
   INDEX[l] = (await imp(`learn/content/${l}/_index.js`)).default;
   TEXT[l] = {};
   for (const c of CONCEPTS) TEXT[l][c.id] = (await imp(`learn/content/${l}/${c.id}.js`)).default;
+  // number formats and unit names follow the language, as in the app
+  await setLang(l);
+  VARS[l] = {};
+  for (const c of CONCEPTS) VARS[l][c.id] = EXAMPLES[c.id] ? (await EXAMPLES[c.id]()).vars : {};
 }
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+/** Fill {name} placeholders in a trusted content string with escaped example values; a missing value is an error. */
+const fillVars = (s, vars, where) => String(s).replace(/\{(\w+)\}/g, (m, k) => {
+  if (vars[k] === undefined || vars[k] === null) throw new Error(`seo_pages: no value for ${m} in ${where}`);
+  return esc(vars[k]);
+});
 const plain = (html) => String(html).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
 const clip = (s, n = 158) => (s.length <= n ? s : s.slice(0, s.lastIndexOf(' ', n - 1)) + '…');
 const prefix = (l) => (l === 'en' ? '' : `/${l}`);
@@ -184,7 +206,11 @@ ${groups.map((g) => `<h2>${esc(t[`learn.group.${g}`] || g)}</h2>
 
   // concepts
   CONCEPTS.forEach((c, i) => {
-    const x = TEXT[l][c.id];
+    const where = `${l}/${c.id}`;
+    const fx = (s) => fillVars(s, VARS[l][c.id], where);
+    const raw = TEXT[l][c.id];
+    const x = { sentence: fx(raw.sentence), simple: (raw.simple || []).map(fx), analogy: raw.analogy ? fx(raw.analogy) : raw.analogy,
+      tech: (raw.tech || []).map(fx) };
     const [name, summary] = INDEX[l][c.id];
     const prev = CONCEPTS[i - 1];
     const next = CONCEPTS[i + 1];

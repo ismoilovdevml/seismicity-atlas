@@ -99,3 +99,30 @@ def test_release_facts_follow_release_json():
     xml = (SITE / "sitemap.xml").read_text()
     home = re.search(rf"<loc>{re.escape(BASE)}/</loc>\s*<lastmod>([^<]+)</lastmod>", xml)
     assert home and home.group(1) == rel["data_cutoff_utc"]
+
+
+def test_no_unfilled_placeholders():
+    """The Learn texts name example values ({nboot}, {radius} …) that the app fills from site/data; seo_pages.mjs runs
+    the same loaders (site/js/learn/examples.js). Until 2026-11-24 the static pages printed 44 of them raw."""
+    pages = sorted(SITE.glob("**/learn/**/index.html"))
+    assert len(pages) > 80
+    bad = {}
+    for page in pages:
+        found = re.findall(r"\{[A-Za-z_][A-Za-z0-9_]*\}", page.read_text())
+        if found:
+            bad[str(page.relative_to(SITE))] = sorted(set(found))
+    assert not bad, bad
+
+
+def test_placeholders_filled_with_manifest_values():
+    """Spot check against site/data/manifest.json: the bootstrap count, the global H3 resolution (the old parser
+    stripped every non-digit of "H3 resolution 2" and gave 32) and the sampling radius."""
+    import json
+
+    m = json.loads((SITE / "data" / "manifest.json").read_text())["method"]
+    res = re.findall(r"\d+", m["cells"])[-1]
+    boot = (SITE / "learn/confidence-interval-bootstrap/index.html").read_text()
+    assert f"repeat {m['nboot']:,} times" in boot
+    h3 = (SITE / "learn/h3-cells-and-sample-radius/index.html").read_text()
+    assert f"Grid: H3 resolution {res} for the global layer" in h3
+    assert f"within {round(m['sample_radius_km'])} km" in h3

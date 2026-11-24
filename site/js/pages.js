@@ -343,7 +343,7 @@ export function renderAbout(root, ctx) {
 
   out.push(h('h2', { id: 'about-privacy-h', text: t('about.privacyH') }));
   out.push(h('p', { class: 'prose', id: 'about-privacy' }, `${t('about.privacy')} ${t('about.privacyHost')} `,
-    h('a', { href: 'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement', ...EXT, text: t('about.privacyLink') }),
+    h('a', { href: 'https://www.cloudflare.com/privacypolicy/', ...EXT, text: t('about.privacyLink') }),
     `. ${t('about.privacyTerrain')}`));
   out.push(h('h2', { id: 'about-a11y-h', text: t('about.a11yH') }));
   out.push(h('p', { class: 'prose', id: 'about-a11y' }, `${t('about.a11y')} ${t('about.a11yReport')} `,

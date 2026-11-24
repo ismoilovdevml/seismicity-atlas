@@ -54,7 +54,7 @@ function draw(root, D, ctx) {
   out.push(section('cs.movH', 'cs.movSub', 'b-positive', h('div', { class: 'card' }, movingChart(D.btime))));
   out.push(section('cs.mapH', 'cs.mapSub', 'gutenberg-richter-b-value', h('div', { class: 'card' }, bMap(D.bmap))));
   out.push(section('cs.valH', 'cs.valSub', null, validationTable(D.val)));
-  out.push(h('section', { 'aria-labelledby': 'cs-src-h' }, h('h2', { id: 'cs-src-h', text: t('cs.srcH') }), sources(idx, 'full')));
+  out.push(h('section', { 'aria-labelledby': 'cs-src-h' }, h('h2', { id: 'cs-src-h', text: t('cs.srcH') }), sources(idx, 'full', rates.events_ge3.time.length)));
   root.replaceChildren(...out);
 }
 
@@ -332,7 +332,7 @@ function validationTable(val) {
 }
 
 /** Every source attribution from index.json; the KNMI network DOI as a link. */
-function sources(idx, kind) {
+function sources(idx, kind, nGe3) {
   const doiLink = (txt) => {
     const i = txt.indexOf(`doi:${KNMI_DOI}`);
     if (i < 0) return [txt];
@@ -346,6 +346,6 @@ function sources(idx, kind) {
     h('ul', { class: 'src-list cs-src' }, idx.sources.map((s) => h('li', {},
       h('strong', { text: s.name }), h('br'), ...doiLink(s.attribution), h('br'),
       h('span', { class: 'hint', text: `${t('cs.licence')}: ${s.licence}. ${t('cs.redistributed')}: ${s.redistributed}.` })))),
-    h('p', { class: 'hint', text: t('cs.noEvents') }),
+    h('p', { class: 'hint', text: t('cs.noEvents', { n: f.int(nGe3) }) }),
     h('p', { class: 'hint', text: t('cs.statement', { s: idx.statement }) }));
 }

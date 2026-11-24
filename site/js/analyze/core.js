@@ -142,7 +142,9 @@ export function cellB(m, floor, { nboot = NBOOT, seed = 20261116, dm = 0.1, nmin
       th[i] = Math.max(mcr, ff[i]);
       if (mm[i] >= th[i] - 1e-9) { s += mm[i] - th[i]; c++; }
     }
-    if (c >= 2) bb.push(bFromExcess(s / c, dm));
+    // a replicate with every event in its lowest bin has no b (NaN): dropped, as atlaslib.cell_b does with isfinite
+    const br = c >= 2 ? bFromExcess(s / c, dm) : NaN;
+    if (Number.isFinite(br)) bb.push(br);
   }
   const [lo, hi] = bb.length > 0.8 * nboot ? [percentile(bb, 2.5), percentile(bb, 97.5)] : [NaN, NaN];
   const q = quality(n, lo, hi, b);

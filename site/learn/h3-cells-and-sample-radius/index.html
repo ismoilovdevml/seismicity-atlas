@@ -66,7 +66,7 @@ footer{margin-top:30px;padding-top:14px;padding-bottom:30px;border-top:1px solid
 <h2>An everyday picture</h2>
 <blockquote>Think of measuring air quality at street corners on a city grid, but each sensor averages the air within a fixed walking distance. Nearby corners give similar readings partly because they breathe the same air.</blockquote>
 <h2>Technical details</h2>
-<p>Grid: H3 resolution {globalRes} for the global layer. Statistics per cell: all events with an epicentre within {radius} km (great-circle distance) of the cell centre, as in the ZMAP constant-radius approach (Wiemer & Wyss 2002). Rates use the cell's own area, not the circle.</p>
+<p>Grid: H3 resolution 2 for the global layer. Statistics per cell: all events with an epicentre within 300 km (great-circle distance) of the cell centre, as in the ZMAP constant-radius approach (Wiemer & Wyss 2002). Rates use the cell's own area, not the circle.</p>
 <p>Why a fixed radius rather than the nearest N events: the spatial support is the same everywhere, so two places are compared over the same footprint, and sparse places are honestly empty (b withheld) instead of borrowing events from far away. The cost is that the sample size, and so the uncertainty, varies; it is reported.</p>
 <p>H3 cells are not exactly equal-area (about a factor of two across one resolution), which is why rates divide by each cell's own <code>area_km2</code>.</p>
 <p>Radius sensitivity (docs/method.md §1): with 200 or 400 km instead of 300 km, b changes by less than 0.04 (median) where it is shown; the radius mainly decides how many cells reach the sample size.</p>

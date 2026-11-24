@@ -200,3 +200,19 @@ def test_every_error_code_is_translated():
     en = set(re.findall(r'^  "(an\.[^"]+)":', (ROOT / "site/js/i18n/en.js").read_text(), re.M))
     for lang in ("uz", "ru", "es"):
         assert set(re.findall(r'^  "(an\.[^"]+)":', (ROOT / "site/js/i18n" / f"{lang}.js").read_text(), re.M)) == en
+
+
+def test_js_bootstrap_drops_replicates_without_b_as_python():
+    """A replicate whose events above its threshold all sit in the lowest bin has a mean excess of 0 and no b (NaN).
+    atlaslib.cell_b drops it (np.isfinite); core.js kept it, and the NaN sorted to the top made the upper interval
+    end NaN. Here about 1 replicate in 8 draws neither M 5.3 event."""
+    import numpy as np
+    from seisatlas import atlaslib as al
+
+    m = [5.0] * 39 + [5.1, 5.1, 5.2, 5.2, 5.2, 5.3, 5.3]
+    py = al.cell_b(np.array(m), np.full(len(m), -9.0), rng=20261116)
+    js = node_eval(f"const m = {json.dumps(m)}; const r = core.cellB(m, m.map(() => -9), {{nboot: 1000}}); "
+                   "console.log(JSON.stringify({lo: r.lo, hi: r.hi}));")
+    assert np.isfinite(py["b_lo_raw"]) and np.isfinite(py["b_hi_raw"])
+    assert js["lo"] is not None and js["hi"] is not None   # JSON null = NaN
+    assert js["lo"] == pytest.approx(py["b_lo_raw"], abs=0.5) and js["hi"] == pytest.approx(py["b_hi_raw"], abs=0.5)

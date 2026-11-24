@@ -16,7 +16,7 @@ pytestmark = pytest.mark.skipif(NODE is None, reason="Node.js not installed")
 DUMP = r"""
 const dir = process.argv[1];
 const out = {};
-const sample = { r: '1.5', k: '5', lo: '0.8', hi: '1.9', pct: 21 };
+const sample = { r: '1.5', k: '5', lo: '0.8', hi: '1.9', pct: 21, n: '21' };
 for (const l of ['en', 'uz', 'ru', 'es']) {
   const d = (await import(`${dir}/${l}.js`)).default;
   out[l] = Object.fromEntries(Object.entries(d).map(([k, v]) => [k, typeof v === 'function' ? ['fn', v(sample)] : ['str', v]]));
@@ -66,6 +66,7 @@ def test_plural_and_ordinal_forms(dicts):
     assert "каждые 5 месяцев" in dicts["ru"]["cs.sum.after"][1]
     assert "cada 5 meses" in dicts["es"]["cs.sum.after"][1]
     assert "21st percentile" in dicts["en"]["mon.prodVal"][1]
+    assert "кроме 21 события ML" in dicts["ru"]["cs.noEvents"][1]
 
 
 def test_uzbek_apostrophes(dicts):
@@ -75,3 +76,12 @@ def test_uzbek_apostrophes(dicts):
     bad = [(k, v[1][:60]) for k, v in dicts["uz"].items()
            if (re.search(r"[‘’]|\w'\w|[^oOgG]ʻ|[oOgG]ʼ", v[1]))]
     assert not bad, bad[:20]
+
+
+def test_privacy_note_names_the_real_host_and_analytics(dicts):
+    """The site is served by Cloudflare Pages, which injects the Cloudflare Web Analytics beacon (allowed in
+    site/_headers since 2026-11-20). Until 2026-11-24 the note said "no analytics" and named GitHub Pages."""
+    for lang, d in dicts.items():
+        text = " ".join(d[k][1] for k in ("about.privacy", "about.privacyHost", "about.privacyLink"))
+        assert "Cloudflare Pages" in text and "Cloudflare Web Analytics" in text, lang
+        assert "GitHub" not in text, lang
