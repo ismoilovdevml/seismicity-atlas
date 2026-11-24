@@ -76,7 +76,7 @@ Statistics per depth class `d` ∈ {`sh`, `dp`}, from ISC-GEM 1976–2021 events
 | `d_unstable` | bool | b at threshold +0.2 and +0.4 both fall outside the interval on the same side |
 | `d_bpos`, `d_bpos_lo`, `d_bpos_hi` | – | b-positive (van der Elst 2021), ±1.96 σ; `null` unless `d_q` is A/B |
 | `d_bdecl`, `d_bdecl_lo`, `d_bdecl_hi` | – | b after Gardner-Knopoff declustering (per depth layer), bootstrap 95 %; `null` unless `d_q` is A/B and the declustered sample's own `d_qdecl` is A/B (since 0.6.0; before, a declustered b from a handful of events was shown when the full sample passed) |
-| `d_qdecl` | – | quality code of the declustered sample (same A/B/C/insufficient rule as `d_q`); present when the declustered b was computed (since 0.6.0) |
+| `d_qdecl` | – | quality code of the declustered sample (same A/B/C/insufficient rule as `d_q`); present when the declustered b was computed and `d_q` is A/B (since 0.6.0; the first 0.6.0 data also gave it next to a masked main b, where an A/B code could come without its value) |
 | `d_mc_cc` | magnitude as served | ComCat Mc (MAXC + 0.2) of the preferred magnitudes, 2010–cut-off, ≥ 50 events else `null` |
 | `d_mc_cc0` | magnitude as served | the same for 1973–1989 |
 

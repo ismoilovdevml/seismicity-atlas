@@ -130,10 +130,12 @@ def test_declustered_b_withheld_unless_its_own_sample_passes_the_gate():
             b_ci_rel=0.35, b_unstable=False, bpos=1.05, bpos_lo=0.8, bpos_hi=1.3, b_decl=3.2, b_decl_lo=0.78,
             b_decl_hi=5.21, b_decl_q="insufficient", mc_cc_2010=4.7, mc_cc_pre1990=5.0).items()})
     good = dict(base, h3="82668ffffffffff", sh_b_decl=0.9, sh_b_decl_lo=0.8, sh_b_decl_hi=1.05, sh_b_decl_q="A")
-    fc = sly.cells_layer(pd.DataFrame([base, good]), set())
-    p0, p1 = (f["properties"] for f in fc["features"])
+    masked = dict(good, h3="82669ffffffffff", sh_b=None, sh_b_lo=None, sh_b_hi=None, sh_b_q="C")
+    fc = sly.cells_layer(pd.DataFrame([base, good, masked]), set())
+    p0, p1, p2 = (f["properties"] for f in fc["features"])
     assert "sh_bdecl" not in p0 and p0["sh_qdecl"] == "insufficient" and p0["sh_b"] == 1.0
     assert p1["sh_bdecl"] == 0.9 and p1["sh_qdecl"] == "A"
+    assert "sh_bdecl" not in p2 and "sh_qdecl" not in p2     # main b masked: no code A without its value
 
 
 def test_manifest_checksums_match_the_published_files():

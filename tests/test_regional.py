@@ -152,3 +152,27 @@ def test_regional_polygons_do_not_jump_across_the_antimeridian():
     h = h3.latlng_to_cell(-38.0, 179.99, 4)
     xs = [c[0] for c in br.cell_polygon(h)["coordinates"][0]]
     assert max(xs) - min(xs) < 2, xs                     # before: about 359.8 for 14 NZ cells
+
+
+def test_declustered_quality_code_never_comes_without_its_b():
+    # Iceland 85074543fffffff had sh_q C (main b masked) but sh_qdecl B and no sh_bdecl
+    import build_regional as br
+    rd_b = {"quality": "B", "b_raw": 1.2, "b_lo_raw": 1.0, "b_hi_raw": 1.5, "n_b": 80}
+    assert br.decl_props("sh_", False, rd_b) == {}                        # main b masked: no declustered code
+    assert br.decl_props("sh_", True, rd_b) == {"sh_qdecl": "B", "sh_bdecl": 1.2, "sh_bdecl_lo": 1.0,
+                                                "sh_bdecl_hi": 1.5}
+    assert br.decl_props("sh_", True, {"quality": "insufficient", "b_raw": 3.2}) == {"sh_qdecl": "insufficient"}
+    assert br.decl_props("sh_", True, {}) == {}                            # declustered b not computed
+
+
+def test_published_regional_cells_with_quality_a_or_b_have_their_b():
+    import json
+    idx = json.loads((ROOT / "site" / "data" / "regional" / "index.json").read_text())
+    for r in idx["regions"]:
+        cells = json.loads((ROOT / "site" / "data" / "regional" / r["id"] / "cells.geojson").read_text())
+        for f in cells["features"]:
+            p = f["properties"]
+            for d in ("sh", "dp"):
+                for q, b in ((f"{d}_q", f"{d}_b"), (f"{d}_qdecl", f"{d}_bdecl")):
+                    if p.get(q) in ("A", "B"):
+                        assert all(p.get(b + s) is not None for s in ("", "_lo", "_hi")), (r["id"], p["id"], q)

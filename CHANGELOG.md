@@ -3,6 +3,13 @@
 Versions follow `scripts/release.json` (shown on the site from `site/data/manifest.json`). A patch is a data refresh
 with the same schema, a minor version a method, schema or website change; see [docs/release.md](docs/release.md).
 
+## Unreleased
+
+- **Declustered quality code** (`*_qdecl`, regional detail `stats.q_decl`) is given only next to a shown main b,
+  so a code A/B always comes with its `*_bdecl` (Iceland `85074543fffffff` had `sh_q` C, `sh_qdecl` B and no
+  `sh_bdecl`). Published layers patched in place (fields removed: global 73, regional 88 cell-layer and 88 detail
+  entries); checksums in `manifest.json` and `regional/index.json` refreshed.
+
 ## 0.6.0 (2026-11-20)
 
 Method, website and pipeline release after an external audit; same data cut-off (2026-11-13). Every method fix with
