@@ -75,3 +75,12 @@ def test_uzbek_apostrophes(dicts):
     bad = [(k, v[1][:60]) for k, v in dicts["uz"].items()
            if (re.search(r"[‘’]|\w'\w|[^oOgG]ʻ|[oOgG]ʼ", v[1]))]
     assert not bad, bad[:20]
+
+
+def test_privacy_note_names_the_real_host_and_analytics(dicts):
+    """The site is served by Cloudflare Pages, which injects the Cloudflare Web Analytics beacon (allowed in
+    site/_headers since 2026-11-20). Until 2026-11-24 the note said "no analytics" and named GitHub Pages."""
+    for lang, d in dicts.items():
+        text = " ".join(d[k][1] for k in ("about.privacy", "about.privacyHost", "about.privacyLink"))
+        assert "Cloudflare Pages" in text and "Cloudflare Web Analytics" in text, lang
+        assert "GitHub" not in text, lang
