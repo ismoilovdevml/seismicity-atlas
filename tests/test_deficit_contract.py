@@ -44,3 +44,5 @@ def test_index():
     assert {r["id"] for r in ix["regions"]} == {f["properties"]["id"] for f in _features("regions.geojson")}
     for f, meta in ix["files"].items():
         assert (D / f).stat().st_size == meta["bytes"]
+    y = ix["method"]["b_whole_belt"]["years"]                    # was [1976, "2026"]: int and string mixed
+    assert all(type(v) is int for v in y) and y[0] < y[1]

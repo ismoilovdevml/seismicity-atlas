@@ -9,6 +9,7 @@ with the same schema, a minor version a method, schema or website change; see [d
   so a code A/B always comes with its `*_bdecl` (Iceland `85074543fffffff` had `sh_q` C, `sh_qdecl` B and no
   `sh_bdecl`). Published layers patched in place (fields removed: global 73, regional 88 cell-layer and 88 detail
   entries); checksums in `manifest.json` and `regional/index.json` refreshed.
+- **Deficit index**: `method.b_whole_belt.years` is `[1976, 2026]` (was `[1976, "2026"]`, int and string mixed).
 
 ## 0.6.0 (2026-11-20)
 
