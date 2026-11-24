@@ -17,7 +17,7 @@ def _period(s: str):
         y0, y1 = years.split("-")
         return int(y0), int(y1), float(fl)
     except ValueError:
-        raise argparse.ArgumentTypeError(f"expected START-END:FLOOR, e.g. 1976-2003:5.8, got {s!r}")
+        raise argparse.ArgumentTypeError(f"expected START-END:FLOOR, e.g. 1976-2003:6.3, got {s!r}")
 
 
 def main(argv=None) -> int:
@@ -38,7 +38,7 @@ def main(argv=None) -> int:
     r.add_argument("--mag-type", help="keep one magnitude type, e.g. mw or ml")
     r.add_argument("--floor", type=float, help="completeness floor for every event (b uses max(Mc, floor))")
     r.add_argument("--floor-period", type=_period, action="append",
-                   help="per-period floor START-END:FLOOR, e.g. 1976-2003:5.8 (repeatable)")
+                   help="per-period floor START-END:FLOOR, e.g. 1976-2003:6.3 (repeatable)")
     r.add_argument("--dm", type=float, default=0.1, help="magnitude bin (default 0.1)")
     r.add_argument("--nboot", type=int, default=1000, help="bootstrap replicates (default 1000)")
     r.add_argument("--seed", type=int, default=20261116)
