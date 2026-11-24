@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Full release rebuild: run_all.sh plus the layers that are not part of it (deficit, Groningen, OAF validation,
 # N-test, Italy HD comparison, GEM hazard overlap). Long CPU job: run it on a build server, not a laptop.
+# Not here: scripts/monitor/build_monitor.py. The ongoing-sequence monitor runs to a live cut-off every 3 hours
+# (.github/workflows/update-monitor.yml); running it at the release cut-off would replace the live output with an
+# older snapshot until the next scheduled run.
 # GEM_GPKG=/path/to/gem_gshm_v2026.1.gpkg enables the GEM step (download: see scripts/sci2/gem_hazard.py).
 set -euo pipefail
 cd "$(dirname "$0")/.."
