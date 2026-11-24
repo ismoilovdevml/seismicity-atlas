@@ -169,3 +169,14 @@ def test_jdump_writes_null_for_nan_everywhere(tmp_path):
     txt = f.read_text()
     assert "NaN" not in txt and "Infinity" not in txt
     assert json.loads(txt) == {"a": None, "b": None, "c": [1.0, None], "d": [2.5, None], "e": {"f": 3, "g": True}}
+
+
+def test_prepare_counts_each_dropped_comcat_row_once():
+    # rows below M 4.5 were also counted as "no depth" (comcat_n - len(c) after both cuts)
+    import pandas as pd
+    import prepare
+    c = pd.DataFrame({"mag": [4.5, 3.4, 3.2, 5.0, 6.1], "depth": [10.0, 5.0, np.nan, np.nan, 33.0]})
+    kept, info = prepare.drop_unusable_comcat(c)
+    assert kept.mag.tolist() == [4.5, 6.1]
+    assert info["comcat_dropped_below_minmag"]["n"] == 2
+    assert info["comcat_dropped_no_depth"] == 1                             # the M 3.2 row is not counted again
