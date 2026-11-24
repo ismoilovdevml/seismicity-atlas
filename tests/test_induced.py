@@ -131,6 +131,21 @@ def test_ml_ge_3_uses_reported_magnitudes_not_bins():
     assert bg.at_least(ev, 3.0).mag.tolist() == [3.0, 3.01, 3.6]          # 2.95 and 2.99 are in bin 3.0, not >= 3.0
 
 
+def test_production_gap_note_names_the_missing_side():
+    # the shut-in phase (Oct 2023 on) was told "NLOG monthly figures start in 2003"; its gap is after 2024-12
+    import build_groningen as bg
+    months = pd.Series([f"{y}-{m:02d}" for y in range(2001, 2027) for m in range(1, 13)])
+    prod = pd.Series(np.where((months >= "2003-01") & (months <= "2024-12"), 1.0, np.nan))
+    covered = months[prod.notna()]
+
+    def note(a, b):
+        sel = (months >= a) & (months < b)
+        return bg.production_gap_note(months[sel], prod[sel], covered)
+    assert note("2001-01", "2003-01") == "NLOG monthly figures start in 2003-01"
+    assert note("2023-10", "2026-11") == "no NLOG monthly figures after 2024-12"
+    assert note("2003-01", "2014-01") is None
+
+
 def test_one_bootstrap_size_everywhere():
     import inspect
 

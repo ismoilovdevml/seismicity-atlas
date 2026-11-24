@@ -84,6 +84,23 @@ def poisson_ci(k, T):
     return k / T, lo / T, hi / T
 
 
+def production_gap_note(months, prod, covered):
+    """Why a phase has no production rate: which side of the NLOG monthly series it falls outside of.
+
+    months/prod: the phase's months and production; covered: all months that have a production figure."""
+    if prod.notna().all():
+        return None
+    first, last = covered.min(), covered.max()
+    parts = []
+    if (months[prod.isna()] < first).any():
+        parts.append(f"NLOG monthly figures start in {first}")
+    if (months[prod.isna()] > last).any():
+        parts.append(f"no NLOG monthly figures after {last}")
+    if not parts:
+        parts.append("NLOG monthly figures have gaps in this phase")
+    return "; ".join(parts)
+
+
 # ------------------------------------------------------------------------------------------------ rates
 def rates(ev, pr):
     reg = ev[ev.in_region]
@@ -110,7 +127,7 @@ def rates(ev, pr):
         ph.append({"label": lab, "start": a, "end": b, "years": round(T, 3), "n_ge15": k, "rate_per_yr": r,
                    "rate_lo": lo, "rate_hi": hi,
                    "prod_bcm_per_yr": float(pp.sum() / T) if pp.notna().all() else None,
-                   "prod_note": None if pp.notna().all() else "NLOG monthly figures start in 2003"})
+                   "prod_note": production_gap_note(monthly.month[sel], pp, monthly.month[monthly.prod_bcm.notna()])})
     big = at_least(reg, 3.0)[["time", "lat", "lon", "mag", "id"]]
     return monthly, ann, ph, {"spearman_rho": rho, "p": p, "years": "2003-2024", "lag1_rho": rho1, "lag1_p": p1,
                               "n_years": int(len(both))}, big
