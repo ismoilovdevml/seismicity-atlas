@@ -693,6 +693,7 @@ async function selectRegion(id, fly) {
     panelFor = null;
     update();
   } catch (e) {
+    if (regionLoading !== my) return; // another region (or "None") was chosen meanwhile
     $('reg-status').textContent = t('reg.error', { msg: e.message });
   }
 }
