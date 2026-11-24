@@ -6,8 +6,10 @@
 
 Method (as in the atlas, docs/method.md):
 - Mc = MAXC + 0.2 (maximum curvature plus the usual correction); MBS and GFT are reported for comparison.
-- b = Aki-Utsu maximum likelihood with the binning correction and a per-event threshold max(Mc, floor_i), where
-  floor_i is an optional completeness floor per period (for catalogues whose completeness changed with time).
+- b = maximum likelihood for binned magnitudes (Tinti & Mulargia 1987: b = log10(1 + dm / mean excess) / dm, the
+  mean excess taken over each event's own threshold bin; the Aki-Utsu formula with the dm/2 correction is its
+  approximation) with a per-event threshold max(Mc, floor_i), where floor_i is an optional completeness floor per
+  period (for catalogues whose completeness changed with time).
 - 95 % interval from bootstrap replicates that re-estimate Mc in every replicate.
 - Quality: A if (hi - lo) / b <= 0.30, B if <= 0.50, C if wider (b withheld), insufficient below 50 events above the
   threshold. The width is relative because the standard error of b grows with b.
@@ -69,7 +71,8 @@ def analyze(cat: Catalog, *, dm: float = 0.1, nboot: int = al.NBOOT, seed: int =
            "settings": {"dm": dm, "nboot": int(nboot), "seed": int(seed), "floor": floor,
                         "floor_periods": [list(p) for p in floor_periods] if floor_periods else None,
                         "quality_rule": "A: (hi - lo) / b <= 0.30; B: <= 0.50; C: wider; insufficient: < 50 events",
-                        "method": "Mc = MAXC + 0.2; Aki-Utsu ML b with per-event threshold max(Mc, floor); "
+                        "method": "Mc = MAXC + 0.2; binned-magnitude ML b (Tinti & Mulargia 1987) with per-event "
+                                  "threshold max(Mc, floor); "
                                   "bootstrap re-estimating Mc"},
            "disclaimer": DISCLAIMER, "warnings": []}
     W = res["warnings"]
