@@ -7,7 +7,7 @@
 //   map:  a URL hash that shows the example on the map, or null
 //   data: raw values for the diagram
 
-import { getJSON } from '../data.js';
+import { getJSON, ruleNumber } from '../data.js';
 import * as f from '../fmt.js';
 import { maxc, median, cumulative } from './kit.js';
 import { distKm } from '../util.js';
@@ -289,7 +289,7 @@ export const EXAMPLES = {
     return {
       vars: { loc: f.latlon(p.lat, p.lon), area: f.int(p.area_km2), radius: f.int(r), circle: f.int(circle), ratio: f.fixed(circle / p.area_km2, 1),
         nCells: f.int(cells.length), res: man.method.cells,
-        regList: resList.map((x) => `${x.res} / ${f.km(x.radius)}`).join(', ') || '–', globalRes: man.method.cells.replace(/\D+/g, '') },
+        regList: resList.map((x) => `${x.res} / ${f.km(x.radius)}`).join(', ') || '–', globalRes: String(ruleNumber(man.method.cells)) },
       map: cellMap(p, 'b'),
       data: { area: p.area_km2, radius: r, resList },
     };
