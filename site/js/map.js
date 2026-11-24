@@ -520,7 +520,10 @@ function eventRow(p) {
 export function preloadM6() {
   return getJSON('events_m6.json').then((e6) => {
     events.e6 = e6;
-    events.years = [Math.floor(Math.min(...e6.year)), Math.floor(Math.max(...e6.year))];
+    // a loop, not Math.min(...e6.year): spreading a large array into a call can overflow the stack
+    let y0 = Infinity, y1 = -Infinity;
+    for (const y of e6.year) { if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    events.years = [Math.floor(y0), Math.floor(y1)];
     C.onEventsLoaded(events);
     return e6;
   });
