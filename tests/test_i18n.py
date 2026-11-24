@@ -16,7 +16,7 @@ pytestmark = pytest.mark.skipif(NODE is None, reason="Node.js not installed")
 DUMP = r"""
 const dir = process.argv[1];
 const out = {};
-const sample = { r: '1.5', k: '5', lo: '0.8', hi: '1.9', pct: 21 };
+const sample = { r: '1.5', k: '5', lo: '0.8', hi: '1.9', pct: 21, n: '21' };
 for (const l of ['en', 'uz', 'ru', 'es']) {
   const d = (await import(`${dir}/${l}.js`)).default;
   out[l] = Object.fromEntries(Object.entries(d).map(([k, v]) => [k, typeof v === 'function' ? ['fn', v(sample)] : ['str', v]]));
@@ -66,6 +66,7 @@ def test_plural_and_ordinal_forms(dicts):
     assert "каждые 5 месяцев" in dicts["ru"]["cs.sum.after"][1]
     assert "cada 5 meses" in dicts["es"]["cs.sum.after"][1]
     assert "21st percentile" in dicts["en"]["mon.prodVal"][1]
+    assert "кроме 21 события ML" in dicts["ru"]["cs.noEvents"][1]
 
 
 def test_uzbek_apostrophes(dicts):

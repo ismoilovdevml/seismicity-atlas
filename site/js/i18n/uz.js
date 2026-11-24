@@ -993,7 +993,7 @@ export default {
   "cs.dataFrom": "Maʼlumotlar:",
   "cs.licence": "Litsenziya",
   "cs.redistributed": "Bu yerda eʼlon qilingan",
-  "cs.noEvents": "Alohida KNMI hodisalari roʻyxati eʼlon qilinmaydi va yuklab olish uchun taklif qilinmaydi (muhim sanalar uchun ishlatilgan ML ≥ 3.0 dagi 16 hodisadan tashqari); skriptlar katalogni KNMI dan qayta yuklab oladi.",
+  "cs.noEvents": "Alohida KNMI hodisalari roʻyxati eʼlon qilinmaydi va yuklab olish uchun taklif qilinmaydi (muhim sanalar uchun ishlatilgan ML ≥ 3.0 dagi {n} hodisadan tashqari); skriptlar katalogni KNMI dan qayta yuklab oladi.",
   "cs.statement": "Maʼlumotlar bayonoti: {s}",
   "cs.msS.2014-01-01": "Cheklovlar",
   "cs.msS.2023-10-01": "Toʻxtatish",

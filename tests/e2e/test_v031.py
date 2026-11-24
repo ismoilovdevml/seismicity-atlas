@@ -46,6 +46,8 @@ def test_case_study_renders(site, viewport, scheme):
     # phase rates, b by phase, moving b-positive with both sub-fields, validation table with every row
     rates = json.loads((GR / "rates.json").read_text())
     assert pg.locator("#cases-root .cs-btable tbody tr").count() == len(rates["phases"])
+    # the count of ML >= 3.0 events in the source note comes from the data (it said 16, the 0.6.0 data have 13)
+    assert f"apart from the {len(rates['events_ge3']['time'])} events of ML ≥ 3.0" in root
     val = json.loads((GR / "validation.json").read_text())
     assert pg.locator(".cs-vtable tbody tr").count() == len(val["rows"])
     assert pg.locator(".cs-vtable tr[data-verdict='differs'] .pill.bad").count() == 1

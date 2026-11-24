@@ -997,7 +997,7 @@ export default {
   "cs.dataFrom": "Data:",
   "cs.licence": "Licence",
   "cs.redistributed": "Published here",
-  "cs.noEvents": "The list of single KNMI events is not published or offered for download (apart from the 16 events of ML ≥ 3.0 used for the milestones); the scripts download the catalogue again from KNMI.",
+  "cs.noEvents": "The list of single KNMI events is not published or offered for download (apart from the {n} events of ML ≥ 3.0 used for the milestones); the scripts download the catalogue again from KNMI.",
   "cs.statement": "Data statement: {s}",
   "cs.msS.2014-01-01": "Restrictions",
   "cs.msS.2023-10-01": "Stop",

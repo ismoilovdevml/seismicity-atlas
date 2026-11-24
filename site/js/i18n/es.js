@@ -993,7 +993,7 @@ export default {
   "cs.dataFrom": "Datos:",
   "cs.licence": "Licencia",
   "cs.redistributed": "Publicado aquí",
-  "cs.noEvents": "La lista de eventos KNMI individuales no se publica ni se ofrece para descargar (salvo los 16 eventos de ML ≥ 3.0 usados para los hitos); los scripts vuelven a descargar el catálogo de KNMI.",
+  "cs.noEvents": "La lista de eventos KNMI individuales no se publica ni se ofrece para descargar (salvo los {n} eventos de ML ≥ 3.0 usados para los hitos); los scripts vuelven a descargar el catálogo de KNMI.",
   "cs.statement": "Declaración de datos: {s}",
   "cs.msS.2014-01-01": "Restricciones",
   "cs.msS.2023-10-01": "Cierre",
