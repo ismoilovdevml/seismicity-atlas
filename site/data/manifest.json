@@ -1,8 +1,8 @@
 {
  "name": "Global Seismicity Atlas",
- "version": "0.6.0",
- "generated_utc": "2026-11-20T07:13:31Z",
- "data_cutoff_utc": "2026-11-13",
+ "version": "0.6.1",
+ "generated_utc": "2026-11-25T10:33:49Z",
+ "data_cutoff_utc": "2026-11-25",
  "coverage": {
   "iscgem": [
    "1904-04-04 10:02:34.560000+00:00",
@@ -10,7 +10,7 @@
   ],
   "comcat": [
    "1973-01-01 03:46:09.800000+00:00",
-   "2026-11-12 22:04:06.729000+00:00"
+   "2026-11-24 23:29:55.097000+00:00"
   ]
  },
  "disclaimer": "Catalogue statistics for research and education. Not an earthquake forecast and not an official seismic hazard map.",
@@ -132,16 +132,16 @@
  },
  "files": {
   "events_m5.json": {
-   "bytes": 7502475,
-   "sha256": "248d94498f1fe8b1171f379cd2d8de86ac5605422d1c8f1813102b775f3b5146"
+   "bytes": 7507318,
+   "sha256": "04fcc9e425a35448b0b8a879aa0d5d46b55f9131ab78d0fc3577c2e8ed646064"
   },
   "events_m6.json": {
-   "bytes": 706506,
-   "sha256": "10bb8bfe413eacbaf76c030ac175ade10fe1f853f296bdb443f868437418d7fc"
+   "bytes": 706838,
+   "sha256": "b45bde0d7896c309a5f8006a4684365287b930b8f8e32d6d68af5b7ccc964499"
   },
   "global.json": {
-   "bytes": 21622,
-   "sha256": "0c540260abed00bffcbae7eadac99197be8808c9e8a8453bae36a1d6d1f50180"
+   "bytes": 21626,
+   "sha256": "58834fde8e255b129f26694a7422979981d3e94133884187eda2b0d4a8f0fcb9"
   },
   "places.json": {
    "bytes": 584959,
@@ -152,12 +152,12 @@
    "sha256": "554ae0f20e9ed066cff0db798a20aa8cd8765ead1903e9246068e07c94e38cea"
   },
   "sequences.json": {
-   "bytes": 56352,
-   "sha256": "f2e85c4bcfa318763a57829654e4b36efdbb4df2530e610c6445bf27c4dc9399"
+   "bytes": 56466,
+   "sha256": "57ea1916bfaa6fbd480fff82407c81ae6ca98e1af5cfc9e29f3697ffa2a23d2a"
   },
   "cells.geojson": {
-   "bytes": 1485813,
-   "sha256": "2e7d27cdc46917be2aef12368dac18189ce43e72bbd94e29c09699080261df71"
+   "bytes": 1485828,
+   "sha256": "676fe227a2d3ed6253ade986740058ac9338946a60a08aea0c2b89c83f52ac93"
   },
   "coastline.geojson": {
    "bytes": 384300,
@@ -174,23 +174,23 @@
  },
  "cell_detail_files": {
   "count": 1289,
-  "bytes": 2572187
+  "bytes": 2572387
  },
  "events": {
   "events_m6.json": {
-   "n": 15000,
+   "n": 15007,
    "src_counts": {
     "0": 7134,
     "1": 7127,
-    "2": 739
+    "2": 746
    }
   },
   "events_m5.json": {
-   "n": 162043,
+   "n": 162148,
    "src_counts": {
     "0": 58655,
     "1": 15485,
-    "2": 87903
+    "2": 88008
    }
   }
  }

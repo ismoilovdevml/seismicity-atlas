@@ -1,8 +1,8 @@
 {
  "layer": "seismic deficit (pilot: Tien Shan)",
- "version": "0.6.0",
- "data_cutoff_utc": "2026-11-13",
- "generated_utc": "2026-11-20T07:39:12Z",
+ "version": "0.6.1",
+ "data_cutoff_utc": "2026-11-25",
+ "generated_utc": "2026-11-25T10:35:31Z",
  "disclaimer": "Not a forecast and not a hazard map. The ratio compares about 120 years of earthquakes with a few decades of geodetic strain; recurrence times of the largest Tien Shan earthquakes are centuries or longer, part of the strain may be released aseismically, and full seismic coupling is an assumption. A low ratio is not evidence that an earthquake is due.",
  "licence": {
   "data": "CC BY-SA 4.0 (derived from ISC-GEM CC BY-SA 3.0 and the strain-rate models CC BY 4.0)"
@@ -160,9 +160,9 @@
    },
    "length_km": 1870.0,
    "u_seis_ours_mm_yr": {
-    "lo": 10.366397308213282,
-    "med": 13.27351253866144,
-    "hi": 17.885540242578184
+    "lo": 10.362957032898066,
+    "med": 13.279082281044879,
+    "hi": 17.88706322644248
    },
    "u_geod_ours_mm_yr": {
     "lo": 8.220226090924344,
@@ -170,14 +170,14 @@
     "hi": 10.109934964779312
    },
    "r_obs_iscgem": {
-    "lo": 1.0641454676706708,
-    "med": 1.4173405887370272,
-    "hi": 2.005995843168613
+    "lo": 1.063675606514809,
+    "med": 1.4172085632143716,
+    "hi": 1.9958457309023008
    },
    "r_obs_with_mg2000_moments": {
-    "lo": 0.5379865203437606,
-    "med": 0.7165468957413164,
-    "hi": 1.014145862832654
+    "lo": 0.5377345788195586,
+    "med": 0.7164609634478271,
+    "hi": 1.0089873801017928
    },
    "ms_obs_with_mg2000_moments": 1.53e+19
   }
@@ -203,18 +203,18 @@
    "mg": 2.14e+19,
    "mg_lo": 1.53e+19,
    "mg_hi": 2.84e+19,
-   "ms_tgr": 1.67e+19,
+   "ms_tgr": 1.66e+19,
    "ms_tgr_lo": 5.79e+18,
    "ms_tgr_hi": 5.03e+19,
    "r_obs": 1.42,
-   "r_obs_lo": 0.906,
-   "r_obs_hi": 9.29,
+   "r_obs_lo": 0.905,
+   "r_obs_hi": 9.28,
    "r_tgr": 0.782,
    "r_tgr_lo": 0.262,
-   "r_tgr_hi": 2.5,
+   "r_tgr_hi": 2.49,
    "r_obs_x1": 0.904,
-   "p_full": 0.83,
-   "p_half": 0.97,
+   "p_full": 0.82,
+   "p_half": 0.98,
    "mc_bal": 8.29,
    "unbal": 0.025,
    "over": 0.0,
@@ -236,20 +236,20 @@
    "mg": 6.64e+18,
    "mg_lo": 4.93e+18,
    "mg_hi": 8.48e+18,
-   "ms_tgr": 6.57e+18,
-   "ms_tgr_lo": 2.06e+18,
+   "ms_tgr": 6.53e+18,
+   "ms_tgr_lo": 2.07e+18,
    "ms_tgr_hi": 2.11e+19,
    "r_obs": 0.916,
-   "r_obs_lo": 0.525,
-   "r_obs_hi": 15.5,
-   "r_tgr": 1.0,
-   "r_tgr_lo": 0.303,
-   "r_tgr_hi": 3.29,
+   "r_obs_lo": 0.52,
+   "r_obs_hi": 16.4,
+   "r_tgr": 0.994,
+   "r_tgr_lo": 0.301,
+   "r_tgr_hi": 3.36,
    "r_obs_x1": 0.56,
    "p_full": 0.69,
    "p_half": 0.89,
-   "mc_bal": 8.1,
-   "unbal": 0.02,
+   "mc_bal": 8.11,
+   "unbal": 0.022,
    "over": 0.0,
    "cov_min": 0.75
   },
@@ -270,23 +270,23 @@
     "ou2026"
    ],
    "ms_obs": 1.29e+19,
-   "mg": 8.28e+18,
-   "mg_lo": 6.01e+18,
-   "mg_hi": 1.09e+19,
-   "ms_tgr": 8.07e+18,
-   "ms_tgr_lo": 2.64e+18,
+   "mg": 8.27e+18,
+   "mg_lo": 6.02e+18,
+   "mg_hi": 1.1e+19,
+   "ms_tgr": 8.06e+18,
+   "ms_tgr_lo": 2.6e+18,
    "ms_tgr_hi": 2.55e+19,
-   "r_obs": 1.55,
-   "r_obs_lo": 0.565,
-   "r_obs_hi": 5.67,
-   "r_tgr": 0.983,
-   "r_tgr_lo": 0.305,
-   "r_tgr_hi": 3.29,
+   "r_obs": 1.56,
+   "r_obs_lo": 0.575,
+   "r_obs_hi": 5.63,
+   "r_tgr": 0.981,
+   "r_tgr_lo": 0.306,
+   "r_tgr_hi": 3.19,
    "r_obs_x1": 0.229,
    "p_full": 0.85,
    "p_half": 0.97,
-   "mc_bal": 8.1,
-   "unbal": 0.019,
+   "mc_bal": 8.11,
+   "unbal": 0.015,
    "over": 0.0,
    "cov_min": 0.93
   },
@@ -309,20 +309,20 @@
    "mg": 3.97e+18,
    "mg_lo": 2.93e+18,
    "mg_hi": 5.15e+18,
-   "ms_tgr": 2.23e+18,
-   "ms_tgr_lo": 5.08e+17,
-   "ms_tgr_hi": 8.51e+18,
-   "r_obs": 2.86,
-   "r_obs_lo": 1.19,
-   "r_obs_hi": 20.5,
-   "r_tgr": 0.563,
-   "r_tgr_lo": 0.126,
-   "r_tgr_hi": 2.28,
-   "r_obs_x1": 0.694,
+   "ms_tgr": 2.22e+18,
+   "ms_tgr_lo": 5.15e+17,
+   "ms_tgr_hi": 8.46e+18,
+   "r_obs": 2.87,
+   "r_obs_lo": 1.2,
+   "r_obs_hi": 21.2,
+   "r_tgr": 0.564,
+   "r_tgr_lo": 0.127,
+   "r_tgr_hi": 2.23,
+   "r_obs_x1": 0.695,
    "p_full": 0.94,
    "p_half": 0.98,
-   "mc_bal": 8.55,
-   "unbal": 0.058,
+   "mc_bal": 8.56,
+   "unbal": 0.057,
    "over": 0.0,
    "cov_min": 0.98
   }
@@ -330,11 +330,11 @@
  "files": {
   "regions.geojson": {
    "what": "one polygon per region",
-   "bytes": 3096
+   "bytes": 3098
   },
   "cells.geojson": {
    "what": "one polygon per H3 resolution-2 cell",
-   "bytes": 7194
+   "bytes": 7192
   }
  }
 }

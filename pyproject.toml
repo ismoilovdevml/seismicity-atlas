@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "seisatlas"
-version = "0.6.0"
+version = "0.6.1"
 description = "Magnitude of completeness and Gutenberg-Richter b-value with uncertainty for any earthquake catalogue (method of the Global Seismicity Atlas)"
 readme = "src/seisatlas/README.md"
 license = "MIT"

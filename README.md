@@ -21,18 +21,18 @@ Spanish.
 ![Simple view on the globe with the place search](docs/img/readme/simple-globe.png)
 
 <!-- key-results:start -->
-## Key results (data cut-off 2026-11-13)
+## Key results (data cut-off 2026-11-25)
 
 Generated from the data files by `scripts/readme_numbers.py`; do not edit by hand.
 
 | | Value |
 |---|---|
-| Events analysed | ISC-GEM 74,153 (1904–2021); ComCat M ≥ 4.5: 294,222 (1973–2026-11-12) |
+| Events analysed | ISC-GEM 74,153 (1904–2021); ComCat M ≥ 4.5: 294,488 (1973–2026-11-24) |
 | Duplicates | 58,666 of 58,982 ISC-GEM events in 1973–2021 matched in ComCat (99.5 %); median offset 1.1 s, 9.6 km |
 | Global b, ISC-GEM direct Mw 1976–2021 | shallow ≤ 70 km: **1.054 [1.036, 1.073]**; deeper: **0.924 [0.900, 0.955]** |
 | Cells with a trusted b (95 % interval ≤ 0.5 × b) | 136 shallow and 66 deeper, out of 2,598 cells that hold events |
 | Global completeness (ISC-GEM direct Mw, shallow) | Mw 6.3 for 1976–2003, 5.2 for 2004–2021 |
-| USGS M4.5+ feed, as served | median Mc 4.7 (mostly mb) over 956 shallow cells, 2010 to the cut-off |
+| USGS M4.5+ feed, as served | median Mc 4.7 (mostly mb) over 957 shallow cells, 2010 to the cut-off |
 | Omori fits | 40 sequences since 1990: 17 quality A, 11 B, 7 C, 5 insufficient |
 <!-- key-results:end -->
 

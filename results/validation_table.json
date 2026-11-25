@@ -173,7 +173,7 @@
   "published": "true p 1.05",
   "verdict": "match (z +1.68) (bias of the mean)",
   "data": "independent data",
-  "z": 1.6768016885592416
+  "z": 1.6768018199452226
  },
  {
   "test": "b recovery, synthetic cells, one period, 240 cells with 100-1000 events above Mc",
@@ -181,7 +181,7 @@
   "published": "true b (0.7-1.4)",
   "verdict": "match (z -0.64) (bias of the mean)",
   "data": "independent data",
-  "z": -0.6384624898654037
+  "z": -0.6384624898654031
  },
  {
   "test": "b recovery, synthetic cells, two period, 240 cells with 100-1000 events above Mc",
@@ -221,7 +221,7 @@
   "published": "beta 0.65 \u00b10.04 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z -0.70); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": -0.7049689978393198
+  "z": -0.7049695748871976
  },
  {
   "test": "Literature b: kj2013_fe05_mexico_guatemala (box [13, 22, -106, -90], 1977-2010, <= 70 km, m >= 5.8)",
@@ -229,7 +229,7 @@
   "published": "beta 0.6 \u00b10.06 (b 0.900; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z -0.88); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": -0.8752881895956314
+  "z": -0.8752884497922232
  },
  {
   "test": "Literature b: kj2013_fe06_central_america (box [7, 15, -92, -82], 1977-2010, <= 70 km, m >= 5.8)",
@@ -237,7 +237,7 @@
   "published": "beta 0.68 \u00b10.06 (b 1.020; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z +0.04); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": 0.04126479824167692
+  "z": 0.041264806596433376
  },
  {
   "test": "Literature b: kj2013_fe08_andean_south_america (box [-56, 13, -82, -63], 1977-2010, <= 70 km, m >= 5.8)",
@@ -245,7 +245,7 @@
   "published": "beta 0.57 \u00b10.04 (b 0.855; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z +0.60); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": 0.5971592837427661
+  "z": 0.5971592489336258
  },
  {
   "test": "Literature b: kj2013_fe12_kermadec_tonga_samoa (box [-38, -13, 175, -170], 1977-2010, <= 70 km, m >= 5.8)",
@@ -253,7 +253,7 @@
   "published": "beta 0.8 \u00b10.04 (b 1.200; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z +0.14); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": 0.1389674155350808
+  "z": 0.13896740208089542
  },
  {
   "test": "Literature b: kj2013_fe18_guam_japan (box [12, 34, 138, 148], 1977-2010, <= 70 km, m >= 5.8)",
@@ -261,7 +261,7 @@
   "published": "beta 0.86 \u00b10.10 (b 1.290; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z -0.14); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": -0.1401451732489636
+  "z": -0.1401452606876291
  },
  {
   "test": "Literature b: kj2013_fe19_japan_kamchatka (box [35, 60, 140, 165], 1977-2010, <= 70 km, m >= 5.8)",
@@ -269,7 +269,7 @@
   "published": "beta 0.62 \u00b10.04 (b 0.930; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z +0.76); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": 0.7567224180112
+  "z": 0.7567214721049192
  },
  {
   "test": "Literature b: kj2013_tohoku_box (box [35, 40, 140, 146], 1977-2010, <= 70 km, m >= 5.8)",
@@ -277,7 +277,7 @@
   "published": "beta 0.64 \u00b10.07 (b 0.960; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (z +0.39); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": 0.3905419666916228
+  "z": 0.3905419259061937
  },
  {
   "test": "Literature b: kj2013_fe24_sunda_arc (box [-12, -5, 100, 125], 1977-2010, <= 70 km, m >= 5.8)",
@@ -285,7 +285,7 @@
   "published": "beta 0.65 \u00b10.04 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z +0.39); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": 0.38937995913170126
+  "z": 0.3893795970664604
  },
  {
   "test": "Literature b: kj2013_fe46_andaman_sumatra (box [-6, 15, 90, 102], 1977-2010, <= 70 km, m >= 5.8)",
@@ -293,7 +293,7 @@
   "published": "beta 0.71 \u00b10.07 (b 1.065; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z -1.12); all events: match [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": -1.1231184639478313
+  "z": -1.1231178351283855
  },
  {
   "test": "Literature b: kj2013_all_18_subduction_zones (PB2002 SUB, 1977-2010, <= 70 km, m >= 5.8)",
@@ -301,7 +301,7 @@
   "published": "beta 0.65 \u00b10.01 (b 0.975; Kagan, Y. Y. & Jackson, D. D. 2013, Table 1 (Table 1)",
   "verdict": "match (approximate region) (z +0.08); all events: differs [needs human check]",
   "data": "same data (GCMT-based)",
-  "z": 0.0757314627013523
+  "z": 0.07573144711773978
  },
  {
   "test": "Literature b: kagan2010_global_mt56 (global, 1982-2008, <= 70 km, m >= 5.6)",
