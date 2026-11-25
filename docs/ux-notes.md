@@ -162,7 +162,9 @@ world seismicity maps, EMSC's description of LastQuake and the papers on it, GEM
   the honesty line. Every number comes from `placeStats()` and `recordingRating()` in `places.js`; the browser tests
   recompute them in Python from the JSON files.
 - **Recording rating.** Four words from the shallow statistics of the cell under the place; the exact table is in
-  `docs/learn.md` and on the Learn page "How well earthquakes are recorded" (the card's (i) button).
+  `docs/learn.md` and on the Learn page "Global data on large earthquakes" (the card's (i) button). The heading and
+  texts say that it counts large earthquakes in the global catalogue, not the quality of the local network; where a
+  regional layer covers the place, the card points to it.
 - **Controls.** Years (last 10, last 50, all), magnitude (5+, 6+, 7+), plate boundaries, relief. On phones they fold
   behind an options button in the search field.
 - **First-visit tip.** Three steps (dots, shading, search), each outlining the part of the legend or the search box it

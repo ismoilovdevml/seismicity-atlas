@@ -166,13 +166,13 @@ Buttons in the static map controls are placed by `site/js/info-rail.js` and rela
 | Legend title "Earthquakes M6+, 1904–2026" | `sx.lgTitle` | `magnitude-types` |
 | Legend shading line ("Not a hazard map") | `sx.lgHeat` | `not-a-forecast` |
 | Legend plate boundaries (when shown) | `sx.lgPlates` | `plate-boundary-classes` |
-| Place card "How well are earthquakes recorded here?" | `sx.rateHead` | `recording-rating` |
+| Place card "Global data on large earthquakes here" | `sx.rateHead` | `recording-rating` |
 | Disclaimer strip (shared) | `disc.strong` | `not-a-forecast` |
 
 Four buttons in the Simple map view (five with the disclaimer), against 10 in the Scientist rail: the Simple view
 keeps only the concepts a non-specialist meets on that screen. Search, the controls and the counts have none.
 
-### The recording rating (Simple view, "How well are earthquakes recorded here?")
+### The recording rating (Simple view, "Global data on large earthquakes here")
 
 `recordingRating(cell, globalMc)` in `site/js/places.js` reads the **shallow (≤ 70 km)** statistics of the cell that
 contains the place (point in hexagon, trying the longitude ± 360° for cells that cross the antimeridian; the nearest
@@ -181,7 +181,7 @@ The rules are checked in this order:
 
 | Rating | Card word | Condition |
 |---|---|---|
-| `few` | Too little data | `sh_q` is `insufficient` (fewer than 50 events above Mc, `method.quality.insufficient`) |
+| `few` | Too little data | `sh_q` is `insufficient` (fewer than 50 events above the per-event threshold, `method.quality.insufficient`) |
 | `limited` | Limited | `sh_q` is `C`, or `c_flag` is `check` (ISC-GEM and ComCat disagree) |
 | `vgood` | Very good | `sh_q` is `A`, `c_flag` is `ok` and `sh_mc` ≤ global shallow Mc + 0.2 (5.5 in 0.6.0; 5.4 in v0.2.0) |
 | `good` | Good | every other `A` or `B` cell (B, or A with `c_flag` `few` or a higher Mc) |
@@ -193,6 +193,17 @@ browser test from `cells.geojson`; no cell has `c_flag` `check` and quality A or
 inputs under the word ("quality B, Mc 5.2, ISC-GEM and ComCat agree"), and its (i) opens the Learn page with the same
 table. The rating describes the global catalogue at a few hundred kilometres, not local networks, and is not a hazard
 or risk estimate.
+
+What it counts, and why most places get "Too little data": shallow, direct-Mw ISC-GEM events of 1976–2021 within
+300 km of the cell centre, each above max(cell Mc, period floor) (floors 6.3 for 1976–2003 and 5.2 for 2004–2021 in
+0.6.0). So the rating says how many large earthquakes the global catalogue holds near a place, not how well the place
+is monitored. Quiet but densely instrumented regions are rated "Too little data" as well (0.6.0: the Zürich cell has
+1 event in its circle and none above the threshold; Berlin 0; Los Angeles 21 above the threshold, Athens 27,
+Istanbul 13, L'Aquila 7). Since 2026-11-25 the card's heading and texts say this in all four languages ("Global data on
+large earthquakes here"; the `few` text names the minimum count and the radius from the manifest and says that it
+is not a verdict on the local network). When the place lies inside the box (`bbox`) of a regional catalogue in
+`regional/index.json`, the card adds a line naming that layer and its typical Mc, with "Open the regional layer →",
+which opens the Scientist view with the layer shown at the place.
 
 Since v0.3.0 the place card reads the rating from `site/data/rating.json`, which `scripts/build_rating.py` computes
 from `cells.geojson` with this rule and the manifest's global shallow Mc, together with the three inputs, the cell's

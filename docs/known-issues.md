@@ -95,7 +95,10 @@ Status on 2026-11-13 (branch with the browser suite, comparison, CSV, regional l
 - **M5+ before 1973.** `events_m5.json` has few M5 events before 1973 (ComCat starts in 1973; ISC-GEM is complete for
   M5 only in places). The legend says so when M5+ is chosen with all years.
 - **Recording rating.** It uses the shallow statistics of one cell and the global shallow Mc; it is not computed for
-  deeper events, and it describes global catalogues, not local networks. The mapping is in `docs/learn.md`.
+  deeper events, and it describes global catalogues, not local networks: it counts large ISC-GEM earthquakes near the
+  place, so quiet but densely instrumented regions (Switzerland, Germany) get "Too little data". The card says so;
+  the regional pointer uses the catalogue's bounding box, which can reach a little beyond the network's own area. The
+  mapping is in `docs/learn.md`.
 - **Density shading.** A MapLibre heatmap of the drawn events: its look depends on zoom (radius in pixels) and on the
   filter. It has no numeric scale on purpose (it is not a rate or hazard surface); the Scientist view has the M6+ rate
   per 100,000 km² per year.

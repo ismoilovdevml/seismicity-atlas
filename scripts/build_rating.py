@@ -23,7 +23,9 @@ Output columns, one row per cell in cells.geojson order:
 Integers divided by 100 or 1000 give exactly the doubles that parsing the published decimals gives, so the
 browser's point-in-hexagon test (places.js cellAtPoint) finds the same cell as it does on cells.geojson.
 
-The rating (docs/learn.md, "The recording rating"; places.js recordingRating), checked in this order:
+The rating says how many large earthquakes the global ISC-GEM catalogue holds near a place (enough for a b-value or
+not); it does not rate local seismic networks, so quiet but densely instrumented regions are "few" too.
+The rule (docs/learn.md, "The recording rating"; places.js recordingRating), checked in this order:
   few      sh_q is not A, B or C ("insufficient")
   limited  sh_q is C, or c_flag is "check"
   vgood    sh_q is A, c_flag is "ok" and sh_mc <= global shallow Mc + 0.2

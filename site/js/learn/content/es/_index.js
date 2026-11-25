@@ -7,7 +7,7 @@ export default {
   'gutenberg-richter-b-value': [`Valor b de Gutenberg-Richter`, `La pendiente que indica con qué rapidez los terremotos grandes se vuelven más escasos que los pequeños.`],
   'confidence-interval-bootstrap': [`Intervalo del 95 % y bootstrap`, `Qué tan seguro es un valor b, estimado volviendo a extraer el catálogo muchas veces.`],
   'quality-codes': [`Códigos de calidad A, B, C e insuficiente`, `Por qué algunas celdas muestran un valor b y la mayoría no.`],
-  'recording-rating': [`Qué tan bien se registran los terremotos`, `La valoración de cuatro palabras de la vista sencilla y la regla exacta que la sostiene.`],
+  'recording-rating': [`Datos globales de terremotos fuertes`, `La valoración de cuatro palabras de la vista sencilla, la regla exacta que la sostiene y lo que no dice.`],
   'b-positive': [`b-positive`, `Un valor b basado en diferencias de magnitud que no se deja engañar por las réplicas pequeñas no registradas.`],
   'declustering': [`Desagrupamiento`, `Eliminar réplicas con ventanas espacio-temporales, y por qué aquí reduce b.`],
   'omori-utsu': [`Decaimiento de Omori-Utsu`, `Cómo disminuye la tasa de réplicas con el tiempo: K, c y p.`],

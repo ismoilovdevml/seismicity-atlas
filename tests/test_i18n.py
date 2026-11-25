@@ -85,3 +85,22 @@ def test_privacy_note_names_the_real_host_and_analytics(dicts):
         text = " ".join(d[k][1] for k in ("about.privacy", "about.privacyHost", "about.privacyLink"))
         assert "Cloudflare Pages" in text and "Cloudflare Web Analytics" in text, lang
         assert "GitHub" not in text, lang
+
+
+def test_rating_texts_describe_the_global_catalogue_not_the_network(dicts):
+    """The place-card rating counts large ISC-GEM earthquakes near the place. Until 2026-11-25 its heading asked "How
+    well are earthquakes recorded here?", which reads as a verdict on the local network; Zürich, Berlin or Los Angeles
+    get "Too little data" although they are densely instrumented."""
+    en = dicts["en"]
+    assert en["sx.rateHead"][1] == "Global data on large earthquakes here"
+    assert "not a verdict on the local seismic network" in en["sx.rateText.few"][1]
+    for k in ("sx.rateHead", "sx.title", "brand.tagSimple", "learn.c.recording-rating"):
+        assert "how well" not in en[k][1].lower(), k
+    for lang, d in dicts.items():
+        assert _placeholders(d["sx.rateText.few"][1]) == {"n", "km"}, lang
+        assert _placeholders(d["sx.regional"][1]) == {"name", "mc"}, lang
+        assert d["sx.regionalBtn"][1].endswith("→"), lang
+    old = {"uz": "qanchalik yaxshi qayd", "ru": "насколько хорошо", "es": "qué tan bien"}
+    for lang, phrase in old.items():
+        for k in ("sx.rateHead", "sx.title", "brand.tagSimple", "learn.c.recording-rating", "tour.search.text"):
+            assert phrase not in dicts[lang][k][1].lower(), (lang, k)

@@ -174,7 +174,8 @@ export function cellAtPoint(features, lat, lon) {
 export const RATINGS = ['vgood', 'good', 'limited', 'few'];
 
 /**
- * "How well are earthquakes recorded here?" from the shallow (≤ 70 km) statistics of the cell:
+ * The place card's rating of the global data ("Global data on large earthquakes here"; it counts ISC-GEM events, it does
+ * not rate local networks), from the shallow (≤ 70 km) statistics of the cell:
  *   few      quality code "insufficient" (fewer events above Mc than the minimum)
  *   limited  quality code C, or the two catalogues disagree (catalogue flag "check")
  *   vgood    quality code A, catalogues agree (flag "ok") and Mc within 0.2 of the global shallow Mc

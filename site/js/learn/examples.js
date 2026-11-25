@@ -182,11 +182,15 @@ export const EXAMPLES = {
     const num = (s) => { const m = String(s).match(/\d+(?:\.\d+)?/g); return m ? +m[m.length - 1] : null; };
     const area = cells.reduce((a, p) => a + p.area_km2, 0) / cells.length;
     const place = v || l || cells[0];
+    const fl = man.method.floors.sh; // the period floors of the per-event threshold, oldest period first
+    const fk = Object.keys(fl).sort();
     return {
       vars: { nAll: f.int(cells.length), nV: f.int(cnt.vgood), nG: f.int(cnt.good), nL: f.int(cnt.limited), nF: f.int(cnt.few),
         vLoc: v ? f.latlon(v.lat, v.lon) : '–', vQ: v ? v.sh_q : '–', vMc: v ? f.mag(v.sh_mc) : '–',
         lLoc: l ? f.latlon(l.lat, l.lon) : '–', lQ: l ? l.sh_q : '–',
-        gMc: f.mag(gMc), mcMax: f.mag(gMc + 0.2), nMin: f.int(num(man.method.quality.insufficient)), area: f.int(Math.round(area / 1000) * 1000) },
+        gMc: f.mag(gMc), mcMax: f.mag(gMc + 0.2), nMin: f.int(num(man.method.quality.insufficient)), area: f.int(Math.round(area / 1000) * 1000),
+        radius: f.int(man.method.sample_radius_km), fOld: f.mag(fl[fk[0]].floor), fNew: f.mag(fl[fk[fk.length - 1]].floor),
+        yNew: fk[fk.length - 1].slice(0, 4) },
       // the example opens in the Simple view, with the place card on the Very good cell
       map: `#v=map&mode=simple&p=${place.lat.toFixed(3)}/${place.lon.toFixed(3)}`,
       data: { counts: cnt, gMc },

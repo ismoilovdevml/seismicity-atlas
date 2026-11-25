@@ -545,6 +545,26 @@ function openExpert(cellId, lat, lon) {
   }).catch(() => {});
 }
 
+/** The regional catalogue whose box contains a point (the first one listed), or null. */
+function regionAt(lat, lon) {
+  return regions.find((r) => lon >= r.bbox[0] && lon <= r.bbox[2] && lat >= r.bbox[1] && lat <= r.bbox[3]) || null;
+}
+
+/** "Open the regional layer": the Scientist view with that regional catalogue shown, zoomed in on the place. */
+function openRegional(id, lat, lon) {
+  state.mode = 'pro';
+  saveMode('pro');
+  state.v = 'map';
+  state.k = null;
+  state.c = null;
+  state.at = { z: 6, lat: +lat.toFixed(2), lon: +lon.toFixed(2) };
+  applyMode();
+  showView('map');
+  commit(true);
+  if (mapReady) M.flyTo(lon, lat, 6);
+  selectRegion(id, false);
+}
+
 function ensureEvents() {
   if (state.ev === 5) {
     $('ev-count').textContent = t('ev.loadingM5');
@@ -651,6 +671,7 @@ async function loadRegionIndex() {
     regions = [];
   }
   $('reg-group').hidden = !regions.length;
+  syncSimple(); // an open place card may now point to a regional layer
   if (!regions.length) {
     if (state.r) { state.r = null; commit(); }
     return;
@@ -818,7 +839,7 @@ async function start() {
   libP.catch(() => {}); // both reported below, once awaited
   await langP;
   wireControls();
-  initSimple({ state, ctx, update, openExpert });
+  initSimple({ state, ctx, update, openExpert, regionAt, openRegional });
   applyMode();
   placeRailInfo();
   syncControls();

@@ -9,7 +9,7 @@ import { h } from './charts.js';
 import { t, lang } from './i18n/index.js';
 import { infoButton } from './info.js';
 import { defineKeys, intIn } from './hashx.js';
-import { mb } from './data.js';
+import { mb, ruleNumber } from './data.js';
 import { EXT } from './util.js';
 import { loadPlaces, searchPlaces, placeName, nearestPlace, placeStats, cellAtPoint, loadRating } from './places.js';
 
@@ -33,7 +33,7 @@ const TOUR_KEY = 'gsa-tour';
 const USGS = 'https://earthquake.usgs.gov/earthquakes/eventpage/';
 const $ = (id) => document.getElementById(id);
 
-let S = null; // {state, ctx, update, openExpert}
+let S = null; // {state, ctx, update, openExpert, regionAt, openRegional}
 let named = null; // the gazetteer place chosen in the search, while the card shows it
 let places = null; // loaded gazetteer rows
 let rating = null; // decoded data/rating.json (the cell under a place and its recording rating), loaded with the first card
@@ -301,7 +301,9 @@ function renderCard() {
   const { y0, y1, minM } = M.simpleFilterValues();
   // with the 5+ filter (and the M5 file loaded) the card counts M5+ like the map; otherwise M6+ and M7+
   const e5 = minM < 6 ? M.getEvents().e5 : null;
-  const key = [lat, lon, st.pr, y0, y1, e5 ? 5 : 6, lang(), named ? named.i : '', places ? 1 : 0, ev ? 1 : 0, rating ? 1 : 0, ratingError ? 1 : 0].join('|');
+  // a regional catalogue whose box contains the place (with the typical Mc the pointer names)
+  const region = [S.regionAt ? S.regionAt(lat, lon) : null].find((r) => r && Number.isFinite(r.mc_typical)) || null;
+  const key = [lat, lon, st.pr, y0, y1, e5 ? 5 : 6, lang(), named ? named.i : '', places ? 1 : 0, ev ? 1 : 0, rating ? 1 : 0, ratingError ? 1 : 0, region ? region.id : ''].join('|');
   if (key === cardKey) return;
   cardKey = key;
   if (!places) ensurePlaces().catch(() => {}); // names the point; renders the card again when loaded
@@ -344,8 +346,10 @@ function renderCard() {
     h('div', { class: 'sx-meter-row' },
       h('span', { class: `sx-meter m-${rate}`, 'aria-hidden': 'true' }, h('i'), h('i'), h('i')),
       h('strong', { class: 'sx-rate-label', text: t(`sx.rate.${rate}`) })),
-    h('p', { class: 'sx-rate-text', text: t(`sx.rateText.${rate}`) }),
+    h('p', { class: 'sx-rate-text', text: t(`sx.rateText.${rate}`, rateVars()) }),
     h('p', { class: 'sx-basis', text: basisLine(cell) }),
+    region ? h('p', { class: 'sx-regional', 'data-region': region.id }, `${t('sx.regional', { name: region.name, mc: f.mag(region.mc_typical) })} `,
+      h('button', { type: 'button', class: 'small-btn sx-regional-btn', onclick: () => S.openRegional(region.id, lat, lon), text: t('sx.regionalBtn') })) : null,
     cell ? h('button', { type: 'button', class: 'btn-primary sx-pro-btn', 'data-cell': cell.id, onclick: () => S.openExpert(cell.id, lat, lon), text: t('sx.proBtn') }) : null);
 
   const honest = h('p', { class: 'sx-honest', role: 'note', text: t('sx.honest') });
@@ -356,6 +360,12 @@ function renderCard() {
 function ensureRating() {
   loadRating().then((r) => { rating = r; cardKey = null; renderCard(); })
     .catch((e) => { ratingError = e.message; cardKey = null; renderCard(); });
+}
+
+/** The rule numbers the rating texts name: the minimum event count and the sample radius (from manifest.json). */
+function rateVars() {
+  const m = S.ctx.manifest.method;
+  return { n: f.int(ruleNumber(m.quality.insufficient)), km: f.int(m.sample_radius_km) };
 }
 
 function basisLine(p) {
