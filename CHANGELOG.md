@@ -3,7 +3,10 @@
 Versions follow `scripts/release.json` (shown on the site from `site/data/manifest.json`). A patch is a data refresh
 with the same schema, a minor version a method, schema or website change; see [docs/release.md](docs/release.md).
 
-## Unreleased
+## 0.6.1 (2026-11-25)
+
+Data cut-off 2026-11-25 (monthly ComCat refresh: `n_comcat` in 161 cells and the ComCat Mc of 7 cells changed; every b, interval and quality code is unchanged, as b uses ISC-GEM 1976–2021).
+
 
 - **Declustered quality code** (`*_qdecl`, regional detail `stats.q_decl`) is given only next to a shown main b,
   so a code A/B always comes with its `*_bdecl` (Iceland `85074543fffffff` had `sh_q` C, `sh_qdecl` B and no
