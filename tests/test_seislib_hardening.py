@@ -1,4 +1,4 @@
-"""Edge cases of the statistics library (0.6.0 audit): Omori fits with too few events or c at a bound, the
+"""Edge cases of the statistics library (0.6.0 audit): Omori fits with too few events or c or p at a bound, the
 omori_fit_mct integral from T1 = 0, and mc_mbs on empty or truncated windows."""
 import sys
 import warnings
@@ -7,7 +7,9 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts" / "monitor"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+import monitorlib as ml  # noqa: E402
 import seislib as sl  # noqa: E402
 
 
@@ -27,6 +29,7 @@ def test_omori_too_few_events_is_unfit_without_warnings(n):
         assert f["fitted"] is False and f["n"] == n
         assert all(np.isnan(f[k]) for k in ("K", "c", "p", "sK", "sc", "sp", "logL"))
         assert f["c_at_bound"] is False and f["c_bound"] is None
+        assert f["p_at_bound"] is False and f["p_bound"] is None
         # the callers' contract: float() of every estimate works (NaN), as for a failed Hessian
         assert all(isinstance(float(f[k]), float) for k in ("K", "c", "p", "sK", "sc", "sp"))
 
@@ -68,6 +71,59 @@ def test_omori_fixed_c_is_never_at_bound():
     for f in (sl.omori_fit(t, 0.0, 365.0, fix_c=365.0),
               sl.omori_fit_mct(t, np.full(t.size, 6.0), 0.0, 365.0, 7.0, 4.5, 1.0, fix_c=365.0)):
         assert f["c_at_bound"] is False and f["c_bound"] is None
+
+
+def test_omori_p_at_lower_bound_is_flagged_and_not_quality_a_or_b():
+    # a flat rate (200 events uniform over a year): p runs to the lower search bound 0.05. Up to 0.6.0 this was not
+    # flagged and sp was the curvature at the bound (0.0715 with c fixed at 1 day, below the A limit of 0.10)
+    t = np.sort(np.random.default_rng(42).uniform(0.0, 365.0, 200))
+    m = np.full(t.size, 6.0)
+    for f in (sl.omori_fit(t, 0.0, 365.0), sl.omori_fit(t, 0.0, 365.0, fix_c=1.0),
+              sl.omori_fit_mct(t, m, 0.0, 365.0, 7.0, 4.5, 1.0),
+              sl.omori_fit_mct(t, m, 0.0, 365.0, 7.0, 4.5, 1.0, fix_c=1.0)):
+        assert f["p"] == pytest.approx(sl.P_BOUNDS[0], abs=1e-3)
+        assert f["p_at_bound"] is True and f["p_bound"] == "lower"
+        assert np.isnan(f["sp"])                       # no interval for a p pinned at the bound
+        assert np.isfinite(f["sK"]) and f["sK"] > 0     # K error for p (and c, if at a bound) fixed there
+    # the callers' quality rule (monitorlib.omori_quality = scripts/sequences.py): not A or B, and no p interval
+    fit = ml.omori_fit(t, m, 365.0, 7.0, 4.5, 1.0)
+    assert fit["p_lo"] is None and fit["p_hi"] is None
+    assert ml.omori_quality(fit, contaminated=False) not in ("A", "B")
+
+
+def test_omori_p_at_upper_bound_is_flagged():
+    # true p = 7 (all events within the first hour): p runs to the upper bound 5.0; c stays interior and keeps
+    # its error (for p fixed at the bound)
+    pt, c = 7.0, 0.01
+    t = sl.synth_omori(200.0 * (pt - 1) * c ** (pt - 1), c, pt, 0.0, 365.0, rng=3)
+    m = np.full(t.size, 6.0)
+    for f in (sl.omori_fit(t, 0.0, 365.0), sl.omori_fit_mct(t, m, 0.0, 365.0, 6.5, 4.5, 1.0, H=0.0)):
+        assert f["p"] == pytest.approx(sl.P_BOUNDS[1], abs=1e-3)
+        assert f["p_at_bound"] is True and f["p_bound"] == "upper"
+        assert np.isnan(f["sp"]) and np.isfinite(f["sK"])
+        assert f["c_at_bound"] is False and np.isfinite(f["sc"])
+
+
+# omori_fit / omori_fit_mct of synth_omori(200, 0.05, 1.1, 0, 100, rng=5) on main 8706ec4, before p_at_bound
+_MAIN_8706EC4 = {
+    "free": (201.44931711035625, 0.04528263486757434, 1.1004857606542293, 8.510810555691972, 0.007086127892447481,
+             0.01907469712415359),
+    "fixc": (205.82220738751982, 0.05, 1.1100973415374755, 5.4062622726594745, np.nan, 0.01207744976826616),
+    "mct": (199.33359593808024, 0.04226373744431257, 1.0962424262278918, 8.41521865661462, 0.006903806165913198,
+            0.019057881877301085),
+    "mctfix": (206.53112170159199, 0.05, 1.112116537094116, 5.427715313195088, np.nan, 0.012117104000219434)}
+
+
+def test_omori_interior_p_is_not_flagged_and_unchanged():
+    t = sl.synth_omori(200.0, 0.05, 1.1, 0.0, 100.0, rng=5)
+    m = np.full(t.size, 6.0)
+    fits = {"free": sl.omori_fit(t, 0.0, 100.0), "fixc": sl.omori_fit(t, 0.0, 100.0, fix_c=0.05),
+            "mct": sl.omori_fit_mct(t, m, 0.0, 100.0, 7.0, 4.5, 1.0),
+            "mctfix": sl.omori_fit_mct(t, m, 0.0, 100.0, 7.0, 4.5, 1.0, fix_c=0.05)}
+    for name, f in fits.items():
+        assert f["p_at_bound"] is False and f["p_bound"] is None
+        got = [f[k] for k in ("K", "c", "p", "sK", "sc", "sp")]
+        assert got == pytest.approx(list(_MAIN_8706EC4[name]), rel=1e-9, nan_ok=True), name
 
 
 def test_omori_fit_mct_integrates_from_T1_zero():

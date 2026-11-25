@@ -315,6 +315,7 @@ def _ou_integral(c, p, T1, T2):
 
 C_MIN_DAYS = 1e-4          # lower bound of the Omori c in the fits (8.6 s; below any catalogue's timing resolution)
 P_BOUNDS = (0.05, 5.0)     # search range of p (wide: only keeps the simplex out of meaningless values)
+BOUND_TOL = 1e-3           # a parameter this close to its search bound (log c, p) counts as at the bound
 
 
 def _c_bounds(T2: float, c_min: float):
@@ -328,22 +329,31 @@ def _ou_starts(p0: float, logc0, lo: float, hi: float):
 OMORI_NMIN = 2             # fewer events than this: no fit (callers apply their own, higher, minimum)
 
 
-def _c_bound(logc: float, lo: float, hi: float, fixed: bool):
-    """Which bound of the c search the fit ended at: "lower", "upper" or None (also None for a fixed c)."""
-    if fixed:
-        return None
-    if logc - lo < 1e-3:
+def _bound_side(x: float, lo: float, hi: float):
+    """Return "lower" or "upper" when x is within BOUND_TOL of that end of [lo, hi], else None."""
+    if x - lo < BOUND_TOL:
         return "lower"
-    if hi - logc < 1e-3:
+    if hi - x < BOUND_TOL:
         return "upper"
     return None
+
+
+def _c_bound(logc: float, lo: float, hi: float, fixed: bool):
+    """Which bound of the c search the fit ended at: "lower", "upper" or None (also None for a fixed c)."""
+    return None if fixed else _bound_side(logc, lo, hi)
+
+
+def _p_bound(p: float):
+    """Which end of P_BOUNDS the fitted p ended at: "lower", "upper" or None."""
+    return _bound_side(p, *P_BOUNDS)
 
 
 def _omori_unfit(n: int, T1: float, T2: float):
     """The omori_fit / omori_fit_mct result for too few events: every estimate NaN, fitted False."""
     nan = float("nan")
     return {"K": nan, "c": nan, "p": nan, "sK": nan, "sc": nan, "sp": nan, "n": int(n), "T1": T1, "T2": T2,
-            "logL": nan, "c_at_bound": False, "c_bound": None, "fitted": False}
+            "logL": nan, "c_at_bound": False, "c_bound": None, "p_at_bound": False, "p_bound": None,
+            "fitted": False}
 
 
 def omori_fit(t, T1: float, T2: float, c0: float = 0.05, p0: float = 1.1, fix_c: float | None = None,
@@ -355,9 +365,18 @@ def omori_fit(t, T1: float, T2: float, c0: float = 0.05, p0: float = 1.1, fix_c:
     Hessian. When c ends at either bound (`c_at_bound`; `c_bound` says "lower" or "upper"), c is reported as not
     resolved (sc NaN) and the standard errors of K and p are those for c fixed there: at a bound the likelihood is
     not stationary in c and the full Hessian is meaningless or singular. An upper-bound c (a rate that hardly decays
-    within the window) was not flagged up to 0.6.0. Returns dict with K, c, p, standard errors from the
-    observed-information matrix, n, log-likelihood, c_at_bound, c_bound and fitted (False, every estimate NaN, for
-    fewer than OMORI_NMIN events)."""
+    within the window) was not flagged up to 0.6.0.
+
+    p is searched in P_BOUNDS (0.05, 5.0). When p ends at either bound (`p_at_bound`; `p_bound` "lower" or "upper";
+    e.g. a nearly flat rate gives p = 0.05), p is the bound, not an estimate, and has no meaningful interval: sp is
+    NaN and the errors of K (and of a free interior c) are those for p fixed there. A NaN sp keeps such a fit out of
+    quality A and B in the callers' rule (scripts/sequences.py, monitorlib.omori_quality: both need a finite sp, and
+    0.5 <= p <= 2.5), and makes their p interval null. Up to 0.6.0 a p at its bound was not flagged and kept the
+    curvature error at the bound (sp 0.07 for 200 events on a flat rate with c fixed at 1 day).
+
+    Returns dict with K, c, p, standard errors from the observed-information matrix, n, log-likelihood,
+    c_at_bound, c_bound, p_at_bound, p_bound and fitted (False, every estimate NaN, for fewer than OMORI_NMIN
+    events). c_bound, p_at_bound and p_bound are for library users; the pipeline scripts do not copy them."""
     t = np.asarray(t, float)
     t = t[(t >= T1) & (t <= T2)]
     n = t.size
@@ -384,20 +403,23 @@ def omori_fit(t, T1: float, T2: float, c0: float = 0.05, p0: float = 1.1, fix_c:
     p = float(best.x[0])
     c = fix_c if fix_c is not None else float(np.exp(best.x[1]))
     bound = _c_bound(best.x[-1], lo, hi, fix_c is not None)
+    pbound = _p_bound(p)
     K = n / _ou_integral(c, p, T1, T2)
-    se = _omori_se(t, T1, T2, K, c, p, fix_c is not None or bound is not None)
+    se = _omori_se(t, T1, T2, K, c, p, fix_c is not None or bound is not None, pbound is not None)
     return {"K": K, "c": c, "p": p, "sK": se[0], "sc": se[1], "sp": se[2], "n": n, "T1": T1, "T2": T2,
-            "logL": -best.fun, "c_at_bound": bound is not None, "c_bound": bound, "fitted": True}
+            "logL": -best.fun, "c_at_bound": bound is not None, "c_bound": bound,
+            "p_at_bound": pbound is not None, "p_bound": pbound, "fitted": True}
 
 
 def _omori_loglik(t, T1, T2, K, c, p):
     return np.sum(np.log(K) - p * np.log(t + c)) - K * _ou_integral(c, p, T1, T2)
 
 
-def _omori_se(t, T1, T2, K, c, p, fixed_c: bool):
-    """Standard errors from a numerical Hessian of the full log-likelihood in (K, c, p)."""
+def _omori_se(t, T1, T2, K, c, p, fixed_c: bool, fixed_p: bool = False):
+    """Standard errors from a numerical Hessian of the full log-likelihood in (K, c, p); a fixed c or p (given, or
+    at its search bound) is left out of the Hessian and gets a NaN error."""
     x = np.array([K, c, p], float)
-    free = [0, 2] if fixed_c else [0, 1, 2]
+    free = [0] + ([] if fixed_c else [1]) + ([] if fixed_p else [2])
     h = np.array([K * 1e-4, max(c * 1e-3, 1e-7), 1e-4])
     H = np.zeros((len(free), len(free)))
 
@@ -473,7 +495,9 @@ def omori_fit_mct(t, m, T1: float, T2: float, mag_main: float, mcat: float, b: f
     Only events with M >= Mc(t) are used; the expected rate of such events is
     K (t+c)^-p 10^(-b (Mc(t) - Mcat)), K being the rate of M >= Mcat events. c is searched in [c_min, max(T2, 1)]
     days (see omori_fit); `c_at_bound` marks a fit whose c ended at either bound (`c_bound`: "lower" or "upper"),
-    sc is then NaN and the errors of K and p are those for c fixed there. The integral of the rate runs over
+    sc is then NaN and the errors of K and p are those for c fixed there. Likewise `p_at_bound` (`p_bound`) marks
+    a p at either end of P_BOUNDS: sp is then NaN and the errors of K and c are those for p fixed there (see
+    omori_fit for why, and for the effect on the callers' quality code). The integral of the rate runs over
     [T1, T2] (trapezoid on a log grid that starts at T1; up to 0.6.0 it started at 1e-6 day when T1 = 0).
 
     Standard errors: (p, log c) from the observed information of the profile likelihood; K = n / A(p, c) with n
@@ -516,17 +540,27 @@ def omori_fit_mct(t, m, T1: float, T2: float, mag_main: float, mcat: float, b: f
     p = float(best.x[0])
     c = fix_c if fix_c is not None else float(np.exp(best.x[1]))
     bound = _c_bound(best.x[-1], lo, hi, fix_c is not None)
+    pbound = _p_bound(p)
     K = n / integral(c, p)
 
-    # observed information of the profile likelihood in (p[, log c]); c at a bound -> p alone, c fixed there
-    k = 1 if (fix_c is not None or bound is not None) else 2
-    x = np.array([p, np.log(c)])[:k]
+    # observed information of the profile likelihood in the free ones of (p, log c): a p or c that is fixed (given,
+    # or at its search bound) stays at its value and gets a NaN error
+    free = [i for i, ok in ((0, pbound is None), (1, fix_c is None and bound is None)) if ok]
+    k = len(free)
+    full = np.array([p, np.log(c)])
+    x = full[free]
+
+    def theta(v):
+        th = full.copy()
+        th[free] = v
+        return th
 
     def f(v):
-        return -nll(np.r_[v, np.log(c)] if (k == 1 and fix_c is None) else v)
+        return -nll(theta(v))
 
     def log_a(v):
-        return np.log(integral(c if k == 1 else np.exp(v[1]), v[0]))
+        th = theta(v)
+        return np.log(integral(np.exp(th[1]) if 1 in free else c, th[0]))
 
     h = 1e-3
     Hm = np.zeros((k, k))
@@ -537,15 +571,17 @@ def omori_fit_mct(t, m, T1: float, T2: float, mag_main: float, mcat: float, b: f
         for j in range(k):
             ej = np.zeros(k); ej[j] = h
             Hm[i, j] = (f(x + ei + ej) - f(x + ei - ej) - f(x - ei + ej) + f(x - ei - ej)) / (4 * h * h)
-    cov = _inv_cov(-Hm)
-    if cov is None:
-        sp = sc = sK = np.nan
-    else:
-        sp = float(np.sqrt(cov[0, 0]))
-        sc = float(c * np.sqrt(cov[1, 1])) if k > 1 else np.nan
+    cov = _inv_cov(-Hm) if k else np.zeros((0, 0))
+    sp = sc = sK = np.nan
+    if cov is not None:
+        if 0 in free:
+            sp = float(np.sqrt(cov[free.index(0), free.index(0)]))
+        if 1 in free:
+            sc = float(c * np.sqrt(cov[free.index(1), free.index(1)]))
         sK = float(K * np.sqrt(1.0 / n + g @ cov @ g))
     return {"K": K, "c": c, "p": p, "sK": sK, "sc": sc, "sp": sp, "n": n, "T1": T1, "T2": T2,
-            "logL": -best.fun, "c_at_bound": bound is not None, "c_bound": bound, "fitted": True}
+            "logL": -best.fun, "c_at_bound": bound is not None, "c_bound": bound,
+            "p_at_bound": pbound is not None, "p_bound": pbound, "fitted": True}
 
 
 # ----------------------------------------------------------------------------------------------- atlas additions
