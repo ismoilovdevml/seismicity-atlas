@@ -82,7 +82,7 @@ def cell_at(lat, lon):
 
 
 def expected_rating(p):
-    """The documented table (docs/learn.md, "How well earthquakes are recorded"), implemented independently."""
+    """The documented table (docs/learn.md, "The recording rating"), implemented independently."""
     q, flag = p["sh_q"], p["c_flag"]
     if q not in ("A", "B", "C"):
         return "few"
@@ -311,6 +311,50 @@ def test_card_rating_and_scientist_view_of_place(site, where):
     assert pg.is_hidden("#sx-card")
 
 
+REGIONS = json.loads((DATA / "regional" / "index.json").read_text())["regions"]
+
+
+def region_at(lat, lon):
+    return next((r for r in REGIONS if r["bbox"][0] <= lon <= r["bbox"][2] and r["bbox"][1] <= lat <= r["bbox"][3]), None)
+
+
+def test_too_little_data_says_it_is_not_about_the_local_network(site):
+    """Zürich: a densely instrumented but quiet place. Its cell has almost no direct-Mw ISC-GEM events, so it is
+    "Too little data"; the card must say that this is about the global catalogue, not the Swiss network, and point to
+    the regional layer whose box covers the place (Italy, INGV)."""
+    p = place("Zürich", "Switzerland")
+    cell = cell_at(round(p["lat"], 3), round(p["lon"], 3))
+    assert expected_rating(cell) == "few"
+    reg = region_at(round(p["lat"], 3), round(p["lon"], 3))
+    assert reg and reg["id"] == "italy"
+    pg = site.open(place_hash(p), mode=None)
+    wait_card(pg)
+    assert pg.get_attribute(".sx-rating", "data-rating") == "few"
+    assert pg.inner_text("#sx-h-rate").strip() == "Global data on large earthquakes here"
+    n_min = int(MANIFEST["method"]["quality"]["insufficient"].split()[1])
+    radius = round(MANIFEST["method"]["sample_radius_km"])
+    text = pg.inner_text(".sx-rate-text")
+    assert f"fewer than {n_min} large earthquakes within {radius} km" in text, text
+    assert "not a verdict on the local seismic network" in text and "excellent national networks" in text, text
+    assert "{" not in text
+    line = pg.locator(f".sx-regional[data-region={reg['id']}]")
+    assert line.is_visible()
+    assert f"“{reg['name']}”" in line.inner_text() and f"magnitude {reg['mc_typical']:.1f}" in line.inner_text()
+    pg.click(".sx-regional-btn")
+    pg.wait_for_function("document.documentElement.dataset.mode === 'pro'")
+    pg.wait_for_function("location.hash.includes('r=italy')")
+    pg.wait_for_function("document.getElementById('reg-select').value === 'italy'", timeout=20000)
+    assert pg.is_hidden("#sx-card")
+
+
+def test_no_regional_pointer_outside_the_regional_boxes(site):
+    assert region_at(round(TOKYO["lat"], 3), round(TOKYO["lon"], 3)) is None
+    pg = site.open(place_hash(TOKYO), mode=None)
+    wait_card(pg)
+    assert pg.locator(".sx-regional").count() == 0
+    assert "{" not in pg.inner_text(".sx-rate-text")
+
+
 def test_learn_page_of_the_rating(site):
     pg = site.open("#v=learn&t=recording-rating", mode=None, ready=False)
     pg.wait_for_selector(".lr-page[data-concept=recording-rating] .lr-diagram[data-ready='1']", timeout=20000)
@@ -329,6 +373,11 @@ def test_learn_page_of_the_rating(site):
     table = pg.evaluate("[...document.querySelectorAll('.lr-table tbody tr')].map((tr) => [...tr.cells].map((c) => c.textContent))")
     want = [["Very good", "vgood"], ["Good", "good"], ["Limited", "limited"], ["Too little data", "few"]]
     assert table == [[w, fmt_int(counts.get(k, 0))] for w, k in want], table
+    # the page says what the rating measures and what it does not
+    body = pg.inner_text(".lr-page")
+    assert "Global data on large earthquakes" in body
+    assert "It does not rate the local seismic network" in body and "Switzerland or Germany" in body
+    assert "{" not in body
 
 
 # ---------------------------------------------------------------- tour, controls, phone, languages
@@ -405,8 +454,9 @@ def test_simple_view_in_four_languages(site, lang, simple, pro, title):
     assert pg.inner_text("#mode-seg [data-mode=simple]") == simple
     assert pg.inner_text("#mode-seg [data-mode=pro]") == pro
     assert pg.inner_text(".sx-title").startswith(title)
-    for key in ("sx-honest", "sx-rate-label", "sx-pro-btn"):
+    for key in ("sx-honest", "sx-rate-label", "sx-rate-text", "sx-pro-btn"):
         assert pg.inner_text(f".{key}").strip()
+        assert "{" not in pg.inner_text(f".{key}")
     if lang != "en":
         assert "not a forecast" not in pg.inner_text(".sx-honest")
 

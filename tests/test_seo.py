@@ -126,3 +126,33 @@ def test_placeholders_filled_with_manifest_values():
     h3 = (SITE / "learn/h3-cells-and-sample-radius/index.html").read_text()
     assert f"Grid: H3 resolution {res} for the global layer" in h3
     assert f"within {round(m['sample_radius_km'])} km" in h3
+
+
+def test_rating_page_says_it_is_not_about_local_networks():
+    """The Simple-view rating counts large ISC-GEM earthquakes near a place (>= 50 above the threshold within 300 km,
+    1976-2021); it says nothing about the local network. Until 2026-11-25 its title read "How well earthquakes are
+    recorded", although quiet, densely instrumented places such as Zürich (1 event in its circle) get "Too little
+    data". Every language says so, with the minimum count, the radius and the period floors filled in."""
+    import json
+
+    m = json.loads((SITE / "data" / "manifest.json").read_text())["method"]
+    n_min = re.findall(r"\d+", m["quality"]["insufficient"])[-1]
+    radius = str(round(m["sample_radius_km"]))
+    floors = [f"{m['floors']['sh'][k]['floor']:.1f}" for k in sorted(m["floors"]["sh"])]
+    want = {
+        "": ("Global data on large earthquakes", "It does not rate the local seismic network", "Switzerland or Germany"),
+        "uz/": ("Kuchli zilzilalar boʻyicha global maʼlumot", "Mahalliy seysmik tarmoq haqida u hech narsa demaydi",
+                "Shveytsariya yoki Germaniya"),
+        "ru/": ("Глобальные данные о сильных землетрясениях", "О местной сейсмической сети она ничего не говорит",
+                "Швейцария или Германия"),
+        "es/": ("Datos globales de terremotos fuertes", "No valora la red sísmica local", "Suiza o Alemania"),
+    }
+    old = ("How well", "qanchalik yaxshi qayd", "Насколько хорошо", "Qué tan bien")
+    for lang, phrases in want.items():
+        html = (SITE / f"{lang}learn/recording-rating/index.html").read_text()
+        assert f"<h1>{phrases[0]}</h1>" in html, lang
+        for ph in phrases[1:]:
+            assert ph in html, (lang, ph)
+        assert not any(o in html for o in old), lang
+        for v in (n_min, radius, *floors):
+            assert v in html, (lang, v)
