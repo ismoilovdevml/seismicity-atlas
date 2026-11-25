@@ -16,6 +16,16 @@ with the same schema, a minor version a method, schema or website change; see [d
   Groningen shut-in phase note says the NLOG series ends in 2024-12 (was "figures start in 2003"; in the data with
   the next Groningen rebuild).
 - **Monthly workflow** also rebuilds the deficit layer (installs `gdal-bin`) and pins Node 22.
+- **Recording rating** wording (four languages): it describes how many large earthquakes the global catalogue holds
+  near a place, not the quality of the local network; "Too little data" says so, and places inside a regional
+  catalogue get a pointer to that layer. Rating rule and data unchanged.
+- **Static Learn pages** fill their example values from the data (44 raw `{placeholders}` before; the H3 resolution
+  read "32" instead of "2"). Privacy note names Cloudflare Pages and Cloudflare Web Analytics. Social card shows the
+  0.6.0 count (136).
+- **Library** (`seisatlas`): Omori fits with fewer than 2 events are marked unfit; `c_at_bound` and the new
+  library-only `p_at_bound` flag a parameter at either search bound (its error is then not given); the `T1 = 0`
+  integral starts at 0; `mc_mbs` needs a finite b over the whole window. No published quality code changes.
+- **Analyzer** (browser): bootstrap replicates without a finite b are dropped, as in the Python package.
 
 ## 0.6.0 (2026-11-20)
 
